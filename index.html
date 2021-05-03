@@ -1,7 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+<head>
+  <title>Hello World program in GLSL</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="index.css" rel="stylesheet" type="text/css"/>
+  <script src="libs/gl-matrix.js" type="text/javascript"> </script>
+  <script src="libs/jquery-3.6.0.js" type="text/javascript"> </script>
+  <script src="gl_matrix_extensions.js" type="text/javascript"> </script>
+  <script src="error.js" type="text/javascript"> </script>
+  <script src="shader_uniforms.js" type="text/javascript"> </script>
+  <script src="input_manager.js" type="text/javascript"> </script>
+  <script src="shader/ray_test.glsl" type="text/javascript"> </script>
+  <script src="data_types.js" type="text/javascript"> </script>
+  <script src="data_container.js" type="text/javascript"> </script>
+  <script src="data_unit.js" type="text/javascript"> </script>
+  <script src="webgl.js" type="text/javascript"> </script>
+  <script src="camera.js" type="text/javascript"> </script>
+  <script src="data.js" type="text/javascript"> </script>
+  <script src="index.js" type="text/javascript"> </script>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>Some example text.</p>
+  <div>
+    <p>Hello WebGL 2.0 - tick: <strong>0</strong> - frame: <strong>0</strong></p>
+    <canvas id="main_canvas" tabindex="1">Your browser does not seem to support 
+      HTML5 canvas.</canvas>
+    <button type="button" id="button_request_data">Request Data</button>
+  </div>
+  <script type="x-shader/x-vertex" id="vertex-shader">#version 300 es
+precision mediump int;
+precision mediump float;
+void main() {
+  gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+  gl_PointSize = 800.0;
+}
+  </script>
+  <script type="x-shader/x-fragment" id="fragment-shader">#version 300 es
+precision mediump int;
+precision mediump float;
+precision mediump sampler3D;
+
+uniform float color_r;
+uniform sampler3D texture_0;
+uniform isampler3D texture_1;
+out vec4 outputColor;
+
+vec4 getTestColor(int x, int y, int z);
+
+void main() {
+	float i = gl_FragCoord[0];//x
+	float j = gl_FragCoord[1];//y
+	//gl_FragColor = vec4(i/float(800), j/float(600), 0, 1);		
+	outputColor = vec4(color_r, 0, 0, 1);	   
+
+  if (int(i) < 100)
+  {
+    if(int(j) < 100)
+      outputColor = getTestColor(0,0,0); 
+    else if (int(j) < 200)
+      outputColor = getTestColor(4,0,0); 
+    else if (int(j) < 300)
+      outputColor = getTestColor(8,0,0);
+    else if (int(j) < 400)
+      outputColor = getTestColor(12,0,0);
+    else if (int(j) < 500)
+      outputColor = getTestColor(0,1,0);
+    else
+      outputColor = getTestColor(0,0,1);
+  }
+}
+
+vec4 getTestColor(int x, int y, int z)
+{
+  float value_r = texelFetch(texture_0, ivec3(x+0,y,z), 0).r;
+  float value_g = texelFetch(texture_0, ivec3(x+1,y,z), 0).r;
+  float value_b = texelFetch(texture_0, ivec3(x+2,y,z), 0).r;
+  return vec4(value_r, value_g, value_b, 1.0);
+}
+  </script>
 </body>
 </html>
