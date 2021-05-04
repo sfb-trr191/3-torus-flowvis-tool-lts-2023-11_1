@@ -1,6 +1,6 @@
 class InputManager{
 
-    NUMBER_OF_KEYS = 6;
+    NUMBER_OF_KEYS = 8;
 
     KEY_INDEX_W = 0;
     KEY_INDEX_A = 1;
@@ -8,6 +8,8 @@ class InputManager{
     KEY_INDEX_D = 3;
     KEY_INDEX_R = 4;
     KEY_INDEX_F = 5;
+    KEY_INDEX_Q = 6;
+    KEY_INDEX_E = 7;
 
     KEY_STATE_INACTIVE = 0;
     KEY_STATE_ACTIVE = 1;
@@ -18,7 +20,6 @@ class InputManager{
     }
 
     initialize(){
-        console.log(this.onKeyDown);
         console.log("NUMBER_OF_KEYS "+this.NUMBER_OF_KEYS);
 
         this.addOnKeyDown();
@@ -40,6 +41,10 @@ class InputManager{
                 this.key_states[this.KEY_INDEX_R] = this.KEY_STATE_ACTIVE;
             if (event.key == 'f')            
                 this.key_states[this.KEY_INDEX_F] = this.KEY_STATE_ACTIVE;
+            if (event.key == 'q')            
+                this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_ACTIVE;
+            if (event.key == 'e')      
+                this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_ACTIVE;
         });
     }
 
@@ -57,6 +62,10 @@ class InputManager{
                 this.key_states[this.KEY_INDEX_R] = this.KEY_STATE_INACTIVE;
             if (event.key == 'f')            
                 this.key_states[this.KEY_INDEX_F] = this.KEY_STATE_INACTIVE;
+            if (event.key == 'q')            
+                this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_INACTIVE;
+            if (event.key == 'e')            
+                this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_INACTIVE;
         });
     }
     
@@ -70,7 +79,7 @@ class InputManager{
     isKeyDown(key_index){
         return this.key_states[key_index] == this.KEY_STATE_ACTIVE;
     }
-    
+
     /**
      * Called at the beginning of every update tick.
      * 

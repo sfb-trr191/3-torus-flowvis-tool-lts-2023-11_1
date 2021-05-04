@@ -46,7 +46,14 @@ class Camera{
         this.left_handed = false;        
         this.velocity_slow = 0.1;
         this.velocity = 1.0;
+        this.rotationSpeed = 1;
+        this.rollspeed = 1.0;
         this.changed = true;
+
+        //panning
+        this.panning = false;
+        this.xMouse_old = 0;
+        this.yMouse_old = 0;
 
         //description of the camera for the user
         this.position = glMatrix.vec3.create();
@@ -180,14 +187,49 @@ class Camera{
         */
     }
 
+    someTestFunction4546(){
+        console.log("someTestFunction4546")
+    }
+
+    someTestFunction8454(x, y){
+        console.log("someTestFunction8454")
+        console.log(x, y)
+    }
+
+    StartPanning(x, y){
+        console.log("start panning")
+        this.xMouse_old = x;
+        this.yMouse_old = y;
+        this.panning = true;
+    }
+
+    StopPanning(){
+        console.log("stop panning")
+        this.panning = false;
+    }
+
     UpdatePanning(x, y, left_handed){
-        /*
+        if (!this.panning)
+            return;
+        //console.log("UpdatePanning")
+
+        var forward = this.forward;
+        var up = this.up;
+        var left = glMatrix.vec3.create();
+        var right = glMatrix.vec3.create();
+        var quaternion = glMatrix.quat.create();
+        var quaternion_up = glMatrix.quat.create();
+        var quaternion_right = glMatrix.quat.create();
+
+        var FORWARD = glMatrix.vec3.fromValues(0,0,1);
+        var UP = glMatrix.vec3.fromValues(0,1,0);
+
+        
         var handedness = left_handed ? 1 : -1;
         var invert = true;
-        if (!panning)
-            return;
-        var deltaX = x - xMouse_old;
-        var deltaY = y - yMouse_old;
+
+        var deltaX = x - this.xMouse_old;
+        var deltaY = y - this.yMouse_old;
         if (invert)
         {
             deltaX *= -1;
@@ -196,20 +238,40 @@ class Camera{
 
         deltaY *= handedness;
 
-        //QVector3D right = QVector3D::crossProduct(forward, up);
-        QVector3D left = QVector3D::crossProduct(forward, up);
-        QVector3D right = -left;
+        glMatrix.vec3.cross(left, forward, up);//left = QVector3D::crossProduct(forward, up);
+        glMatrix.vec3.negate(right, left);//right = -left;
+
+        //glMatrix.quat.setAxes(quaternion, forward, right, up);//QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
+        glMatrix.quat.setAxisAngle(quaternion_up, up, deltaX * -this.rotationSpeed);//quaternion = QQuaternion::fromAxisAndAngle(up, deltaX * -rotationSpeed) * quaternion;
+        glMatrix.quat.setAxisAngle(quaternion_right, right, deltaY * -this.rotationSpeed);//quaternion = QQuaternion::fromAxisAndAngle(right, deltaY * -rotationSpeed) * quaternion;
         
-        QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
-        quaternion = QQuaternion::fromAxisAndAngle(up, deltaX * -rotationSpeed) * quaternion;
-        quaternion = QQuaternion::fromAxisAndAngle(right, deltaY * -rotationSpeed) * quaternion;
-        forward = quaternion * QVector3D(0,0,1);
-        up = quaternion * QVector3D(0,1,0);
+        glMatrix.quat.multiply(quaternion, quaternion_right, quaternion_up);
 
+        glMatrix.vec3.transformQuat(this.forward, this.forward, quaternion);//forward = quaternion * QVector3D(0,0,1);
+        glMatrix.vec3.transformQuat(this.up, this.up, quaternion);//up = quaternion * QVector3D(0,1,0);
 
-        xMouse_old = x;
-        yMouse_old = y;
-        */
+        this.xMouse_old = x;
+        this.yMouse_old = y;
+
+        this.changed = true;        
+    }
+
+    RollLeft(deltaTime, left_handed){
+        var handedness = left_handed ? 1 : -1;
+        var quaternion = glMatrix.quat.create();
+        //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
+        glMatrix.quat.setAxisAngle(quaternion, this.forward, deltaTime * this.rollspeed * handedness);//quaternion = QQuaternion::fromAxisAndAngle(forward, deltaTime * -rollSpeed * handedness) * quaternion;
+        glMatrix.vec3.transformQuat(this.up, this.up, quaternion);//up = quaternion * QVector3D(0,1,0);
+        this.changed = true;
+    }
+
+    RollRight(deltaTime, left_handed){
+        var handedness = left_handed ? 1 : -1;
+        var quaternion = glMatrix.quat.create();
+        //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
+        glMatrix.quat.setAxisAngle(quaternion, this.forward, deltaTime * -this.rollspeed * handedness);//quaternion = QQuaternion::fromAxisAndAngle(forward, deltaTime * -rollSpeed * handedness) * quaternion;
+        glMatrix.vec3.transformQuat(this.up, this.up, quaternion);//up = quaternion * QVector3D(0,1,0);
+        this.changed = true;
     }
 
     moveLeft(deltaTime, slow){

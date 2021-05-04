@@ -33,6 +33,7 @@ var data_unit_lod_0;
 var main_camera;
 var main_canvas;
 var input_manager;
+var mouse_manager;
 
 var buffer_lights;
 var GLOBAL_DATA = "old data";
@@ -51,8 +52,13 @@ function onStart (evt) {
   console.log("DATA_POINTS.length "+DATA_POINTS.length);
 
   main_canvas = document.getElementById("main_canvas");
+
+  main_camera = new Camera("main_camera");
+
   input_manager = new InputManager(main_canvas);
   input_manager.initialize();
+  mouse_manager = new MouseManager(main_canvas, main_camera);
+  mouse_manager.initialize();
 
   buildErrorDictionary();
 
@@ -69,7 +75,6 @@ function onStart (evt) {
   */
 
 
-  main_camera = new Camera("main_camera");
   main_camera.width = 800;
   main_camera.height = 600;
 	//main_camera.q_x = glMatrix.vec3.fromValues(-0.00100059, 0.00183964, -1.96343e-05);
@@ -248,6 +253,16 @@ function on_update(){
     var deltaTime = 0.01;
     var slow = false;
     main_camera.moveDown(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_Q)){
+    var deltaTime = 0.01;
+    var left_handed = false;
+    main_camera.RollLeft(deltaTime, left_handed);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_E)){
+    var deltaTime = 0.01;
+    var left_handed = false;
+    main_camera.RollRight(deltaTime, left_handed);
   }
   main_camera.repositionCamera();
   main_camera.UpdateShaderValues();
