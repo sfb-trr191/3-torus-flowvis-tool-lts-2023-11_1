@@ -11,6 +11,7 @@ class DataUnit{
      * @param {*} dummy a dummy element used to get the data layout
      */
     constructor(name) {
+        console.log("Generate data unit: "+name);
         this.name = name;
         this.list_data_containers = [];
         this.list_data_containers_float_start = [];
@@ -24,7 +25,6 @@ class DataUnit{
         this.texture_size_y = 512;
         this.texture_size_float_z = 1;//this value is variable depending on the total data size
         this.texture_size_int_z = 1;//this value is variable depending on the total data size
-        console.log("Generate data unit: "+name);
     }
 
     registerDataCollection(collection){

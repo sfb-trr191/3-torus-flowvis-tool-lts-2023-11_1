@@ -218,100 +218,100 @@ void main() {
 	//write color to output
 	outputColor = vec4(color, 1);	
 
-	//return;   
+	return;   
 
 	float i = gl_FragCoord[0];//x
 	float j = gl_FragCoord[1];//y
-  if (int(i) < 100)
-  {
-    if(int(j) < 100)
-      	outputColor = getTestColor(0,0,0);	
-    else if (int(j) < 200)
-	{
-      	outputColor = vec4(GetPosition(0, false), 1);	
+  	if (int(i) < 100)
+  	{
+		if(int(j) < 100)
+			outputColor = getTestColor(0,0,0);	
+		else if (int(j) < 200)
+		{
+			outputColor = vec4(GetPosition(0, false), 1);	
+		}
+		else if (int(j) < 300)
+		{
+			bool flag = validateInteger(ivec3(8,0,0), 1);  
+			outputColor = getValidationColor(flag);	 
+		} 
+		else if (int(j) < 400)
+		{
+			bool flag = validateInteger(ivec3(9,0,0), 2);  
+			outputColor = getValidationColor(flag);	 
+
+			/*
+			GL_AABB aabb = GetAABB(0, false);
+			bool flag1 = validateVec3(aabb.min.xyz, vec3(0,0,0));
+			bool flag2 = validateVec3(aabb.max.xyz, vec3(1,1,1));
+
+			aabb = GetAABB(1, false);
+			bool flag3 = validateVec3(aabb.min.xyz, vec3(0.4,0.4,0.4));
+			bool flag4 = validateVec3(aabb.max.xyz, vec3(0.6,0.6,0.7));
+
+			aabb = GetAABB(2, false);
+			bool flag5 = validateVec3(aabb.min.xyz, vec3(0.4,0.4,0.5));
+			bool flag6 = validateVec3(aabb.max.xyz, vec3(0.8,0.8,0.7));
+
+			bool flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6;
+			outputColor = getValidationColor(flag);
+			*/
+		}
+		else if (int(j) < 500)
+		{
+			GL_TreeNode node = GetNode(0, false);
+			bool flag1 = validateInteger(node.hitLink, 1);
+			bool flag2 = validateInteger(node.missLink, 0);
+			bool flag3 = validateInteger(node.objectIndex, -1);
+			bool flag4 = validateInteger(node.type, 0);
+
+			node = GetNode(1, false);
+			bool flag5 = validateInteger(node.hitLink, 2);
+			bool flag6 = validateInteger(node.missLink, 2);
+			bool flag7 = validateInteger(node.objectIndex, 0);
+			bool flag8 = validateInteger(node.type, 1);
+
+			node = GetNode(2, false);
+			bool flag9 = validateInteger(node.hitLink, 0);
+			bool flag10 = validateInteger(node.missLink, 0);
+			bool flag11 = validateInteger(node.objectIndex, 1);
+			bool flag12 = validateInteger(node.type, 1);
+
+			bool flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6 && flag7 && flag8 && flag9 && flag10 && flag11 && flag12;
+			outputColor = getValidationColor(flag);	
+		}
+		else
+		{
+			/*
+			GL_CameraData cam = GetActiveCamera();
+			vec3 E = cam.E.xyz;
+			vec3 forward = cam.forward.xyz;
+			vec3 p_1m = cam.p_1m.xyz;
+			vec3 q_x = cam.q_x.xyz;
+			vec3 q_y = cam.q_y.xyz;
+
+			bool flag1 = validateVec3(E, vec3(0.5, 0.01, 0.5));
+			bool flag2 = validateVec3(forward, vec3(0.0, 1.0, 0.0));
+
+			bool flag = flag1 && flag2;// && flag4;
+			outputColor = getValidationColor(flag);	
+			*/
+
+			GL_DirLight light = GetDirLight(0);
+			
+			vec3 ambient = light.ambient.xyz;
+			vec3 diffuse = light.diffuse.xyz;
+			vec3 specular = light.specular.xyz;
+			vec3 direction = light.direction.xyz;
+			
+			bool flag1 = validateVec3(ambient, vec3(0.04, 0.04, 0.04));
+			bool flag2 = validateVec3(diffuse, vec3(0.6, 0.6, 0.6));
+			bool flag3 = validateVec3(specular, vec3(0.3, 0.3, 0.3));
+			bool flag4 = validateVec3(direction, vec3(1.0, 1.0, 1.0));
+			bool flag = flag1 && flag2 && flag3 && flag4;
+			outputColor = getValidationColor(flag);			  
+		}	
 	}
-    else if (int(j) < 300)
-	{
-      	bool flag = validateInteger(ivec3(8,0,0), 1);  
-      	outputColor = getValidationColor(flag);	 
-	} 
-    else if (int(j) < 400)
-	{
-		bool flag = validateInteger(ivec3(9,0,0), 2);  
-      	outputColor = getValidationColor(flag);	 
-
-		/*
-		GL_AABB aabb = GetAABB(0, false);
-		bool flag1 = validateVec3(aabb.min.xyz, vec3(0,0,0));
-		bool flag2 = validateVec3(aabb.max.xyz, vec3(1,1,1));
-
-		aabb = GetAABB(1, false);
-		bool flag3 = validateVec3(aabb.min.xyz, vec3(0.4,0.4,0.4));
-		bool flag4 = validateVec3(aabb.max.xyz, vec3(0.6,0.6,0.7));
-
-		aabb = GetAABB(2, false);
-		bool flag5 = validateVec3(aabb.min.xyz, vec3(0.4,0.4,0.5));
-		bool flag6 = validateVec3(aabb.max.xyz, vec3(0.8,0.8,0.7));
-
-		bool flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6;
-      	outputColor = getValidationColor(flag);
-		  */
-	}
-    else if (int(j) < 500)
-	{
-		GL_TreeNode node = GetNode(0, false);
-		bool flag1 = validateInteger(node.hitLink, 1);
-		bool flag2 = validateInteger(node.missLink, 0);
-		bool flag3 = validateInteger(node.objectIndex, -1);
-		bool flag4 = validateInteger(node.type, 0);
-
-		node = GetNode(1, false);
-		bool flag5 = validateInteger(node.hitLink, 2);
-		bool flag6 = validateInteger(node.missLink, 2);
-		bool flag7 = validateInteger(node.objectIndex, 0);
-		bool flag8 = validateInteger(node.type, 1);
-
-		node = GetNode(2, false);
-		bool flag9 = validateInteger(node.hitLink, 0);
-		bool flag10 = validateInteger(node.missLink, 0);
-		bool flag11 = validateInteger(node.objectIndex, 1);
-		bool flag12 = validateInteger(node.type, 1);
-
-		bool flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6 && flag7 && flag8 && flag9 && flag10 && flag11 && flag12;
-      	outputColor = getValidationColor(flag);	
-	}
-    else
-    {
-		/*
-		GL_CameraData cam = GetActiveCamera();
-		vec3 E = cam.E.xyz;
-		vec3 forward = cam.forward.xyz;
-		vec3 p_1m = cam.p_1m.xyz;
-		vec3 q_x = cam.q_x.xyz;
-		vec3 q_y = cam.q_y.xyz;
-
-		bool flag1 = validateVec3(E, vec3(0.5, 0.01, 0.5));
-		bool flag2 = validateVec3(forward, vec3(0.0, 1.0, 0.0));
-
-		bool flag = flag1 && flag2;// && flag4;
-      	outputColor = getValidationColor(flag);	
-		*/
-
-		GL_DirLight light = GetDirLight(0);
-		
-		vec3 ambient = light.ambient.xyz;
-		vec3 diffuse = light.diffuse.xyz;
-		vec3 specular = light.specular.xyz;
-		vec3 direction = light.direction.xyz;
-		
-		bool flag1 = validateVec3(ambient, vec3(0.04, 0.04, 0.04));
-		bool flag2 = validateVec3(diffuse, vec3(0.6, 0.6, 0.6));
-		bool flag3 = validateVec3(specular, vec3(0.3, 0.3, 0.3));
-		bool flag4 = validateVec3(direction, vec3(1.0, 1.0, 1.0));
-		bool flag = flag1 && flag2 && flag3 && flag4;
-      	outputColor = getValidationColor(flag);			  
-	}	
-  }
 }
 
 vec4 getTestColor(int x, int y, int z)
@@ -1114,6 +1114,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		
 		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
 		resultColor = mix(fogColor, lightColor, fogFactor);
+		return normal;
 	}
 	else
 	{

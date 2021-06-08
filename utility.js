@@ -17,3 +17,12 @@ function getMousePositionPercentage(canvas, event) {
         y : y
     };
 }
+
+function GetIndexInList(value, vector){
+    for (var i = 0; i < vector.length; i++)
+    {
+        if (vector[i] == value)
+            return i;
+    }
+    return -1;
+}

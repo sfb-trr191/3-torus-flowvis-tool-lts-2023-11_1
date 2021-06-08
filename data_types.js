@@ -57,7 +57,7 @@ class LineSegment {
     //integer based
     indexA = 0;
     indexB = 0;
-    lineIndex = 0;
+    multiPolyID = 0;
     copy = 0;
     beginning = 0;
     //float based
@@ -66,14 +66,14 @@ class LineSegment {
     
 
     constructor(){        
-        this.matrix[0] = 2;//TODO remove: test inverse
-        glMatrix.mat4.invert(this.matrixInverse, this.matrix);//TODO remove: test inverse
+        //this.matrix[0] = 2;//TODO remove: test inverse
+        //glMatrix.mat4.invert(this.matrixInverse, this.matrix);//TODO remove: test inverse
     }
 
     print(){
         console.log("indexA: "+this.indexA);
         console.log("indexB: "+this.indexB);
-        console.log("lineIndex: "+this.lineIndex);
+        console.log("multiPolyID: "+this.multiPolyID);
         console.log("matrix: "+this.matrix);
         console.log("matrixInverse: "+this.matrixInverse);
     }
@@ -90,7 +90,7 @@ class LineSegment {
         var index = start_index_i;
         arrayi[index++] = this.indexA;
         arrayi[index++] = this.indexB;
-        arrayi[index++] = this.lineIndex;      
+        arrayi[index++] = this.multiPolyID;      
         arrayi[index++] = this.copy;      
         arrayi[index++] = this.beginning;        
 
@@ -131,6 +131,7 @@ class TreeNode {
     }
 
     writeToArrays(arrayf, arrayi, start_index_f, start_index_i){
+        //this.print()
         var index = start_index_i;
         arrayi[index++] = this.hitLink;
         arrayi[index++] = this.missLink;

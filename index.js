@@ -18,10 +18,9 @@ var location_height;
 
 var texture_float;
 var texture_float_settings;
+var texture_float_data;
 var texture_int;
 var texture_int_settings;
-
-var texture_float_data;
 var texture_int_data;
 
 var data_container_lod_0_positions;
@@ -30,16 +29,367 @@ var data_container_lod_0_tree_nodes;
 var data_container_lod_0_dir_lights;
 var data_unit_lod_0;
 
+var lod_0;
+
 var main_camera;
 var main_canvas;
 var input_manager;
 var mouse_manager;
+var streamline_generator;
+var lights;
+var streamline_context_static;//the static streamlines
+var streamline_context_dynamic;//interactive streamline placement
 
 var buffer_lights;
 var GLOBAL_DATA = "old data";
 var data_changed = false;
 
 function onStart (evt) {
+  console.log("onStart");
+  window.removeEventListener(evt.type, onStart, false);
+  addOnClickRequestData();
+  
+  main_canvas = document.getElementById("main_canvas");
+
+  main_camera = new Camera("main_camera");
+
+  input_manager = new InputManager(main_canvas);
+  input_manager.initialize();
+  mouse_manager = new MouseManager(main_canvas, main_camera);
+  mouse_manager.initialize();
+
+  buildErrorDictionary();
+
+  if (!(gl = getRenderingContext()))
+    return;
+
+  lights = new Lights();
+  lights.GenerateDefaultLighting();
+  streamline_context_static = new StreamlineContext("static", lights, gl);
+  streamline_context_static.CalculateExampleStreamlines(gl);
+
+  main_camera.width = 800;
+  main_camera.height = 600;
+  main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
+  main_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
+  main_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
+
+  var tex = generateDataTextureFloat(gl);
+  texture_float = tex.texture;
+  texture_float_data = tex.texture_data;
+  texture_float_settings = tex.texture_settings;
+
+  tex = generateDataTextureInt(gl);
+  texture_int = tex.texture;
+  texture_int_data = tex.texture_data;
+  texture_int_settings = tex.texture_settings;
+
+  program = gl.createProgram();
+
+  tick_counter = 0;
+  frame_counter = 0;
+  var strongs = document.querySelectorAll("strong");
+  strong_tick_counter = strongs[0];
+  strong_frame_counter = strongs[1];
+
+  loadShaderProgram(gl, program, "#vertex-shader", "#fragment-shader");
+  loadUniformLocations(program);
+
+  initializeAttributes();
+
+  gl.useProgram(program);
+
+  timer = setTimeout(on_update, 1);
+}
+
+function on_update(){
+  tick_counter++;
+
+  var x = (frame_counter % 1000) / 1000
+
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_A)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveLeft(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_D)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveRight(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_W)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveForward(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_S)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveBackward(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_R)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveUp(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_F)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveDown(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_Q)){
+    var deltaTime = 0.01;
+    var left_handed = false;
+    main_camera.RollLeft(deltaTime, left_handed);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_E)){
+    var deltaTime = 0.01;
+    var left_handed = false;
+    main_camera.RollRight(deltaTime, left_handed);
+  }
+  main_camera.repositionCamera();
+  main_camera.UpdateShaderValues();
+  main_camera.WriteToUniform(gl, program, "active_camera");
+
+  gl.uniform1f(location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
+  gl.uniform1i(location_width, main_camera.width);
+  gl.uniform1i(location_height, main_camera.height);
+
+  // Tell the shader to use texture unit 0 for u_texture
+  //gl.activeTexture(gl.TEXTURE0);                  // added this and following line to be extra sure which texture is being used...
+  //gl.bindTexture(gl.TEXTURE_3D, texture_float);
+  //gl.uniform1i(location_texture_float, 0);
+  //gl.activeTexture(gl.TEXTURE1);
+  //gl.bindTexture(gl.TEXTURE_3D, texture_int);
+  //gl.uniform1i(location_texture_int, 1);
+  streamline_context_static.bind_lod(0, gl, program_shader_uniforms, location_texture_float, location_texture_int);
+
+  //program_shader_uniforms.updateUniforms();
+    /*
+  if (tick_counter == 10){   
+    data_unit_lod_0.generateFromArrays(DATA_POINTS, DATA_SEGMENTS_FLOAT, DATA_SEGMENTS_INT, DATA_NODES_FLOAT, DATA_NODES_INT);
+    texture_float_settings.width = data_unit_lod_0.texture_size_x;
+    texture_float_settings.height = data_unit_lod_0.texture_size_y;
+    texture_float_settings.depth = data_unit_lod_0.texture_size_float_z;
+    console.log("texture_float_settings.width: "+texture_float_settings.width);
+    console.log("texture_float_settings.height: "+texture_float_settings.height);
+    console.log("texture_float_settings.depth: "+texture_float_settings.depth);
+    //gl.bindTexture(gl.TEXTURE_3D, texture_float);
+    updateDataTexture(gl, texture_float, data_unit_lod_0.arrayf, texture_float_settings);
+
+    texture_int_settings.width = data_unit_lod_0.texture_size_x;
+    texture_int_settings.height = data_unit_lod_0.texture_size_y;
+    texture_int_settings.depth = data_unit_lod_0.texture_size_int_z;
+    //gl.bindTexture(gl.TEXTURE_3D, texture_int);
+    console.log("texture_int_settings.width: "+texture_int_settings.width);
+    console.log("texture_int_settings.height: "+texture_int_settings.height);
+    console.log("texture_int_settings.depth: "+texture_int_settings.depth);
+    updateDataTexture(gl, texture_int, data_unit_lod_0.arrayi, texture_int_settings);
+
+    program_shader_uniforms.setUniform("start_index_int_position_data", data_unit_lod_0.getIntStart("positions"));
+    program_shader_uniforms.setUniform("start_index_int_line_segments", data_unit_lod_0.getIntStart("line_segments"));
+    program_shader_uniforms.setUniform("start_index_int_tree_nodes", data_unit_lod_0.getIntStart("tree_nodes"));
+    program_shader_uniforms.setUniform("start_index_int_dir_lights", data_unit_lod_0.getIntStart("dir_lights"));
+    program_shader_uniforms.setUniform("start_index_float_position_data", data_unit_lod_0.getFloatStart("positions"));
+    program_shader_uniforms.setUniform("start_index_float_line_segments", data_unit_lod_0.getFloatStart("line_segments"));
+    program_shader_uniforms.setUniform("start_index_float_tree_nodes", data_unit_lod_0.getFloatStart("tree_nodes"));
+    program_shader_uniforms.setUniform("start_index_float_dir_lights", data_unit_lod_0.getFloatStart("dir_lights"));
+    program_shader_uniforms.updateUniforms();
+
+    data_changed = true;
+  }
+
+
+  if(tick_counter == 100){
+    streamline_context_static.streamline_generator.num_points_per_streamline = 2000;
+    streamline_context_static.CalculateExampleStreamlines(gl);
+    data_changed = true;
+  }
+  */
+  if(main_camera.changed || data_changed){
+    frame_counter++;
+    main_camera.changed = false;
+    data_changed = false;
+    gl.drawArrays(gl.POINTS, 0, 1);
+  }
+
+  gl.finish();
+  strong_tick_counter.innerHTML = tick_counter;
+  strong_frame_counter.innerHTML = frame_counter;
+  //shedule next call
+  timer = setTimeout(on_update, 60);
+}
+
+var buffer;
+function initializeAttributes() {
+  gl.enableVertexAttribArray(0);
+  buffer = gl.createBuffer();  
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.vertexAttribPointer(0, 1, gl.FLOAT, false, 0, 0);
+}
+
+function cleanup() {
+gl.useProgram(null);
+if (buffer)
+  gl.deleteBuffer(buffer);
+if (program) 
+  gl.deleteProgram(program);
+}
+
+function loadUniformLocations(program){
+  location_color_r = gl.getUniformLocation(program, "color_r");
+  location_texture_float = gl.getUniformLocation(program, "texture_float");
+  location_texture_int = gl.getUniformLocation(program, "texture_int");
+  location_width = gl.getUniformLocation(program, "width");
+  location_height = gl.getUniformLocation(program, "height");
+
+  program_shader_uniforms = new ShaderUniforms(gl, program);
+  program_shader_uniforms.registerUniform("start_index_int_position_data", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_float_position_data", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_int_line_segments", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_float_line_segments", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_int_tree_nodes", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_float_tree_nodes", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
+  program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);
+  program_shader_uniforms.print();
+}
+/*
+uniform int start_index_int_position_data = 0;//DUMMY
+uniform int start_index_float_position_data = 0;//DUMMY
+uniform int start_index_int_line_segments = 0;//DUMMY
+uniform int start_index_float_line_segments = 80544;//DUMMY
+uniform int start_index_int_tree_nodes = 102560;//DUMMY
+uniform int start_index_float_tree_nodes = 490784;//DUMMY
+uniform int start_index_int_dir_lights = 177424;//DUMMY
+uniform int start_index_float_dir_lights = 640512;//DUMMY
+*/
+
+function addOnClickRequestData(){
+  document.getElementById("button_request_data").addEventListener("click", function() {
+    console.log("onClickRequestData: "+GLOBAL_DATA);
+    var shader_formula_u = document.getElementById("input_field_equation_u").value;
+    var shader_formula_v = document.getElementById("input_field_equation_v").value;
+    var shader_formula_w = document.getElementById("input_field_equation_w").value;
+    var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
+    var step_size = document.getElementById("input_step_size").value;
+    streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size);
+    data_changed = true;
+  });
+}
+
+function on_update_old(){
+  tick_counter++;
+
+  var x = (frame_counter % 1000) / 1000
+
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_A)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveLeft(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_D)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveRight(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_W)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveForward(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_S)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveBackward(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_R)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveUp(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_F)){
+    var deltaTime = 0.01;
+    var slow = false;
+    main_camera.moveDown(deltaTime, slow);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_Q)){
+    var deltaTime = 0.01;
+    var left_handed = false;
+    main_camera.RollLeft(deltaTime, left_handed);
+  }
+  if(input_manager.isKeyDown(input_manager.KEY_INDEX_E)){
+    var deltaTime = 0.01;
+    var left_handed = false;
+    main_camera.RollRight(deltaTime, left_handed);
+  }
+  main_camera.repositionCamera();
+  main_camera.UpdateShaderValues();
+  main_camera.WriteToUniform(gl, program, "active_camera");
+
+  gl.uniform1f(location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
+  gl.uniform1i(location_width, main_camera.width);
+  gl.uniform1i(location_height, main_camera.height);
+
+  // Tell the shader to use texture unit 0 for u_texture
+  gl.activeTexture(gl.TEXTURE0);                  // added this and following line to be extra sure which texture is being used...
+  gl.bindTexture(gl.TEXTURE_3D, texture_float);
+  gl.uniform1i(location_texture_float, 0);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_3D, texture_int);
+  gl.uniform1i(location_texture_int, 1);
+
+  program_shader_uniforms.updateUniforms();
+    
+  if (tick_counter == 10){   
+    data_unit_lod_0.generateFromArrays(DATA_POINTS, DATA_SEGMENTS_FLOAT, DATA_SEGMENTS_INT, DATA_NODES_FLOAT, DATA_NODES_INT);
+    texture_float_settings.width = data_unit_lod_0.texture_size_x;
+    texture_float_settings.height = data_unit_lod_0.texture_size_y;
+    texture_float_settings.depth = data_unit_lod_0.texture_size_float_z;
+    console.log("texture_float_settings.width: "+texture_float_settings.width);
+    console.log("texture_float_settings.height: "+texture_float_settings.height);
+    console.log("texture_float_settings.depth: "+texture_float_settings.depth);
+    //gl.bindTexture(gl.TEXTURE_3D, texture_float);
+    updateDataTexture(gl, texture_float, data_unit_lod_0.arrayf, texture_float_settings);
+
+    texture_int_settings.width = data_unit_lod_0.texture_size_x;
+    texture_int_settings.height = data_unit_lod_0.texture_size_y;
+    texture_int_settings.depth = data_unit_lod_0.texture_size_int_z;
+    //gl.bindTexture(gl.TEXTURE_3D, texture_int);
+    console.log("texture_int_settings.width: "+texture_int_settings.width);
+    console.log("texture_int_settings.height: "+texture_int_settings.height);
+    console.log("texture_int_settings.depth: "+texture_int_settings.depth);
+    updateDataTexture(gl, texture_int, data_unit_lod_0.arrayi, texture_int_settings);
+
+    program_shader_uniforms.setUniform("start_index_int_position_data", data_unit_lod_0.getIntStart("positions"));
+    program_shader_uniforms.setUniform("start_index_int_line_segments", data_unit_lod_0.getIntStart("line_segments"));
+    program_shader_uniforms.setUniform("start_index_int_tree_nodes", data_unit_lod_0.getIntStart("tree_nodes"));
+    program_shader_uniforms.setUniform("start_index_int_dir_lights", data_unit_lod_0.getIntStart("dir_lights"));
+    program_shader_uniforms.setUniform("start_index_float_position_data", data_unit_lod_0.getFloatStart("positions"));
+    program_shader_uniforms.setUniform("start_index_float_line_segments", data_unit_lod_0.getFloatStart("line_segments"));
+    program_shader_uniforms.setUniform("start_index_float_tree_nodes", data_unit_lod_0.getFloatStart("tree_nodes"));
+    program_shader_uniforms.setUniform("start_index_float_dir_lights", data_unit_lod_0.getFloatStart("dir_lights"));
+    program_shader_uniforms.updateUniforms();
+
+    data_changed = true;
+  }
+
+  if(main_camera.changed || data_changed){
+    frame_counter++;
+    main_camera.changed = false;
+    data_changed = false;
+    gl.drawArrays(gl.POINTS, 0, 1);
+  }
+
+  gl.finish();
+  strong_tick_counter.innerHTML = tick_counter;
+  strong_frame_counter.innerHTML = frame_counter;
+  //shedule next call
+  timer = setTimeout(on_update, 60);
+}
+
+function onStart_old(){
+
   window.removeEventListener(evt.type, onStart, false);
   addOnClickRequestData();
 
@@ -217,167 +567,6 @@ function onStart (evt) {
   //cleanup();
 
   timer = setTimeout(on_update, 1);
-}
-
-function on_update(){
-  tick_counter++;
-
-  var x = (frame_counter % 1000) / 1000
-
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_A)){
-    var deltaTime = 0.01;
-    var slow = false;
-    main_camera.moveLeft(deltaTime, slow);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_D)){
-    var deltaTime = 0.01;
-    var slow = false;
-    main_camera.moveRight(deltaTime, slow);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_W)){
-    var deltaTime = 0.01;
-    var slow = false;
-    main_camera.moveForward(deltaTime, slow);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_S)){
-    var deltaTime = 0.01;
-    var slow = false;
-    main_camera.moveBackward(deltaTime, slow);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_R)){
-    var deltaTime = 0.01;
-    var slow = false;
-    main_camera.moveUp(deltaTime, slow);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_F)){
-    var deltaTime = 0.01;
-    var slow = false;
-    main_camera.moveDown(deltaTime, slow);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_Q)){
-    var deltaTime = 0.01;
-    var left_handed = false;
-    main_camera.RollLeft(deltaTime, left_handed);
-  }
-  if(input_manager.isKeyDown(input_manager.KEY_INDEX_E)){
-    var deltaTime = 0.01;
-    var left_handed = false;
-    main_camera.RollRight(deltaTime, left_handed);
-  }
-  main_camera.repositionCamera();
-  main_camera.UpdateShaderValues();
-  main_camera.WriteToUniform(gl, program, "active_camera");
-
-  gl.uniform1f(location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
-  gl.uniform1i(location_width, main_camera.width);
-  gl.uniform1i(location_height, main_camera.height);
-
-  // Tell the shader to use texture unit 0 for u_texture
-  gl.activeTexture(gl.TEXTURE0);                  // added this and following line to be extra sure which texture is being used...
-  gl.bindTexture(gl.TEXTURE_3D, texture_float);
-  gl.uniform1i(location_texture_float, 0);
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_3D, texture_int);
-  gl.uniform1i(location_texture_int, 1);
-
-  program_shader_uniforms.updateUniforms();
-    
-  if (tick_counter == 10){   
-    data_unit_lod_0.generateFromArrays(DATA_POINTS, DATA_SEGMENTS_FLOAT, DATA_SEGMENTS_INT, DATA_NODES_FLOAT, DATA_NODES_INT);
-    texture_float_settings.width = data_unit_lod_0.texture_size_x;
-    texture_float_settings.height = data_unit_lod_0.texture_size_y;
-    texture_float_settings.depth = data_unit_lod_0.texture_size_float_z;
-    console.log("texture_float_settings.width: "+texture_float_settings.width);
-    console.log("texture_float_settings.height: "+texture_float_settings.height);
-    console.log("texture_float_settings.depth: "+texture_float_settings.depth);
-    //gl.bindTexture(gl.TEXTURE_3D, texture_float);
-    updateDataTexture(gl, texture_float, data_unit_lod_0.arrayf, texture_float_settings);
-
-    texture_int_settings.width = data_unit_lod_0.texture_size_x;
-    texture_int_settings.height = data_unit_lod_0.texture_size_y;
-    texture_int_settings.depth = data_unit_lod_0.texture_size_int_z;
-    //gl.bindTexture(gl.TEXTURE_3D, texture_int);
-    console.log("texture_int_settings.width: "+texture_int_settings.width);
-    console.log("texture_int_settings.height: "+texture_int_settings.height);
-    console.log("texture_int_settings.depth: "+texture_int_settings.depth);
-    updateDataTexture(gl, texture_int, data_unit_lod_0.arrayi, texture_int_settings);
-
-    program_shader_uniforms.setUniform("start_index_int_position_data", data_unit_lod_0.getIntStart("positions"));
-    program_shader_uniforms.setUniform("start_index_int_line_segments", data_unit_lod_0.getIntStart("line_segments"));
-    program_shader_uniforms.setUniform("start_index_int_tree_nodes", data_unit_lod_0.getIntStart("tree_nodes"));
-    program_shader_uniforms.setUniform("start_index_int_dir_lights", data_unit_lod_0.getIntStart("dir_lights"));
-    program_shader_uniforms.setUniform("start_index_float_position_data", data_unit_lod_0.getFloatStart("positions"));
-    program_shader_uniforms.setUniform("start_index_float_line_segments", data_unit_lod_0.getFloatStart("line_segments"));
-    program_shader_uniforms.setUniform("start_index_float_tree_nodes", data_unit_lod_0.getFloatStart("tree_nodes"));
-    program_shader_uniforms.setUniform("start_index_float_dir_lights", data_unit_lod_0.getFloatStart("dir_lights"));
-    program_shader_uniforms.updateUniforms();
-
-    data_changed = true;
-  }
-
-  if(main_camera.changed || data_changed){
-    frame_counter++;
-    main_camera.changed = false;
-    data_changed = false;
-    gl.drawArrays(gl.POINTS, 0, 1);
-  }
-
-  gl.finish();
-  strong_tick_counter.innerHTML = tick_counter;
-  strong_frame_counter.innerHTML = frame_counter;
-  //shedule next call
-  timer = setTimeout(on_update, 60);
-}
-
-var buffer;
-function initializeAttributes() {
-  gl.enableVertexAttribArray(0);
-  buffer = gl.createBuffer();  
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.vertexAttribPointer(0, 1, gl.FLOAT, false, 0, 0);
-}
-
-function cleanup() {
-gl.useProgram(null);
-if (buffer)
-  gl.deleteBuffer(buffer);
-if (program) 
-  gl.deleteProgram(program);
-}
-
-function loadUniformLocations(program){
-  location_color_r = gl.getUniformLocation(program, "color_r");
-  location_texture_float = gl.getUniformLocation(program, "texture_float");
-  location_texture_int = gl.getUniformLocation(program, "texture_int");
-  location_width = gl.getUniformLocation(program, "width");
-  location_height = gl.getUniformLocation(program, "height");
-
-  program_shader_uniforms = new ShaderUniforms(gl, program);
-  program_shader_uniforms.registerUniform("start_index_int_position_data", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_float_position_data", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_int_line_segments", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_float_line_segments", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_int_tree_nodes", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_float_tree_nodes", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
-  program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);
-  program_shader_uniforms.print();
-}
-/*
-uniform int start_index_int_position_data = 0;//DUMMY
-uniform int start_index_float_position_data = 0;//DUMMY
-uniform int start_index_int_line_segments = 0;//DUMMY
-uniform int start_index_float_line_segments = 80544;//DUMMY
-uniform int start_index_int_tree_nodes = 102560;//DUMMY
-uniform int start_index_float_tree_nodes = 490784;//DUMMY
-uniform int start_index_int_dir_lights = 177424;//DUMMY
-uniform int start_index_float_dir_lights = 640512;//DUMMY
-*/
-
-function addOnClickRequestData(){
-  document.getElementById("button_request_data").addEventListener("click", function() {
-    console.log("onClickRequestData: "+GLOBAL_DATA);
-  });
 }
 
 

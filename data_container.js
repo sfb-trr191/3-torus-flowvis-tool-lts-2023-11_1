@@ -33,8 +33,8 @@ class DataContainer{
         this.setByName("total_float_count", this.arrayf.length);
         this.setByName("total_int_count", this.arrayi.length);
 
-        console.log("arrayi [" + this.arrayi.length +"] : "+this.arrayi);
-        console.log("arrayf [" + this.arrayf.length +"] : "+this.arrayf);
+        console.log("arrayi [" + this.arrayi.length +"]["+this.getElementIntCount()+"] : "+this.arrayi);
+        console.log("arrayf [" + this.arrayf.length +"]["+this.getElementFloatCount()+"] : "+this.arrayf);
     }
 
     getElementFloatCount(){
