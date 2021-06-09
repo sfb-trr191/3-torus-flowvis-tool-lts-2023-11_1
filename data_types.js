@@ -62,12 +62,12 @@ class LineSegment {
     beginning = 0;
     //float based
     matrix = glMatrix.mat4.create();
-    matrixInverse = glMatrix.mat4.create();
+    matrix_inv = glMatrix.mat4.create();
     
 
     constructor(){        
         //this.matrix[0] = 2;//TODO remove: test inverse
-        //glMatrix.mat4.invert(this.matrixInverse, this.matrix);//TODO remove: test inverse
+        //glMatrix.mat4.invert(this.matrix_inv, this.matrix);//TODO remove: test inverse
     }
 
     print(){
@@ -75,7 +75,7 @@ class LineSegment {
         console.log("indexB: "+this.indexB);
         console.log("multiPolyID: "+this.multiPolyID);
         console.log("matrix: "+this.matrix);
-        console.log("matrixInverse: "+this.matrixInverse);
+        console.log("matrix_inv: "+this.matrix_inv);
     }
 
     getFloatCount(){
@@ -96,7 +96,7 @@ class LineSegment {
 
         for (var i=0; i<16; i++){
             arrayf[start_index_f + i] = this.matrix[i];
-            arrayf[start_index_f + i + 16] = this.matrixInverse[i];
+            arrayf[start_index_f + i + 16] = this.matrix_inv[i];
         }
     }
 }

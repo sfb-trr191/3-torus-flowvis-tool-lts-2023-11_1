@@ -977,6 +977,7 @@ void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cuto
 		//vec3 p = (matrix_inv * vec4(p_os, 1)).xyz;
 		//calculate tube center in world space (for normal calculation)
 		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;
+		//vec3 tube_center = mix(a, b, local_percentage);//alternative
 		float v_a = GetVelocity(lineSegment.indexA, interactiveStreamline);
 		float v_b = GetVelocity(lineSegment.indexB, interactiveStreamline);		
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
@@ -1114,7 +1115,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		
 		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
 		resultColor = mix(fogColor, lightColor, fogFactor);
-		return normal;
+		//return normal;//
 	}
 	else
 	{

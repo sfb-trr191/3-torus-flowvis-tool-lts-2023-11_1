@@ -158,6 +158,7 @@ class LODData{
     }
 
     CalculateMatrices(){        
+        console.log("CalculateMatrices");
         for (var i = 0; i < this.vectorLineSegment.length; i++)
         {
             var matrixTranslation = glMatrix.mat4.create();
@@ -237,7 +238,29 @@ class LODData{
             this.vectorLineSegment[i].matrix_inv = matrixInverted;
             //console.log("posA_os: ", posA_os);
             //console.log("posB_os: ", posB_os);
+            /*
+            console.log("-----------------: ");
+            console.log("matrixCombined: ", matrixCombined);
+            console.log("matrixInverted: ", matrixInverted);
+            var a = glMatrix.vec4.create();
+            var b = glMatrix.vec4.create();
+            var a2 = glMatrix.vec4.create();
+            var b2 = glMatrix.vec4.create();
+            var diff = glMatrix.vec4.create();
+            glMatrix.vec4.transformMat4(a, posA_ws, matrixCombined);
+            glMatrix.vec4.transformMat4(b, posB_ws, matrixCombined);
+            glMatrix.vec4.transformMat4(a2, a, matrixInverted);
+            glMatrix.vec4.transformMat4(b2, b, matrixInverted);
+            //glMatrix.vec4.subtract(diff, c, a);
+            console.log("posA_ws: ", posA_ws);
+            console.log("posB_ws: ", posB_ws);
+            console.log("posA_os: ", a);
+            console.log("posB_os: ", b);
+            console.log("posA_2: ", a2);
+            console.log("posB_2: ", b2);
+            */
         }        
+        console.log("CalculateMatrices completed"); 
     }
 
     CalculateBVH(){
