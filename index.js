@@ -273,7 +273,8 @@ function addOnClickRequestData(){
     var shader_formula_w = document.getElementById("input_field_equation_w").value;
     var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
     var step_size = document.getElementById("input_step_size").value;
-    streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size);
+    var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
+    streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations);
     data_changed = true;
   });
 }

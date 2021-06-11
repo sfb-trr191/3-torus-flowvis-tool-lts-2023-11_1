@@ -71,12 +71,12 @@ class AABB{
 
 	Intersect(other){
 		return !(
-			other.min[0] > max[0] ||//other.min.x() > max.x() ||
-			other.max[0] < min[0] ||//other.max.x() < min.x() ||
-			other.min[1] > max[1] ||//other.min.y() > max.y() ||
-			other.max[1] < min[1] ||//other.max.y() < min.y() ||
-			other.min[2] > max[2] ||//other.min.z() > max.z() ||
-			other.max[2] < min[2]);//other.max.z() < min.z());
+			other.min[0] > this.max[0] ||//other.min.x() > max.x() ||
+			other.max[0] < this.min[0] ||//other.max.x() < min.x() ||
+			other.min[1] > this.max[1] ||//other.min.y() > max.y() ||
+			other.max[1] < this.min[1] ||//other.max.y() < min.y() ||
+			other.min[2] > this.max[2] ||//other.min.z() > max.z() ||
+			other.max[2] < this.min[2]);//other.max.z() < min.z());
 	}
 
 	GetVolume(){

@@ -35,6 +35,7 @@ class LODData{
         //---start region: references
         this.p_streamline_context = p_streamline_context;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
+        this.p_segment_duplicator = p_streamline_context.segment_duplicator;
         this.p_raw_data = p_streamline_context.raw_data;
         this.p_lights = p_streamline_context.p_lights;
         //---end region: references
@@ -148,7 +149,7 @@ class LODData{
                     segment.indexB = p.pointIndices[k];
                     segment.multiPolyID = m.multiPolyID;
                     segment.copy = 0;
-                    segment.isBeginning = (k == 1) ? 1 : 0;
+                    segment.beginning = (k == 1) ? 1 : 0;
                     this.vectorLineSegment.push(segment);
                 }
             }
@@ -266,7 +267,7 @@ class LODData{
     CalculateBVH(){
         console.log("CalculateBVH");
         var bvh = new BVH_AA();        
-        var tubeRadius = 0.005;
+        var tubeRadius = this.p_streamline_generator.tubeRadius;
         var maxCost = -1;
         var growthID = -1;
         var volume_threshold = 0.0001;
@@ -309,5 +310,11 @@ class LODData{
         shader_uniforms.setUniform("start_index_float_tree_nodes", this.data_unit.getFloatStart("tree_nodes"));
         shader_uniforms.setUniform("start_index_float_dir_lights", this.data_unit.getFloatStart("dir_lights"));
         shader_uniforms.updateUniforms();
+    }
+
+    GenerateLineSegmentCopies(){
+        console.log("GenerateLineSegmentCopies");
+        this.p_segment_duplicator.GenerateLineSegmentCopies(this);
+        console.log("GenerateLineSegmentCopies completed");
     }
 }

@@ -6,6 +6,7 @@ class StreamlineContext{
         this.p_lights = p_lights;
         this.raw_data = new RawData();
         this.streamline_generator = new StreamlineGenerator(this);
+        this.segment_duplicator = new SegmentDuplicator(this);
         this.lod_0 = new LODData(name+"_lod_0", this, gl);
     }
 
@@ -28,8 +29,8 @@ class StreamlineContext{
         
         //TODO: DouglasPeuker: simplify (for all lods except lod0)
 
-        this.lod_0.GenerateLineSegments();//TODO:(for all lods)
-        //TODO: GeometryDuplicator: generate copies (for all lods)        
+        this.lod_0.GenerateLineSegments();//TODO:(for all lods)        
+        this.lod_0.GenerateLineSegmentCopies();//TODO: GeometryDuplicator: generate copies (for all lods)   
         this.lod_0.CalculateMatrices();//TODO:(for all lods)
         this.lod_0.CalculateBVH();//TODO:(for all lods)
 
@@ -39,7 +40,7 @@ class StreamlineContext{
         this.lod_0.UpdateDataTextures(gl);//TODO:(for all lods)
     }
 
-    CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size){
+    CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations){
         console.log("CalculateStreamlines");
         var direction = DIRECTION_FORWARD;
 
@@ -48,6 +49,7 @@ class StreamlineContext{
         this.streamline_generator.shader_formula_w = shader_formula_w;
         this.streamline_generator.num_points_per_streamline = input_num_points_per_streamline;
         this.streamline_generator.step_size = step_size;        
+        this.segment_duplicator.iterations = segment_duplicator_iterations;
 
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateExampleSeeds();
@@ -57,8 +59,8 @@ class StreamlineContext{
         
         //TODO: DouglasPeuker: simplify (for all lods except lod0)
 
-        this.lod_0.GenerateLineSegments();//TODO:(for all lods)
-        //TODO: GeometryDuplicator: generate copies (for all lods)        
+        this.lod_0.GenerateLineSegments();//TODO:(for all lods)            
+        this.lod_0.GenerateLineSegmentCopies();//TODO: GeometryDuplicator: generate copies (for all lods)   
         this.lod_0.CalculateMatrices();//TODO:(for all lods)
         this.lod_0.CalculateBVH();//TODO:(for all lods)
 

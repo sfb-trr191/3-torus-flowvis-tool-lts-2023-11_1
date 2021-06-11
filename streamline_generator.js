@@ -6,6 +6,9 @@ class StreamlineGenerator{
         this.seeds = [];
         this.num_points_per_streamline = 10;
         this.step_size = 0.0125;
+        this.epsilon_move_just_outside_cube = 0.00001;
+        this.confine_to_cube = true;      
+        this.tubeRadius = 0.005;
     }
 
     GenerateExampleSeeds(){
@@ -136,6 +139,8 @@ class StreamlineGenerator{
             glMatrix.vec3.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
 
             //console.log(i, currentPosition);
+            if(this.confine_to_cube)
+			    currentPosition = this.ConfineToCube(currentPosition, previousPosition);
 
 
             var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
@@ -275,6 +280,59 @@ class StreamlineGenerator{
         }
 
         return glMatrix.vec3.fromValues(scope.x, scope.y, scope.z);
+    }
+
+    //vec3 currentPosition, previousPosition
+    ConfineToCube(currentPosition, previousPosition){
+        //return currentPosition;
+        var confine = false;
+        var min_t = 1000000;
+        for(var i=0; i<3; i++)
+        {
+            if(currentPosition[i] < 0)
+            {
+                confine = true;
+                var t = this.ExtractLinearPercentage(previousPosition[i], currentPosition[i], 0);
+                if(t < min_t)
+                    min_t = t;
+            }
+            if(currentPosition[i] > 1)
+            {
+                confine = true;
+                var t = this.ExtractLinearPercentage(previousPosition[i], currentPosition[i], 1);
+                if(t < min_t)
+                    min_t = t;
+            }
+        }
+
+        if(confine)
+        {
+            //vec3 direction = currentPosition - previousPosition;
+            var direction = glMatrix.vec3.create();
+            glMatrix.vec3.subtract(direction, currentPosition, previousPosition);
+            //vec3 direction_normalized = normalize(direction);
+            var direction_normalized = glMatrix.vec3.create();
+            glMatrix.vec3.normalize(direction_normalized, direction);
+            //return previousPosition + min_t * direction + epsilon_move_just_outside_cube * direction_normalized;
+            var result = glMatrix.vec3.clone(previousPosition);//previousPosition + ...
+            var tmp = glMatrix.vec3.create();
+            //... + min_t * direction + ...
+            glMatrix.vec3.scale(tmp, direction, min_t)
+            glMatrix.vec3.add(result, result, tmp);
+            //... + epsilon_move_just_outside_cube * direction_normalized + ...
+            glMatrix.vec3.scale(tmp, direction_normalized, this.epsilon_move_just_outside_cube)
+            glMatrix.vec3.add(result, result, tmp);
+            return result;
+
+        }
+
+        return currentPosition;
+    }
+
+    //float a, b, value
+    ExtractLinearPercentage(a, b, value)
+    {
+        return (value - a) / (b - a);
     }
 
 }
