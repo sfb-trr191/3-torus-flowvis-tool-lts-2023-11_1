@@ -162,8 +162,7 @@ function on_update(){
   //gl.activeTexture(gl.TEXTURE1);
   //gl.bindTexture(gl.TEXTURE_3D, texture_int);
   //gl.uniform1i(location_texture_int, 1);
-  streamline_context_static.bind_lod(0, gl, program_shader_uniforms, location_texture_float, location_texture_int);
-
+  
   //program_shader_uniforms.updateUniforms();
     /*
   if (tick_counter == 10){   
@@ -207,6 +206,10 @@ function on_update(){
   }
   */
   if(main_camera.changed || data_changed){
+    var panning = main_camera.panning;
+    var active_lod = panning ? 2 : 0;
+    streamline_context_static.bind_lod(active_lod, gl, program_shader_uniforms, location_texture_float, location_texture_int);
+
     frame_counter++;
     main_camera.changed = false;
     data_changed = false;
@@ -274,7 +277,8 @@ function addOnClickRequestData(){
     var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
     var step_size = document.getElementById("input_step_size").value;
     var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
-    streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations);
+    var direction = DIRECTION_FORWARD;
+    streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
     data_changed = true;
   });
 }

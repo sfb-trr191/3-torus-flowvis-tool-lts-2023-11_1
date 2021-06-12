@@ -201,11 +201,13 @@ class Camera{
         this.xMouse_old = x;
         this.yMouse_old = y;
         this.panning = true;
+        this.changed = true;
     }
 
     StopPanning(){
         console.log("stop panning")
         this.panning = false;
+        this.changed = true;
     }
 
     UpdatePanning(x, y, left_handed){

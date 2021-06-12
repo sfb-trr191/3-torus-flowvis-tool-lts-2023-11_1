@@ -1,3 +1,54 @@
+class PolyLineSegment{
+    
+    constructor() {
+        this.indexA = -1;
+        this.indexB = -1;
+        this.highestDistance = -1;
+        this.indexHighestDistance = -1;
+        this.hasInBetweenVertex = false;
+    }
+
+    //std::vector<int>& pointIndices, std::vector<PositionData> &pointDataVector
+    CalculateDistances(pointIndices, pointDataVector)
+    {
+        //std::cout << "TODO PolyLineSegment::CalculateDistances" << std::endl;
+        this.hasInBetweenVertex = (this.indexB - this.indexA) > 1;
+        if (!this.hasInBetweenVertex)
+            return;
+
+        var iA = pointIndices[this.indexA];
+        //console.log("pointDataVector[iA]", pointDataVector[iA])
+        var vecA = glMatrix.vec3.create();
+        vec3_from_vec4(vecA, pointDataVector[iA].position);
+
+        var iB = pointIndices[this.indexB];
+        var vecB = glMatrix.vec3.create();
+        vec3_from_vec4(vecB, pointDataVector[iB].position);
+        var direction = glMatrix.vec3.create();
+        glMatrix.vec3.subtract(direction, vecB, vecA);
+        glMatrix.vec3.normalize(direction, direction);
+
+        //std::cout << "vecA: " << vecA.x() << ", "<< vecA.y() << ", "<<vecA.z() << std::endl;
+        //std::cout << "vecB: " << vecB.x() << ", " << vecB.y() << ", " << vecB.z() << std::endl;
+        for (var i = this.indexA + 1; i < this.indexB; i++)
+        {
+            var iC = pointIndices[i];
+            var vecC = glMatrix.vec3.create();
+            vec3_from_vec4(vecC, pointDataVector[iC].position);
+            var distance = distancePointToLine(vecC, vecA, direction);
+            //std::cout << "vecC: " << vecC.x() << ", " << vecC.y() << ", " << vecC.z() << std::endl;
+            //std::cout << "distance: " << distance << std::endl;
+            if (distance > this.highestDistance)
+            {
+                this.indexHighestDistance = i;
+                this.highestDistance = distance;
+            }
+        }
+        //std::cout << "indexHighestDistance: " << indexHighestDistance << ", highestDistance; " << highestDistance << std::endl;
+    }
+
+}
+
 class PolyLine{
  
     constructor() {
@@ -31,6 +82,7 @@ class LODData{
         this.vectorMultiPolyLines = [];
         this.vectorLineSegment = [];
         this.tree_nodes = [];
+        this.douglasPeukerParameter = 0;
 
         //---start region: references
         this.p_streamline_context = p_streamline_context;
@@ -60,10 +112,11 @@ class LODData{
         this.vectorLineSegment = [];  
     }
 
-    ExtractMultiPolyLines(direction){
+    ExtractMultiPolyLines(){
         console.log("ExtractMultiPolyLines");
         this.Reset();
 
+        var direction = this.p_streamline_generator.direction;
         var multi = new MultiPolyLine();
         var poly = new PolyLine();
         var currentDirection;
@@ -130,8 +183,87 @@ class LODData{
         for (var i = 0; i < this.vectorMultiPolyLines.length; i++)	
             this.vectorMultiPolyLines[i].multiPolyID = i;
         
-        console.log("ExtractMultiPolyLines completed");
         console.log("this.vectorMultiPolyLines: ", this.vectorMultiPolyLines);
+        console.log("ExtractMultiPolyLines completed");
+    }
+
+    DouglasPeuker(lod_data_original){
+        console.log("DouglasPeuker: ", this.name);
+        this.Reset();
+        for (var i = 0; i < lod_data_original.vectorMultiPolyLines.length; i++){
+            this.DouglasPeukerMulti(lod_data_original.vectorMultiPolyLines[i]);
+        }
+        //lod_data_original.LogState();
+        //this.LogState();
+        console.log("DouglasPeuker completed");
+    }
+
+    DouglasPeukerMulti(originalMulti){
+        var newMulti = new MultiPolyLine();
+        newMulti.multiPolyID = originalMulti.multiPolyID;
+        for (var i = 0; i < originalMulti.polyLines.length; i++){
+            this.DouglasPeukerAddPoly(newMulti, originalMulti.polyLines[i]);
+        }
+        this.vectorMultiPolyLines.push(newMulti);
+            
+    }
+
+    DouglasPeukerAddPoly(newMulti, originalPoly){
+        var numberOfPoints = originalPoly.pointIndices.length;
+        var vectorKeep = new Array(numberOfPoints);//address via local index
+        for (var i = 1; i < numberOfPoints - 1; i++){
+            vectorKeep[i] = false;
+        }
+        vectorKeep[0] = true;
+        vectorKeep[numberOfPoints - 1] = true;
+    
+        var segment = new PolyLineSegment();
+        segment.indexA = 0;//address via local index
+        segment.indexB = numberOfPoints - 1;//address via local index
+        var stack = [];//stack<PolyLineSegment>
+        stack.push(segment);
+    
+        while (stack.length > 0)
+        {
+            var segment = stack.pop();
+            //std::cout << "pop: " << segment.indexA << ", " << segment.indexB << std::endl;
+    
+            segment.CalculateDistances(originalPoly.pointIndices, this.p_raw_data.data);
+            if (segment.hasInBetweenVertex && segment.highestDistance > this.douglasPeukerParameter)
+            {
+                //std::cout << "segment split: " << segment.indexA << ", " << segment.indexB << std::endl;
+                //std::cout << "segment.highestDistance: " << segment.highestDistance << std::endl;
+                //indexVector.push_back(pointIDs->GetId(segment.indexHighestDistance));
+                vectorKeep[segment.indexHighestDistance] = true;//address via local index
+    
+                var segmentLow = new PolyLineSegment();
+                segmentLow.indexA = segment.indexA;//address via local index
+                segmentLow.indexB = segment.indexHighestDistance;//address via local index
+                stack.push(segmentLow);
+                //std::cout << "push: " << segmentLow.indexA << ", " << segmentLow.indexB << std::endl;
+    
+                var segmentHigh = new PolyLineSegment();
+                segmentHigh.indexA = segment.indexHighestDistance;//address via local index
+                segmentHigh.indexB = segment.indexB;//address via local index
+                stack.push(segmentHigh);
+                //std::cout << "push: " << segmentHigh.indexA << ", " << segmentHigh.indexB << std::endl;
+            }
+            else
+            {
+                continue;
+            }
+        }
+        
+        var newPoly = new PolyLine();
+        for (var localIndex = 0; localIndex < numberOfPoints; localIndex++)
+        {
+            if (vectorKeep[localIndex])
+            {
+                var globalIndex = originalPoly.pointIndices[localIndex];
+                newPoly.pointIndices.push(globalIndex);
+            }
+        }
+        newMulti.polyLines.push(newPoly);
     }
 
     GenerateLineSegments(){
@@ -316,5 +448,11 @@ class LODData{
         console.log("GenerateLineSegmentCopies");
         this.p_segment_duplicator.GenerateLineSegmentCopies(this);
         console.log("GenerateLineSegmentCopies completed");
+    }
+
+    LogState(){
+        console.log("LOD: " + this.name);
+        console.log("segments: " + this.vectorLineSegment.length);
+        console.log("nodes: " + this.tree_nodes.length);
     }
 }
