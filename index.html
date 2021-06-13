@@ -43,12 +43,20 @@
       HTML5 canvas.</canvas>
     </div>    
     <div class="column column-two">
-      <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
-      <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
-      <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
-      <input id="input_num_points_per_streamline" type="text" value="1000">
-      <input id="input_step_size" type="text" value="0.0125">
-      <input id="segment_duplicator_iterations" type="text" value="1">      
+      <form>
+        <label>u</label>
+        <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">    
+        <label>v</label>
+        <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+        <label>w</label>
+        <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
+        <label>points per streamline</label>
+        <input id="input_num_points_per_streamline" type="text" value="1000">
+        <label>step size</label>
+        <input id="input_step_size" type="text" value="0.0125">
+        <label>duplicator iterations</label>
+        <input id="segment_duplicator_iterations" type="text" value="1">  
+      </form>      
     </div>
  </div>
   <script type="x-shader/x-vertex" id="vertex-shader">#version 300 es

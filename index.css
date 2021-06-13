@@ -35,3 +35,9 @@ button {
 .column-two {
   order: 2;
 }
+
+form {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 4px;
+}
