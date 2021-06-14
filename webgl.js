@@ -21,7 +21,7 @@ function loadShaderProgram(gl, program, vertex_shader_name, fragment_shader_name
     gl.shaderSource(vertexShader, source);
     gl.compileShader(vertexShader);
     //source = document.querySelector(fragment_shader_name).innerHTML
-    source = SHADER_RAY_TEST;
+    source = F_SHADER_RAYTRACING;
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, source);
     gl.compileShader(fragmentShader);

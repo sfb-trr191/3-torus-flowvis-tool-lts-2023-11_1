@@ -34,7 +34,7 @@ class CanvasWrapper {
         this.render_wrapper_raytracing_panning_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_panning, camera.height_panning);
 
         this.program_raytracing = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, SHADER_RAY_TEST);
+        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, F_SHADER_RAYTRACING);
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         

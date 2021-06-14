@@ -1,4 +1,4 @@
-var SHADER_RAY_TEST = `#version 300 es
+var F_SHADER_RAYTRACING = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
 precision highp float;
