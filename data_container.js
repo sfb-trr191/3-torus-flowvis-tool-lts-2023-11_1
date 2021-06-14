@@ -1,4 +1,4 @@
-class DataContainer{
+class DataContainer {
 
     /**
      * 
@@ -16,52 +16,52 @@ class DataContainer{
             total_float_count: 0,
             total_int_count: 0
         };
-        console.log("Generate container: "+name+" with "+this.getElementFloatCount()+" floats and "+this.getElementIntCount()+" ints per element.")
+        console.log("Generate container: " + name + " with " + this.getElementFloatCount() + " floats and " + this.getElementIntCount() + " ints per element.")
     }
 
     generateArrays() {
-        console.log("Generate arrays for container: "+this.name);
+        console.log("Generate arrays for container: " + this.name);
         this.arrayf = new Float32Array(this.data.length * this.getElementFloatCount());
         this.arrayi = new Int32Array(this.data.length * this.getElementIntCount());
 
-        for (var i = 0; i < this.data.length; i++){
+        for (var i = 0; i < this.data.length; i++) {
             var start_index_f = this.getElementFloatCount() * i;
-            var start_index_i = this.getElementIntCount() * i; 
+            var start_index_i = this.getElementIntCount() * i;
             this.data[i].writeToArrays(this.arrayf, this.arrayi, start_index_f, start_index_i);
         }
 
         this.setByName("total_float_count", this.arrayf.length);
         this.setByName("total_int_count", this.arrayi.length);
 
-        console.log("arrayi [" + this.arrayi.length +"]["+this.getElementIntCount()+"] : "+this.arrayi);
-        console.log("arrayf [" + this.arrayf.length +"]["+this.getElementFloatCount()+"] : "+this.arrayf);
+        console.log("arrayi [" + this.arrayi.length + "][" + this.getElementIntCount() + "] : " + this.arrayi);
+        console.log("arrayf [" + this.arrayf.length + "][" + this.getElementFloatCount() + "] : " + this.arrayf);
     }
 
-    getElementFloatCount(){
+    getElementFloatCount() {
         return this.meta_data["element_float_count"];
     }
 
-    getElementIntCount(){
+    getElementIntCount() {
         return this.meta_data["element_int_count"];
     }
 
-    getTotalFloatCount(){
+    getTotalFloatCount() {
         return this.meta_data["total_float_count"];
     }
 
-    getTotalIntCount(){
+    getTotalIntCount() {
         return this.meta_data["total_int_count"];
     }
 
-    getByName(name){
+    getByName(name) {
         return this.meta_data[name];
     }
 
-    setByName(name, value){
+    setByName(name, value) {
         this.meta_data[name] = value;
     }
 
-    setDataArrays(arrayf, arrayi){
+    setDataArrays(arrayf, arrayi) {
         this.arrayf = arrayf;
         this.arrayi = arrayi;
         this.setByName("total_float_count", this.arrayf.length);

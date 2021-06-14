@@ -1,10 +1,10 @@
-class Lights{
- 
+class Lights {
+
     constructor() {
         this.dir_lights = [];
     }
 
-    GenerateDefaultLighting(){
+    GenerateDefaultLighting() {
         console.log("GenerateDefaultLighting");
 
         var l0 = new DirLight();

@@ -1,5 +1,5 @@
-class BVH_AA_Node{
- 
+class BVH_AA_Node {
+
     constructor() {
         this.nodeID = -1;
         this.parentID = -1;
@@ -16,7 +16,7 @@ class BVH_AA_Node{
 /**
  * The BoundingVolumeHierarchy 
  */
-class BVH_AA{
+class BVH_AA {
 
     /**
      * 
@@ -26,7 +26,7 @@ class BVH_AA{
         console.log("Generate BVH_AA");
         this.nodes = [];
     }
-    
+
 
     //std::vector<PositionData> &positionData
     //GL_LineSegment * lineSegments
@@ -36,43 +36,41 @@ class BVH_AA{
     //float maxCost
     //int growthID
     //float volume_threshold
-    GenerateTree(positionData, lineSegments, tubeRadius, maxCost, growthID, volume_threshold){
+    GenerateTree(positionData, lineSegments, tubeRadius, maxCost, growthID, volume_threshold) {
         console.log("GenerateTree, maxCost: " + maxCost);
         var r = glMatrix.vec4.fromValues(tubeRadius, tubeRadius, tubeRadius, 0);
         this.nodes = [];//nodes.clear();
         var nodeStack = [];//std::stack<int> nodeStack;
-    
+
         //create root node
         var root = new BVH_AA_Node();//Node *root = new Node();
         root.type = 0;//0=parent
         root.nodeID = this.nodes.length;
         root.parentID = root.nodeID;
         this.nodes.push(root);
-        for (var i = 0; i < lineSegments.length; i++)
-        {
+        for (var i = 0; i < lineSegments.length; i++) {
             var nodeLeaf = new BVH_AA_Node();
             nodeLeaf.type = 1;//1=lineSegment
             nodeLeaf.objectIndex = i;//i-th lineSegment
             nodeLeaf.nodeID = this.nodes.length;
-    
+
             var segment = lineSegments[i];
             var data_a = positionData[segment.indexA];
             var data_b = positionData[segment.indexB];
-            
-            var filter_flag = false;	
-            if(maxCost != -1)
-            {
-                if(data_a.cost > maxCost)			
-                    filter_flag = true;	
-                
+
+            var filter_flag = false;
+            if (maxCost != -1) {
+                if (data_a.cost > maxCost)
+                    filter_flag = true;
+
                 //if selective growth, but a different id
-                if(growthID != -1 && segment.multiPolyID != growthID)				
-                    filter_flag = false;	
-                
+                if (growthID != -1 && segment.multiPolyID != growthID)
+                    filter_flag = false;
+
             }
-            if(filter_flag)
+            if (filter_flag)
                 continue;
-    
+
             //console.log("data_a.position: "+data_a.position);
             //console.log("data_b.position: "+data_b.position);
             //console.log("r: "+r);
@@ -81,54 +79,48 @@ class BVH_AA{
             this.nodes.push(nodeLeaf);
         }
         nodeStack.push(0);
-    
-        if(root.unassignedChildren.length == 0)
-        {
+
+        if (root.unassignedChildren.length == 0) {
             console.log("root node has no children");
             return;
         }
-    
-        while (nodeStack.length > 0)
-        {
+
+        while (nodeStack.length > 0) {
             var nodeID = nodeStack.pop();
             var node = this.nodes[nodeID];
-    
+
             //PrintNodes();
             this.CalculateCombinedAABB_fromUnassignedChildren(nodeID);
             var volume = node.aabb.GetVolume();
             //console.log("volume: ", volume, volume < volume_threshold);
-            if(volume < volume_threshold)
-            {
+            if (volume < volume_threshold) {
                 this.AssignChildrenAsLeaves(node);
                 continue;
             }
-    
+
             var onlyLeaves = this.AssignChildren_splitAtCenter(nodeID);
             //console.log("onlyLeaves: ", onlyLeaves);
             //PrintNodes();
-    
+
             if (onlyLeaves)
                 continue;
-    
-            for (var i = 0; i < node.children.length; i++)
-            {
+
+            for (var i = 0; i < node.children.length; i++) {
                 var childID = node.children[i];
                 var child = this.nodes[childID];
                 if (child.type == 0)
                     nodeStack.push(childID);
             }
-        }       
+        }
 
         console.log("GenerateTree completed: " + this.nodes.length + " nodes");
     }
 
-    CalculateCombinedAABB_fromUnassignedChildren(nodeID)
-    {
+    CalculateCombinedAABB_fromUnassignedChildren(nodeID) {
         //console.log("CalculateCombinedAABB_fromUnassignedChildren", nodeID);
         var node = this.nodes[nodeID];
         var toCombine = [];//std::vector<AABB*>
-        for (var i = 0; i < node.unassignedChildren.length; i++)
-        {
+        for (var i = 0; i < node.unassignedChildren.length; i++) {
             var childID = node.unassignedChildren[i];
             //std::cout << "childID: " << childID << std::endl;
             var child = this.nodes[childID];
@@ -140,8 +132,7 @@ class BVH_AA{
     }
 
     //returns onlyLeaves
-    AssignChildren_splitAtCenter(nodeID)
-    {
+    AssignChildren_splitAtCenter(nodeID) {
         //console.log("AssignChildren_splitAtCenter: " + nodeID);
         //std::cout << "AssignChildren_splitAtCenter: " << nodeID << std::endl;
         var node = this.nodes[nodeID];
@@ -151,19 +142,17 @@ class BVH_AA{
     }
 
     //returns onlyLeaves
-    AssignChildren(node, threshold){
+    AssignChildren(node, threshold) {
         //std::cout << "AssignChildren" << std::endl;
         //create octant vector
         var octants = [];//vector<vector<int>>
-        for (var i = 0; i < 8; i++)
-        {
+        for (var i = 0; i < 8; i++) {
             var children = [];//vector<int>
             octants.push(children);
         }
-    
+
         //assign children to octants
-        for (var i = 0; i < node.unassignedChildren.length; i++)
-        {
+        for (var i = 0; i < node.unassignedChildren.length; i++) {
             var childID = node.unassignedChildren[i];
             var child = this.nodes[childID];
             var position = child.aabb.center;
@@ -171,17 +160,14 @@ class BVH_AA{
             var octant = octants[octantIndex];
             octant.push(childID);
         }
-    
+
         //check if all children fall in the same octant
-        for (var i = 0; i < 8; i++)
-        {
+        for (var i = 0; i < 8; i++) {
             var octant = octants[i];
-            if (octant.length == node.unassignedChildren.length)
-            {
+            if (octant.length == node.unassignedChildren.length) {
                 //TODO handle special case?
                 //For now just put leaves directly
-                for (var j = 0; j < octant.length; j++)
-                {
+                for (var j = 0; j < octant.length; j++) {
                     var leafID = octant[j];
                     node.children.push(leafID);
                     var leaf = this.nodes[leafID];
@@ -191,15 +177,13 @@ class BVH_AA{
                 return true;//onlyLeaves = true;
             }
         }
-    
-        for (var i = 0; i < 8; i++)
-        {
+
+        for (var i = 0; i < 8; i++) {
             var octant = octants[i];
             if (octant.length == 0)
                 //octant contains no child --> ignore
                 continue;
-            if (octant.length == 1)
-            {
+            if (octant.length == 1) {
                 //octant contains exactly one child
                 //--> just put leaf directly
                 var leafID = octant[0];
@@ -219,15 +203,14 @@ class BVH_AA{
                 child.unassignedChildren.push(octant[j]);
             node.children.push(child.nodeID);
         }
-    
+
         node.unassignedChildren = [];
         return false;//onlyLeaves = false;
     }
 
 
-    AssignChildrenAsLeaves(node){
-        for (var i = 0; i < node.unassignedChildren.length; i++)
-        {
+    AssignChildrenAsLeaves(node) {
+        for (var i = 0; i < node.unassignedChildren.length; i++) {
             var leafID = node.unassignedChildren[i];
             node.children.push(leafID);
             var leaf = this.nodes[leafID];
@@ -236,8 +219,7 @@ class BVH_AA{
         node.unassignedChildren = [];//node.unassignedChildren.clear();
     }
 
-    GetOctantIndex(position, threshold)
-    {
+    GetOctantIndex(position, threshold) {
         var difference = glMatrix.vec4.create();
         glMatrix.vec4.subtract(difference, position, threshold);//QVector4D difference = position - threshold;
         var x = (difference[0] > 0) ? 1 : 0;
@@ -246,9 +228,9 @@ class BVH_AA{
         return x + y + z;
     }
 
-    ConvertNodes(){
+    ConvertNodes() {
         var converted_nodes = new Array(this.nodes.length);
-        for (var i = 0; i < this.nodes.length; i++){
+        for (var i = 0; i < this.nodes.length; i++) {
             var node = this.nodes[i];
             var converted_node = new TreeNode();
             converted_node.hitLink = this.GetHitLink(i);
@@ -264,41 +246,35 @@ class BVH_AA{
         return converted_nodes;
     }
 
-    GetHitLink(nodeID)
-    {
+    GetHitLink(nodeID) {
         var node = this.nodes[nodeID];
-        if (node.type == 0)
-        {
+        if (node.type == 0) {
             //root without children
-            if(node.children.length == 0)
+            if (node.children.length == 0)
                 return -1;
             //node is parent --> return first child
             return node.children[0];
         }
         return this.GetRightSiblingUpwards(nodeID);
     }
-    
+
     //finds the right sibling
     //if no right sibling exists finds right sibling in parent level
     //stops at root node where -1 is returned
-    GetRightSiblingUpwards(nodeID)
-    {
+    GetRightSiblingUpwards(nodeID) {
         //find right sibling
         var id_tmp = nodeID;
-        while (true)
-        {
+        while (true) {
             var node_tmp = this.nodes[id_tmp];
             var parentID = node_tmp.parentID;
             if (id_tmp == parentID)//at rootnode we stop
                 return -1;
             var parent = this.nodes[parentID];
             var childIndex_tmp = GetIndexInList(id_tmp, parent.children);
-            if (childIndex_tmp == -1)
-            {
+            if (childIndex_tmp == -1) {
                 var debug = 0;
             }
-            if (childIndex_tmp == parent.children.length - 1)
-            {
+            if (childIndex_tmp == parent.children.length - 1) {
                 //last child, go one level higher			
                 id_tmp = parentID;
                 continue;

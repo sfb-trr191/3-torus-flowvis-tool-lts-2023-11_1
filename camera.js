@@ -1,5 +1,5 @@
-class GL_CameraData{
-    constructor(){
+class GL_CameraData {
+    constructor() {
         this.q_x = glMatrix.vec4.create();
         this.q_y = glMatrix.vec4.create();
         this.p_1m = glMatrix.vec4.create();
@@ -9,18 +9,18 @@ class GL_CameraData{
         this.normal_right = glMatrix.vec4.create();
         this.normal_top = glMatrix.vec4.create();
         this.normal_bottom = glMatrix.vec4.create();
-    } 
+    }
 
-    WriteToUniform(gl, program, uniform_variable_name){
-        var location_q_x = gl.getUniformLocation(program, uniform_variable_name+".q_x");
-        var location_q_y = gl.getUniformLocation(program, uniform_variable_name+".q_y");
-        var location_p_1m = gl.getUniformLocation(program, uniform_variable_name+".p_1m");
-        var location_E = gl.getUniformLocation(program, uniform_variable_name+".E");
-        var location_forward = gl.getUniformLocation(program, uniform_variable_name+".forward");
-        var location_normal_left = gl.getUniformLocation(program, uniform_variable_name+".normal_left");
-        var location_normal_right = gl.getUniformLocation(program, uniform_variable_name+".normal_right");
-        var location_normal_top = gl.getUniformLocation(program, uniform_variable_name+".normal_top");
-        var location_normal_bottom = gl.getUniformLocation(program, uniform_variable_name+".normal_bottom");
+    WriteToUniform(gl, program, uniform_variable_name) {
+        var location_q_x = gl.getUniformLocation(program, uniform_variable_name + ".q_x");
+        var location_q_y = gl.getUniformLocation(program, uniform_variable_name + ".q_y");
+        var location_p_1m = gl.getUniformLocation(program, uniform_variable_name + ".p_1m");
+        var location_E = gl.getUniformLocation(program, uniform_variable_name + ".E");
+        var location_forward = gl.getUniformLocation(program, uniform_variable_name + ".forward");
+        var location_normal_left = gl.getUniformLocation(program, uniform_variable_name + ".normal_left");
+        var location_normal_right = gl.getUniformLocation(program, uniform_variable_name + ".normal_right");
+        var location_normal_top = gl.getUniformLocation(program, uniform_variable_name + ".normal_top");
+        var location_normal_bottom = gl.getUniformLocation(program, uniform_variable_name + ".normal_bottom");
 
         gl.uniform4fv(location_q_x, this.q_x);
         gl.uniform4fv(location_q_y, this.q_y);
@@ -34,16 +34,16 @@ class GL_CameraData{
     }
 }
 
-class Camera{
+class Camera {
     /**
      * 
      * @param {string} name the name of the camera
      */
-     constructor(name) {
+    constructor(name) {
         this.name = name;
         this.height = 0;
         this.width = 0;
-        this.left_handed = false;        
+        this.left_handed = false;
         this.velocity_slow = 0.1;
         this.velocity = 1.0;
         this.rotationSpeed = 1;
@@ -71,15 +71,15 @@ class Camera{
         this.normal_top = glMatrix.vec3.create();
         this.normal_bottom = glMatrix.vec3.create();
 
-        console.log("Generate camera: "+name);
+        console.log("Generate camera: " + name);
 
     }
 
-    GetCameraData(){
+    GetCameraData() {
         return this.GetCameraDataWithPosition(this.position);
     }
 
-    GetCameraDataWithPosition(eyePosition){
+    GetCameraDataWithPosition(eyePosition) {
         var data = new GL_CameraData();
         data.q_x = vec4fromvec3(this.q_x, 0);
         data.q_y = vec4fromvec3(this.q_y, 0);
@@ -93,12 +93,12 @@ class Camera{
         return data;
     }
 
-    WriteToUniform(gl, program, uniform_variable_name){
+    WriteToUniform(gl, program, uniform_variable_name) {
         var data = this.GetCameraData();
         data.WriteToUniform(gl, program, uniform_variable_name);
     }
 
-    UpdateShaderValues(){
+    UpdateShaderValues() {
         //std::cout << "UpdateShaderValues" << std::endl;
         var T = glMatrix.vec3.create();
         var t = glMatrix.vec3.create();
@@ -129,12 +129,12 @@ class Camera{
         glMatrix.vec3.cross(v_n, t_n, b_n)//v_n = QVector3D::crossProduct(t_n, b_n);
 
         var g_x = d * Math.tan(theta * Math.PI / 180.0);//TODO does M_PI work here?
-        var g_y = g_x * m / (k*1.0);//TODO is this correct syntax?
+        var g_y = g_x * m / (k * 1.0);//TODO is this correct syntax?
 
         //uniforms
         glMatrix.vec3.scale(this.q_x, b_n, ((2 * g_x) / (k - 1)));//this.q_x = ((2 * g_x) / (k - 1)) * b_n;
         glMatrix.vec3.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
-        
+
         //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
         var t_n_times_d = glMatrix.vec3.create();
         var g_x_times_b_n = glMatrix.vec3.create();
@@ -154,7 +154,7 @@ class Camera{
         glMatrix.vec3.cross(this.normal_right, bottom_right, top_right);//normal_right = QVector3D::crossProduct(bottom_right, top_right);
         glMatrix.vec3.cross(this.normal_top, top_right, top_left);//normal_top = QVector3D::crossProduct(top_right, top_left);
         glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
-    
+
         /*
         console.log("position "+this.position);
         console.log("forward "+this.forward);
@@ -187,16 +187,16 @@ class Camera{
         */
     }
 
-    someTestFunction4546(){
+    someTestFunction4546() {
         console.log("someTestFunction4546")
     }
 
-    someTestFunction8454(x, y){
+    someTestFunction8454(x, y) {
         console.log("someTestFunction8454")
         console.log(x, y)
     }
 
-    StartPanning(x, y){
+    StartPanning(x, y) {
         console.log("start panning")
         this.xMouse_old = x;
         this.yMouse_old = y;
@@ -204,13 +204,13 @@ class Camera{
         this.changed = true;
     }
 
-    StopPanning(){
+    StopPanning() {
         console.log("stop panning")
         this.panning = false;
         this.changed = true;
     }
 
-    UpdatePanning(x, y, left_handed){
+    UpdatePanning(x, y, left_handed) {
         if (!this.panning)
             return;
         //console.log("UpdatePanning")
@@ -223,17 +223,16 @@ class Camera{
         var quaternion_up = glMatrix.quat.create();
         var quaternion_right = glMatrix.quat.create();
 
-        var FORWARD = glMatrix.vec3.fromValues(0,0,1);
-        var UP = glMatrix.vec3.fromValues(0,1,0);
+        var FORWARD = glMatrix.vec3.fromValues(0, 0, 1);
+        var UP = glMatrix.vec3.fromValues(0, 1, 0);
 
-        
+
         var handedness = left_handed ? 1 : -1;
         var invert = true;
 
         var deltaX = x - this.xMouse_old;
         var deltaY = y - this.yMouse_old;
-        if (invert)
-        {
+        if (invert) {
             deltaX *= -1;
             deltaY *= -1;
         }
@@ -246,7 +245,7 @@ class Camera{
         //glMatrix.quat.setAxes(quaternion, forward, right, up);//QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
         glMatrix.quat.setAxisAngle(quaternion_up, up, deltaX * -this.rotationSpeed);//quaternion = QQuaternion::fromAxisAndAngle(up, deltaX * -rotationSpeed) * quaternion;
         glMatrix.quat.setAxisAngle(quaternion_right, right, deltaY * -this.rotationSpeed);//quaternion = QQuaternion::fromAxisAndAngle(right, deltaY * -rotationSpeed) * quaternion;
-        
+
         glMatrix.quat.multiply(quaternion, quaternion_right, quaternion_up);
 
         glMatrix.vec3.transformQuat(this.forward, this.forward, quaternion);//forward = quaternion * QVector3D(0,0,1);
@@ -255,10 +254,10 @@ class Camera{
         this.xMouse_old = x;
         this.yMouse_old = y;
 
-        this.changed = true;        
+        this.changed = true;
     }
 
-    RollLeft(deltaTime, left_handed){
+    RollLeft(deltaTime, left_handed) {
         var handedness = left_handed ? 1 : -1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
@@ -267,7 +266,7 @@ class Camera{
         this.changed = true;
     }
 
-    RollRight(deltaTime, left_handed){
+    RollRight(deltaTime, left_handed) {
         var handedness = left_handed ? 1 : -1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
@@ -276,7 +275,7 @@ class Camera{
         this.changed = true;
     }
 
-    moveLeft(deltaTime, slow){
+    moveLeft(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var left = glMatrix.vec3.create();
@@ -290,7 +289,7 @@ class Camera{
         this.changed = true;
     }
 
-    moveRight(deltaTime, slow){   
+    moveRight(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var left = glMatrix.vec3.create();
@@ -304,7 +303,7 @@ class Camera{
         this.changed = true;
     }
 
-    moveForward(deltaTime, slow){
+    moveForward(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var change = glMatrix.vec3.create();
@@ -315,7 +314,7 @@ class Camera{
         this.changed = true;
     }
 
-    moveBackward(deltaTime, slow){        
+    moveBackward(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var change = glMatrix.vec3.create();
@@ -326,7 +325,7 @@ class Camera{
         this.changed = true;
     }
 
-    moveUp(deltaTime, slow){
+    moveUp(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
         var handedness = this.left_handed ? 1 : -1;
 
@@ -338,7 +337,7 @@ class Camera{
         this.changed = true;
     }
 
-    moveDown(deltaTime, slow){
+    moveDown(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
         var handedness = this.left_handed ? 1 : -1;
 
@@ -350,12 +349,12 @@ class Camera{
         this.changed = true;
     }
 
-    repositionCamera(){
-        for (var i=0; i<3; i++){
-            if (this.position[i] > 1.0){
+    repositionCamera() {
+        for (var i = 0; i < 3; i++) {
+            if (this.position[i] > 1.0) {
                 this.position[i] -= 1.0;
             }
-            else if (this.position[i] < 0.0){
+            else if (this.position[i] < 0.0) {
                 this.position[i] += 1.0;
             }
         }

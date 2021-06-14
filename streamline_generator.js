@@ -1,17 +1,17 @@
-class StreamlineGenerator{
+class StreamlineGenerator {
 
-    constructor(p_streamline_context){
+    constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
         this.p_raw_data = p_streamline_context.raw_data;
         this.seeds = [];
         this.num_points_per_streamline = 10;
         this.step_size = 0.0125;
         this.epsilon_move_just_outside_cube = 0.00001;
-        this.confine_to_cube = true;      
+        this.confine_to_cube = true;
         this.tubeRadius = 0.005;
     }
 
-    GenerateExampleSeeds(){
+    GenerateExampleSeeds() {
         console.log("GenerateExampleSeeds");
         this.seeds = [];
 
@@ -29,7 +29,7 @@ class StreamlineGenerator{
         this.seeds.push(seed);
     }
 
-    SetRulesTorus(){
+    SetRulesTorus() {
         console.log("SetRulesTorus");
         //rules
         this.shader_rule_x_pos_x = "x-1";	//if x>1 : x=___
@@ -58,20 +58,20 @@ class StreamlineGenerator{
         this.shader_rule_z_neg_z = "z+1";	//if z>1 : z=___
     }
 
-    CalculateRawStreamlines(){
+    CalculateRawStreamlines() {
         console.log("CalculateRawStreamlines");
         this.check_bounds = true;
         this.continue_at_bounds = true;
 
         this.p_raw_data.initialize(this.seeds, this.num_points_per_streamline);
 
-        for(var i=0; i<this.seeds.length; i++){
+        for (var i = 0; i < this.seeds.length; i++) {
             this.CalculateRawStreamline(i);
         }
         console.log("CalculateRawStreamlines completed");
     }
 
-    CalculateRawStreamline(seed_index){
+    CalculateRawStreamline(seed_index) {
         console.log("CalculateRawStreamline: ", seed_index);
 
         var startIndex = seed_index * this.num_points_per_streamline;
@@ -101,9 +101,9 @@ class StreamlineGenerator{
         var previous_plus_k1_2 = glMatrix.vec3.create();// previousPosition + k1/2
         var previous_plus_k2_2 = glMatrix.vec3.create();// previousPosition + k2/2
         var previous_plus_k3 = glMatrix.vec3.create();// previousPosition + k3
-        for (var i=1; i<this.num_points_per_streamline; i++){
+        for (var i = 1; i < this.num_points_per_streamline; i++) {
 
-            var currentIndex = startIndex+i;
+            var currentIndex = startIndex + i;
             var previousIndex = currentIndex - 1;
             var previousVec4 = this.p_raw_data.data[previousIndex].position;
             previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
@@ -115,12 +115,12 @@ class StreamlineGenerator{
             glMatrix.vec3.scale(k1, this.f(previousPosition, signum), this.step_size);
 
             //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
-            glMatrix.vec3.scale(k1_2, k1, 1/2);// k1_2 = k1/2
+            glMatrix.vec3.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
             glMatrix.vec3.add(previous_plus_k1_2, previousPosition, k1_2);// previousPosition + k1/2            
             glMatrix.vec3.scale(k2, this.f(previous_plus_k1_2, signum), this.step_size);
-            
-		    //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
-            glMatrix.vec3.scale(k2_2, k2, 1/2);// k2_2 = k2/2
+
+            //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
+            glMatrix.vec3.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
             glMatrix.vec3.add(previous_plus_k2_2, previousPosition, k2_2);// previousPosition + k2/2     
             glMatrix.vec3.scale(k3, this.f(previous_plus_k2_2, signum), this.step_size);
 
@@ -129,18 +129,18 @@ class StreamlineGenerator{
             glMatrix.vec3.scale(k4, this.f(previous_plus_k3, signum), this.step_size);
 
             //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
-            glMatrix.vec3.scale(k1_6, k1, 1/6);// k1_6 = k1/6
-            glMatrix.vec3.scale(k2_3, k2, 1/3);// k2_3 = k2/3
-            glMatrix.vec3.scale(k3_3, k3, 1/3);// k3_3 = k3/3
-            glMatrix.vec3.scale(k4_6, k4, 1/6);// k4_6 = k4/6
+            glMatrix.vec3.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+            glMatrix.vec3.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+            glMatrix.vec3.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+            glMatrix.vec3.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
             glMatrix.vec3.add(currentPosition, previousPosition, k1_6);// previousPosition + k1 / 6 
             glMatrix.vec3.add(currentPosition, currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
             glMatrix.vec3.add(currentPosition, currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
             glMatrix.vec3.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
 
             //console.log(i, currentPosition);
-            if(this.confine_to_cube)
-			    currentPosition = this.ConfineToCube(currentPosition, previousPosition);
+            if (this.confine_to_cube)
+                currentPosition = this.ConfineToCube(currentPosition, previousPosition);
 
 
             var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
@@ -153,33 +153,29 @@ class StreamlineGenerator{
             var time_current = time_previous + (this.step_size / v_average);
 
 
-            if(i == this.num_points_per_streamline-1)
-			    flag = 3;//end of polyline
+            if (i == this.num_points_per_streamline - 1)
+                flag = 3;//end of polyline
 
             var terminate = false;
-            if(this.check_bounds)
-            {
+            if (this.check_bounds) {
                 var outOfBounds = this.CheckOutOfBounds(currentPosition);
-                if (outOfBounds)
-                {
+                if (outOfBounds) {
                     flag = 3;//end of polyline
                     //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
-                
-                    if(this.continue_at_bounds && i<this.num_points_per_streamline-2)
-                    {
+
+                    if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
                         var movedPosition = this.MoveOutOfBounds(currentPosition);
                         var f_movedPosition = this.f(movedPosition, signum);
                         var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
-                        this.p_raw_data.data[currentIndex+1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
-                        this.p_raw_data.data[currentIndex+1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
-                        this.p_raw_data.data[currentIndex+1].time = time_current;
-                        this.p_raw_data.data[currentIndex+1].velocity = v_movedPosition;
-                        i++;				
+                        this.p_raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
+                        this.p_raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
+                        this.p_raw_data.data[currentIndex + 1].time = time_current;
+                        this.p_raw_data.data[currentIndex + 1].velocity = v_movedPosition;
+                        i++;
                     }
-                    else
-                    {
+                    else {
                         terminate = true;
-                    }						
+                    }
                 }
             }
 
@@ -189,12 +185,12 @@ class StreamlineGenerator{
             this.p_raw_data.data[currentIndex].time = time_current;
 
             //previousPosition = currentPosition;
-            if(terminate)
-			    break;
+            if (terminate)
+                break;
         }
     }
 
-    f(vector, signum){
+    f(vector, signum) {
         //console.log("--------------");
         //console.log("vector: ", vector, "test");
         //console.log("vector0: ", vector[0]);
@@ -217,14 +213,14 @@ class StreamlineGenerator{
         return result;
     }
 
-    CheckOutOfBounds(position){
-        for(var i=0; i<3; i++)
-            if(position[i] > 1 || position[i] < 0)
+    CheckOutOfBounds(position) {
+        for (var i = 0; i < 3; i++)
+            if (position[i] > 1 || position[i] < 0)
                 return true;
         return false;
     }
 
-    MoveOutOfBounds(position){
+    MoveOutOfBounds(position) {
         //user friendly variables
         var x = position[0];
         var y = position[1];
@@ -239,41 +235,35 @@ class StreamlineGenerator{
             y: y,
             z: z,
         };
-        
-        if(x > 1)
-        {
+
+        if (x > 1) {
             scope.x = math.evaluate(this.shader_rule_x_pos_x, scope);
             scope.y = math.evaluate(this.shader_rule_x_pos_y, scope);
             scope.z = math.evaluate(this.shader_rule_x_pos_z, scope);
         }
-        else if(x < 0)
-        {
+        else if (x < 0) {
             scope.x = math.evaluate(this.shader_rule_x_neg_x, scope);
             scope.y = math.evaluate(this.shader_rule_x_neg_y, scope);
             scope.z = math.evaluate(this.shader_rule_x_neg_z, scope);
         }
 
-        if(y > 1)
-        {
+        if (y > 1) {
             scope.x = math.evaluate(this.shader_rule_y_pos_x, scope);
             scope.y = math.evaluate(this.shader_rule_y_pos_y, scope);
             scope.z = math.evaluate(this.shader_rule_y_pos_z, scope);
         }
-        else if(y < 0)
-        {
+        else if (y < 0) {
             scope.x = math.evaluate(this.shader_rule_y_neg_x, scope);
             scope.y = math.evaluate(this.shader_rule_y_neg_y, scope);
             scope.z = math.evaluate(this.shader_rule_y_neg_z, scope);
         }
 
-        if(z > 1)
-        {
+        if (z > 1) {
             scope.x = math.evaluate(this.shader_rule_z_pos_x, scope);
             scope.y = math.evaluate(this.shader_rule_z_pos_y, scope);
             scope.z = math.evaluate(this.shader_rule_z_pos_z, scope);
         }
-        else if(z < 0)
-        {
+        else if (z < 0) {
             scope.x = math.evaluate(this.shader_rule_z_neg_x, scope);
             scope.y = math.evaluate(this.shader_rule_z_neg_y, scope);
             scope.z = math.evaluate(this.shader_rule_z_neg_z, scope);
@@ -283,30 +273,26 @@ class StreamlineGenerator{
     }
 
     //vec3 currentPosition, previousPosition
-    ConfineToCube(currentPosition, previousPosition){
+    ConfineToCube(currentPosition, previousPosition) {
         //return currentPosition;
         var confine = false;
         var min_t = 1000000;
-        for(var i=0; i<3; i++)
-        {
-            if(currentPosition[i] < 0)
-            {
+        for (var i = 0; i < 3; i++) {
+            if (currentPosition[i] < 0) {
                 confine = true;
                 var t = this.ExtractLinearPercentage(previousPosition[i], currentPosition[i], 0);
-                if(t < min_t)
+                if (t < min_t)
                     min_t = t;
             }
-            if(currentPosition[i] > 1)
-            {
+            if (currentPosition[i] > 1) {
                 confine = true;
                 var t = this.ExtractLinearPercentage(previousPosition[i], currentPosition[i], 1);
-                if(t < min_t)
+                if (t < min_t)
                     min_t = t;
             }
         }
 
-        if(confine)
-        {
+        if (confine) {
             //vec3 direction = currentPosition - previousPosition;
             var direction = glMatrix.vec3.create();
             glMatrix.vec3.subtract(direction, currentPosition, previousPosition);
@@ -330,8 +316,7 @@ class StreamlineGenerator{
     }
 
     //float a, b, value
-    ExtractLinearPercentage(a, b, value)
-    {
+    ExtractLinearPercentage(a, b, value) {
         return (value - a) / (b - a);
     }
 

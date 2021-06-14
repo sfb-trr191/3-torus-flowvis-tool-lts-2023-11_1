@@ -3,8 +3,8 @@ function getMousePosition(canvas, event) {
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
     return {
-        x : x,
-        y : y
+        x: x,
+        y: y
     };
 }
 
@@ -13,14 +13,13 @@ function getMousePositionPercentage(canvas, event) {
     let x = (event.clientX - rect.left) / rect.width;
     let y = (event.clientY - rect.top) / rect.height;
     return {
-        x : x,
-        y : y
+        x: x,
+        y: y
     };
 }
 
-function GetIndexInList(value, vector){
-    for (var i = 0; i < vector.length; i++)
-    {
+function GetIndexInList(value, vector) {
+    for (var i = 0; i < vector.length; i++) {
         if (vector[i] == value)
             return i;
     }
@@ -33,7 +32,7 @@ function GetIndexInList(value, vector){
  * @param {*} a point on the line 
  * @param {*} n direction of the line 
  */
-function distancePointToLine(p, a, n){
+function distancePointToLine(p, a, n) {
 
     var a_minus_p = glMatrix.vec3.create();
     glMatrix.vec3.subtract(a_minus_p, a, p);

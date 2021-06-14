@@ -1,5 +1,5 @@
-class PolyLineSegment{
-    
+class PolyLineSegment {
+
     constructor() {
         this.indexA = -1;
         this.indexB = -1;
@@ -9,8 +9,7 @@ class PolyLineSegment{
     }
 
     //std::vector<int>& pointIndices, std::vector<PositionData> &pointDataVector
-    CalculateDistances(pointIndices, pointDataVector)
-    {
+    CalculateDistances(pointIndices, pointDataVector) {
         //std::cout << "TODO PolyLineSegment::CalculateDistances" << std::endl;
         this.hasInBetweenVertex = (this.indexB - this.indexA) > 1;
         if (!this.hasInBetweenVertex)
@@ -30,16 +29,14 @@ class PolyLineSegment{
 
         //std::cout << "vecA: " << vecA.x() << ", "<< vecA.y() << ", "<<vecA.z() << std::endl;
         //std::cout << "vecB: " << vecB.x() << ", " << vecB.y() << ", " << vecB.z() << std::endl;
-        for (var i = this.indexA + 1; i < this.indexB; i++)
-        {
+        for (var i = this.indexA + 1; i < this.indexB; i++) {
             var iC = pointIndices[i];
             var vecC = glMatrix.vec3.create();
             vec3_from_vec4(vecC, pointDataVector[iC].position);
             var distance = distancePointToLine(vecC, vecA, direction);
             //std::cout << "vecC: " << vecC.x() << ", " << vecC.y() << ", " << vecC.z() << std::endl;
             //std::cout << "distance: " << distance << std::endl;
-            if (distance > this.highestDistance)
-            {
+            if (distance > this.highestDistance) {
                 this.indexHighestDistance = i;
                 this.highestDistance = distance;
             }
@@ -49,15 +46,15 @@ class PolyLineSegment{
 
 }
 
-class PolyLine{
- 
+class PolyLine {
+
     constructor() {
         this.pointIndices = [];//list<int>
     }
 }
 
-class MultiPolyLine{
- 
+class MultiPolyLine {
+
     constructor() {
         this.polyLines = [];//list<PolyLine>
         this.multiPolyID = -1;
@@ -70,14 +67,14 @@ class MultiPolyLine{
  * - They are then modified (e.g. simplified)
  * - Finally they are converted and stored in a DataUnit to be used as textures
  */
-class LODData{
+class LODData {
 
     /**
      * 
      * @param {string} name the name of the lod data
      */
     constructor(name, p_streamline_context, gl) {
-        console.log("Generate lod: "+name);
+        console.log("Generate lod: " + name);
         this.name = name;
         this.vectorMultiPolyLines = [];
         this.vectorLineSegment = [];
@@ -106,13 +103,13 @@ class LODData{
 
         this.data_textures = new DataTextures(gl, this.data_unit);
     }
-    
-    Reset(){
+
+    Reset() {
         this.vectorMultiPolyLines = [];
-        this.vectorLineSegment = [];  
+        this.vectorLineSegment = [];
     }
 
-    ExtractMultiPolyLines(){
+    ExtractMultiPolyLines() {
         console.log("ExtractMultiPolyLines");
         this.Reset();
 
@@ -120,58 +117,51 @@ class LODData{
         var multi = new MultiPolyLine();
         var poly = new PolyLine();
         var currentDirection;
-        for (var seedIndex = 0; seedIndex < this.p_raw_data.num_seeds; seedIndex++)
-        {
-            var startIndex = seedIndex*this.p_raw_data.num_points_per_streamline;
+        for (var seedIndex = 0; seedIndex < this.p_raw_data.num_seeds; seedIndex++) {
+            var startIndex = seedIndex * this.p_raw_data.num_points_per_streamline;
             var oldFlag = 1337;
-            for (var offset = 0; offset < this.p_raw_data.num_points_per_streamline; offset++)
-            {
+            for (var offset = 0; offset < this.p_raw_data.num_points_per_streamline; offset++) {
                 var index = startIndex + offset;
                 var flag = this.p_raw_data.data[index].position[3];
-                switch (flag)
-                {
-                case -1://new polyline other direction
-                    //console.log("case -1: new polyline other direction");
-                    currentDirection = DIRECTION_BACKWARD;
-                    poly.pointIndices.push(index);
-                    break;
-                case 0://skip point
-                    //console.log("case 0: skip point");
-                    break;
-                case 1://new polyline
-                    //console.log("case 1: new polyline");
-                    currentDirection = DIRECTION_FORWARD;
-                    poly.pointIndices.push(index);
-                    break;
-                case 2://normal point
-                    //console.log("case 2: normal point");
-                    poly.pointIndices.push(index);
-                    break;
-                case 3://end polyline
-                    //console.log("case 3: end polyline");
-                    poly.pointIndices.push(index);
-                    if (poly.pointIndices.length == 1)
-                    {
-                        console.log("Error size 1");
-                    }
-                    multi.polyLines.push(poly);
-                    poly = new PolyLine();;//cleanup for next poly
-                    break;
-                default://ERROR
-                    console.log("Error unknown flag: ", flag);
-                    break;
+                switch (flag) {
+                    case -1://new polyline other direction
+                        //console.log("case -1: new polyline other direction");
+                        currentDirection = DIRECTION_BACKWARD;
+                        poly.pointIndices.push(index);
+                        break;
+                    case 0://skip point
+                        //console.log("case 0: skip point");
+                        break;
+                    case 1://new polyline
+                        //console.log("case 1: new polyline");
+                        currentDirection = DIRECTION_FORWARD;
+                        poly.pointIndices.push(index);
+                        break;
+                    case 2://normal point
+                        //console.log("case 2: normal point");
+                        poly.pointIndices.push(index);
+                        break;
+                    case 3://end polyline
+                        //console.log("case 3: end polyline");
+                        poly.pointIndices.push(index);
+                        if (poly.pointIndices.length == 1) {
+                            console.log("Error size 1");
+                        }
+                        multi.polyLines.push(poly);
+                        poly = new PolyLine();;//cleanup for next poly
+                        break;
+                    default://ERROR
+                        console.log("Error unknown flag: ", flag);
+                        break;
                 }
-                if (flag == oldFlag)
-                {
-                    if (flag == 3 || flag == 1 || flag == -1)
-                    {
+                if (flag == oldFlag) {
+                    if (flag == 3 || flag == 1 || flag == -1) {
                         console.log("Error consecutive flags: ", flag);
                     }
                 }
                 oldFlag = flag;
             }
-            if (direction != DIRECTION_BOTH || currentDirection == DIRECTION_BACKWARD)
-            {
+            if (direction != DIRECTION_BOTH || currentDirection == DIRECTION_BACKWARD) {
                 //the multi poly line ends for every seed in "direction=forward" or "direction=backward" mode
                 //in "direction=both" mode, the multi poly ends if the current direction is backward
                 //because seeds alternate forward and backward
@@ -180,17 +170,17 @@ class LODData{
             }
         }
 
-        for (var i = 0; i < this.vectorMultiPolyLines.length; i++)	
+        for (var i = 0; i < this.vectorMultiPolyLines.length; i++)
             this.vectorMultiPolyLines[i].multiPolyID = i;
-        
+
         console.log("this.vectorMultiPolyLines: ", this.vectorMultiPolyLines);
         console.log("ExtractMultiPolyLines completed");
     }
 
-    DouglasPeuker(lod_data_original){
+    DouglasPeuker(lod_data_original) {
         console.log("DouglasPeuker: ", this.name);
         this.Reset();
-        for (var i = 0; i < lod_data_original.vectorMultiPolyLines.length; i++){
+        for (var i = 0; i < lod_data_original.vectorMultiPolyLines.length; i++) {
             this.DouglasPeukerMulti(lod_data_original.vectorMultiPolyLines[i]);
         }
         //lod_data_original.LogState();
@@ -198,67 +188,62 @@ class LODData{
         console.log("DouglasPeuker completed");
     }
 
-    DouglasPeukerMulti(originalMulti){
+    DouglasPeukerMulti(originalMulti) {
         var newMulti = new MultiPolyLine();
         newMulti.multiPolyID = originalMulti.multiPolyID;
-        for (var i = 0; i < originalMulti.polyLines.length; i++){
+        for (var i = 0; i < originalMulti.polyLines.length; i++) {
             this.DouglasPeukerAddPoly(newMulti, originalMulti.polyLines[i]);
         }
         this.vectorMultiPolyLines.push(newMulti);
-            
+
     }
 
-    DouglasPeukerAddPoly(newMulti, originalPoly){
+    DouglasPeukerAddPoly(newMulti, originalPoly) {
         var numberOfPoints = originalPoly.pointIndices.length;
         var vectorKeep = new Array(numberOfPoints);//address via local index
-        for (var i = 1; i < numberOfPoints - 1; i++){
+        for (var i = 1; i < numberOfPoints - 1; i++) {
             vectorKeep[i] = false;
         }
         vectorKeep[0] = true;
         vectorKeep[numberOfPoints - 1] = true;
-    
+
         var segment = new PolyLineSegment();
         segment.indexA = 0;//address via local index
         segment.indexB = numberOfPoints - 1;//address via local index
         var stack = [];//stack<PolyLineSegment>
         stack.push(segment);
-    
-        while (stack.length > 0)
-        {
+
+        while (stack.length > 0) {
             var segment = stack.pop();
             //std::cout << "pop: " << segment.indexA << ", " << segment.indexB << std::endl;
-    
+
             segment.CalculateDistances(originalPoly.pointIndices, this.p_raw_data.data);
-            if (segment.hasInBetweenVertex && segment.highestDistance > this.douglasPeukerParameter)
-            {
+            if (segment.hasInBetweenVertex && segment.highestDistance > this.douglasPeukerParameter) {
                 //std::cout << "segment split: " << segment.indexA << ", " << segment.indexB << std::endl;
                 //std::cout << "segment.highestDistance: " << segment.highestDistance << std::endl;
                 //indexVector.push_back(pointIDs->GetId(segment.indexHighestDistance));
                 vectorKeep[segment.indexHighestDistance] = true;//address via local index
-    
+
                 var segmentLow = new PolyLineSegment();
                 segmentLow.indexA = segment.indexA;//address via local index
                 segmentLow.indexB = segment.indexHighestDistance;//address via local index
                 stack.push(segmentLow);
                 //std::cout << "push: " << segmentLow.indexA << ", " << segmentLow.indexB << std::endl;
-    
+
                 var segmentHigh = new PolyLineSegment();
                 segmentHigh.indexA = segment.indexHighestDistance;//address via local index
                 segmentHigh.indexB = segment.indexB;//address via local index
                 stack.push(segmentHigh);
                 //std::cout << "push: " << segmentHigh.indexA << ", " << segmentHigh.indexB << std::endl;
             }
-            else
-            {
+            else {
                 continue;
             }
         }
-        
+
         var newPoly = new PolyLine();
-        for (var localIndex = 0; localIndex < numberOfPoints; localIndex++)
-        {
-            if (vectorKeep[localIndex])
-            {
+        for (var localIndex = 0; localIndex < numberOfPoints; localIndex++) {
+            if (vectorKeep[localIndex]) {
                 var globalIndex = originalPoly.pointIndices[localIndex];
                 newPoly.pointIndices.push(globalIndex);
             }
@@ -266,16 +251,13 @@ class LODData{
         newMulti.polyLines.push(newPoly);
     }
 
-    GenerateLineSegments(){
+    GenerateLineSegments() {
         console.log("GenerateLineSegments");
-        for (var i = 0; i < this.vectorMultiPolyLines.length; i++)
-        {
+        for (var i = 0; i < this.vectorMultiPolyLines.length; i++) {
             var m = this.vectorMultiPolyLines[i];
-            for (var j = 0; j < m.polyLines.length; j++)
-            {
+            for (var j = 0; j < m.polyLines.length; j++) {
                 var p = m.polyLines[j];
-                for (var k = 1; k < p.pointIndices.length; k++)
-                {
+                for (var k = 1; k < p.pointIndices.length; k++) {
                     var segment = new LineSegment();
                     segment.indexA = p.pointIndices[k - 1];
                     segment.indexB = p.pointIndices[k];
@@ -287,13 +269,12 @@ class LODData{
             }
         }
         console.log("GenerateLineSegments completed");
-        console.log("this.vectorLineSegment [", this.vectorLineSegment.length, "]: " , this.vectorLineSegment);
+        console.log("this.vectorLineSegment [", this.vectorLineSegment.length, "]: ", this.vectorLineSegment);
     }
 
-    CalculateMatrices(){        
+    CalculateMatrices() {
         console.log("CalculateMatrices");
-        for (var i = 0; i < this.vectorLineSegment.length; i++)
-        {
+        for (var i = 0; i < this.vectorLineSegment.length; i++) {
             var matrixTranslation = glMatrix.mat4.create();
             var matrixRotation1 = glMatrix.mat4.create();
             var matrixRotation2 = glMatrix.mat4.create();
@@ -305,8 +286,8 @@ class LODData{
             var posB_os = glMatrix.vec4.create();
 
             var translation_vector = glMatrix.vec3.create();
-            var axis_x = glMatrix.vec3.fromValues(1,0,0);
-            var axis_y = glMatrix.vec3.fromValues(0,1,0);
+            var axis_x = glMatrix.vec3.fromValues(1, 0, 0);
+            var axis_y = glMatrix.vec3.fromValues(0, 1, 0);
 
             //std::cout << "------------------------------" << i << std::endl;
             //std::cout << "SEGMENT: " << i << std::endl;
@@ -321,7 +302,7 @@ class LODData{
             vec3_from_vec4(translation_vector, posA_ws);
             glMatrix.vec3.negate(translation_vector, translation_vector);
             glMatrix.mat4.fromTranslation(matrixTranslation, translation_vector);//matrixTranslation.translate(-1 * posA_ws.toVector3D());
-            
+
             glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixTranslation);//var posA_os = matrixTranslation * posA_ws;//vec4
             glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixTranslation);//var posB_os = matrixTranslation * posB_ws;//vec4
             //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
@@ -355,8 +336,7 @@ class LODData{
             //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
             //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
 
-            if (posB_os[2] < posA_os[2])
-            {
+            if (posB_os[2] < posA_os[2]) {
                 glMatrix.mat4.fromRotation(matrixRotation3, Math.PI, axis_x);//rotate.rotate(180, QVector3D(1, 0, 0));
                 glMatrix.mat4.multiply(matrixCombined, matrixRotation3, matrixCombined);//matrixCombined = rotate * matrixCombined;
                 glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
@@ -364,7 +344,7 @@ class LODData{
                 //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
                 //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
             }
-            
+
             glMatrix.mat4.invert(matrixInverted, matrixCombined);//matrixInverted = matrixCombined.inverted();
 
             this.vectorLineSegment[i].matrix = matrixCombined;
@@ -392,24 +372,24 @@ class LODData{
             console.log("posA_2: ", a2);
             console.log("posB_2: ", b2);
             */
-        }        
-        console.log("CalculateMatrices completed"); 
+        }
+        console.log("CalculateMatrices completed");
     }
 
-    CalculateBVH(){
+    CalculateBVH() {
         console.log("CalculateBVH");
-        var bvh = new BVH_AA();        
+        var bvh = new BVH_AA();
         var tubeRadius = this.p_streamline_generator.tubeRadius;
         var maxCost = -1;
         var growthID = -1;
         var volume_threshold = 0.0001;
         bvh.GenerateTree(this.p_raw_data.data, this.vectorLineSegment, tubeRadius, maxCost, growthID, volume_threshold);
         this.tree_nodes = bvh.ConvertNodes();
-        console.log("tree_nodes: "+this.tree_nodes);
+        console.log("tree_nodes: " + this.tree_nodes);
         console.log("CalculateBVH completed");
     }
 
-    UpdateDataUnit(){
+    UpdateDataUnit() {
         console.log("UpdateDataUnit");
         this.data_container_dir_lights.data = this.p_lights.dir_lights;
         this.data_container_positions.data = this.p_raw_data.position_data;
@@ -419,13 +399,13 @@ class LODData{
         console.log("UpdateDataUnit completed");
     }
 
-    UpdateDataTextures(gl){
+    UpdateDataTextures(gl) {
         console.log("UpdateDataTextures");
         this.data_textures.update(gl);
         console.log("UpdateDataTextures completed");
     }
 
-    bind(gl, shader_uniforms, location_texture_float, location_texture_int){
+    bind(gl, shader_uniforms, location_texture_float, location_texture_int) {
         gl.activeTexture(gl.TEXTURE0);                  // added this and following line to be extra sure which texture is being used...
         gl.bindTexture(gl.TEXTURE_3D, this.data_textures.texture_float.texture);
         gl.uniform1i(location_texture_float, 0);
@@ -444,13 +424,13 @@ class LODData{
         shader_uniforms.updateUniforms();
     }
 
-    GenerateLineSegmentCopies(){
+    GenerateLineSegmentCopies() {
         console.log("GenerateLineSegmentCopies");
         this.p_segment_duplicator.GenerateLineSegmentCopies(this);
         console.log("GenerateLineSegmentCopies completed");
     }
 
-    LogState(){
+    LogState() {
         console.log("LOD: " + this.name);
         console.log("segments: " + this.vectorLineSegment.length);
         console.log("nodes: " + this.tree_nodes.length);

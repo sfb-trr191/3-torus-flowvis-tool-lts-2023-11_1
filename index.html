@@ -1,65 +1,67 @@
 <!doctype html>
 <html>
+
 <head>
-  <title>Reeb Vector Fields</title>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link href="index.css" rel="stylesheet" type="text/css"/>
-  <script src="libs/gl-matrix.js" type="text/javascript"> </script>
-  <script src="libs/jquery-3.6.0.js" type="text/javascript"> </script>
-  <script src="libs/math.js" type="text/javascript"></script>
-  <script src="gl_matrix_extensions.js" type="text/javascript"> </script>
-  <script src="error.js" type="text/javascript"> </script>
-  <script src="const.js" type="text/javascript"> </script>
-  <script src="utility.js" type="text/javascript"> </script>
-  <script src="shader_uniforms.js" type="text/javascript"> </script>
-  <script src="input_manager.js" type="text/javascript"> </script>
-  <script src="mouse_manager.js" type="text/javascript"> </script>
-  <script src="shader/ray_test.glsl" type="text/javascript"> </script>
-  <script src="data_types.js" type="text/javascript"> </script>
-  <script src="data_container.js" type="text/javascript"> </script>
-  <script src="data_unit.js" type="text/javascript"> </script>
-  <script src="data_textures.js" type="text/javascript"> </script>
-  <script src="lights.js" type="text/javascript"> </script>
-  <script src="raw_data.js" type="text/javascript"> </script>
-  <script src="aabb.js" type="text/javascript"> </script>
-  <script src="bvh_aa.js" type="text/javascript"> </script>
-  <script src="lod_data.js" type="text/javascript"> </script>
-  <script src="streamline_generator.js" type="text/javascript"> </script>
-  <script src="segment_duplicator.js" type="text/javascript"> </script>
-  <script src="streamline_context.js" type="text/javascript"> </script>
-  <script src="webgl.js" type="text/javascript"> </script>
-  <script src="camera.js" type="text/javascript"> </script>
-  <script src="index.js" type="text/javascript"> </script>
+    <title>Reeb Vector Fields</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="index.css" rel="stylesheet" type="text/css" />
+    <script src="libs/gl-matrix.js" type="text/javascript"> </script>
+    <script src="libs/jquery-3.6.0.js" type="text/javascript"> </script>
+    <script src="libs/math.js" type="text/javascript"></script>
+    <script src="gl_matrix_extensions.js" type="text/javascript"> </script>
+    <script src="error.js" type="text/javascript"> </script>
+    <script src="const.js" type="text/javascript"> </script>
+    <script src="utility.js" type="text/javascript"> </script>
+    <script src="shader_uniforms.js" type="text/javascript"> </script>
+    <script src="input_manager.js" type="text/javascript"> </script>
+    <script src="mouse_manager.js" type="text/javascript"> </script>
+    <script src="shader/ray_test.glsl" type="text/javascript"> </script>
+    <script src="data_types.js" type="text/javascript"> </script>
+    <script src="data_container.js" type="text/javascript"> </script>
+    <script src="data_unit.js" type="text/javascript"> </script>
+    <script src="data_textures.js" type="text/javascript"> </script>
+    <script src="lights.js" type="text/javascript"> </script>
+    <script src="raw_data.js" type="text/javascript"> </script>
+    <script src="aabb.js" type="text/javascript"> </script>
+    <script src="bvh_aa.js" type="text/javascript"> </script>
+    <script src="lod_data.js" type="text/javascript"> </script>
+    <script src="streamline_generator.js" type="text/javascript"> </script>
+    <script src="segment_duplicator.js" type="text/javascript"> </script>
+    <script src="streamline_context.js" type="text/javascript"> </script>
+    <script src="webgl.js" type="text/javascript"> </script>
+    <script src="camera.js" type="text/javascript"> </script>
+    <script src="index.js" type="text/javascript"> </script>
 </head>
+
 <body>
-  <div>
-    <p>tick: <strong>0</strong> - frame: <strong>0</strong></p>    
-    <button type="button" id="button_request_data">Calculate</button>
-  </div>
-  <div class="container">
-    <div class="column column-one">
-      <canvas id="main_canvas" tabindex="1">Your browser does not seem to support 
-      HTML5 canvas.</canvas>
-    </div>    
-    <div class="column column-two">
-      <form>
-        <label>u</label>
-        <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">    
-        <label>v</label>
-        <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
-        <label>w</label>
-        <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
-        <label>points per streamline</label>
-        <input id="input_num_points_per_streamline" type="text" value="1000">
-        <label>step size</label>
-        <input id="input_step_size" type="text" value="0.0125">
-        <label>duplicator iterations</label>
-        <input id="segment_duplicator_iterations" type="text" value="1">  
-      </form>      
+    <div>
+        <p>tick: <strong>0</strong> - frame: <strong>0</strong></p>
+        <button type="button" id="button_request_data">Calculate</button>
     </div>
- </div>
-  <script type="x-shader/x-vertex" id="vertex-shader">#version 300 es
+    <div class="container">
+        <div class="column column-one">
+            <canvas id="main_canvas" tabindex="1">Your browser does not seem to support
+                HTML5 canvas.</canvas>
+        </div>
+        <div class="column column-two">
+            <form>
+                <label>u</label>
+                <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
+                <label>v</label>
+                <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+                <label>w</label>
+                <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
+                <label>points per streamline</label>
+                <input id="input_num_points_per_streamline" type="text" value="1000">
+                <label>step size</label>
+                <input id="input_step_size" type="text" value="0.0125">
+                <label>duplicator iterations</label>
+                <input id="segment_duplicator_iterations" type="text" value="1">
+            </form>
+        </div>
+    </div>
+    <script type="x-shader/x-vertex" id="vertex-shader">#version 300 es
 precision mediump int;
 precision mediump float;
 void main() {
@@ -67,7 +69,7 @@ void main() {
   gl_PointSize = 800.0;
 }
   </script>
-  <script type="x-shader/x-fragment" id="fragment-shader">#version 300 es
+    <script type="x-shader/x-fragment" id="fragment-shader">#version 300 es
 precision mediump int;
 precision mediump float;
 precision mediump sampler3D;
@@ -111,4 +113,5 @@ vec4 getTestColor(int x, int y, int z)
 }
   </script>
 </body>
+
 </html>
