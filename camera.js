@@ -41,8 +41,12 @@ class Camera {
      */
     constructor(name) {
         this.name = name;
-        this.height = 0;
         this.width = 0;
+        this.height = 0;
+        this.width_still = 0;
+        this.height_still = 0;
+        this.width_panning = 0;
+        this.height_panning = 0;
         this.left_handed = false;
         this.velocity_slow = 0.1;
         this.velocity = 1.0;
@@ -73,6 +77,15 @@ class Camera {
 
         console.log("Generate camera: " + name);
 
+    }
+
+    SetRenderSizes(width, height, width_panning, height_panning) {
+        this.width = width;
+        this.height = height;
+        this.width_still = width;
+        this.height_still = height;
+        this.width_panning = width_panning;
+        this.height_panning = height_panning;
     }
 
     GetCameraData() {
@@ -202,12 +215,16 @@ class Camera {
         this.yMouse_old = y;
         this.panning = true;
         this.changed = true;
+        this.width = this.width_panning;
+        this.height = this.height_panning;
     }
 
     StopPanning() {
         console.log("stop panning")
         this.panning = false;
         this.changed = true;
+        this.width = this.width_still;
+        this.height = this.height_still;
     }
 
     UpdatePanning(x, y, left_handed) {
