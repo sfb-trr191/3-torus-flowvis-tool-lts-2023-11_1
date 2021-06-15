@@ -30,8 +30,8 @@ class CanvasWrapper {
         
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
-        this.render_wrapper_raytracing_panning_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_panning, camera.height_panning);
-        this.render_wrapper_raytracing_panning_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_panning, camera.height_panning);
+        this.render_wrapper_raytracing_panning_left = new RenderWrapper(gl, name + "_raytracing_panning_left", camera.width_panning, camera.height_panning);
+        this.render_wrapper_raytracing_panning_right = new RenderWrapper(gl, name + "_raytracing_panning_right", camera.width_panning, camera.height_panning);
 
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, F_SHADER_RAYTRACING);
@@ -51,6 +51,18 @@ class CanvasWrapper {
 
     SetCanvasSize(width, height) {
 
+    }
+
+    UpdatePanningResolutionFactor(gl, panning_resolution_factor){
+        var width_panning = Math.round(this.camera.width_still * panning_resolution_factor);
+        var height_panning = Math.round(this.camera.height_still * panning_resolution_factor);
+        var changed = (width_panning != this.camera.width_panning)||(height_panning != this.camera.height_panning);
+        if(changed){
+            this.camera.width_panning = width_panning;
+            this.camera.height_panning = height_panning;
+            this.render_wrapper_raytracing_panning_left.resize(gl, width_panning, height_panning);
+            this.render_wrapper_raytracing_panning_right.resize(gl, width_panning, height_panning);
+        }
     }
 
     draw(gl) {

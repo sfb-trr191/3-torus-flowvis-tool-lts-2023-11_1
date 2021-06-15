@@ -42,7 +42,6 @@
 <body>
     <div>
         <p>tick: <strong>0</strong> - frame: <strong>0</strong></p>
-        <button type="button" id="button_request_data">Calculate</button>
     </div>
     <div class="container">
         <div class="column column-one">
@@ -51,18 +50,29 @@
         </div>
         <div class="column column-two">
             <form>
-                <label>u</label>
-                <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
-                <label>v</label>
-                <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
-                <label>w</label>
-                <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
-                <label>points per streamline</label>
-                <input id="input_num_points_per_streamline" type="text" value="1000">
-                <label>step size</label>
-                <input id="input_step_size" type="text" value="0.0125">
-                <label>duplicator iterations</label>
-                <input id="segment_duplicator_iterations" type="text" value="1">
+                <fieldset>
+                    <button type="button" id="button_request_data">calculate</button>
+                    <label></label>
+                    <label>u</label>
+                    <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
+                    <label>v</label>
+                    <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+                    <label>w</label>
+                    <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
+                    <label>points per streamline</label>
+                    <input id="input_num_points_per_streamline" type="text" value="2000">
+                    <label>step size</label>
+                    <input id="input_step_size" type="text" value="0.0125">
+                    <label>duplicator iterations</label>
+                    <input id="segment_duplicator_iterations" type="text" value="1">
+                </fieldset>
+                <fieldset>
+                    <button type="button" id="button_render_settings">update render settings</button>
+                    <label></label>
+                    <label>panning resolution factor</label>
+                    <input id="input_panning_resolution_factor" type="text" value="0.5">
+                </fieldset>
+
             </form>
         </div>
     </div>

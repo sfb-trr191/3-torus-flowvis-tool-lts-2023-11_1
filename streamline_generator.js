@@ -7,7 +7,7 @@ class StreamlineGenerator {
         this.num_points_per_streamline = 10;
         this.step_size = 0.0125;
         this.epsilon_move_just_outside_cube = 0.00001;
-        this.confine_to_cube = true;
+        this.confine_to_cube = false;
         this.tubeRadius = 0.005;
     }
 
@@ -75,6 +75,7 @@ class StreamlineGenerator {
         console.log("CalculateRawStreamline: ", seed_index);
 
         var startIndex = seed_index * this.num_points_per_streamline;
+        var total_points = this.p_raw_data.num_points;
         var positionData = this.p_raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
         var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;

@@ -50,6 +50,7 @@
         console.log("onStart");
         window.removeEventListener(evt.type, onStart, false);
         addOnClickRequestData();
+        addOnClickUpdateRenderSettings();
 
         main_canvas = document.getElementById("main_canvas");
 
@@ -231,17 +232,35 @@
 
     function addOnClickRequestData() {
         document.getElementById("button_request_data").addEventListener("click", function () {
-            console.log("onClickRequestData: " + GLOBAL_DATA);
-            var shader_formula_u = document.getElementById("input_field_equation_u").value;
-            var shader_formula_v = document.getElementById("input_field_equation_v").value;
-            var shader_formula_w = document.getElementById("input_field_equation_w").value;
-            var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
-            var step_size = document.getElementById("input_step_size").value;
-            var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
-            var direction = DIRECTION_FORWARD;
-            streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
-            data_changed = true;
+            console.log("onClickRequestData");
+            CalculateStreamlines();    
         });
+    }
+
+    function addOnClickUpdateRenderSettings() {
+        document.getElementById("button_render_settings").addEventListener("click", function () {
+            console.log("onClickUpdateRenderSettings");            
+            UpdateRenderSettings();
+        });
+    }
+
+    function CalculateStreamlines(){
+        console.log("CalculateStreamlines");
+        var shader_formula_u = document.getElementById("input_field_equation_u").value;
+        var shader_formula_v = document.getElementById("input_field_equation_v").value;
+        var shader_formula_w = document.getElementById("input_field_equation_w").value;
+        var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
+        var step_size = document.getElementById("input_step_size").value;
+        var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
+        var direction = DIRECTION_FORWARD;
+        streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
+        data_changed = true;    
+    }
+
+    function UpdateRenderSettings(){
+        console.log("UpdateRenderSettings");
+        var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
+        canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
     }
 
     function on_update_old() {
