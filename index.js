@@ -51,6 +51,7 @@
         window.removeEventListener(evt.type, onStart, false);
         addOnClickRequestData();
         addOnClickUpdateRenderSettings();
+        testWebGPU();
 
         main_canvas = document.getElementById("main_canvas");
 
@@ -72,7 +73,7 @@
         streamline_context_static = new StreamlineContext("static", lights, gl);
         streamline_context_static.CalculateExampleStreamlines(gl);
 
-        main_camera.SetRenderSizes(800,600,400,300);
+        main_camera.SetRenderSizes(800, 600, 400, 300);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
         main_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
         main_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
@@ -233,18 +234,18 @@
     function addOnClickRequestData() {
         document.getElementById("button_request_data").addEventListener("click", function () {
             console.log("onClickRequestData");
-            CalculateStreamlines();    
+            CalculateStreamlines();
         });
     }
 
     function addOnClickUpdateRenderSettings() {
         document.getElementById("button_render_settings").addEventListener("click", function () {
-            console.log("onClickUpdateRenderSettings");            
+            console.log("onClickUpdateRenderSettings");
             UpdateRenderSettings();
         });
     }
 
-    function CalculateStreamlines(){
+    function CalculateStreamlines() {
         console.log("CalculateStreamlines");
         var shader_formula_u = document.getElementById("input_field_equation_u").value;
         var shader_formula_v = document.getElementById("input_field_equation_v").value;
@@ -254,10 +255,10 @@
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
         var direction = DIRECTION_FORWARD;
         streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
-        data_changed = true;    
+        data_changed = true;
     }
 
-    function UpdateRenderSettings(){
+    function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
         canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
@@ -553,6 +554,34 @@
 
         timer = setTimeout(on_update, 1);
     }
+
+    function testWebGPU() {
+        async function demo() {
+            console.log('B');
+            const adapter = await navigator.gpu.requestAdapter();
+            if (!adapter) {
+                console.log("testWebGPU error A");
+                return;
+
+            }
+            const device = await adapter.requestDevice();
+            if (!device) {
+                console.log("testWebGPU error B");
+                return;
+
+            }
+            console.log("testWebGPU successful");
+            console.log('C');
+        }
+
+        console.log('A');
+        demo().then(() => {
+            console.log('D');
+        });
+
+        console.log('E');
+    }
+
 
 
 })();
