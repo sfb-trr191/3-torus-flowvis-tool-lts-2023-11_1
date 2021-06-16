@@ -52,6 +52,7 @@
         addOnClickRequestData();
         addOnClickUpdateRenderSettings();
         testWebGPU();
+        testParameterExtractionFromURL();
 
         main_canvas = document.getElementById("main_canvas");
 
@@ -580,6 +581,31 @@
         });
 
         console.log('E');
+    }
+
+    function testParameterExtractionFromURL() {
+        console.log("testParameterExtractionFromURL");
+
+        //ENCODING
+        const params = {
+            u: '2 * sin(2 * PI * z)',
+            v: 'sin(2 * PI * y) + 2 * cos (2 * PI * z)'
+        }
+
+        var query_string = "?" + Object.entries(params)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+            .join('&')
+
+        console.log("query_string:", query_string);
+
+        //DECODING
+        console.log("window.location.search:", window.location.search);
+        const urlParams = new URLSearchParams(window.location.search);
+        const u = urlParams.get('u')
+        console.log("u:", u);
+        const v = urlParams.get('v')
+        console.log("v:", v);
+
     }
 
 
