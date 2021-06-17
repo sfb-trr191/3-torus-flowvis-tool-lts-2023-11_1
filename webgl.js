@@ -70,11 +70,18 @@ function loadShaderProgramFromCode(gl, program, v_source, f_source) {
     gl.compileShader(fragmentShader);
 
     // Check the compile status
-    var compiled = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
+    var compiled = gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS);
+    if (!compiled) {
+        // Something went wrong during compilation; get the error
+        console.error(gl.getShaderInfoLog(vertexShader));
+        console.log("test point 1 vertexShader");
+    }
+
+    compiled = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
     if (!compiled) {
         // Something went wrong during compilation; get the error
         console.error(gl.getShaderInfoLog(fragmentShader));
-        console.log("test point 1");
+        console.log("test point 1 fragmentShader");
     }
 
     gl.attachShader(program, vertexShader);

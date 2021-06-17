@@ -220,6 +220,8 @@ class Camera {
     }
 
     StopPanning() {
+        if (!this.panning)
+            return;
         console.log("stop panning")
         this.panning = false;
         this.changed = true;

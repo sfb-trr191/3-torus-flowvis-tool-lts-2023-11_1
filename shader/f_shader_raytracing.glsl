@@ -129,6 +129,8 @@ const int TYPE_GL_CYLINDER = 3;
 uniform float color_r;
 uniform sampler3D texture_float;
 uniform isampler3D texture_int;
+uniform float offset_x;
+uniform float offset_y;
 
 uniform int width;
 uniform int height;
@@ -207,9 +209,7 @@ ivec3 GetIndex3D(int global_index);
 
 void main() {
 	HitInformation hit;
-	float x_offset = 0.0;
-	float y_offset = 0.0;
-	vec3 color = CalculateOneRay(x_offset, y_offset, hit);
+	vec3 color = CalculateOneRay(offset_x, offset_y, hit);
 	//if(hit.hitType > TYPE_NONE)
 	//{
   //  

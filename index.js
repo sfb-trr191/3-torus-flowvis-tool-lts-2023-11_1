@@ -40,6 +40,7 @@
     var streamline_context_static;//the static streamlines
     var streamline_context_dynamic;//interactive streamline placement
 
+    var aliasing;
     var canvas_wrapper_main;
 
     var buffer_lights;
@@ -79,7 +80,9 @@
         main_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
         main_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
 
-        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera);
+        aliasing = new Aliasing();
+
+        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing);
 
         var tex = generateDataTextureFloat(gl);
         texture_float = tex.texture;
@@ -161,24 +164,21 @@
         //gl.uniform1f(location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         //gl.uniform1i(location_width, main_camera.width);
         //gl.uniform1i(location_height, main_camera.height);
+        /*
+        var progressive_active = true;
+        if (main_camera.changed || data_changed || progressive_active) {
 
-        if (main_camera.changed || data_changed) {
-            /*
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            var panning = main_camera.panning;
-            var active_lod = panning ? 2 : 0;
-            streamline_context_static.bind_lod(active_lod, gl, program_shader_uniforms, location_texture_float, location_texture_int);
-    
             frame_counter++;
             main_camera.changed = false;
             data_changed = false;
-            gl.drawArrays(gl.POINTS, 0, 1);
-            */
-            frame_counter++;
-            main_camera.changed = false;
-            data_changed = false;
-            canvas_wrapper_main.draw(gl);
+            canvas_wrapper_main.draw(gl, data_changed);
         }
+*/
+        canvas_wrapper_main.draw(gl, data_changed);
+        frame_counter++;
+        frame_counter = canvas_wrapper_main.aliasing_index;
+        main_camera.changed = false;
+        data_changed = false;
 
         gl.finish();
         strong_tick_counter.innerHTML = tick_counter;

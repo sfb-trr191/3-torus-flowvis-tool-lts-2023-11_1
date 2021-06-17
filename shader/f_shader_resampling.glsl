@@ -10,12 +10,13 @@ uniform sampler2D texture1;
 uniform sampler2D texture2;
 
 uniform float progress;
-uniform float progressbar_height;
-uniform bool progressbar;
+uniform bool show_progressbar;
 uniform	int text_rect_width;
 uniform	int text_rect_height;
 
 out vec4 outputColor;
+
+const float progressbar_height = 0.02;
 
 //varying vec2 v_texcoord;
 
@@ -26,10 +27,17 @@ void main()
     vec2 v_texcoord = vec2(gl_FragCoord[0]/float(width), (gl_FragCoord[1]/float(height)));
     //outputColor = vec4(v_texcoord[0],v_texcoord[1],0,1);
     outputColor = texture(texture1, v_texcoord);//center
-    /*if(v_texcoord.x > 0.9)
-    {
-        outputColor = vec4(0,0,0,1);
-    }*/
+
+    if(show_progressbar){
+        if(v_texcoord.y < progressbar_height)
+            {
+                outputColor = vec4(0,0,0,1);
+                if(v_texcoord.x < progress)        
+                    outputColor = vec4(1,1,1,1);
+                return;
+            }
+    }
+
     return;
 
     /*
