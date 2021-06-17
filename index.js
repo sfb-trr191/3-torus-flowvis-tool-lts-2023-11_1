@@ -235,6 +235,9 @@
     function addOnClickRequestData() {
         document.getElementById("button_request_data").addEventListener("click", function () {
             console.log("onClickRequestData");
+            //MARKER url changes
+            //window.location.href = window.location.pathname + '?u=123';
+            //window.history.replaceState(null, null, 'index.html?u=123');
             CalculateStreamlines();
         });
     }
@@ -605,6 +608,9 @@
         console.log("u:", u);
         const v = urlParams.get('v')
         console.log("v:", v);
+
+        //MARKER url changes
+        //window.location.href = window.location.pathname.substring( 0, window.location.pathname.lastIndexOf( '/' ) + 1 ) + 'myPage.xhtml?u=123';
 
     }
 
