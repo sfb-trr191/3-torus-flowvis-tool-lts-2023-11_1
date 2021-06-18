@@ -108,7 +108,7 @@ class CanvasWrapper {
         if (this.aliasing_index == this.aliasing.num_rays_per_pixel)
             return;
 
-        console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);
+        //console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);
         //console.log("offset_x: ", this.aliasing.offset_x[this.aliasing_index]);
         //console.log("offset_y: ", this.aliasing.offset_y[this.aliasing_index]);
 
@@ -125,7 +125,7 @@ class CanvasWrapper {
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, this.camera.width, this.camera.height);
-        console.log(this.camera.width, this.camera.height);
+        //console.log(this.camera.width, this.camera.height);
         gl.useProgram(this.program_raytracing);
         this.camera.WriteToUniform(gl, this.program_raytracing, "active_camera");
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));

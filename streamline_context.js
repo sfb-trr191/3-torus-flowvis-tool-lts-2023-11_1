@@ -105,7 +105,7 @@ class StreamlineContext {
     }
 
     bind_lod(lod_index, gl, shader_uniforms, location_texture_float, location_texture_int) {
-        console.log("bind_lod index: " + lod_index);
+        //console.log("bind_lod index: " + lod_index);
         this.lod_list[lod_index].bind(gl, shader_uniforms, location_texture_float, location_texture_int);
     }
 

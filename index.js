@@ -42,6 +42,7 @@
 
     var aliasing;
     var canvas_wrapper_main;
+    var input_parameter_wrapper;
 
     var buffer_lights;
     var GLOBAL_DATA = "old data";
@@ -73,7 +74,7 @@
         lights = new Lights();
         lights.GenerateDefaultLighting();
         streamline_context_static = new StreamlineContext("static", lights, gl);
-        streamline_context_static.CalculateExampleStreamlines(gl);
+        //streamline_context_static.CalculateExampleStreamlines(gl);
 
         main_camera.SetRenderSizes(800, 600, 400, 300);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
@@ -83,6 +84,7 @@
         aliasing = new Aliasing();
 
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing);
+
 
         var tex = generateDataTextureFloat(gl);
         texture_float = tex.texture;
@@ -108,6 +110,11 @@
         initializeAttributes();
 
         gl.useProgram(program);
+
+        input_parameter_wrapper = new InputParameterWrapper();
+        input_parameter_wrapper.fromURL();
+        CalculateStreamlines(gl);
+        //runParametersFromURL();
 
         timer = setTimeout(on_update, 1);
     }
@@ -239,6 +246,8 @@
             //window.location.href = window.location.pathname + '?u=123';
             //window.history.replaceState(null, null, 'index.html?u=123');
             CalculateStreamlines();
+            var query_string = input_parameter_wrapper.toQueryString();
+            window.history.pushState(null, null, 'index.html' + query_string);
         });
     }
 
@@ -589,31 +598,13 @@
     function testParameterExtractionFromURL() {
         console.log("testParameterExtractionFromURL");
 
-        //ENCODING
-        const params = {
-            u: '2 * sin(2 * PI * z)',
-            v: 'sin(2 * PI * y) + 2 * cos (2 * PI * z)'
-        }
 
-        var query_string = "?" + Object.entries(params)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&')
 
-        console.log("query_string:", query_string);
 
-        //DECODING
-        console.log("window.location.search:", window.location.search);
-        const urlParams = new URLSearchParams(window.location.search);
-        const u = urlParams.get('u')
-        console.log("u:", u);
-        const v = urlParams.get('v')
-        console.log("v:", v);
 
         //MARKER url changes
         //window.location.href = window.location.pathname.substring( 0, window.location.pathname.lastIndexOf( '/' ) + 1 ) + 'myPage.xhtml?u=123';
 
     }
-
-
 
 })();
