@@ -16,6 +16,7 @@
     <script src="shader_uniforms.js" type="text/javascript"> </script>
     <script src="input_manager.js" type="text/javascript"> </script>
     <script src="mouse_manager.js" type="text/javascript"> </script>
+    <script src="ui_seeds.js" type="text/javascript"> </script>
     <script src="input_parameter_wrapper.js" type="text/javascript"> </script>
     <script src="shader/f_shader_raytracing.glsl" type="text/javascript"> </script>
     <script src="shader/f_shader_average.glsl" type="text/javascript"> </script>
@@ -71,6 +72,22 @@
                     <input id="segment_duplicator_iterations" type="text" value="1">
                 </fieldset>  
                 <fieldset>
+                    <button type="button" id="button_add_seed">add seed</button>
+                    <label></label>
+                </fieldset>  
+                <fieldset id="fieldset_seeds">
+                    <!--
+                    <div id="div_seed_position_0" class="horizontal_div_seed">
+                        <label>0</label>
+                        <input id="seed_x_0" type="text" value="0.5">
+                        <input id="seed_y_0" type="text" value="0.5">
+                        <input id="seed_z_0" type="text" value="0.5">
+                        <input id="seed_c_0" type="color" value="#ff0000">
+                        <button type="button" id="button_remove_seed_0">x</button>
+                    </div>
+                    -->
+                </fieldset>    
+                <fieldset>
                     <button type="button" id="button_update_camera">update camera</button>
                     <label></label>
                     <label>position</label>
@@ -115,7 +132,7 @@
                         <option value="2">medium</option>
                         <option value="3">low</option>
                     </select> 
-                </fieldset>             
+                </fieldset>         
             </form>
         </div>
     </div>

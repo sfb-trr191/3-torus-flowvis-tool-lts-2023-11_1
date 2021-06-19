@@ -3,6 +3,7 @@ class StreamlineGenerator {
     constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
         this.p_raw_data = p_streamline_context.raw_data;
+        this.p_ui_seeds = p_streamline_context.ui_seeds;
         this.seeds = [];
         this.num_points_per_streamline = 10;
         this.step_size = 0.0125;
@@ -28,6 +29,11 @@ class StreamlineGenerator {
         seed = glMatrix.vec4.fromValues(0.25, 0.25, 0.9, 1);
         this.seeds.push(seed);
     }
+
+    GenerateSeedsFromUI() {
+        console.log("GenerateSeedsFromUI");
+        this.seeds = this.p_ui_seeds.createPointList();
+    }    
 
     SetRulesTorus() {
         console.log("SetRulesTorus");

@@ -1,9 +1,10 @@
 class StreamlineContext {
 
-    constructor(name, p_lights, gl) {
+    constructor(name, p_lights, ui_seeds, gl) {
         console.log("Generate context: " + name);
         this.name = name;
         this.p_lights = p_lights;
+        this.ui_seeds = ui_seeds;
         this.raw_data = new RawData();
         this.streamline_generator = new StreamlineGenerator(this);
         this.segment_duplicator = new SegmentDuplicator(this);
@@ -70,7 +71,7 @@ class StreamlineContext {
         this.segment_duplicator.iterations = segment_duplicator_iterations;
 
         this.streamline_generator.SetRulesTorus();
-        this.streamline_generator.GenerateExampleSeeds();
+        this.streamline_generator.GenerateSeedsFromUI();
 
         this.CalculateStreamlinesInternal(gl);
     }

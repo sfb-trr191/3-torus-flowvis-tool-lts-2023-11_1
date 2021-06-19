@@ -49,12 +49,15 @@
     var data_changed = false;
     var settings_changed = false;
 
+    var ui_seeds;
+
     function onStart(evt) {
         console.log("onStart");
         window.removeEventListener(evt.type, onStart, false);
         addOnClickRequestData();
         addOnClickUpdateRenderSettings();
         addOnClickUpdateCamera();
+        addOnClickAddSeed();
         testWebGPU();
         testParameterExtractionFromURL();
 
@@ -72,10 +75,13 @@
         if (!(gl = getRenderingContext()))
             return;
 
+        ui_seeds = new UISeeds();
+        ui_seeds.generateDefaultSeeds();
+
 
         lights = new Lights();
         lights.GenerateDefaultLighting();
-        streamline_context_static = new StreamlineContext("static", lights, gl);
+        streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl);
         //streamline_context_static.CalculateExampleStreamlines(gl);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
@@ -127,7 +133,7 @@
 
         gl.useProgram(program);
 
-        input_parameter_wrapper = new InputParameterWrapper();
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds);
         input_parameter_wrapper.fromURL();
         CalculateStreamlines(gl);
         //runParametersFromURL();
@@ -284,6 +290,13 @@
         });
     }
 
+    function addOnClickAddSeed() {
+        document.getElementById("button_add_seed").addEventListener("click", function () {
+            console.log("onClickAddSeed");
+            AddSeed();
+        });
+    }
+
     function CalculateStreamlines() {
         console.log("CalculateStreamlines");
         var shader_formula_u = document.getElementById("input_field_equation_u").value;
@@ -313,6 +326,11 @@
     function UpdateCamera() {
         console.log("UpdateCamera");
         main_camera.FromInput();
+    }
+
+    function AddSeed(){
+        console.log("AddSeed");
+        ui_seeds.addSeed();
     }
 
     function on_update_old() {
