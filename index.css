@@ -4,8 +4,8 @@ body {
 
 canvas {
     display: block;
-    width: 800px;
-    height: 600px;
+    width: 1280px;
+    height: 720px;
     margin: auto;
     padding: 0;
     border: none;
@@ -60,5 +60,11 @@ fieldset {
 .horizontal_div_3{
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 4px;
     gap: 4px;
 }
+
+.horizontal_div_3 input{
+    min-width: 75px;
+}
+

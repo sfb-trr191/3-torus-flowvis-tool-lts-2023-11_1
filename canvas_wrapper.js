@@ -193,12 +193,12 @@ class CanvasWrapper {
         var progress = this.aliasing_index / (this.aliasing.num_rays_per_pixel - 1);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, 800, 600);
+        gl.viewport(0, 0, 1280, 720);
         gl.useProgram(this.program_resampling);
         gl.uniform1f(this.location_resampling.location_show_progressbar, show_progressbar);
         gl.uniform1f(this.location_resampling.location_progress, progress);
-        gl.uniform1i(this.location_resampling.location_width, 800);
-        gl.uniform1i(this.location_resampling.location_height, 600);
+        gl.uniform1i(this.location_resampling.location_width, 1280);
+        gl.uniform1i(this.location_resampling.location_height, 720);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);

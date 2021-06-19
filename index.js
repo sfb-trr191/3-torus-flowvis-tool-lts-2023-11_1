@@ -78,7 +78,7 @@
         streamline_context_static = new StreamlineContext("static", lights, gl);
         //streamline_context_static.CalculateExampleStreamlines(gl);
 
-        main_camera.SetRenderSizes(800, 600, 400, 300);
+        main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
         main_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
         main_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
