@@ -15,9 +15,19 @@ class MouseManager {
 
     addOnMouseDown() {
         this.canvas.addEventListener("mousedown", (event) => {
-            var pos = getMousePositionPercentage(this.canvas, event)
-            //console.log("down", "x: " + pos.x, "y: " + pos.y);
-            this.camera.StartPanning(pos.x, pos.y);
+            switch (event.which) {
+                case 1:
+                    var pos = getMousePositionPercentage(this.canvas, event)
+                    //console.log("down", "x: " + pos.x, "y: " + pos.y);
+                    this.camera.StartPanning(pos.x, pos.y);
+                    break;
+                case 2:
+                    //Middle Mouse button
+                    break;
+                case 3:
+                    //Right Mouse button
+                    break;
+            }            
         });
     }
 
