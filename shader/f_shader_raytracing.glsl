@@ -131,6 +131,8 @@ uniform sampler3D texture_float;
 uniform isampler3D texture_int;
 uniform float offset_x;
 uniform float offset_y;
+uniform float maxRayDistance;
+uniform int maxIterationCount;
 
 uniform int width;
 uniform int height;
@@ -144,11 +146,9 @@ const int growth_id = -1;//DUMMY
 const float tubeRadius = 0.005;//DUMMY
 const bool check_bounds = true;//DUMMY
 const int allowOutOfBoundSphere = 0;//DUMMY
-const int maxIterationCount = 100;//DUMMY
-const float maxRayDistance = 100.0;//DUMMY
 const int numDirLights = 3;//DUMMY
-const float fogStart = 100.0;//DUMMY
-const float fogEnd = 101.0;//DUMMY
+const float fogStart = 1000.0;//DUMMY
+const float fogEnd = 1001.0;//DUMMY
 const vec3 fogColor = vec3(1,1,1);//DUMMY
 const float tubeShininess = 32.0;//DUMMY
 const bool blinn_phong = true;//DUMMY

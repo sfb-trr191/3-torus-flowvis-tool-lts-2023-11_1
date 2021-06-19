@@ -115,6 +115,7 @@
         input_parameter_wrapper.fromURL();
         CalculateStreamlines(gl);
         //runParametersFromURL();
+        UpdateRenderSettings();
 
         timer = setTimeout(on_update, 1);
     }
@@ -273,6 +274,7 @@
 
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
+        canvas_wrapper_main.max_ray_distance = document.getElementById("input_max_ray_distance").value;
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
         canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
     }

@@ -8,6 +8,8 @@ class UniformLocationsRayTracing {
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_offset_x = gl.getUniformLocation(program, "offset_x");
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
+        this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
+        this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
     }
 }
 
@@ -53,6 +55,7 @@ class CanvasWrapper {
         this.aliasing = aliasing;
         this.p_streamline_context_static = streamline_context_static;
         this.aliasing_index = 0;
+        this.max_ray_distance = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -131,8 +134,13 @@ class CanvasWrapper {
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
+        gl.uniform1i(this.location_raytracing.location_max_iteration_count, Math.ceil(this.max_ray_distance * 3));
+
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
+        gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.max_ray_distance);
+
+        
 
         var panning = this.camera.panning;
         var active_lod = panning ? 2 : 0;
