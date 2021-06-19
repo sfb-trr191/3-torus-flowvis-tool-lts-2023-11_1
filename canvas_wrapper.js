@@ -10,6 +10,7 @@ class UniformLocationsRayTracing {
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
+        this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
     }
 }
 
@@ -56,6 +57,9 @@ class CanvasWrapper {
         this.p_streamline_context_static = streamline_context_static;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
+        this.tube_radius = 0;
+        this.lod_index_panning = 0;
+        this.lod_index_still = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -104,8 +108,8 @@ class CanvasWrapper {
         }
     }
 
-    draw(gl, data_changed) {
-        if (this.camera.changed || data_changed)
+    draw(gl, data_changed, settings_changed) {
+        if (this.camera.changed || data_changed || settings_changed)
             this.aliasing_index = 0;
 
         if (this.aliasing_index == this.aliasing.num_rays_per_pixel)
@@ -139,11 +143,10 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.max_ray_distance);
-
-        
+        gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
 
         var panning = this.camera.panning;
-        var active_lod = panning ? 2 : 0;
+        var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(active_lod, gl,
             this.shader_uniforms_raytracing,
             this.location_raytracing.location_texture_float,

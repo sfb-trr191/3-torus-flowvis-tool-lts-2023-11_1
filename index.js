@@ -47,6 +47,7 @@
     var buffer_lights;
     var GLOBAL_DATA = "old data";
     var data_changed = false;
+    var settings_changed = false;
 
     function onStart(evt) {
         console.log("onStart");
@@ -182,10 +183,11 @@
             canvas_wrapper_main.draw(gl, data_changed);
         }
 */
-        canvas_wrapper_main.draw(gl, data_changed);
+        canvas_wrapper_main.draw(gl, data_changed, settings_changed);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
         main_camera.changed = false;
+        settings_changed = false;
         data_changed = false;
 
         gl.finish();
@@ -274,7 +276,13 @@
 
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
+        settings_changed = true;
         canvas_wrapper_main.max_ray_distance = document.getElementById("input_max_ray_distance").value;
+        canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
+
+        canvas_wrapper_main.lod_index_panning = document.getElementById("select_lod_panning").value;
+        canvas_wrapper_main.lod_index_still = document.getElementById("select_lod_still").value;
+
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
         canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
     }

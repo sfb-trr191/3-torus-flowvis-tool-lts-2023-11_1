@@ -133,6 +133,7 @@ uniform float offset_x;
 uniform float offset_y;
 uniform float maxRayDistance;
 uniform int maxIterationCount;
+uniform float tubeRadius;
 
 uniform int width;
 uniform int height;
@@ -143,7 +144,6 @@ const float growth_max_cost = 0.0;//DUMMY
 const float scalar_cost_max = 0.0;//DUMMY
 const int growth = 0;//DUMMY
 const int growth_id = -1;//DUMMY
-const float tubeRadius = 0.005;//DUMMY
 const bool check_bounds = true;//DUMMY
 const int allowOutOfBoundSphere = 0;//DUMMY
 const int numDirLights = 3;//DUMMY
