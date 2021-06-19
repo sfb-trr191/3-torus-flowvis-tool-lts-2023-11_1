@@ -16,17 +16,15 @@ class MouseManager {
     addOnMouseDown() {
         this.canvas.addEventListener("mousedown", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
-            console.log("down", "x: " + pos.x, "y: " + pos.y);
-            //console.log(this.camera);
+            //console.log("down", "x: " + pos.x, "y: " + pos.y);
             this.camera.StartPanning(pos.x, pos.y);
-            //this.camera.lol();
         });
     }
 
     addOnMouseUp() {
         this.canvas.addEventListener("mouseup", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
-            console.log("up", "x: " + pos.x, "y: " + pos.y);
+            //console.log("up", "x: " + pos.x, "y: " + pos.y);
             this.camera.StopPanning();
         });
     }
@@ -34,7 +32,7 @@ class MouseManager {
     addOnMouseOut() {
         this.canvas.addEventListener("mouseout", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
-            console.log("out", "x: " + pos.x, "y: " + pos.y);
+            //console.log("out", "x: " + pos.x, "y: " + pos.y);
             this.camera.StopPanning();
         });
     }

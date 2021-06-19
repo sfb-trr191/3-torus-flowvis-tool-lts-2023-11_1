@@ -75,7 +75,7 @@ class Camera {
         this.normal_top = glMatrix.vec3.create();
         this.normal_bottom = glMatrix.vec3.create();
 
-        console.log("Generate camera: " + name);
+        //console.log("Generate camera: " + name);
 
     }
 
@@ -97,7 +97,7 @@ class Camera {
     }
 
     FromInput() {
-        console.log("FromInput");
+        //console.log("FromInput");
         this.position = new_vec3_from_input(this.input_camera_position_x, this.input_camera_position_y, this.input_camera_position_z);
         this.forward = new_vec3_from_input(this.input_camera_forward_x, this.input_camera_forward_y, this.input_camera_forward_z);
         this.up = new_vec3_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z);
@@ -107,7 +107,7 @@ class Camera {
     WriteToInputFields() {
         if (!this.changed)
             return;
-        console.log("WriteToInputFields")
+        //console.log("WriteToInputFields")
         var decimals = 6;
         this.input_camera_position_x.value = this.position[0].toFixed(decimals);
         this.input_camera_position_y.value = this.position[1].toFixed(decimals);
@@ -251,7 +251,7 @@ class Camera {
     }
 
     StartPanning(x, y) {
-        console.log("start panning")
+        //console.log("start panning")
         this.xMouse_old = x;
         this.yMouse_old = y;
         this.panning = true;
@@ -263,7 +263,7 @@ class Camera {
     StopPanning() {
         if (!this.panning)
             return;
-        console.log("stop panning")
+        //console.log("stop panning")
         this.panning = false;
         this.changed = true;
         this.width = this.width_still;
@@ -344,7 +344,7 @@ class Camera {
         glMatrix.vec3.normalize(left, left);
         glMatrix.vec3.scale(change, left, (deltaTime * v));
         glMatrix.vec3.add(this.position, this.position, change);
-        console.log(this.position);
+        //console.log(this.position);
 
         this.changed = true;
     }
@@ -358,7 +358,7 @@ class Camera {
         glMatrix.vec3.normalize(left, left);
         glMatrix.vec3.scale(change, left, (deltaTime * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
-        console.log(this.position);
+        //console.log(this.position);
 
         this.changed = true;
     }
@@ -369,7 +369,7 @@ class Camera {
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.forward, (deltaTime * v));
         glMatrix.vec3.add(this.position, this.position, change);
-        console.log(this.position);
+        //console.log(this.position);
 
         this.changed = true;
     }
@@ -380,7 +380,7 @@ class Camera {
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.forward, (deltaTime * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
-        console.log(this.position);
+        //console.log(this.position);
 
         this.changed = true;
     }
@@ -392,7 +392,7 @@ class Camera {
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (deltaTime * v * handedness));
         glMatrix.vec3.add(this.position, this.position, change);
-        console.log(this.position);
+        //console.log(this.position);
 
         this.changed = true;
     }
@@ -404,7 +404,7 @@ class Camera {
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (deltaTime * v * handedness));
         glMatrix.vec3.subtract(this.position, this.position, change);
-        console.log(this.position);
+        //console.log(this.position);
 
         this.changed = true;
     }
