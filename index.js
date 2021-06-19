@@ -54,6 +54,7 @@
         window.removeEventListener(evt.type, onStart, false);
         addOnClickRequestData();
         addOnClickUpdateRenderSettings();
+        addOnClickUpdateCamera();
         testWebGPU();
         testParameterExtractionFromURL();
 
@@ -81,6 +82,20 @@
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
         main_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
         main_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
+        //main_camera.LinkInput("input_camera_position_x", "input_camera_position_y", "input_camera_position_z",
+        //    "input_camera_forward_x", "input_camera_forward_y", "input_camera_forward_z",
+        //    "input_camera_up_x", "input_camera_up_y", "input_camera_up_z");
+
+        main_camera.LinkInput(
+            document.getElementById("input_camera_position_x"),
+            document.getElementById("input_camera_position_y"),
+            document.getElementById("input_camera_position_z"),
+            document.getElementById("input_camera_forward_x"),
+            document.getElementById("input_camera_forward_y"),
+            document.getElementById("input_camera_forward_z"),
+            document.getElementById("input_camera_up_x"),
+            document.getElementById("input_camera_up_y"),
+            document.getElementById("input_camera_up_z"));
 
         aliasing = new Aliasing();
 
@@ -168,6 +183,7 @@
         }
         main_camera.repositionCamera();
         main_camera.UpdateShaderValues();
+        main_camera.WriteToInputFields();
         //main_camera.WriteToUniform(gl, program, "active_camera");
 
         //gl.uniform1f(location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
@@ -261,6 +277,13 @@
         });
     }
 
+    function addOnClickUpdateCamera() {
+        document.getElementById("button_update_camera").addEventListener("click", function () {
+            console.log("onClickUpdateCamera");
+            UpdateCamera();
+        });
+    }
+
     function CalculateStreamlines() {
         console.log("CalculateStreamlines");
         var shader_formula_u = document.getElementById("input_field_equation_u").value;
@@ -285,6 +308,11 @@
 
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
         canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
+    }
+
+    function UpdateCamera() {
+        console.log("UpdateCamera");
+        main_camera.FromInput();
     }
 
     function on_update_old() {

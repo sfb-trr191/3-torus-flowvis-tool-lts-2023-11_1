@@ -34,3 +34,17 @@ vec4_from_vec3_1 = function (out, vec3) {
     out[3] = 1;
     return out;
 };
+
+new_vec3_from_input = function (field_0, field_1, field_2) {
+    var v0 = field_0.value;
+    var v1 = field_1.value;
+    var v2 = field_2.value;
+    return glMatrix.vec3.fromValues(v0, v1, v2);
+}
+
+new_vec3_from_input_name = function (field_name_0, field_name_1, field_name_2) {
+    var v0 = document.getElementById(field_name_0).value;
+    var v1 = document.getElementById(field_name_1).value;
+    var v2 = document.getElementById(field_name_2).value;
+    return glMatrix.vec3.fromValues(v0, v1, v2);
+}

@@ -56,3 +56,9 @@ fieldset {
     height: 30px;
     background-color: green;
 }
+
+.horizontal_div_3{
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+}

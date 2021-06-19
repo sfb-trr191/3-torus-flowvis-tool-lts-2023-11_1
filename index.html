@@ -69,7 +69,29 @@
                     <input id="input_step_size" type="text" value="0.0125">
                     <label>duplicator iterations</label>
                     <input id="segment_duplicator_iterations" type="text" value="1">
-                </fieldset>
+                </fieldset>  
+                <fieldset>
+                    <button type="button" id="button_update_camera">update camera</button>
+                    <label></label>
+                    <label>position</label>
+                    <div id="div_input_camera_position" class="horizontal_div_3">
+                        <input id="input_camera_position_x" type="text" value="0.5">
+                        <input id="input_camera_position_y" type="text" value="0.5">
+                        <input id="input_camera_position_z" type="text" value="0.5">
+                    </div>
+                    <label>forward</label>
+                    <div id="div_input_camera_forward" class="horizontal_div_3">
+                        <input id="input_camera_forward_x" type="text" value="0.0">
+                        <input id="input_camera_forward_y" type="text" value="1.0">
+                        <input id="input_camera_forward_z" type="text" value="0.0">
+                    </div>
+                    <label>up</label>
+                    <div id="div_input_camera_up" class="horizontal_div_3">
+                        <input id="input_camera_up_x" type="text" value="0.0">
+                        <input id="input_camera_up_y" type="text" value="0.0">
+                        <input id="input_camera_up_z" type="text" value="1.0">
+                    </div>
+                </fieldset>    
                 <fieldset>
                     <button type="button" id="button_render_settings">update render settings</button>
                     <label></label>
@@ -93,7 +115,7 @@
                         <option value="2">medium</option>
                         <option value="3">low</option>
                     </select> 
-                </fieldset>                
+                </fieldset>             
             </form>
         </div>
     </div>

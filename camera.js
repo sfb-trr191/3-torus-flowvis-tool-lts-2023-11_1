@@ -79,6 +79,47 @@ class Camera {
 
     }
 
+    LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z,
+        input_camera_forward_x, input_camera_forward_y, input_camera_forward_z,
+        input_camera_up_x, input_camera_up_y, input_camera_up_z) {
+
+        this.input_camera_position_x = input_camera_position_x;
+        this.input_camera_position_y = input_camera_position_y;
+        this.input_camera_position_z = input_camera_position_z;
+
+        this.input_camera_forward_x = input_camera_forward_x;
+        this.input_camera_forward_y = input_camera_forward_y;
+        this.input_camera_forward_z = input_camera_forward_z;
+
+        this.input_camera_up_x = input_camera_up_x;
+        this.input_camera_up_y = input_camera_up_y;
+        this.input_camera_up_z = input_camera_up_z;
+    }
+
+    FromInput() {
+        console.log("FromInput");
+        this.position = new_vec3_from_input(this.input_camera_position_x, this.input_camera_position_y, this.input_camera_position_z);
+        this.forward = new_vec3_from_input(this.input_camera_forward_x, this.input_camera_forward_y, this.input_camera_forward_z);
+        this.up = new_vec3_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z);
+        this.changed = true;
+    }
+
+    WriteToInputFields() {
+        if (!this.changed)
+            return;
+        console.log("WriteToInputFields")
+        var decimals = 6;
+        this.input_camera_position_x.value = this.position[0].toFixed(decimals);
+        this.input_camera_position_y.value = this.position[1].toFixed(decimals);
+        this.input_camera_position_z.value = this.position[2].toFixed(decimals);
+        this.input_camera_forward_x.value = this.forward[0].toFixed(decimals);
+        this.input_camera_forward_y.value = this.forward[1].toFixed(decimals);
+        this.input_camera_forward_z.value = this.forward[2].toFixed(decimals);
+        this.input_camera_up_x.value = this.up[0].toFixed(decimals);
+        this.input_camera_up_y.value = this.up[1].toFixed(decimals);
+        this.input_camera_up_z.value = this.up[2].toFixed(decimals);
+    }
+
     SetRenderSizes(width, height, width_panning, height_panning) {
         this.width = width;
         this.height = height;
