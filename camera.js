@@ -120,6 +120,42 @@ class Camera {
         this.input_camera_up_z.value = this.up[2].toFixed(decimals);
     }
 
+    fromString(s) {
+        console.log("CAMERA ", s);
+        if (s === null)
+            return;
+        console.log("CAMERA not null");
+        if (!s.includes("~"))
+            return;
+        console.log("CAMERA ~");
+
+        var split = s.split("~");
+        this.input_camera_position_x.value = split[0];
+        this.input_camera_position_y.value = split[1];
+        this.input_camera_position_z.value = split[2];
+        this.input_camera_forward_x.value = split[3];
+        this.input_camera_forward_y.value = split[4];
+        this.input_camera_forward_z.value = split[5];
+        this.input_camera_up_x.value = split[6];
+        this.input_camera_up_y.value = split[7];
+        this.input_camera_up_z.value = split[8];
+
+        this.FromInput();
+    }
+
+    toString() {
+        var s = this.input_camera_position_x.value + "~"
+            + this.input_camera_position_y.value + "~"
+            + this.input_camera_position_z.value + "~"
+            + this.input_camera_forward_x.value + "~"
+            + this.input_camera_forward_y.value + "~"
+            + this.input_camera_forward_z.value + "~"
+            + this.input_camera_up_x.value + "~"
+            + this.input_camera_up_y.value + "~"
+            + this.input_camera_up_z.value;
+        return s;
+    }
+
     SetRenderSizes(width, height, width_panning, height_panning) {
         this.width = width;
         this.height = height;

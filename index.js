@@ -58,6 +58,7 @@
         addOnClickUpdateRenderSettings();
         addOnClickUpdateCamera();
         addOnClickAddSeed();
+        addOnClickUpdateURL();
         testWebGPU();
         testParameterExtractionFromURL();
 
@@ -133,7 +134,7 @@
 
         gl.useProgram(program);
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera);
         input_parameter_wrapper.fromURL();
         CalculateStreamlines(gl);
         //runParametersFromURL();
@@ -271,8 +272,7 @@
             //window.location.href = window.location.pathname + '?u=123';
             //window.history.replaceState(null, null, 'index.html?u=123');
             CalculateStreamlines();
-            var query_string = input_parameter_wrapper.toQueryString();
-            window.history.pushState(null, null, 'index.html' + query_string);
+            UpdateURL();
         });
     }
 
@@ -294,6 +294,13 @@
         document.getElementById("button_add_seed").addEventListener("click", function () {
             console.log("onClickAddSeed");
             AddSeed();
+        });
+    }
+
+    function addOnClickUpdateURL(){        
+        document.getElementById("button_update_url").addEventListener("click", function () {
+            console.log("onClickUpdateURL");
+            UpdateURL();
         });
     }
 
@@ -331,6 +338,12 @@
     function AddSeed(){
         console.log("AddSeed");
         ui_seeds.addSeed();
+    }
+
+    function UpdateURL(){
+        console.log("UpdateURL");
+        var query_string = input_parameter_wrapper.toQueryString();
+        window.history.pushState(null, null, 'index.html' + query_string);
     }
 
     function on_update_old() {

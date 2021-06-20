@@ -11,8 +11,9 @@ class InputFieldWrapper {
 
 class InputParameterWrapper {
 
-    constructor(ui_seeds) {
+    constructor(ui_seeds, main_camera) {
         this.ui_seeds = ui_seeds;
+        this.main_camera = main_camera;
         this.dict_url_parameter_name_to_input_field = {};
         new InputFieldWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputFieldWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
@@ -36,9 +37,11 @@ class InputParameterWrapper {
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
 
-
         const seeds = urlParams.get(PARAM_SEEDS);
         this.ui_seeds.fromString(seeds);
+
+        const camera = urlParams.get(PARAM_CAMERA);
+        this.main_camera.fromString(camera);
     }
 
     toQueryString() {
@@ -53,6 +56,7 @@ class InputParameterWrapper {
             params[input_field_wrapper.url_parameter_name] = value;
         }
         params[PARAM_SEEDS] = this.ui_seeds.toString();
+        params[PARAM_CAMERA] = this.main_camera.toString();
         /*
         params["text"] = `
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu neque efficitur augue malesuada tristique. Mauris aliquam bibendum risus quis vestibulum. Sed dictum dignissim libero, commodo faucibus ex. Aenean lobortis in justo eget rutrum. Suspendisse maximus felis massa, non ornare risus rhoncus non. Quisque congue ex nulla, mollis tincidunt arcu auctor vitae. Mauris orci diam, suscipit sed commodo ac, eleifend et urna. Nullam dapibus urna eros, in euismod nibh iaculis accumsan. Proin ut ipsum at dolor tempus maximus a non diam. Vivamus leo nisi, rhoncus vitae dignissim a, scelerisque at ex. Quisque ipsum nulla, posuere at tempor quis, molestie vitae risus. Morbi ut metus non ex malesuada porta. Donec varius eros purus. Aliquam vehicula libero ac arcu venenatis vestibulum. Integer justo arcu, imperdiet id turpis ut, tincidunt ultrices mi.
