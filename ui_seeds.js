@@ -65,6 +65,16 @@ class UISeed {
             + this.node_input_c.value;
         return s;
     }
+
+    getColorVector(){
+        var hex = this.node_input_c.value;
+        console.log("hex: ", hex);
+        const r = parseInt(hex.substr(1,2), 16) / 255
+        const g = parseInt(hex.substr(3,2), 16) / 255
+        const b = parseInt(hex.substr(5,2), 16) / 255
+        console.log(`red: ${r}, green: ${g}, blue: ${b}`)
+        return glMatrix.vec3.fromValues(r, g, b);
+    }
 }
 
 class UISeeds {
@@ -86,26 +96,32 @@ class UISeeds {
         this.list[i].node_input_x.value = 0.01;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.25;
+        this.list[i].node_input_c.value = "#FF0000";
         i+=1;
         this.list[i].node_input_x.value = 0.99;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.75;
+        this.list[i].node_input_c.value = "#00FF00";
         i+=1;
         this.list[i].node_input_x.value = 0.55;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.5;
+        this.list[i].node_input_c.value = "#0000FF";
         i+=1;
         this.list[i].node_input_x.value = 0.95;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.5;
+        this.list[i].node_input_c.value = "#FFFF00";
         i+=1;
         this.list[i].node_input_x.value = 0.25;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.1;
+        this.list[i].node_input_c.value = "#FF00FF";
         i+=1;
         this.list[i].node_input_x.value = 0.25;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.9;
+        this.list[i].node_input_c.value = "#00FFFF";
     }
 
     addSeed() {
@@ -171,6 +187,18 @@ class UISeeds {
             point_list.push(seed);
         }
         return point_list;
+    }
+
+    getStreamlineColors(){
+        var color_list = [];
+        for (var i = 0; i < this.list.length; i++) {
+            var entry = this.list[i];
+            var color = entry.getColorVector();
+            var streamline_color = new StreamlineColor();
+            streamline_color.color = color;
+            color_list.push(streamline_color);
+        }
+        return color_list; 
     }
 }
 /*

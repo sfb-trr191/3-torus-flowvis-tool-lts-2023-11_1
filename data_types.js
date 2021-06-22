@@ -14,6 +14,8 @@ var TREE_NODE_FLOAT_COUNT = 8;
 var TREE_NODE_INT_COUNT = 4;
 var DIR_LIGHT_FLOAT_COUNT = 16;
 var DIR_LIGHT_INT_COUNT = 0;
+var STREAMLINE_COLOR_FLOAT_COUNT = 4;
+var STREAMLINE_COLOR_INT_COUNT = 0;
 
 class PositionData {
 
@@ -177,6 +179,33 @@ class DirLight {
             arrayf[start_index_f + i + 4] = this.diffuse[i];
             arrayf[start_index_f + i + 8] = this.specular[i];
             arrayf[start_index_f + i + 12] = this.direction[i];
+        }
+    }
+}
+
+class StreamlineColor {
+
+    //integer based
+    //float based
+    color = glMatrix.vec3.create();
+
+    constructor() { }
+
+    print() {
+        console.log("color: " + this.color);
+    }
+
+    getFloatCount() {
+        return STREAMLINE_COLOR_FLOAT_COUNT;
+    }
+
+    getIntCount() {
+        return STREAMLINE_COLOR_INT_COUNT;
+    }
+
+    writeToArrays(arrayf, arrayi, start_index_f, start_index_i) {
+        for (var i = 0; i < 3; i++) {
+            arrayf[start_index_f + i] = this.color[i];
         }
     }
 }

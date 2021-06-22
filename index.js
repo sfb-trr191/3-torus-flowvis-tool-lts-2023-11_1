@@ -252,6 +252,8 @@
         program_shader_uniforms.registerUniform("start_index_float_tree_nodes", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_streamline_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_streamline_color", "INT", -1);
         program_shader_uniforms.print();
     }
     /*
@@ -433,10 +435,12 @@
             program_shader_uniforms.setUniform("start_index_int_line_segments", data_unit_lod_0.getIntStart("line_segments"));
             program_shader_uniforms.setUniform("start_index_int_tree_nodes", data_unit_lod_0.getIntStart("tree_nodes"));
             program_shader_uniforms.setUniform("start_index_int_dir_lights", data_unit_lod_0.getIntStart("dir_lights"));
+            program_shader_uniforms.setUniform("start_index_int_streamline_color", data_unit_lod_0.getIntStart("streamline_color"));
             program_shader_uniforms.setUniform("start_index_float_position_data", data_unit_lod_0.getFloatStart("positions"));
             program_shader_uniforms.setUniform("start_index_float_line_segments", data_unit_lod_0.getFloatStart("line_segments"));
             program_shader_uniforms.setUniform("start_index_float_tree_nodes", data_unit_lod_0.getFloatStart("tree_nodes"));
             program_shader_uniforms.setUniform("start_index_float_dir_lights", data_unit_lod_0.getFloatStart("dir_lights"));
+            program_shader_uniforms.setUniform("start_index_float_streamline_color", data_unit_lod_0.getFloatStart("streamline_color"));
             program_shader_uniforms.updateUniforms();
 
             data_changed = true;

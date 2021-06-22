@@ -219,10 +219,12 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_tree_nodes", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_streamline_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_streamline_color", "INT", -1);
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }
-
+    
     loadShaderUniformsAverage(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();

@@ -204,6 +204,7 @@ GL_LineSegment GetLineSegment(int index, bool interactiveStreamline);
 GL_TreeNode GetNode(int index, bool interactiveStreamline);
 GL_AABB GetAABB(int index, bool interactiveStreamline);
 GL_DirLight GetDirLight(int index);
+vec3 GetStreamlineColor(int index);
 
 ivec3 GetIndex3D(int global_index);
 
@@ -1133,6 +1134,8 @@ vec3 GetObjectColor(inout HitInformation hit)
 	if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
 	{
 		int index = hit.multiPolyID % 8;
+        return GetStreamlineColor(index);
+        /*
 		switch(index){
 			case 0:
 			return vec3(1,0,0); 
@@ -1151,7 +1154,7 @@ vec3 GetObjectColor(inout HitInformation hit)
 			case 7:
 			return vec3(1,0.5,1); 
 		}
-		
+		*/
 	}
 	
 	return objectColor;
@@ -1223,6 +1226,8 @@ const int TREE_NODE_FLOAT_COUNT = 8;
 const int TREE_NODE_INT_COUNT = 4;
 const int DIR_LIGHT_FLOAT_COUNT = 16;
 const int DIR_LIGHT_INT_COUNT = 0;
+const int STREAMLINE_COLOR_FLOAT_COUNT = 4;
+const int STREAMLINE_COLOR_INT_COUNT = 0;
 
 uniform int start_index_int_position_data;
 uniform int start_index_float_position_data;
@@ -1232,6 +1237,8 @@ uniform int start_index_int_tree_nodes;
 uniform int start_index_float_tree_nodes;
 uniform int start_index_int_dir_lights;
 uniform int start_index_float_dir_lights;
+uniform int start_index_int_streamline_color;
+uniform int start_index_float_streamline_color;
 /*
 const int start_index_int_position_data = 0;//DUMMY
 const int start_index_float_position_data = 0;//DUMMY
@@ -1412,6 +1419,17 @@ GL_DirLight GetDirLight(int index)
 		texelFetch(texture_float, pointer+ivec3(15,0,0), 0).r//unnecessary
 	);
 	return light;
+}
+
+vec3 GetStreamlineColor(int index)
+{
+	ivec3 pointer = GetIndex3D(start_index_float_streamline_color + index * STREAMLINE_COLOR_FLOAT_COUNT);
+	vec3 color = vec3(
+		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r
+	);
+	return color;
 }
 
 `;
