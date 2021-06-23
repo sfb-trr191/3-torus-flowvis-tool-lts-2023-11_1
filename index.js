@@ -136,10 +136,9 @@
 
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera);
         input_parameter_wrapper.fromURL();
-        CalculateStreamlines(gl);
-        //runParametersFromURL();
-        UpdateRenderSettings();
 
+        CalculateStreamlines(gl);
+        UpdateRenderSettings();
         timer = setTimeout(on_update, 1);
     }
 
