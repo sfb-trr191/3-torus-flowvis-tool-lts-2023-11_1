@@ -58,6 +58,7 @@ class Camera {
         this.panning = false;
         this.xMouse_old = 0;
         this.yMouse_old = 0;
+        this.mouse_in_canvas = false;
 
         //description of the camera for the user
         this.position = glMatrix.vec3.create();

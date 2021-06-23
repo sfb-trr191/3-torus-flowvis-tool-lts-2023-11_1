@@ -44,6 +44,7 @@ class MouseManager {
             var pos = getMousePositionPercentage(this.canvas, event)
             //console.log("out", "x: " + pos.x, "y: " + pos.y);
             this.camera.StopPanning();
+            this.camera.mouse_in_canvas = false;
         });
     }
 
@@ -51,6 +52,7 @@ class MouseManager {
         this.canvas.addEventListener("mousemove", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
             this.camera.UpdatePanning(pos.x, pos.y, false);
+            this.camera.mouse_in_canvas = true;
         });
     }
 

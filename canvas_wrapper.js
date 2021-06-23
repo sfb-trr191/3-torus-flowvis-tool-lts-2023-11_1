@@ -108,11 +108,14 @@ class CanvasWrapper {
         }
     }
 
-    draw(gl, data_changed, settings_changed) {
+    draw(gl, data_changed, settings_changed, mouse_in_canvas) {
         if (this.camera.changed || data_changed || settings_changed)
             this.aliasing_index = 0;
 
         if (this.aliasing_index == this.aliasing.num_rays_per_pixel)
+            return;
+
+        if(this.aliasing_index > 0 && !mouse_in_canvas)
             return;
 
         //console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);

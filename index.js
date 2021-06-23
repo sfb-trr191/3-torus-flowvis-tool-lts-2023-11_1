@@ -139,7 +139,8 @@
 
         CalculateStreamlines(gl);
         UpdateRenderSettings();
-        timer = setTimeout(on_update, 1);
+        //timer = setTimeout(on_update, 1);
+        requestAnimationFrame(on_update);
     }
 
     function on_update() {
@@ -205,7 +206,7 @@
             canvas_wrapper_main.draw(gl, data_changed);
         }
 */
-        canvas_wrapper_main.draw(gl, data_changed, settings_changed);
+        canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
         main_camera.changed = false;
@@ -216,7 +217,8 @@
         strong_tick_counter.innerHTML = tick_counter;
         strong_frame_counter.innerHTML = frame_counter;
         //shedule next call
-        timer = setTimeout(on_update, 60);
+        //timer = setTimeout(on_update, 60);
+        requestAnimationFrame(on_update);
     }
 
     var buffer;
