@@ -11,6 +11,7 @@ class UniformLocationsRayTracing {
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
+        this.location_fog_density = gl.getUniformLocation(program, "fog_density");        
     }
 }
 
@@ -60,6 +61,7 @@ class CanvasWrapper {
         this.tube_radius = 0;
         this.lod_index_panning = 0;
         this.lod_index_still = 0;
+        this.fog_density = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -147,6 +149,9 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.max_ray_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
+        gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
+
+        
 
         var panning = this.camera.panning;
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;

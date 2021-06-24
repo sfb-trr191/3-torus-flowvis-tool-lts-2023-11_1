@@ -134,6 +134,7 @@ uniform float offset_y;
 uniform float maxRayDistance;
 uniform int maxIterationCount;
 uniform float tubeRadius;
+uniform float fog_density;
 
 uniform int width;
 uniform int height;
@@ -1111,7 +1112,9 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		//return objectColor;
 		lightColor *= objectColor;
 		
-		float fogFactor = (fogEnd - hit.distance)/(fogEnd-fogStart);
+		//float fogFactor = (fogEnd - hit.distance)/(fogEnd-fogStart);
+        float dz = fog_density * hit.distance;
+		float fogFactor = exp(-dz*dz);
 		fogFactor = clamp(fogFactor, 0.0, 1.0);
 		
 		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
@@ -1135,26 +1138,6 @@ vec3 GetObjectColor(inout HitInformation hit)
 	{
 		int index = hit.multiPolyID % 8;
         return GetStreamlineColor(index);
-        /*
-		switch(index){
-			case 0:
-			return vec3(1,0,0); 
-			case 1:
-			return vec3(0,1,0); 
-			case 2:
-			return vec3(0,0,1); 
-			case 3:
-			return vec3(1,1,0); 
-			case 4:
-			return vec3(1,0,1); 
-			case 5:
-			return vec3(0,1,1); 
-			case 6:
-			return vec3(1,1,0.5); 
-			case 7:
-			return vec3(1,0.5,1); 
-		}
-		*/
 	}
 	
 	return objectColor;
