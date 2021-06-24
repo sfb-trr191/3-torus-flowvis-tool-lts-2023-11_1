@@ -8,8 +8,8 @@
     var frame_counter;
     var strong_tick_counter;
     var strong_frame_counter;
-    var strong_time;
-    var strong_delta_time;
+    //var strong_time;
+    //var strong_delta_time;
     var strong_fps;
 
     var main_camera;
@@ -91,9 +91,9 @@
         var strongs = document.querySelectorAll("strong");
         strong_tick_counter = strongs[0];
         strong_frame_counter = strongs[1];
-        strong_time = strongs[2];
-        strong_delta_time = strongs[3];
-        strong_fps = strongs[4];
+        strong_fps = strongs[2];
+        //strong_time = strongs[2];
+        //strong_delta_time = strongs[3];
 
         initializeAttributes();
 
@@ -157,8 +157,8 @@
 
         strong_tick_counter.innerHTML = tick_counter;
         strong_frame_counter.innerHTML = frame_counter;
-        strong_time.innerHTML = time_now.toFixed(3);
-        strong_delta_time.innerHTML = deltaTime.toFixed(3);
+        //strong_time.innerHTML = time_now.toFixed(3);
+        //strong_delta_time.innerHTML = deltaTime.toFixed(3);
         strong_fps.innerHTML = current_fps.toFixed(1)
         fps_display.innerHTML = current_fps.toFixed(1)
 

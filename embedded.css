@@ -1,0 +1,102 @@
+body {
+    text-align: center;
+}
+
+canvas {
+    display: block;
+    width: 1280px;
+    height: 720px;
+    margin: auto;
+    padding: 0;
+    border: none;
+    background-color: black;
+}
+
+button {
+    width: 100%;
+    display: block;
+    font-size: inherit;
+    margin: auto;
+    padding: 0.2em;
+}
+
+.container {
+    display: flex;
+}
+
+.column {
+    flex: 0;
+    /*for demo purposes only */
+    background: #f2f2f2;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+
+.column-one {
+    order: 1;
+}
+
+.column-two {
+    order: 2;
+    display: none;
+}
+
+fieldset {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 4px;
+}
+
+#fieldset_seeds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+#myProgress {
+    width: 100%;
+    background-color: grey;
+}
+
+#myBar {
+    width: 1%;
+    height: 30px;
+    background-color: green;
+}
+
+.horizontal_div_3{
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_seed{
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_3 input{
+    min-width: 75px;
+}
+
+.horizontal_div_seed input{
+    min-width: 75px;
+}
+
+#fps_display
+{
+    z-index:100;
+    position:absolute;    
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    left:16px;
+    top:0px;
+}
+
+#div_top{
+    display: none;
+}

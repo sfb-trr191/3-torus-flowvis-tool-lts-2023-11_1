@@ -42,6 +42,21 @@ class InputParameterWrapper {
 
         const camera = urlParams.get(PARAM_CAMERA);
         this.main_camera.fromString(camera);
+
+        const style = urlParams.get(PARAM_STYLE);
+        console.log("STYLE:", style)
+        switch (style) {
+            case STYLE_DEFAULT:
+                setCSS("index.css");
+                break;
+            case STYLE_EMBEDDED:
+                setCSS("embedded.css");
+                break;
+            default:
+                setCSS("index.css");
+                break;
+        }
+
     }
 
     toQueryString() {
