@@ -6,7 +6,7 @@
   }
   
   /* Then style the iframe to fit in the container div with full height and width */
-  .responsive-iframe {
+  .iframe_reeb_vector_fields_default {
     position: absolute;
     top: 0;
     left: 0;
@@ -17,7 +17,7 @@
   }
 
   /* Then style the iframe to fit in the container div with full height and width */
-  .embedded-iframe {
+  .iframe_reeb_vector_fields_embedded {
     position: absolute;
     top: 0;
     left: 0;
