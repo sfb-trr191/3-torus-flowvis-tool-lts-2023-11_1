@@ -26,3 +26,5 @@
     width: 1320px;
     height: 760px;
   }
+
+  pre { font-family: monospace; }
