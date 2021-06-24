@@ -84,3 +84,14 @@ fieldset {
 .horizontal_div_seed input{
     min-width: 75px;
 }
+
+#fps_display
+{
+    z-index:100;
+    position:absolute;    
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    left:16px;
+    top:36px;
+}

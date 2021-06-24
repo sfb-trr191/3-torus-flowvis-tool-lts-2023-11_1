@@ -49,9 +49,9 @@ class Camera {
         this.height_panning = 0;
         this.left_handed = false;
         this.velocity_slow = 0.1;
-        this.velocity = 1.0;
+        this.velocity = 0.25;
         this.rotationSpeed = 1;
-        this.rollspeed = 1.0;
+        this.rollspeed = 0.5;
         this.changed = true;
 
         //panning

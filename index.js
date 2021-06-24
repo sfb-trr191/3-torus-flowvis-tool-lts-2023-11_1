@@ -10,6 +10,9 @@
     var frame_counter;
     var strong_tick_counter;
     var strong_frame_counter;
+    var strong_time;
+    var strong_delta_time;
+    var strong_fps;
     var location_color_r;
     var location_texture_float;
     var location_texture_int;
@@ -50,6 +53,9 @@
     var settings_changed = false;
 
     var ui_seeds;
+    var time_last_tick = 0;
+    var fps_display;
+    var current_fps = 0;
 
     function onStart(evt) {
         console.log("onStart");
@@ -63,6 +69,8 @@
         testParameterExtractionFromURL();
 
         main_canvas = document.getElementById("main_canvas");
+        fps_display = document.getElementById("fps_display");
+        
 
         main_camera = new Camera("main_camera");
 
@@ -126,6 +134,9 @@
         var strongs = document.querySelectorAll("strong");
         strong_tick_counter = strongs[0];
         strong_frame_counter = strongs[1];
+        strong_time = strongs[2];
+        strong_delta_time = strongs[3];
+        strong_fps = strongs[4];
 
         loadShaderProgram(gl, program, "#vertex-shader", "#fragment-shader");
         loadUniformLocations(program);
@@ -143,48 +154,42 @@
         requestAnimationFrame(on_update);
     }
 
-    function on_update() {
+    function on_update(time_now) {
         tick_counter++;
+        var deltaTime = (time_now - time_last_tick) / 1000;
+
 
         var x = (frame_counter % 1000) / 1000
 
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_A)) {
-            var deltaTime = 0.01;
             var slow = false;
             main_camera.moveLeft(deltaTime, slow);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_D)) {
-            var deltaTime = 0.01;
             var slow = false;
             main_camera.moveRight(deltaTime, slow);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_W)) {
-            var deltaTime = 0.01;
             var slow = false;
             main_camera.moveForward(deltaTime, slow);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_S)) {
-            var deltaTime = 0.01;
             var slow = false;
             main_camera.moveBackward(deltaTime, slow);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_R)) {
-            var deltaTime = 0.01;
             var slow = false;
             main_camera.moveUp(deltaTime, slow);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_F)) {
-            var deltaTime = 0.01;
             var slow = false;
             main_camera.moveDown(deltaTime, slow);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_Q)) {
-            var deltaTime = 0.01;
             var left_handed = false;
             main_camera.RollLeft(deltaTime, left_handed);
         }
         if (input_manager.isKeyDown(input_manager.KEY_INDEX_E)) {
-            var deltaTime = 0.01;
             var left_handed = false;
             main_camera.RollRight(deltaTime, left_handed);
         }
@@ -213,11 +218,18 @@
         settings_changed = false;
         data_changed = false;
 
-        gl.finish();
+        //gl.finish();
+        current_fps = 1 / deltaTime
+
         strong_tick_counter.innerHTML = tick_counter;
         strong_frame_counter.innerHTML = frame_counter;
+        strong_time.innerHTML = time_now.toFixed(3);
+        strong_delta_time.innerHTML = deltaTime.toFixed(3);
+        strong_fps.innerHTML = current_fps.toFixed(1)
+        fps_display.innerHTML = current_fps.toFixed(1)
         //shedule next call
         //timer = setTimeout(on_update, 60);
+        time_last_tick = time_now;
         requestAnimationFrame(on_update);
     }
 
