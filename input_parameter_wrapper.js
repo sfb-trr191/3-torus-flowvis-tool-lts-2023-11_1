@@ -15,12 +15,14 @@ class InputParameterWrapper {
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
         this.dict_url_parameter_name_to_input_field = {};
+        this.css_loaded = "index.css";
         new InputFieldWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputFieldWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
         new InputFieldWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
         new InputFieldWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputFieldWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputFieldWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
+        new InputFieldWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
     }
 
     fromURL() {
@@ -45,15 +47,25 @@ class InputParameterWrapper {
 
         const style = urlParams.get(PARAM_STYLE);
         console.log("STYLE:", style)
+
+        const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
+        console.log("thumbnail_url:", thumbnail_url)
+        var invalid_thumbnail = thumbnail_url === null || thumbnail_url === "";
+        if(!invalid_thumbnail)
+            document.getElementById("image_thumbnail").src = thumbnail_url;
+
         switch (style) {
             case STYLE_DEFAULT:
                 setCSS("index.css");
+                this.css_loaded = "index.css";
                 break;
             case STYLE_EMBEDDED:
-                setCSS("embedded.css");
+                setCSS("embedded_thumbnail.css");
+                this.css_loaded = "embedded.css";
                 break;
             default:
                 setCSS("index.css");
+                this.css_loaded = "index.css";
                 break;
         }
 

@@ -25,7 +25,7 @@ button {
 }
 
 .column {
-    flex: 1;
+    flex: 0;
     /*for demo purposes only */
     background: #f2f2f2;
     border: 1px solid #e6e6e6;
@@ -34,11 +34,11 @@ button {
 
 .column-one {
     order: 1;
-    position:relative; 
 }
 
 .column-two {
     order: 2;
+    display: none;
 }
 
 fieldset {
@@ -88,13 +88,7 @@ fieldset {
 
 #fps_display
 {
-    z-index:100;
-    position:absolute;    
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    left:16px;
-    top:0px;
+    display: none;
 }
 
 #message_display
@@ -107,7 +101,11 @@ fieldset {
     left:0px;
     top:0px;
     text-align:center;
-    width: 100%
+    width: 1280px;
+}
+
+#div_top{
+    display: none;
 }
 
 #image_thumbnail

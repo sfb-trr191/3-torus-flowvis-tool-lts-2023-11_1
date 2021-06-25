@@ -14,3 +14,4 @@ const PARAM_input_num_points_per_streamline = "pps";
 const PARAM_input_step_size = "ss";
 const PARAM_segment_duplicator_iterations = "di";
 const PARAM_STYLE = "style";
+const PARAM_THUMBNAIL = "thumb";

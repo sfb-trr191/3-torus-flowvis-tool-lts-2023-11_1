@@ -30,6 +30,7 @@
     var ui_seeds;
     var time_last_tick = 0;
     var fps_display;
+    var message_display;
     var current_fps = 0;
 
     function onStart(evt) {
@@ -44,7 +45,7 @@
 
         main_canvas = document.getElementById("main_canvas");
         fps_display = document.getElementById("fps_display");
-        
+        message_display = document.getElementById("message_display");
 
         main_camera = new Camera("main_camera");
 
@@ -100,10 +101,23 @@
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera);
         input_parameter_wrapper.fromURL();
 
+        message_display.innerHTML = "calculating...";
+        setTimeout(on_start_delayed, 100);
+    }
+
+    function on_start_delayed(){
         CalculateStreamlines(gl);
         UpdateRenderSettings();
+        on_fully_loaded();
         requestAnimationFrame(on_update);
     }
+
+    function on_fully_loaded(){
+        console.log("on_fully_loaded");
+        setCSS(input_parameter_wrapper.css_loaded);
+        message_display.innerHTML = "";
+    }
+
 
     function on_update(time_now) {
         tick_counter++;
