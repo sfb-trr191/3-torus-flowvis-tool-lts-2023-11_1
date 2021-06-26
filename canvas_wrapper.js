@@ -72,22 +72,41 @@ class CanvasWrapper {
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, F_SHADER_RAYTRACING);
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
+        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");
 
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
         this.location_average = new UniformLocationsAverage(gl, this.program_average);
         this.shader_uniforms_average = this.loadShaderUniformsAverage(gl, this.program_average);
+        this.attribute_location_dummy_program_average = gl.getAttribLocation(this.program_average, "a_position");
 
         this.program_copy = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_copy, V_SHADER_RAYTRACING, F_SHADER_COPY);
         this.location_copy = new UniformLocationsCopy(gl, this.program_copy);
         this.shader_uniforms_copy = this.loadShaderUniformsCopy(gl, this.program_copy);
+        this.attribute_location_dummy_program_copy = gl.getAttribLocation(this.program_copy, "a_position");
 
         this.program_resampling = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_resampling, V_SHADER_RAYTRACING, F_SHADER_RESAMPLING);
         this.location_resampling = new UniformLocationsResampling(gl, this.program_resampling);
         this.shader_uniforms_resampling = this.loadShaderUniformsResampling(gl, this.program_resampling);
+        this.attribute_location_dummy_program_resampling = gl.getAttribLocation(this.program_resampling, "a_position");
 
+        this.GenerateDummyBuffer(gl);
+    }
+
+    GenerateDummyBuffer(gl){
+        this.dummy_buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.dummy_buffer);
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array([
+                -1.0, -1.0,
+                1.0, -1.0,
+                -1.0, 1.0,
+                1.0, 1.0]),
+            gl.STATIC_DRAW
+            );
     }
 
     SetRenderSizes(width, height, width_panning, height_panning) {
@@ -150,16 +169,15 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.max_ray_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
-
-        
-
+   
         var panning = this.camera.panning;
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(active_lod, gl,
             this.shader_uniforms_raytracing,
             this.location_raytracing.location_texture_float,
             this.location_raytracing.location_texture_int);
-        gl.drawArrays(gl.POINTS, 0, 1);
+
+        this.drawDummy(gl, this.attribute_location_dummy_program_raytracing);
     }
 
     drawTextureAverage(gl, render_wrapper, width, height) {
@@ -177,8 +195,7 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_in.texture);
         gl.uniform1i(this.location_average.location_texture2, 1);
 
-
-        gl.drawArrays(gl.POINTS, 0, 1);
+        this.drawDummy(gl, this.attribute_location_dummy_program_average);
     }
 
     //copies data from render_texture_average_out to render_texture_average_in to prepare next frame
@@ -193,7 +210,7 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         gl.uniform1i(this.location_copy.location_texture1, 0);
 
-        gl.drawArrays(gl.POINTS, 0, 1);
+        this.drawDummy(gl, this.attribute_location_dummy_program_copy);
     }
 
     drawResampling(gl, render_wrapper) {
@@ -212,10 +229,15 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         gl.uniform1i(this.location_resampling.location_texture1, 0);
 
-        gl.drawArrays(gl.POINTS, 0, 1);
+        this.drawDummy(gl, this.shader_uniforms_resampling);
     }
 
-
+    drawDummy(gl, location){
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.dummy_buffer);
+        gl.enableVertexAttribArray(location);
+        gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
 
     loadShaderUniformsRayTracing(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
