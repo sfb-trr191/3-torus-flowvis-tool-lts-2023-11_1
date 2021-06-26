@@ -9,6 +9,17 @@ class InputFieldWrapper {
     }
 }
 
+class InputSelectWrapper {
+
+    constructor(input_parameter_wrapper, input_select_name, url_parameter_name) {
+        this.input_select_name = input_select_name;
+        this.input_select = document.getElementById(input_select_name);
+        this.url_parameter_name = url_parameter_name;
+
+        input_parameter_wrapper.dict_url_parameter_name_to_input_field[url_parameter_name] = this;
+    }
+}
+
 class InputParameterWrapper {
 
     constructor(ui_seeds, main_camera, tab_manager) {
@@ -24,6 +35,7 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputFieldWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
         new InputFieldWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
+        new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
     }
 
     fromURL() {

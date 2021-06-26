@@ -43,6 +43,7 @@
         addOnClickUpdateCamera();
         addOnClickAddSeed();
         addOnClickUpdateURL();
+        addOnClickExport();
         addOnClickTabs();
         testWebGPU();
 
@@ -238,6 +239,16 @@
             console.log("onClickUpdateURL");
             UpdateURL();
         });
+        document.getElementById("button_export_update_url").addEventListener("click", function () {
+            console.log("onClickUpdateURL");
+            UpdateURL();
+        });
+    }
+
+    function addOnClickExport() {
+        document.getElementById("button_export").addEventListener("click", function () {
+            console.log("onClickExport");
+        });
     }
 
     function addOnClickTabs() {
@@ -252,6 +263,14 @@
         document.getElementById("button_tab_edit").addEventListener("click", function () {
             console.log("onClick: button_tab_edit");
             tab_manager.selectTab("tab_group_main", "tab_edit");
+        });
+        document.getElementById("button_tab_export").addEventListener("click", function () {
+            console.log("onClick: button_tab_export");
+            tab_manager.selectTab("tab_group_main", "tab_export");
+        });
+        document.getElementById("button_tab_help").addEventListener("click", function () {
+            console.log("onClick: button_tab_help");
+            tab_manager.selectTab("tab_group_main", "tab_help");
         });
     }
 

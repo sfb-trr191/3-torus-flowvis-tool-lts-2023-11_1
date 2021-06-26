@@ -33,6 +33,8 @@ class TabManager{
         tab_group_main.addTab("tab_settings", "button_tab_settings", "tabcontent_settings");
         tab_group_main.addTab("tab_information", "button_tab_information", "tabcontent_information");
         tab_group_main.addTab("tab_edit", "button_tab_edit", "tabcontent_edit");
+        tab_group_main.addTab("tab_export", "button_tab_export", "tabcontent_export");
+        tab_group_main.addTab("tab_help", "button_tab_help", "tabcontent_help");
     }
 
     selectTab(tab_group_name, tab_name){

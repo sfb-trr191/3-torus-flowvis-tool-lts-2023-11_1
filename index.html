@@ -62,6 +62,8 @@
                 <button id="button_tab_settings" class="tablink">settings</button>
                 <button id="button_tab_information" class="tablink">information</button>
                 <button id="button_tab_edit" class="tablink">edit</button>
+                <button id="button_tab_export" class="tablink">export</button>
+                <button id="button_tab_help" class="tablink">?</button>
             </div>
             <div id="tabcontent_settings" class="tabcontent">
                 <form>
@@ -80,8 +82,6 @@
                         <input id="input_step_size" type="text" value="0.0125">
                         <label>duplicator iterations</label>
                         <input id="segment_duplicator_iterations" type="text" value="1">
-                        <label>thumbnail</label>
-                        <input id="input_thumbnail" type="text" value="">
                     </fieldset>  
                     <fieldset>
                         <button type="button" id="button_add_seed">add seed</button>
@@ -144,7 +144,28 @@
             </div>
             <div id="tabcontent_edit" class="tabcontent">
                 
-            </div>            
+            </div>       
+            <div id="tabcontent_export" class="tabcontent">
+                <form>
+                    <fieldset>
+                        <button type="button" id="button_export">export</button>
+                        <button type="button" id="button_export_update_url">update url</button>
+                        <label>thumbnail URL</label>
+                        <input id="input_thumbnail" type="text" value="">
+                        <label>selected tab</label>
+                        <select id="select_tab">
+                            <option value="tab_settings">settings</option>
+                            <option value="tab_information">information</option>
+                            <option value="tab_edit">edit</option>
+                            <option value="tab_export">export</option>
+                            <option value="tab_help">help</option>
+                        </select> 
+                    </fieldset>  
+                </form>
+            </div>    
+            <div id="tabcontent_help" class="tabcontent">
+                
+            </div>         
         </div>
     </div>
     <div>
