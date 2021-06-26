@@ -33,6 +33,8 @@
     var message_display;
     var current_fps = 0;
 
+    var tab_manager;
+
     function onStart(evt) {
         console.log("onStart");
         window.removeEventListener(evt.type, onStart, false);
@@ -41,7 +43,10 @@
         addOnClickUpdateCamera();
         addOnClickAddSeed();
         addOnClickUpdateURL();
+        addOnClickTabs();
         testWebGPU();
+
+        tab_manager = new TabManager();
 
         main_canvas = document.getElementById("main_canvas");
         fps_display = document.getElementById("fps_display");
@@ -98,21 +103,21 @@
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, tab_manager);
         input_parameter_wrapper.fromURL();
 
         message_display.innerHTML = "calculating...";
         setTimeout(on_start_delayed, 100);
     }
 
-    function on_start_delayed(){
+    function on_start_delayed() {
         CalculateStreamlines(gl);
         UpdateRenderSettings();
         on_fully_loaded();
         requestAnimationFrame(on_update);
     }
 
-    function on_fully_loaded(){
+    function on_fully_loaded() {
         console.log("on_fully_loaded");
         setCSS(input_parameter_wrapper.css_loaded);
         message_display.innerHTML = "";
@@ -228,10 +233,25 @@
         });
     }
 
-    function addOnClickUpdateURL(){        
+    function addOnClickUpdateURL() {
         document.getElementById("button_update_url").addEventListener("click", function () {
             console.log("onClickUpdateURL");
             UpdateURL();
+        });
+    }
+
+    function addOnClickTabs() {
+        document.getElementById("button_tab_settings").addEventListener("click", function () {
+            console.log("onClick: button_tab_settings");
+            tab_manager.selectTab("tab_group_main", "tab_settings");
+        });
+        document.getElementById("button_tab_information").addEventListener("click", function () {
+            console.log("onClick: button_tab_information");
+            tab_manager.selectTab("tab_group_main", "tab_information");
+        });
+        document.getElementById("button_tab_edit").addEventListener("click", function () {
+            console.log("onClick: button_tab_edit");
+            tab_manager.selectTab("tab_group_main", "tab_edit");
         });
     }
 
@@ -254,7 +274,7 @@
         canvas_wrapper_main.max_ray_distance = document.getElementById("input_max_ray_distance").value;
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
-        
+
         canvas_wrapper_main.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_main.lod_index_still = document.getElementById("select_lod_still").value;
 
@@ -267,12 +287,12 @@
         main_camera.FromInput();
     }
 
-    function AddSeed(){
+    function AddSeed() {
         console.log("AddSeed");
         ui_seeds.addSeed();
     }
 
-    function UpdateURL(){
+    function UpdateURL() {
         console.log("UpdateURL");
         var query_string = input_parameter_wrapper.toQueryString();
         window.history.pushState(null, null, 'index.html' + query_string);
@@ -303,6 +323,28 @@
         });
 
         console.log('E');
+    }
+
+    function selectTab(evt, id) {
+        console.log(id);
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(id).style.display = "block";
+        evt.currentTarget.className += " active";
     }
 
 })();

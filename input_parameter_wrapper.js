@@ -11,9 +11,10 @@ class InputFieldWrapper {
 
 class InputParameterWrapper {
 
-    constructor(ui_seeds, main_camera) {
+    constructor(ui_seeds, main_camera, tab_manager) {
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
+        this.tab_manager = tab_manager;
         this.dict_url_parameter_name_to_input_field = {};
         this.css_loaded = "index.css";
         new InputFieldWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
@@ -69,6 +70,11 @@ class InputParameterWrapper {
                 break;
         }
 
+        var tab = urlParams.get(PARAM_TAB_MAIN);
+        var invalid_tab = tab === null || tab === "";
+        if(invalid_tab)
+            tab = "tab_settings";
+        this.tab_manager.selectTab("tab_group_main", tab);
     }
 
     toQueryString() {

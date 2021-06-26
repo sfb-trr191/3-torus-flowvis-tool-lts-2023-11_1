@@ -15,3 +15,4 @@ const PARAM_input_step_size = "ss";
 const PARAM_segment_duplicator_iterations = "di";
 const PARAM_STYLE = "style";
 const PARAM_THUMBNAIL = "thumb";
+const PARAM_TAB_MAIN = "tab";

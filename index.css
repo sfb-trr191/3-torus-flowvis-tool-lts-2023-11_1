@@ -34,7 +34,7 @@ button {
 
 .column-one {
     order: 1;
-    position:relative; 
+    position: relative;
 }
 
 .column-two {
@@ -64,53 +64,92 @@ fieldset {
     background-color: green;
 }
 
-.horizontal_div_3{
+.horizontal_div_3 {
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr;
     column-gap: 4px;
     gap: 4px;
 }
 
-.horizontal_div_seed{
+.horizontal_div_seed {
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
     column-gap: 4px;
     gap: 4px;
 }
 
-.horizontal_div_3 input{
+.horizontal_div_3 input {
     min-width: 75px;
 }
 
-.horizontal_div_seed input{
+.horizontal_div_seed input {
     min-width: 75px;
 }
 
-#fps_display
-{
-    z-index:100;
-    position:absolute;    
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    left:16px;
-    top:0px;
+#fps_display {
+    z-index: 100;
+    position: absolute;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    left: 16px;
+    top: 0px;
 }
 
-#message_display
-{
-    z-index:100;
-    position:absolute;    
-    color:rgb(255, 255, 255);
-    font-size:20px;
-    font-weight:bold;
-    left:0px;
-    top:0px;
-    text-align:center;
+#message_display {
+    z-index: 100;
+    position: absolute;
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    font-weight: bold;
+    left: 0px;
+    top: 0px;
+    text-align: center;
     width: 100%
 }
 
-#image_thumbnail
-{
+#image_thumbnail {
     display: none;
+}
+
+/* Style the tab */
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    display: flex;
+}
+
+/* Style the buttons that are used to open the tab content */
+
+.tab button {
+    float: left;
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
 }
