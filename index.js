@@ -246,8 +246,11 @@
     }
 
     function addOnClickExport() {
+        
         document.getElementById("button_export").addEventListener("click", function () {
             console.log("onClickExport");
+            UpdateURL();
+            Export(input_parameter_wrapper);
         });
     }
 

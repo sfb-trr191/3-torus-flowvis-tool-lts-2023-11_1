@@ -35,9 +35,11 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputFieldWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
         new InputFieldWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
+        new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
+        new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
         new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
     }
-
+    
     fromURL() {
         console.log("fromURL:", window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
