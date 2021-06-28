@@ -56,6 +56,7 @@ class Camera {
 
         //panning
         this.panning = false;
+        this.panning_forced = false;
         this.xMouse_old = 0;
         this.yMouse_old = 0;
         this.mouse_in_canvas = false;
@@ -287,14 +288,24 @@ class Camera {
         console.log(x, y)
     }
 
+    IsPanningOrForced() {
+        return (this.panning || this.panning_forced);
+    }
+
+    TogglePanningForced() {
+        this.panning_forced = !this.panning_forced;
+        this.changed = true;
+        this.SetCorrectResolution();
+        console.log("this.panning_forced", this.panning_forced);
+    }
+
     StartPanning(x, y) {
         //console.log("start panning")
         this.xMouse_old = x;
         this.yMouse_old = y;
         this.panning = true;
         this.changed = true;
-        this.width = this.width_panning;
-        this.height = this.height_panning;
+        this.SetCorrectResolution();
     }
 
     StopPanning() {
@@ -303,8 +314,18 @@ class Camera {
         //console.log("stop panning")
         this.panning = false;
         this.changed = true;
-        this.width = this.width_still;
-        this.height = this.height_still;
+        this.SetCorrectResolution();
+    }
+
+    SetCorrectResolution(){
+        if (this.panning_forced || this.panning) {
+            this.width = this.width_panning;
+            this.height = this.height_panning;
+        }
+        else {
+            this.width = this.width_still;
+            this.height = this.height_still;
+        }
     }
 
     UpdatePanning(x, y, left_handed) {

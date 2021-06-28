@@ -55,7 +55,7 @@
 
         main_camera = new Camera("main_camera");
 
-        input_manager = new InputManager(main_canvas);
+        input_manager = new InputManager(main_canvas, main_camera);
         input_manager.initialize();
         mouse_manager = new MouseManager(main_canvas, main_camera);
         mouse_manager.initialize();
@@ -179,8 +179,12 @@
         strong_frame_counter.innerHTML = frame_counter;
         //strong_time.innerHTML = time_now.toFixed(3);
         //strong_delta_time.innerHTML = deltaTime.toFixed(3);
-        strong_fps.innerHTML = current_fps.toFixed(1)
-        fps_display.innerHTML = current_fps.toFixed(1)
+        strong_fps.innerHTML = current_fps.toFixed(1);
+
+        var text_fps_panning = current_fps.toFixed(1);
+        if (main_camera.IsPanningOrForced())
+            text_fps_panning += "[P]";
+        fps_display.innerHTML = text_fps_panning;
 
         time_last_tick = time_now;
         requestAnimationFrame(on_update);
@@ -246,7 +250,6 @@
     }
 
     function addOnClickExport() {
-        
         document.getElementById("button_export").addEventListener("click", function () {
             console.log("onClickExport");
             UpdateURL();

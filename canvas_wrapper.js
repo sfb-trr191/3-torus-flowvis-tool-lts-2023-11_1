@@ -143,7 +143,7 @@ class CanvasWrapper {
         //console.log("offset_x: ", this.aliasing.offset_x[this.aliasing_index]);
         //console.log("offset_y: ", this.aliasing.offset_y[this.aliasing_index]);
 
-        var left_render_wrapper = this.camera.panning ? this.render_wrapper_raytracing_panning_left : this.render_wrapper_raytracing_still_left
+        var left_render_wrapper = this.camera.IsPanningOrForced() ? this.render_wrapper_raytracing_panning_left : this.render_wrapper_raytracing_still_left
         this.drawTextureRaytracing(gl, left_render_wrapper);
         this.drawTextureAverage(gl, left_render_wrapper);
         this.drawResampling(gl, left_render_wrapper);
@@ -170,7 +170,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
    
-        var panning = this.camera.panning;
+        var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(active_lod, gl,
             this.shader_uniforms_raytracing,

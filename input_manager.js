@@ -1,6 +1,6 @@
 class InputManager {
 
-    NUMBER_OF_KEYS = 8;
+    NUMBER_OF_KEYS = 8;//only continuous keys
 
     KEY_INDEX_W = 0;
     KEY_INDEX_A = 1;
@@ -14,8 +14,9 @@ class InputManager {
     KEY_STATE_INACTIVE = 0;
     KEY_STATE_ACTIVE = 1;
 
-    constructor(main_canvas) {
+    constructor(main_canvas, main_camera) {
         this.main_canvas = main_canvas;
+        this.main_camera = main_camera;
         this.key_states = new Int32Array(this.NUMBER_OF_KEYS);
     }
 
@@ -50,6 +51,7 @@ class InputManager {
 
     addOnKeyUp() {
         this.main_canvas.addEventListener("keyup", (event) => {
+            //HANDLING CONTINUOUS KEYS
             if (event.key == 'w')
                 this.key_states[this.KEY_INDEX_W] = this.KEY_STATE_INACTIVE;
             if (event.key == 'a')
@@ -66,6 +68,10 @@ class InputManager {
                 this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_INACTIVE;
             if (event.key == 'e')
                 this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_INACTIVE;
+
+            //HANDLING NON CONTINUOUS KEYS
+            if (event.key == 'p')
+                this.main_camera.TogglePanningForced();
         });
     }
 
