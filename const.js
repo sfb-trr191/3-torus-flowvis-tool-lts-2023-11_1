@@ -18,3 +18,4 @@ const PARAM_THUMBNAIL = "et";
 const PARAM_TAB_MAIN = "tab";
 const PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 const PARAM_EXPORT_THUMBNAIL_NAME = "etn";
+const PARAM_RNG_SEED_POSITION = "rngp";

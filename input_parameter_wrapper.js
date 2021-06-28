@@ -38,6 +38,7 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
         new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
+        new InputFieldWrapper(this, "input_random_position_seed", PARAM_RNG_SEED_POSITION);
     }
     
     fromURL() {
