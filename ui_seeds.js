@@ -50,6 +50,12 @@ class UISeed {
         this.node_label.innerHTML = new_index;
     }
 
+    randomizePosition() {
+        this.node_input_x.value = this.ui_seeds.rng_positions();
+        this.node_input_y.value = this.ui_seeds.rng_positions();
+        this.node_input_z.value = this.ui_seeds.rng_positions();
+    }
+
     fromString(s) {
         var split = s.split("~");
         this.node_input_x.value = split[0];
@@ -66,12 +72,12 @@ class UISeed {
         return s;
     }
 
-    getColorVector(){
+    getColorVector() {
         var hex = this.node_input_c.value;
         console.log("hex: ", hex);
-        const r = parseInt(hex.substr(1,2), 16) / 255
-        const g = parseInt(hex.substr(3,2), 16) / 255
-        const b = parseInt(hex.substr(5,2), 16) / 255
+        const r = parseInt(hex.substr(1, 2), 16) / 255
+        const g = parseInt(hex.substr(3, 2), 16) / 255
+        const b = parseInt(hex.substr(5, 2), 16) / 255
         console.log(`red: ${r}, green: ${g}, blue: ${b}`)
         return glMatrix.vec3.fromValues(r, g, b);
     }
@@ -81,6 +87,8 @@ class UISeeds {
     constructor() {
         this.element = document.getElementById("fieldset_seeds");
         this.list = [];
+        this.rng_positions = new Math.seedrandom('hello.');
+        this.rng_positions_seed_string = 'hello.';
     }
 
     generateDefaultSeeds() {
@@ -97,27 +105,27 @@ class UISeeds {
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.25;
         this.list[i].node_input_c.value = "#FF0000";
-        i+=1;
+        i += 1;
         this.list[i].node_input_x.value = 0.99;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.75;
         this.list[i].node_input_c.value = "#00FF00";
-        i+=1;
+        i += 1;
         this.list[i].node_input_x.value = 0.55;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.5;
         this.list[i].node_input_c.value = "#0000FF";
-        i+=1;
+        i += 1;
         this.list[i].node_input_x.value = 0.95;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.5;
         this.list[i].node_input_c.value = "#FFFF00";
-        i+=1;
+        i += 1;
         this.list[i].node_input_x.value = 0.25;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.1;
         this.list[i].node_input_c.value = "#FF00FF";
-        i+=1;
+        i += 1;
         this.list[i].node_input_x.value = 0.25;
         this.list[i].node_input_y.value = 0.25;
         this.list[i].node_input_z.value = 0.9;
@@ -137,6 +145,14 @@ class UISeeds {
         this.list.splice(index, 1);
         for (var i = 0; i < this.list.length; i++) {
             this.list[i].updateIndex(i);
+        }
+    }
+
+    randomizePosition(seed_string) {
+        this.rng_positions = new Math.seedrandom(seed_string);
+        this.rng_positions_seed_string = seed_string;
+        for (var i = 0; i < this.list.length; i++) {
+            this.list[i].randomizePosition(i);
         }
     }
 
@@ -189,7 +205,7 @@ class UISeeds {
         return point_list;
     }
 
-    getStreamlineColors(){
+    getStreamlineColors() {
         var color_list = [];
         for (var i = 0; i < this.list.length; i++) {
             var entry = this.list[i];
@@ -198,7 +214,7 @@ class UISeeds {
             streamline_color.color = color;
             color_list.push(streamline_color);
         }
-        return color_list; 
+        return color_list;
     }
 }
 /*

@@ -11,6 +11,7 @@
     <script src="libs/math.js" type="text/javascript"></script>
     <script src="libs/FileSaver.js" type="text/javascript"></script>
     <script src="libs/jszip.js" type="text/javascript"></script>
+    <script src="libs/seedrandom.js" type="text/javascript"></script>
     <script src="gl_matrix_extensions.js" type="text/javascript"> </script>
     <script src="error.js" type="text/javascript"> </script>
     <script src="const.js" type="text/javascript"> </script>
@@ -87,8 +88,12 @@
                         <input id="segment_duplicator_iterations" type="text" value="1">
                     </fieldset>  
                     <fieldset>
-                        <button type="button" id="button_add_seed">add seed</button>
-                        <label></label>
+                        <button type="button" id="button_add_seed">add streamline seed</button>
+                        <div id="div_buttons_rng" class="horizontal_div_3">
+                            <button type="button" id="button_randomize_seed_positions">refresh rng</button>
+                            <button type="button" id="button_randomize_seed_positions_new_seed">new rng</button>
+                            <input id="input_random_position_seed" type="text" value="1">
+                        </div>
                     </fieldset>  
                     <fieldset id="fieldset_seeds">
                     </fieldset>    
@@ -120,7 +125,7 @@
                         <label>panning resolution factor</label>
                         <input id="input_panning_resolution_factor" type="text" value="0.5">
                         <label>max distance</label>
-                        <div id="div_input_camera_forward" class="horizontal_div_2">
+                        <div id="div_input_max_distance" class="horizontal_div_2">
                             <input id="input_max_ray_distance" type="text" value="100">
                             <input class="input_readonly" id="input_limited_max_ray_distance" type="text" value="100" readonly>
                         </div>

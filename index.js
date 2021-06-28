@@ -42,6 +42,7 @@
         addOnClickUpdateRenderSettings();
         addOnClickUpdateCamera();
         addOnClickAddSeed();
+        addOnClickRandomizeSeedPositions();
         addOnClickUpdateURL();
         addOnClickExport();
         addOnClickTabs();
@@ -238,6 +239,18 @@
         });
     }
 
+    function addOnClickRandomizeSeedPositions() {
+        document.getElementById("button_randomize_seed_positions").addEventListener("click", function () {
+            console.log("onClickRandomizeSeedPositions");
+            RandomizeSeedPositions();
+        });
+        document.getElementById("button_randomize_seed_positions_new_seed").addEventListener("click", function () {
+            console.log("onClickRandomizeSeedPositionsNewSeed");
+            RandomizeSeedPositionsNewSeed();
+        });
+
+    }
+
     function addOnClickUpdateURL() {
         document.getElementById("button_update_url").addEventListener("click", function () {
             console.log("onClickUpdateURL");
@@ -317,6 +330,23 @@
     function AddSeed() {
         console.log("AddSeed");
         ui_seeds.addSeed();
+    }
+
+    function RandomizeSeedPositions() {
+        console.log("RandomizeSeedPositions");
+        var seed = document.getElementById("input_random_position_seed").value;
+        ui_seeds.randomizePosition(seed);
+    }
+
+    function RandomizeSeedPositionsNewSeed() {
+        console.log("RandomizeSeedPositionsNewSeed");
+        var old_seed = document.getElementById("input_random_position_seed").value;
+        var new_seed = parseInt(old_seed);
+        if (isNaN(new_seed))
+            new_seed = 0;
+        new_seed += 1;
+        document.getElementById("input_random_position_seed").value = new_seed;
+        RandomizeSeedPositions();
     }
 
     function UpdateURL() {
