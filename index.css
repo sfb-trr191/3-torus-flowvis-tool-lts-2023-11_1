@@ -169,3 +169,11 @@ fieldset {
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.hidden {
+    display: none;
+}
+
+.list_entry {
+    text-align: left;
+}

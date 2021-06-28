@@ -221,7 +221,7 @@ class CanvasWrapper {
     }
 
     drawResampling(gl, render_wrapper) {
-        var show_progressbar = this.aliasing_index < this.aliasing.num_rays_per_pixel - 1;
+        var show_progressbar = this.isRenderingIncomplete();
         var progress = this.aliasing_index / (this.aliasing.num_rays_per_pixel - 1);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -237,6 +237,10 @@ class CanvasWrapper {
         gl.uniform1i(this.location_resampling.location_texture1, 0);
 
         this.drawDummy(gl, this.shader_uniforms_resampling);
+    }
+
+    isRenderingIncomplete(){
+        return this.aliasing_index < this.aliasing.num_rays_per_pixel - 1;
     }
 
     drawDummy(gl, location){
