@@ -120,7 +120,10 @@
                         <label>panning resolution factor</label>
                         <input id="input_panning_resolution_factor" type="text" value="0.5">
                         <label>max distance</label>
-                        <input id="input_max_ray_distance" type="text" value="100">
+                        <div id="div_input_camera_forward" class="horizontal_div_2">
+                            <input id="input_max_ray_distance" type="text" value="100">
+                            <input class="input_readonly" id="input_limited_max_ray_distance" type="text" value="100" readonly>
+                        </div>
                         <label>fog density</label>
                         <input id="input_fog_density" type="text" value="0.01">
                         <label>tube radius factor</label>

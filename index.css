@@ -20,6 +20,15 @@ button {
     padding: 0.2em;
 }
 
+input {
+    border:1px solid rgb(118, 118, 118);
+}
+
+.input_readonly {
+    background: rgb(242, 242, 242);
+    border:1px solid rgb(118, 118, 118);
+}
+
 .container {
     display: flex;
 }
@@ -67,6 +76,13 @@ fieldset {
 .horizontal_div_3 {
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_2 {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
     column-gap: 4px;
     gap: 4px;
 }

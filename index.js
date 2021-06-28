@@ -299,6 +299,8 @@
         canvas_wrapper_main.max_ray_distance = document.getElementById("input_max_ray_distance").value;
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
+        canvas_wrapper_main.CalculateLimitedMaxRayDistance();
+        document.getElementById("input_limited_max_ray_distance").value = canvas_wrapper_main.limited_max_distance.toFixed(3);
 
         canvas_wrapper_main.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_main.lod_index_still = document.getElementById("select_lod_still").value;
