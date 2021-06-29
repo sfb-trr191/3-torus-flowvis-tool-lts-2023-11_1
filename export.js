@@ -8,6 +8,7 @@ function Export(input_parameter_wrapper) {
     
     var query_string = input_parameter_wrapper.toQueryString();
     var url_without_query = window.location.toString().replace(window.location.search, "");
+    url_without_query = url_without_query.replace("index", "lazy");
     var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
     var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
     //console.log("query_string: ", query_string);
@@ -39,6 +40,6 @@ function GenerateExportString_Latex(url, file_name){
 }
 
 function GenerateExportString_HTML(url, class_name){
-    var html = '<iframe class="'+class_name+'" src="'+url+'"></style>';
+    var html = '<iframe class="'+class_name+'" src="'+url+'"></iframe>';
     return html;    
 }
