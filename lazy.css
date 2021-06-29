@@ -1,0 +1,12 @@
+#message_display
+{
+    z-index:100;
+    position:absolute;    
+    color:rgb(255, 255, 255);
+    font-size:20px;
+    font-weight:bold;
+    left:0px;
+    top:0px;
+    text-align:center;
+    width: 1280px;
+}
