@@ -46,7 +46,7 @@
         addOnClickUpdateURL();
         addOnClickExport();
         addOnClickTabs();
-        testWebGPU();
+        //testWebGPU();
 
         tab_manager = new TabManager();
 
@@ -109,7 +109,7 @@
         input_parameter_wrapper.fromURL();
 
         message_display.innerHTML = "calculating...";
-        setTimeout(on_start_delayed, 100);
+        setTimeout(on_start_delayed, 1000);
     }
 
     function on_start_delayed() {
