@@ -246,11 +246,16 @@
             console.log("onClickRandomizeSeedPositions");
             RandomizeSeedPositions();
         });
+        document.getElementById("button_randomize_seed_colors").addEventListener("click", function () {
+            console.log("onClickRandomizeSeedColors");
+            RandomizeSeedColors();
+        });
+        /*
         document.getElementById("button_randomize_seed_positions_new_seed").addEventListener("click", function () {
             console.log("onClickRandomizeSeedPositionsNewSeed");
             RandomizeSeedPositionsNewSeed();
         });
-
+        */
     }
 
     function addOnClickUpdateURL() {
@@ -339,10 +344,18 @@
 
     function RandomizeSeedPositions() {
         console.log("RandomizeSeedPositions");
-        var seed = document.getElementById("input_random_position_seed").value;
-        ui_seeds.randomizePosition(seed);
+        //var seed = document.getElementById("input_random_position_seed").value;
+        //ui_seeds.randomizePosition(seed);
+        ui_seeds.randomizePosition();
     }
 
+    function RandomizeSeedColors() {
+        console.log("RandomizeSeedColors");
+        //var seed = document.getElementById("input_random_position_seed").value;
+        //ui_seeds.randomizePosition(seed);
+        ui_seeds.randomizeColor();
+    }
+    /*
     function RandomizeSeedPositionsNewSeed() {
         console.log("RandomizeSeedPositionsNewSeed");
         var old_seed = document.getElementById("input_random_position_seed").value;
@@ -353,7 +366,7 @@
         document.getElementById("input_random_position_seed").value = new_seed;
         RandomizeSeedPositions();
     }
-
+    */
     function UpdateURL() {
         console.log("UpdateURL");
         var query_string = input_parameter_wrapper.toQueryString();

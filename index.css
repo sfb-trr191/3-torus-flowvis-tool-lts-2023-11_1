@@ -89,7 +89,7 @@ fieldset {
 
 .horizontal_div_seed {
     display: inline-grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     column-gap: 4px;
     gap: 4px;
 }
@@ -100,6 +100,10 @@ fieldset {
 
 .horizontal_div_seed input {
     min-width: 75px;
+}
+
+.horizontal_div_seed button {
+    min-width: 32px;
 }
 
 #fps_display {

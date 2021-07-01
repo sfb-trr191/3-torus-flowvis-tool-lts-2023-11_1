@@ -29,20 +29,34 @@ class UISeed {
         this.node_input_c.value = "#00FF00";
         this.node.appendChild(this.node_input_c);
 
+        this.node_random = document.createElement("button");
+        this.node_random.innerHTML = "r pos";
+        this.node_random.type = "button";
+        this.node_random.addEventListener("click", (event) => {
+            console.log("this.index: ", event.target.id, this.index);
+            this.randomizePosition();
+        });
+        this.node.appendChild(this.node_random);
+
+        this.node_random_col = document.createElement("button");
+        this.node_random_col.innerHTML = "r col";
+        this.node_random_col.type = "button";
+        this.node_random_col.addEventListener("click", (event) => {
+            console.log("this.index: ", event.target.id, this.index);
+            this.randomizeColor();
+        });
+        this.node.appendChild(this.node_random_col);
+
         this.node_button = document.createElement("button");
         this.node_button.innerHTML = "x";
         this.node_button.type = "button";
-        //node_button.id = "button_remove_seed_" + index;
-        //node_button.addEventListener("click", function (e, seed) {
-        //    console.log("this.index: ", e.target.id, seed.index);
-        //});
-
         this.node_button.addEventListener("click", (event) => {
             console.log("this.index: ", event.target.id, this.index);
             this.ui_seeds.removeSeed(this.index);
         });
-
         this.node.appendChild(this.node_button);
+
+        this.randomizePosition();
     }
 
     updateIndex(new_index) {
@@ -51,10 +65,17 @@ class UISeed {
     }
 
     randomizePosition() {
-        this.node_input_x.value = this.ui_seeds.rng_positions();
-        this.node_input_y.value = this.ui_seeds.rng_positions();
-        this.node_input_z.value = this.ui_seeds.rng_positions();
+        this.node_input_x.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_y.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_z.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
     }
+
+    randomizeColor() {
+        var r = Math.round(this.ui_seeds.rng_positions() * 255);
+        var g = Math.round(this.ui_seeds.rng_positions() * 255);
+        var b = Math.round(this.ui_seeds.rng_positions() * 255);
+        this.node_input_c.value = rgbToHex(r, g, b);
+    }    
 
     fromString(s) {
         var split = s.split("~");
@@ -87,8 +108,8 @@ class UISeeds {
     constructor() {
         this.element = document.getElementById("fieldset_seeds");
         this.list = [];
-        this.rng_positions = new Math.seedrandom('hello.');
-        this.rng_positions_seed_string = 'hello.';
+        this.rng_positions = new Math.seedrandom();
+        //this.rng_positions_seed_string = 'hello.';
     }
 
     generateDefaultSeeds() {
@@ -148,6 +169,21 @@ class UISeeds {
         }
     }
 
+    randomizePosition() {
+        for (var i = 0; i < this.list.length; i++) {
+            this.list[i].randomizePosition(i);
+        }
+    }
+
+    randomizeColor() {
+        for (var i = 0; i < this.list.length; i++) {
+            this.list[i].randomizeColor(i);
+        }
+    }
+
+    
+
+    /*
     randomizePosition(seed_string) {
         this.rng_positions = new Math.seedrandom(seed_string);
         this.rng_positions_seed_string = seed_string;
@@ -155,6 +191,7 @@ class UISeeds {
             this.list[i].randomizePosition(i);
         }
     }
+    */
 
     toString() {
         var s = "";

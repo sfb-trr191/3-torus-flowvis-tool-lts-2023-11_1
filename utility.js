@@ -48,11 +48,20 @@ function distancePointToLine(p, a, n) {
 
 
 function setCSS(value) {
-  
+
     // Obtain the name of stylesheet 
     // as a parameter and set it 
     // using href attribute.
     var sheets = document.getElementsByTagName("link");
     sheets[0].href = value;
     console.log("STYLE:", value)
+}
+
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
