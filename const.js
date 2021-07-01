@@ -5,6 +5,11 @@ const DIRECTION_BOTH = 3;
 const STYLE_DEFAULT = "d";
 const STYLE_EMBEDDED = "e";
 
+const FOG_NONE = 0;
+const FOG_LINEAR = 1;
+const FOG_EXPONENTIAL = 2;
+const FOG_EXPONENTIAL_SQUARED = 3;
+
 const PARAM_SEEDS = "s";
 const PARAM_CAMERA = "mc";
 const PARAM_input_field_equation_u = "u";

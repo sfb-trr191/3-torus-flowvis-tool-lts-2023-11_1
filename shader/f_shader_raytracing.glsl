@@ -120,6 +120,11 @@ const int TYPE_STREAMLINE_SEGMENT = 1;
 const int TYPE_CLICKED_SPHERE = 2;
 const int TYPE_GL_CYLINDER = 3;
 
+const int FOG_NONE = 0;
+const int FOG_LINEAR = 1;
+const int FOG_EXPONENTIAL = 2;
+const int FOG_EXPONENTIAL_SQUARED = 3;
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START UNIFORMS
@@ -135,6 +140,7 @@ uniform float maxRayDistance;
 uniform int maxIterationCount;
 uniform float tubeRadius;
 uniform float fog_density;
+uniform int fog_type;
 
 uniform int width;
 uniform int height;
@@ -191,6 +197,7 @@ float ExtractLinearPercentage(float a, float b, float value);
 //**********************************************************
 
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override);
+float CalculateFogFactor(float dist);
 vec3 GetObjectColor(inout HitInformation hit);
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir);
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
@@ -1112,10 +1119,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		//return objectColor;
 		lightColor *= objectColor;
 		
-		//float fogFactor = (fogEnd - hit.distance)/(fogEnd-fogStart);
-        float dz = fog_density * hit.distance;
-		float fogFactor = exp(-dz*dz);
-		fogFactor = clamp(fogFactor, 0.0, 1.0);
+        float fogFactor = CalculateFogFactor(hit.distance);
 		
 		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
 		resultColor = mix(fogColor, lightColor, fogFactor);
@@ -1127,6 +1131,28 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		resultColor = vec3(1, 1, 1);
 	}
 	return resultColor;
+}
+
+float CalculateFogFactor(float dist)
+{
+    float fogFactor = 1.0;
+    if (fog_type == FOG_LINEAR){
+	    //float fogFactor = (fogEnd - hit.distance)/(fogEnd-fogStart);
+	    fogFactor = (maxRayDistance - dist)/(maxRayDistance);
+	    fogFactor = clamp(fogFactor, 0.0, 1.0);   
+    }
+    else if (fog_type == FOG_EXPONENTIAL){
+        float dz = fog_density * dist;
+	    fogFactor = exp(-dz);
+	    fogFactor = clamp(fogFactor, 0.0, 1.0);   
+    }
+    else if (fog_type == FOG_EXPONENTIAL_SQUARED){
+        float dz = fog_density * dist;
+	    fogFactor = exp(-dz*dz);
+	    fogFactor = clamp(fogFactor, 0.0, 1.0);      
+    }
+
+    return fogFactor;
 }
 
 vec3 GetObjectColor(inout HitInformation hit)

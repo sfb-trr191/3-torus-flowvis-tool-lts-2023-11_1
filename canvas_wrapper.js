@@ -11,7 +11,8 @@ class UniformLocationsRayTracing {
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
-        this.location_fog_density = gl.getUniformLocation(program, "fog_density");        
+        this.location_fog_density = gl.getUniformLocation(program, "fog_density");     
+        this.location_fog_type = gl.getUniformLocation(program, "fog_type");               
     }
 }
 
@@ -62,6 +63,7 @@ class CanvasWrapper {
         this.lod_index_panning = 0;
         this.lod_index_still = 0;
         this.fog_density = 0;
+        this.fog_type = 0;
         this.limited_max_distance = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
@@ -111,9 +113,15 @@ class CanvasWrapper {
     }
 
     CalculateLimitedMaxRayDistance(){
-        var d = this.fog_density;
-        //see https://www.wolframalpha.com/input/?i=e%5E%28-%28d*z%29%5E2%29+%3E+0.001
-        this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d*d)));//js allows division by zero;
+        var d = this.fog_density;         
+        this.limited_max_distance = this.max_ray_distance;
+        if (this.fog_type == FOG_EXPONENTIAL){            
+            this.limited_max_distance = Math.min(this.max_ray_distance, 6.90776/d);//js allows division by zero;
+        }
+        else if (this.fog_type == FOG_EXPONENTIAL_SQUARED){
+            //see https://www.wolframalpha.com/input/?i=e%5E%28-%28d*z%29%5E2%29+%3E+0.001
+            this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d*d)));//js allows division by zero;
+        }              
     }
 
     SetRenderSizes(width, height, width_panning, height_panning) {
@@ -169,13 +177,14 @@ class CanvasWrapper {
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
-        gl.uniform1i(this.location_raytracing.location_max_iteration_count, Math.ceil(this.limited_max_distance * 3));
+        gl.uniform1i(this.location_raytracing.location_max_iteration_count, Math.ceil(this.limited_max_distance) * 3);
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
+        gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
    
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
