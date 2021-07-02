@@ -38,7 +38,7 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
         new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
-        new InputFieldWrapper(this, "input_random_position_seed", PARAM_RNG_SEED_POSITION);
+        //new InputFieldWrapper(this, "input_random_position_seed", PARAM_RNG_SEED_POSITION);
     }
     
     fromURL() {
@@ -97,6 +97,7 @@ class InputParameterWrapper {
         var params = {};
         for (var key in this.dict_url_parameter_name_to_input_field) {
             var input_field_wrapper = this.dict_url_parameter_name_to_input_field[key];
+            console.log("key:", key);
             const value = input_field_wrapper.input_field.value;
             console.log("url_parameter_name:", input_field_wrapper.url_parameter_name, "value:", value);
             if (value === null)
