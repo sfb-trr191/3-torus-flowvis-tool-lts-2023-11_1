@@ -12,6 +12,9 @@ const FOG_LINEAR = 1;
 const FOG_EXPONENTIAL = 2;
 const FOG_EXPONENTIAL_SQUARED = 3;
 
+const SHADING_MODE_STREAMLINES_ID = 0;
+const SHADING_MODE_STREAMLINES_SCALAR = 1;
+
 const PARAM_SEEDS = "s";
 const PARAM_CAMERA = "mc";
 const PARAM_input_field_equation_u = "u";

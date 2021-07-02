@@ -125,6 +125,9 @@ const int FOG_LINEAR = 1;
 const int FOG_EXPONENTIAL = 2;
 const int FOG_EXPONENTIAL_SQUARED = 3;
 
+const int SHADING_MODE_STREAMLINES_ID = 0;
+const int SHADING_MODE_STREAMLINES_SCALAR = 1;
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START UNIFORMS
@@ -141,6 +144,7 @@ uniform int maxIterationCount;
 uniform float tubeRadius;
 uniform float fog_density;
 uniform int fog_type;
+uniform int shading_mode_streamlines;
 
 uniform int width;
 uniform int height;
@@ -199,6 +203,7 @@ float ExtractLinearPercentage(float a, float b, float value);
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override);
 float CalculateFogFactor(float dist);
 vec3 GetObjectColor(inout HitInformation hit);
+float GetScalar(vec3 position);
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir);
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
 //float clamp(float x, float min, float max);
@@ -1116,14 +1121,12 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		}
 
 		vec3 objectColor = GetObjectColor(hit);	
-		//return objectColor;
 		lightColor *= objectColor;
 		
         float fogFactor = CalculateFogFactor(hit.distance);
 		
 		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
 		resultColor = mix(fogColor, lightColor, fogFactor);
-		//return normal;//
 	}
 	else
 	{
@@ -1162,11 +1165,26 @@ vec3 GetObjectColor(inout HitInformation hit)
 	
 	if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
 	{
-		int index = hit.multiPolyID % 8;
-        return GetStreamlineColor(index);
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_ID)
+        {
+		    int index = hit.multiPolyID % 8;
+            return GetStreamlineColor(index);
+        }
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR)
+        {
+            float scalar = GetScalar(hit.positionCenter);
+            return vec3(scalar,0,0);
+        }
 	}
 	
 	return objectColor;
+}
+
+float GetScalar(vec3 position){
+    float x = position.x;
+	float y = position.y;
+	float z = position.z;
+    return shader_formula_scalar;
 }
 
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir)

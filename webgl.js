@@ -15,49 +15,6 @@ function getRenderingContext() {
     return gl;
 }
 
-function loadShaderProgram(gl, program, vertex_shader_name, fragment_shader_name) {
-    var source = document.querySelector(vertex_shader_name).innerHTML;
-    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, source);
-    gl.compileShader(vertexShader);
-    //source = document.querySelector(fragment_shader_name).innerHTML
-    source = F_SHADER_RAYTRACING;
-    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, source);
-    gl.compileShader(fragmentShader);
-
-    // Check the compile status
-    var compiled = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
-    if (!compiled) {
-        // Something went wrong during compilation; get the error
-        console.error(gl.getShaderInfoLog(fragmentShader));
-    }
-
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
-
-    // Check the link status
-    var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
-    if (!linked) {
-        // something went wrong with the link
-        console.error(gl.getProgramInfoLog(program));
-    }
-
-    gl.detachShader(program, vertexShader);
-    gl.detachShader(program, fragmentShader);
-    gl.deleteShader(vertexShader);
-    gl.deleteShader(fragmentShader);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        var linkErrLog = gl.getProgramInfoLog(program);
-        //cleanup();
-        document.querySelector("p").innerHTML =
-            "Shader program did not link successfully. "
-            + "Error log: " + linkErrLog;
-        return;
-    }
-}
-
 function loadShaderProgramFromCode(gl, program, v_source, f_source) {
     var source = v_source;
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);

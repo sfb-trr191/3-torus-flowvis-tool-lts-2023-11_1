@@ -12,7 +12,8 @@ class UniformLocationsRayTracing {
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");     
-        this.location_fog_type = gl.getUniformLocation(program, "fog_type");               
+        this.location_fog_type = gl.getUniformLocation(program, "fog_type");     
+        this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");              
     }
 }
 
@@ -51,11 +52,12 @@ class UniformLocationsResampling {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, name, canvas, camera, aliasing) {
+    constructor(gl, streamline_context_static, name, canvas, camera, aliasing, shader_manager) {
         console.log("Construct CanvasWrapper: ", name)
         this.canvas = canvas;
         this.camera = camera;
         this.aliasing = aliasing;
+        this.shader_manager = shader_manager;
         this.p_streamline_context_static = streamline_context_static;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
@@ -64,6 +66,7 @@ class CanvasWrapper {
         this.lod_index_still = 0;
         this.fog_density = 0;
         this.fog_type = 0;
+        this.shading_mode_streamlines = 0;
         this.limited_max_distance = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
@@ -72,7 +75,7 @@ class CanvasWrapper {
         this.render_wrapper_raytracing_panning_right = new RenderWrapper(gl, name + "_raytracing_panning_right", camera.width_panning, camera.height_panning);
 
         this.program_raytracing = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, F_SHADER_RAYTRACING);
+        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");
@@ -96,6 +99,15 @@ class CanvasWrapper {
         this.attribute_location_dummy_program_resampling = gl.getAttribLocation(this.program_resampling, "a_position");
 
         this.GenerateDummyBuffer(gl);
+    }
+
+    ReplaceRaytracingShader(gl, shader_formula_scalar){
+        console.log("ReplaceRaytracingShader");
+        this.program_raytracing = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetShader(shader_formula_scalar));
+        this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
+        this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
+        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
     }
 
     GenerateDummyBuffer(gl){
@@ -185,7 +197,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
-   
+        gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
+        
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(active_lod, gl,

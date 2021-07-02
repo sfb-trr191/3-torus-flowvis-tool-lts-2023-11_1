@@ -28,6 +28,7 @@
     <script src="shader/f_shader_resampling.glsl" type="text/javascript"> </script>
     <script src="shader/v_shader_raytracing.glsl" type="text/javascript"> </script>
     <script src="shader/v_shader_resampling.glsl" type="text/javascript"> </script>
+    <script src="shader_manager.js" type="text/javascript"> </script>
     <script src="aliasing.js" type="text/javascript"> </script>
     <script src="data_types.js" type="text/javascript"> </script>
     <script src="data_container.js" type="text/javascript"> </script>
@@ -143,6 +144,13 @@
                         </select>
                         <label>fog density</label>
                         <input id="input_fog_density" type="text" value="0.01">
+                        <label>streamline shading</label>
+                        <select id="select_shading_mode_streamlines">
+                            <option value="0">id</option>
+                            <option value="1">scalar</option>
+                        </select>
+                        <label>scalar field</label>
+                        <input id="input_formula_scalar" type="text" value="0.0">
                         <label>tube radius factor</label>
                         <input id="input_tube_radius_factor" type="text" value="1.0">
                         <label>LOD still</label>

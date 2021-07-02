@@ -21,6 +21,7 @@
     var streamline_context_dynamic;//interactive streamline placement
 
     var aliasing;
+    var shader_manager;
     var canvas_wrapper_main;
     var input_parameter_wrapper;
 
@@ -92,7 +93,9 @@
 
         aliasing = new Aliasing();
 
-        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing);
+        shader_manager = new ShaderManager();
+
+        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing, shader_manager);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -216,6 +219,7 @@
             //window.location.href = window.location.pathname + '?u=123';
             //window.history.replaceState(null, null, 'index.html?u=123');
             CalculateStreamlines();
+            UpdateRenderSettings();
             UpdateURL();
         });
     }
@@ -320,6 +324,7 @@
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_main.fog_type = document.getElementById("select_fog_type").value;
+        canvas_wrapper_main.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         console.log("fog_type", canvas_wrapper_main.fog_type);
         console.log("limited_max_distance", canvas_wrapper_main.limited_max_distance);
@@ -330,6 +335,9 @@
 
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
         canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
+
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar);
     }
 
     function UpdateCamera() {
