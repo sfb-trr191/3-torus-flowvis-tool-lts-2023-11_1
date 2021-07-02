@@ -65,3 +65,7 @@ function componentToHex(c) {
 function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
+
+function lerp(a, b, t) {
+    return (1 - t) * a + t * b;
+  }

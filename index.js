@@ -21,6 +21,7 @@
     var streamline_context_dynamic;//interactive streamline placement
 
     var aliasing;
+    var transfer_function_manager;
     var shader_manager;
     var canvas_wrapper_main;
     var input_parameter_wrapper;
@@ -92,6 +93,8 @@
             document.getElementById("input_camera_up_z"));
 
         aliasing = new Aliasing();
+
+        transfer_function_manager = new TransferFunctionManager();
 
         shader_manager = new ShaderManager();
 
