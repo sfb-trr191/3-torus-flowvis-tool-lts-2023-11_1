@@ -128,6 +128,8 @@ const int FOG_EXPONENTIAL_SQUARED = 3;
 const int SHADING_MODE_STREAMLINES_ID = 0;
 const int SHADING_MODE_STREAMLINES_SCALAR = 1;
 
+const float PI = 3.1415926535897932384626433832795;
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START UNIFORMS
@@ -137,6 +139,8 @@ const int SHADING_MODE_STREAMLINES_SCALAR = 1;
 uniform float color_r;
 uniform sampler3D texture_float;
 uniform isampler3D texture_int;
+uniform sampler3D texture_float_global;
+uniform isampler3D texture_int_global;
 uniform float offset_x;
 uniform float offset_y;
 uniform float maxRayDistance;
@@ -218,10 +222,14 @@ GL_TreeNode GetNode(int index, bool interactiveStreamline);
 GL_AABB GetAABB(int index, bool interactiveStreamline);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
+vec3 GetScalarColor(int index);
 
 ivec3 GetIndex3D(int global_index);
 
 void main() {
+    float i = gl_FragCoord[0];//x
+	float j = gl_FragCoord[1];//y
+    
 	HitInformation hit;
 	vec3 color = CalculateOneRay(offset_x, offset_y, hit);
 	//if(hit.hitType > TYPE_NONE)
@@ -234,8 +242,6 @@ void main() {
 
 	return;   
 
-	float i = gl_FragCoord[0];//x
-	float j = gl_FragCoord[1];//y
   	if (int(i) < 100)
   	{
 		if(int(j) < 100)
@@ -1173,7 +1179,9 @@ vec3 GetObjectColor(inout HitInformation hit)
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR)
         {
             float scalar = GetScalar(hit.positionCenter);
-            return vec3(scalar,0,0);
+            int bin = int(float(127) * scalar);
+            bin = clamp(bin, 0, 127);
+            return GetScalarColor(bin);
         }
 	}
 	
@@ -1245,6 +1253,7 @@ float clamp(float x, float min, float max){
 //
 ////////////////////////////////////////////////////////////////////
 
+//DATA SIZES
 const int POSITION_DATA_FLOAT_COUNT = 4;
 const int POSITION_DATA_INT_COUNT = 0;
 const int LINE_SEGMENT_FLOAT_COUNT = 32;
@@ -1256,31 +1265,25 @@ const int DIR_LIGHT_INT_COUNT = 0;
 const int STREAMLINE_COLOR_FLOAT_COUNT = 4;
 const int STREAMLINE_COLOR_INT_COUNT = 0;
 
+//LOD DATA
 uniform int start_index_int_position_data;
 uniform int start_index_float_position_data;
 uniform int start_index_int_line_segments;
 uniform int start_index_float_line_segments;
 uniform int start_index_int_tree_nodes;
 uniform int start_index_float_tree_nodes;
+
+//GLOBAL DATA
 uniform int start_index_int_dir_lights;
 uniform int start_index_float_dir_lights;
 uniform int start_index_int_streamline_color;
 uniform int start_index_float_streamline_color;
-/*
-const int start_index_int_position_data = 0;//DUMMY
-const int start_index_float_position_data = 0;//DUMMY
-const int start_index_int_line_segments = 0;//DUMMY
-const int start_index_float_line_segments = 32;//DUMMY
-const int start_index_int_tree_nodes = 8;//DUMMY
-const int start_index_float_tree_nodes = 96;//DUMMY
-const int start_index_int_dir_lights = 20;//DUMMY
-const int start_index_float_dir_lights = 128;//DUMMY
-*/
+uniform int start_index_int_scalar_color;
+uniform int start_index_float_scalar_color;
+
+//TEXTURE
 const int tex_n_x = 512;
 const int tex_n_y = 512;
-
-//const int tex_int_n_z = 4;
-//const int tex_float_n_z = 4;
 const int tex_ny_nx = tex_n_y * tex_n_x;
 ivec3 GetIndex3D(int global_index)
 {  
@@ -1290,7 +1293,11 @@ ivec3 GetIndex3D(int global_index)
   return ivec3(x,y,z);
 }
 
-//********************************************************** 
+////////////////////////////////////////////////////////////////////
+//
+//                START REGION ACCESS LOD TEXTURE
+//
+////////////////////////////////////////////////////////////////////
 
 vec3 GetPosition(int index, bool interactiveStreamline)
 {
@@ -1417,33 +1424,39 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
 	return aabb;
 }
 
+////////////////////////////////////////////////////////////////////
+//
+//               START REGION ACCESS GLOBAL TEXTURE
+//
+////////////////////////////////////////////////////////////////////
+
 GL_DirLight GetDirLight(int index)
 {
 	GL_DirLight light;
 	ivec3 pointer = GetIndex3D(start_index_float_dir_lights + index * DIR_LIGHT_FLOAT_COUNT);
 	light.ambient = vec4(
-		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r//unnecessary
+		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(3,0,0), 0).r//unnecessary
 	);
 	light.diffuse = vec4(
-		texelFetch(texture_float, pointer+ivec3(4,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(5,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(6,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(7,0,0), 0).r//unnecessary
+		texelFetch(texture_float_global, pointer+ivec3(4,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(5,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(6,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(7,0,0), 0).r//unnecessary
 	);
 	light.specular = vec4(
-		texelFetch(texture_float, pointer+ivec3(8,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(9,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(10,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(11,0,0), 0).r//unnecessary
+		texelFetch(texture_float_global, pointer+ivec3(8,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(9,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(10,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(11,0,0), 0).r//unnecessary
 	);
 	light.direction = vec4(
-		texelFetch(texture_float, pointer+ivec3(12,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(13,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(14,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(15,0,0), 0).r//unnecessary
+		texelFetch(texture_float_global, pointer+ivec3(12,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(13,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(14,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(15,0,0), 0).r//unnecessary
 	);
 	return light;
 }
@@ -1452,9 +1465,20 @@ vec3 GetStreamlineColor(int index)
 {
 	ivec3 pointer = GetIndex3D(start_index_float_streamline_color + index * STREAMLINE_COLOR_FLOAT_COUNT);
 	vec3 color = vec3(
-		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
-		texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r
+		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
+	);
+	return color;
+}
+
+vec3 GetScalarColor(int index)
+{
+	ivec3 pointer = GetIndex3D(start_index_float_scalar_color + index * STREAMLINE_COLOR_FLOAT_COUNT);
+	vec3 color = vec3(
+		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
 	);
 	return color;
 }

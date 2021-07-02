@@ -13,11 +13,11 @@ class TransferFunction {
         this.name = name;
         this.bin_count = bin_count;//size of list_colors
         this.list_points = [];//TransferFunctionPoint
-        this.list_colors = [];//glMatrix.vec3
+        this.list_colors = [];//StreamlineColor
     }
 
     addPoint(t, r, g, b) {
-        this.list_points.push(new TransferFunctionPoint(t, r, g, b));
+        this.list_points.push(new TransferFunctionPoint(t, r/255, g/255, b/255));
     }
 
     fillBins() {
@@ -27,6 +27,9 @@ class TransferFunction {
             var index_low = this.findIndexLow(t);
             var index_high = index_low + 1;
             var color = this.interpolateColor(index_low, index_high, t);
+            var c = new StreamlineColor();
+            c.color = color;
+            this.list_colors.push(c);
             console.log(i, " t:", t, "color:", color);
         }
     }
@@ -78,5 +81,9 @@ class TransferFunctionManager {
         transfer_function.addPoint(1.00, 66, 50, 112);
 
         transfer_function.fillBins();
+    }
+
+    GetActiveTransferfunctionColorList(){
+        return this.transfer_functions[this.active_transfer_function].list_colors;
     }
 }

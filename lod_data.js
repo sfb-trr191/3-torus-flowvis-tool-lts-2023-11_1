@@ -92,16 +92,16 @@ class LODData {
 
         //---start region: data unit 
         this.data_unit = new DataUnit(name);
-        this.data_container_dir_lights = new DataContainer("dir_lights", new DirLight());
+        //this.data_container_dir_lights = new DataContainer("dir_lights", new DirLight());
         this.data_container_positions = new DataContainer("positions", new PositionData());
         this.data_container_line_segments = new DataContainer("line_segments", new LineSegment());
         this.data_container_tree_nodes = new DataContainer("tree_nodes", new TreeNode());
-        this.data_container_streamline_color = new DataContainer("streamline_color", new StreamlineColor());
-        this.data_unit.registerDataCollection(this.data_container_dir_lights);
+        //this.data_container_streamline_color = new DataContainer("streamline_color", new StreamlineColor());
+        //this.data_unit.registerDataCollection(this.data_container_dir_lights);
         this.data_unit.registerDataCollection(this.data_container_positions);
         this.data_unit.registerDataCollection(this.data_container_line_segments);
         this.data_unit.registerDataCollection(this.data_container_tree_nodes);
-        this.data_unit.registerDataCollection(this.data_container_streamline_color);
+        //this.data_unit.registerDataCollection(this.data_container_streamline_color);
         //---end region: data unit 
 
         this.data_textures = new DataTextures(gl, this.data_unit);
@@ -394,11 +394,11 @@ class LODData {
 
     UpdateDataUnit() {
         console.log("UpdateDataUnit");
-        this.data_container_dir_lights.data = this.p_lights.dir_lights;
+        //this.data_container_dir_lights.data = this.p_lights.dir_lights;
         this.data_container_positions.data = this.p_raw_data.position_data;
         this.data_container_line_segments.data = this.vectorLineSegment;
         this.data_container_tree_nodes.data = this.tree_nodes;
-        this.data_container_streamline_color.data = this.p_ui_seeds.getStreamlineColors();
+        //this.data_container_streamline_color.data = this.p_ui_seeds.getStreamlineColors();
         this.data_unit.generateArrays();
         console.log("UpdateDataUnit completed");
     }
@@ -420,13 +420,13 @@ class LODData {
         shader_uniforms.setUniform("start_index_int_position_data", this.data_unit.getIntStart("positions"));
         shader_uniforms.setUniform("start_index_int_line_segments", this.data_unit.getIntStart("line_segments"));
         shader_uniforms.setUniform("start_index_int_tree_nodes", this.data_unit.getIntStart("tree_nodes"));
-        shader_uniforms.setUniform("start_index_int_dir_lights", this.data_unit.getIntStart("dir_lights"));
-        shader_uniforms.setUniform("start_index_int_streamline_color", this.data_unit.getIntStart("streamline_color"));
+        //shader_uniforms.setUniform("start_index_int_dir_lights", this.data_unit.getIntStart("dir_lights"));
+        //shader_uniforms.setUniform("start_index_int_streamline_color", this.data_unit.getIntStart("streamline_color"));
         shader_uniforms.setUniform("start_index_float_position_data", this.data_unit.getFloatStart("positions"));
         shader_uniforms.setUniform("start_index_float_line_segments", this.data_unit.getFloatStart("line_segments"));
         shader_uniforms.setUniform("start_index_float_tree_nodes", this.data_unit.getFloatStart("tree_nodes"));
-        shader_uniforms.setUniform("start_index_float_dir_lights", this.data_unit.getFloatStart("dir_lights"));
-        shader_uniforms.setUniform("start_index_float_streamline_color", this.data_unit.getFloatStart("streamline_color"));
+        //shader_uniforms.setUniform("start_index_float_dir_lights", this.data_unit.getFloatStart("dir_lights"));
+        //shader_uniforms.setUniform("start_index_float_streamline_color", this.data_unit.getFloatStart("streamline_color"));
         shader_uniforms.updateUniforms();
     }
 

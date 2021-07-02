@@ -30,6 +30,7 @@
     var settings_changed = false;
 
     var ui_seeds;
+    var global_data;
     var time_last_tick = 0;
     var fps_display;
     var message_display;
@@ -74,6 +75,11 @@
 
         lights = new Lights();
         lights.GenerateDefaultLighting();
+
+        transfer_function_manager = new TransferFunctionManager();
+
+        global_data = new GlobalData(gl, lights, ui_seeds, transfer_function_manager);
+
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
@@ -94,11 +100,11 @@
 
         aliasing = new Aliasing();
 
-        transfer_function_manager = new TransferFunctionManager();
+        
 
         shader_manager = new ShaderManager();
 
-        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing, shader_manager);
+        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing, shader_manager, global_data);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -121,6 +127,7 @@
     function on_start_delayed() {
         CalculateStreamlines(gl);
         UpdateRenderSettings();
+        UpdateGlobalData();
         on_fully_loaded();
         requestAnimationFrame(on_update);
     }
@@ -223,6 +230,7 @@
             //window.history.replaceState(null, null, 'index.html?u=123');
             CalculateStreamlines();
             UpdateRenderSettings();
+            UpdateGlobalData();
             UpdateURL();
         });
     }
@@ -231,6 +239,7 @@
         document.getElementById("button_render_settings").addEventListener("click", function () {
             console.log("onClickUpdateRenderSettings");
             UpdateRenderSettings();
+            UpdateGlobalData();
         });
     }
 
@@ -341,6 +350,11 @@
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar);
+    }
+
+    function UpdateGlobalData(){
+        global_data.UpdateDataUnit();
+        global_data.UpdateDataTextures(gl);
     }
 
     function UpdateCamera() {
