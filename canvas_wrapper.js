@@ -15,7 +15,9 @@ class UniformLocationsRayTracing {
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");     
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");     
-        this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");              
+        this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");   
+        this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");   
+        this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");          
     }
 }
 
@@ -74,6 +76,8 @@ class CanvasWrapper {
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
         this.limited_max_distance = 0;
+        this.min_scalar = 0;
+        this.max_scalar = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -208,6 +212,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
+        gl.uniform1f(this.location_raytracing.location_min_scalar, this.min_scalar);
+        gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar); 
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;

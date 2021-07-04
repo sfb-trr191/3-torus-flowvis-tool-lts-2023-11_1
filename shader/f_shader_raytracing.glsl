@@ -149,6 +149,8 @@ uniform float tubeRadius;
 uniform float fog_density;
 uniform int fog_type;
 uniform int shading_mode_streamlines;
+uniform float min_scalar;
+uniform float max_scalar;
 
 uniform int width;
 uniform int height;
@@ -1179,7 +1181,8 @@ vec3 GetObjectColor(inout HitInformation hit)
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR)
         {
             float scalar = GetScalar(hit.positionCenter);
-            int bin = int(float(127) * scalar);
+            float t = (scalar - min_scalar) / (max_scalar - min_scalar);
+            int bin = int(float(127) * t);
             bin = clamp(bin, 0, 127);
             return GetScalarColor(bin);
         }

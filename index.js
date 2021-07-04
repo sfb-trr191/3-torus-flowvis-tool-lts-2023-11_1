@@ -337,6 +337,8 @@
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_main.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_main.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
+        canvas_wrapper_main.min_scalar = document.getElementById("input_min_scalar").value;
+        canvas_wrapper_main.max_scalar = document.getElementById("input_max_scalar").value;
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         console.log("fog_type", canvas_wrapper_main.fog_type);
         console.log("limited_max_distance", canvas_wrapper_main.limited_max_distance);
