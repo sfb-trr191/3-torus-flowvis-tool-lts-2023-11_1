@@ -54,6 +54,7 @@ fieldset {
     display: grid;
     grid-template-columns: 200px 1fr;
     gap: 4px;
+    margin-bottom: 2px;
 }
 
 #fieldset_seeds {
@@ -180,4 +181,18 @@ fieldset {
 
 .list_entry {
     text-align: left;
+}
+
+.warning{
+    border: 3px solid rgb(255, 0, 0);
+    padding: 0px 8px 8px 8px;
+    margin-bottom: 2px;
+}
+
+.warning_text{
+    color: rgb(255, 0, 0);
+}
+
+.warning_title{
+    color: rgb(255, 0, 0);
 }

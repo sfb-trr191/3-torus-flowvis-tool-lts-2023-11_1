@@ -91,7 +91,7 @@
                         <input id="segment_duplicator_iterations" type="text" value="1">
                     </fieldset>
                     <fieldset>
-                        <button type="button" id="button_add_seed">add streamline seed</button>                        
+                        <button type="button" id="button_add_seed">add streamline seed</button>
                         <div id="div_buttons_rng" class="horizontal_div_2">
                             <button type="button" id="button_randomize_seed_positions">randomize positions</button>
                             <button type="button" id="button_randomize_seed_colors">randomize colors</button>
@@ -100,7 +100,7 @@
                             <input id="input_random_position_seed" type="text" value="1">
                             -->
                         </div>
-                        
+
                     </fieldset>
                     <fieldset id="fieldset_seeds">
                     </fieldset>
@@ -198,18 +198,55 @@
                             <option value="tab_help">help</option>
                         </select>
                     </fieldset>
-                    <h3 id="h_export_warnings">Warnings</h3>
-                    <ul>
-                        <li id="list_warning_p" class="list_entry">For high quality thumbnails it is recommended to deactivate panning mode
-                            by clicking into the canvas and pressing "p".</li>
-                        <li id="list_warning_index" class="list_entry">For high quality thumbnails it is recommended to wait until the
+                    <!--
+                    <div id="h_export_warnings" class="warning">
+                        <h3>Warnings</h3>
+                        <ul>
+                            <li id="list_warning_p" class="list_entry">For high quality thumbnails it is recommended to
+                                deactivate panning mode
+                                by clicking into the canvas and pressing "p".</li>
+                            <li id="list_warning_index" class="list_entry">For high quality thumbnails it is recommended
+                                to wait until the
+                                progress bar at the bottom of the image disappears. This requires that the mouse is
+                                inside
+                                the canvas.</li>
+                            <li id="list_warning_thumbnail_url" class="list_entry">It is recommended to set a thumbnail
+                                URL before export. If
+                                you do not know the URL yet, e.g. because you plan to upload the thumbnail to a server
+                                where
+                                you can not choose the URL of the uploaded image, you can leave it blank for now,
+                                export,
+                                upload the thumbnail, insert the URL of the uploaded thumbnail and export again.</li>
+                        </ul>
+                    </div>
+                    -->
+                    <div id="warning_p" class="warning">
+                        <h3 class="warning_title">Warning</h3>
+                        <p class="warning_text">
+                            For high quality thumbnails it is recommended to deactivate panning mode
+                            by clicking into the canvas and pressing "p".
+                        </p>
+                    </div>
+                    <div id="warning_index" class="warning">
+                        <h3 class="warning_title">Warning</h3>
+                        <p class="warning_text">
+                            For high quality thumbnails it is recommended to wait until the
                             progress bar at the bottom of the image disappears. This requires that the mouse is inside
-                            the canvas.</li>
-                        <li id="list_warning_thumbnail_url" class="list_entry">It is recommended to set a thumbnail URL before export. If
-                            you do not know the URL yet, e.g. because you plan to upload the thumbnail to a server where
-                            you can not choose the URL of the uploaded image, you can leave it blank for now, export,
-                            upload the thumbnail, insert the URL of the uploaded thumbnail and export again.</li>
-                    </ul>
+                            the canvas.
+                        </p>
+                    </div>
+                    <div id="warning_thumbnail_url" class="warning">
+                        <h3 class="warning_title">Warning</h3>
+                        <p class="warning_text">
+                            It is recommended to set a thumbnail
+                            URL before export. If
+                            you do not know the URL yet, e.g. because you plan to upload the thumbnail to a server
+                            where
+                            you can not choose the URL of the uploaded image, you can leave it blank for now,
+                            export,
+                            upload the thumbnail, insert the URL of the uploaded thumbnail and export again.
+                        </p>
+                    </div>
                 </form>
             </div>
             <div id="tabcontent_help" class="tabcontent">
