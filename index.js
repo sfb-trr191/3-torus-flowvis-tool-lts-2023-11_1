@@ -103,7 +103,7 @@
 
         aliasing = new Aliasing();
 
-        
+
 
         shader_manager = new ShaderManager();
 
@@ -356,12 +356,18 @@
         canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar);
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+        document.getElementById("input_formula_scalar_float").value = shader_formula_scalar_float;
+        console.log("shader_formula_scalar", shader_formula_scalar);
+        console.log("shader_formula_scalar_float", shader_formula_scalar_float);
+        canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
         input_changed_manager.UpdateDefaultValuesRenderSettings();
     }
 
-    function UpdateGlobalData(){
+    function UpdateGlobalData() {
         global_data.UpdateDataUnit();
         global_data.UpdateDataTextures(gl);
     }
@@ -408,7 +414,7 @@
         window.history.pushState(null, null, 'index.html' + query_string);
     }
 
-    function UpdateHiddenWarnings(){
+    function UpdateHiddenWarnings() {
         var warning_counter = 0;
 
         /*
@@ -421,53 +427,53 @@
         */
 
         var class_name = "hidden";
-        if(main_camera.panning_forced){
+        if (main_camera.panning_forced) {
             class_name = "warning";
             warning_counter += 1;
         }
         document.getElementById("warning_p").className = class_name;
 
 
-/*
-        class_name = "hidden";
-        if(canvas_wrapper_main.isRenderingIncomplete()){
-            class_name = "list_entry";
-            warning_counter += 1;
-        }
-        document.getElementById("list_warning_index").className = class_name;*/
+        /*
+                class_name = "hidden";
+                if(canvas_wrapper_main.isRenderingIncomplete()){
+                    class_name = "list_entry";
+                    warning_counter += 1;
+                }
+                document.getElementById("list_warning_index").className = class_name;*/
 
         class_name = "hidden";
-        if(canvas_wrapper_main.isRenderingIncomplete()){
+        if (canvas_wrapper_main.isRenderingIncomplete()) {
             class_name = "warning";
             warning_counter += 1;
         }
         document.getElementById("warning_index").className = class_name;
 
-        
-/*
-        var text = document.getElementById("input_thumbnail").value
-        class_name = "hidden";
-        if(text == ""){
-            class_name = "list_entry";
-            warning_counter += 1;
-        }
-        document.getElementById("list_warning_thumbnail_url").className = class_name;*/
+
+        /*
+                var text = document.getElementById("input_thumbnail").value
+                class_name = "hidden";
+                if(text == ""){
+                    class_name = "list_entry";
+                    warning_counter += 1;
+                }
+                document.getElementById("list_warning_thumbnail_url").className = class_name;*/
 
         var text = document.getElementById("input_thumbnail").value
         class_name = "hidden";
-        if(text == ""){
+        if (text == "") {
             class_name = "warning";
             warning_counter += 1;
         }
         document.getElementById("warning_thumbnail_url").className = class_name;
 
-/*
-        class_name = "hidden";
-        if(warning_counter > 0){
-            class_name = "warning";
-            warning_counter += 1;
-        }
-        document.getElementById("h_export_warnings").className = class_name;        */
+        /*
+                class_name = "hidden";
+                if(warning_counter > 0){
+                    class_name = "warning";
+                    warning_counter += 1;
+                }
+                document.getElementById("h_export_warnings").className = class_name;        */
     }
 
     function testWebGPU() {
