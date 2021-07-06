@@ -57,6 +57,7 @@ class UISeed {
         this.node.appendChild(this.node_button);
 
         this.randomizePosition();
+        this.randomizeColor();
     }
 
     updateIndex(new_index) {
@@ -75,7 +76,7 @@ class UISeed {
         var g = Math.round(this.ui_seeds.rng_positions() * 255);
         var b = Math.round(this.ui_seeds.rng_positions() * 255);
         this.node_input_c.value = rgbToHex(r, g, b);
-    }    
+    }
 
     fromString(s) {
         var split = s.split("~");
@@ -102,10 +103,38 @@ class UISeed {
         console.log(`red: ${r}, green: ${g}, blue: ${b}`)
         return glMatrix.vec3.fromValues(r, g, b);
     }
+
+    UpdateDefaultValues(name) {
+        if (name == CONST_GROUP_NAME_CALCULATE) {
+            this.node_input_x.defaultValue = this.node_input_x.value;
+            this.node_input_y.defaultValue = this.node_input_y.value;
+            this.node_input_z.defaultValue = this.node_input_z.value;
+        }
+        else if (name == CONST_GROUP_NAME_RENDER_SETTINGS) {
+            this.node_input_c.defaultValue = this.node_input_c.value;
+        }
+    }
+
+    HasValueChanged(name) {
+        if (name == CONST_GROUP_NAME_CALCULATE) {
+            if (this.node_input_x.defaultValue != this.node_input_x.value)
+                return true;
+            if (this.node_input_y.defaultValue != this.node_input_y.value)
+                return true;
+            if (this.node_input_z.defaultValue != this.node_input_z.value)
+                return true;
+        }
+        else if (name == CONST_GROUP_NAME_RENDER_SETTINGS) {
+            if (this.node_input_c.defaultValue != this.node_input_c.value)
+                return true;
+        }
+        return false;
+    }
 }
 
 class UISeeds {
     constructor() {
+        this.changed_count = false;
         this.element = document.getElementById("fieldset_seeds");
         this.list = [];
         this.rng_positions = new Math.seedrandom();
@@ -157,6 +186,7 @@ class UISeeds {
         var new_seed = new UISeed(this, this.list.length);
         this.list.push(new_seed);
         this.element.appendChild(new_seed.node);
+        this.changed_count = true;
     }
 
     removeSeed(index) {
@@ -167,6 +197,7 @@ class UISeeds {
         for (var i = 0; i < this.list.length; i++) {
             this.list[i].updateIndex(i);
         }
+        this.changed_count = true;
     }
 
     randomizePosition() {
@@ -181,7 +212,7 @@ class UISeeds {
         }
     }
 
-    
+
 
     /*
     randomizePosition(seed_string) {
@@ -252,6 +283,21 @@ class UISeeds {
             color_list.push(streamline_color);
         }
         return color_list;
+    }
+
+    HasValueChanged(name) {
+        var changed = this.changed_count;
+        for (var i = 0; i < this.list.length; i++) {
+            changed = changed || this.list[i].HasValueChanged(name);
+        }
+        return changed;
+    }
+
+    UpdateDefaultValues(name) {
+        this.changed_count = false;
+        for (var i = 0; i < this.list.length; i++) {
+            this.list[i].UpdateDefaultValues(name);
+        }
     }
 }
 /*

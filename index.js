@@ -16,6 +16,7 @@
     var main_canvas;
     var input_manager;
     var mouse_manager;
+    var input_changed_manager;
     var lights;
     var streamline_context_static;//the static streamlines
     var streamline_context_dynamic;//interactive streamline placement
@@ -57,7 +58,8 @@
         fps_display = document.getElementById("fps_display");
         message_display = document.getElementById("message_display");
 
-        main_camera = new Camera("main_camera");
+        input_changed_manager = new InputChangedManager();
+        main_camera = new Camera("main_camera", input_changed_manager);
 
         input_manager = new InputManager(main_canvas, main_camera);
         input_manager.initialize();
@@ -71,6 +73,7 @@
 
         ui_seeds = new UISeeds();
         ui_seeds.generateDefaultSeeds();
+        input_changed_manager.LinkUISeeds(ui_seeds);
 
 
         lights = new Lights();
@@ -201,6 +204,7 @@
         fps_display.innerHTML = text_fps_panning;
 
         UpdateHiddenWarnings();
+        input_changed_manager.CheckValuesChanged();
 
         time_last_tick = time_now;
         requestAnimationFrame(on_update);
@@ -327,6 +331,7 @@
         var direction = DIRECTION_FORWARD;
         streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
         data_changed = true;
+        input_changed_manager.UpdateDefaultValuesCalculate();
     }
 
     function UpdateRenderSettings() {
@@ -352,6 +357,8 @@
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar);
+
+        input_changed_manager.UpdateDefaultValuesRenderSettings();
     }
 
     function UpdateGlobalData(){
@@ -362,6 +369,7 @@
     function UpdateCamera() {
         console.log("UpdateCamera");
         main_camera.FromInput();
+        input_changed_manager.UpdateDefaultValuesMainCamera();
     }
 
     function AddSeed() {

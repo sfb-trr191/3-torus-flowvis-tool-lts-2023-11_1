@@ -39,8 +39,9 @@ class Camera {
      * 
      * @param {string} name the name of the camera
      */
-    constructor(name) {
+    constructor(name, input_changed_manager) {
         this.name = name;
+        this.input_changed_manager = input_changed_manager;
         this.width = 0;
         this.height = 0;
         this.width_still = 0;
@@ -120,6 +121,7 @@ class Camera {
         this.input_camera_up_x.value = this.up[0].toFixed(decimals);
         this.input_camera_up_y.value = this.up[1].toFixed(decimals);
         this.input_camera_up_z.value = this.up[2].toFixed(decimals);
+        this.input_changed_manager.UpdateDefaultValues(this.name);
     }
 
     fromString(s) {

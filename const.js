@@ -29,3 +29,8 @@ const PARAM_TAB_MAIN = "tab";
 const PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 const PARAM_EXPORT_THUMBNAIL_NAME = "etn";
 const PARAM_RNG_SEED_POSITION = "rngp";
+
+CONST_GROUP_NAME_CALCULATE = "group_calculate";
+CONST_GROUP_NAME_MAIN_CAMERA = "group_main_camera";
+CONST_GROUP_NAME_RENDER_SETTINGS = "group_render_settings";
+

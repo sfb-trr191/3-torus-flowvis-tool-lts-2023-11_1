@@ -196,3 +196,7 @@ fieldset {
 .warning_title{
     color: rgb(255, 0, 0);
 }
+
+.button_changed{
+    background-color: rgb(255, 128, 0);
+}
