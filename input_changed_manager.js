@@ -48,9 +48,9 @@ class InputChangedManager{
     constructor(){
         this.groups = [];
         this.groups_dict = {};
-        this.group_calculate = new InputChangedGroup(CONST_GROUP_NAME_CALCULATE, document.getElementById("button_request_data"));
-        this.group_main_camera = new InputChangedGroup(CONST_GROUP_NAME_MAIN_CAMERA, document.getElementById("button_update_camera"));
-        this.group_render_settings = new InputChangedGroup(CONST_GROUP_NAME_RENDER_SETTINGS, document.getElementById("button_render_settings"));
+        this.group_calculate = new InputChangedGroup(GROUP_NAME_CALCULATE, document.getElementById("button_request_data"));
+        this.group_main_camera = new InputChangedGroup(GROUP_NAME_MAIN_CAMERA, document.getElementById("button_update_camera"));
+        this.group_render_settings = new InputChangedGroup(GROUP_NAME_RENDER_SETTINGS, document.getElementById("button_render_settings"));
         this.groups.push(this.group_calculate);
         this.groups.push(this.group_main_camera);
         this.groups.push(this.group_render_settings);

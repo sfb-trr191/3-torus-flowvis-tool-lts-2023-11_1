@@ -1,6 +1,6 @@
 class StreamlineContext {
 
-    constructor(name, p_lights, ui_seeds, gl) {
+    constructor(name, p_lights, ui_seeds, gl, gl_side) {
         console.log("Generate context: " + name);
         this.name = name;
         this.p_lights = p_lights;
@@ -15,7 +15,7 @@ class StreamlineContext {
         //var douglasPeukerParameter = 0.0001;
         var douglasPeukerParameter = 0.0005;
         for (var i = 0; i < num_lods; i++) {
-            var lod = new LODData(name + "_lod_" + i, this, gl);
+            var lod = new LODData(name + "_lod_" + i, this, gl, gl_side);
             this.lod_list.push(lod);
             if (i > 0) {
                 lod.douglasPeukerParameter = douglasPeukerParameter;
@@ -25,7 +25,7 @@ class StreamlineContext {
         this.lod_0 = this.lod_list[0];
     }
 
-    CalculateExampleStreamlines(gl) {
+    CalculateExampleStreamlines(gl, gl_side) {
         console.log("CalculateExampleStreamlines");
 
         this.streamline_generator.direction = DIRECTION_FORWARD;
@@ -39,7 +39,7 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateExampleSeeds();
 
-        this.CalculateStreamlinesInternal(gl);
+        this.CalculateStreamlinesInternal(gl, gl_side);
         /*
         this.streamline_generator.CalculateRawStreamlines();
         this.lod_0.ExtractMultiPolyLines();
@@ -59,7 +59,7 @@ class StreamlineContext {
         */
     }
 
-    CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
+    CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
         console.log("CalculateStreamlines");
 
         this.streamline_generator.direction = direction;
@@ -73,10 +73,10 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        this.CalculateStreamlinesInternal(gl);
+        this.CalculateStreamlinesInternal(gl, gl_side);
     }
 
-    CalculateStreamlinesInternal(gl) {
+    CalculateStreamlinesInternal(gl, gl_side) {
         this.streamline_generator.CalculateRawStreamlines();
         this.lod_0.ExtractMultiPolyLines();
         this.raw_data.MakeDataHomogenous();
@@ -97,7 +97,7 @@ class StreamlineContext {
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].UpdateDataUnit();
-            this.lod_list[i].UpdateDataTextures(gl);
+            this.lod_list[i].UpdateDataTextures(gl, gl_side);
         }
 
         for (var i = 0; i < this.lod_list.length; i++) {
@@ -105,9 +105,9 @@ class StreamlineContext {
         }
     }
 
-    bind_lod(lod_index, gl, shader_uniforms, location_texture_float, location_texture_int) {
+    bind_lod(canvas_wrapper_name, lod_index, gl, shader_uniforms, location_texture_float, location_texture_int) {
         //console.log("bind_lod index: " + lod_index);
-        this.lod_list[lod_index].bind(gl, shader_uniforms, location_texture_float, location_texture_int);
+        this.lod_list[lod_index].bind(canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int);
     }
 
 

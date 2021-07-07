@@ -1,5 +1,4 @@
-function getRenderingContext() {
-    var canvas = document.querySelector("canvas");
+function getRenderingContext(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 

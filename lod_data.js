@@ -73,7 +73,7 @@ class LODData {
      * 
      * @param {string} name the name of the lod data
      */
-    constructor(name, p_streamline_context, gl) {
+    constructor(name, p_streamline_context, gl, gl_side) {
         console.log("Generate lod: " + name);
         this.name = name;
         this.vectorMultiPolyLines = [];
@@ -105,6 +105,7 @@ class LODData {
         //---end region: data unit 
 
         this.data_textures = new DataTextures(gl, this.data_unit);
+        this.data_textures_side = new DataTextures(gl_side, this.data_unit);
     }
 
     Reset() {
@@ -403,18 +404,21 @@ class LODData {
         console.log("UpdateDataUnit completed");
     }
 
-    UpdateDataTextures(gl) {
+    UpdateDataTextures(gl, gl_side) {
         console.log("UpdateDataTextures");
         this.data_textures.update(gl);
+        this.data_textures_side.update(gl_side);
         console.log("UpdateDataTextures completed");
     }
 
-    bind(gl, shader_uniforms, location_texture_float, location_texture_int) {
+    bind(canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int) {
+        var data_textures = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_textures : this.data_textures_side;
+
         gl.activeTexture(gl.TEXTURE0);                  // added this and following line to be extra sure which texture is being used...
-        gl.bindTexture(gl.TEXTURE_3D, this.data_textures.texture_float.texture);
+        gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_float.texture);
         gl.uniform1i(location_texture_float, 0);
         gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_3D, this.data_textures.texture_int.texture);
+        gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_int.texture);
         gl.uniform1i(location_texture_int, 1);
 
         shader_uniforms.setUniform("start_index_int_position_data", this.data_unit.getIntStart("positions"));

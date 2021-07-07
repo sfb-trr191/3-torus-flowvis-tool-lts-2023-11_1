@@ -59,13 +59,16 @@ class UniformLocationsResampling {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, name, canvas, camera, aliasing, shader_manager, global_data) {
+    constructor(gl, streamline_context_static, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, lights, ui_seeds, transfer_function_manager) {
         console.log("Construct CanvasWrapper: ", name)
+        this.name = name;
         this.canvas = canvas;
+        this.canvas_width = canvas_width;
+        this.canvas_height = canvas_height;
         this.camera = camera;
         this.aliasing = aliasing;
         this.shader_manager = shader_manager;
-        this.global_data = global_data;
+        this.global_data = new GlobalData(gl, lights, ui_seeds, transfer_function_manager);
         this.p_streamline_context_static = streamline_context_static;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
@@ -83,6 +86,9 @@ class CanvasWrapper {
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_panning_left = new RenderWrapper(gl, name + "_raytracing_panning_left", camera.width_panning, camera.height_panning);
         this.render_wrapper_raytracing_panning_right = new RenderWrapper(gl, name + "_raytracing_panning_right", camera.width_panning, camera.height_panning);
+
+        console.log("CanvasWrapper: ", name, "create program")
+        console.log("CanvasWrapper gl: ", gl)
 
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
@@ -183,7 +189,9 @@ class CanvasWrapper {
         //console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);
         //console.log("offset_x: ", this.aliasing.offset_x[this.aliasing_index]);
         //console.log("offset_y: ", this.aliasing.offset_y[this.aliasing_index]);
-
+        console.log("draw CanvasWrapper: ", this.name);
+        console.log("CanvasWrapper gl: ", gl)
+        console.log("CanvasWrapper canvas: ", this.canvas)
         var left_render_wrapper = this.camera.IsPanningOrForced() ? this.render_wrapper_raytracing_panning_left : this.render_wrapper_raytracing_still_left
         this.drawTextureRaytracing(gl, left_render_wrapper);
         this.drawTextureAverage(gl, left_render_wrapper);
@@ -217,7 +225,7 @@ class CanvasWrapper {
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
-        this.p_streamline_context_static.bind_lod(active_lod, gl,
+        this.p_streamline_context_static.bind_lod(this.name, active_lod, gl,
             this.shader_uniforms_raytracing,
             this.location_raytracing.location_texture_float,
             this.location_raytracing.location_texture_int);
@@ -268,12 +276,12 @@ class CanvasWrapper {
         var progress = this.aliasing_index / (this.aliasing.num_rays_per_pixel - 1);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, 1280, 720);
+        gl.viewport(0, 0, this.canvas_width, this.canvas_height);
         gl.useProgram(this.program_resampling);
         gl.uniform1f(this.location_resampling.location_show_progressbar, show_progressbar);
         gl.uniform1f(this.location_resampling.location_progress, progress);
-        gl.uniform1i(this.location_resampling.location_width, 1280);
-        gl.uniform1i(this.location_resampling.location_height, 720);
+        gl.uniform1i(this.location_resampling.location_width, this.canvas_width);
+        gl.uniform1i(this.location_resampling.location_height, this.canvas_height);
         gl.uniform1i(this.location_resampling.location_render_color_bar, this.ShouldRenderColorBar());
 
         gl.activeTexture(gl.TEXTURE0);
@@ -344,5 +352,11 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
         program_shader_uniforms.print();
         return program_shader_uniforms;
+    }
+
+    UpdateGlobalData(gl){
+        this.global_data.UpdateDataUnit();
+        this.global_data.UpdateDataTextures(gl);
+
     }
 }

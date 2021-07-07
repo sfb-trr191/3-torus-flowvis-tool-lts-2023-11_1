@@ -3,6 +3,7 @@
     window.addEventListener("load", onStart, false);
 
     var gl;
+    var gl_side;
     var timer;
     var tick_counter;
     var frame_counter;
@@ -13,25 +14,29 @@
     var strong_fps;
 
     var main_camera;
+    var side_camera;
     var main_canvas;
+    var side_canvas;
     var input_manager;
     var mouse_manager;
     var input_changed_manager;
     var lights;
     var streamline_context_static;//the static streamlines
     var streamline_context_dynamic;//interactive streamline placement
+    var ftle_manager;
 
     var aliasing;
     var transfer_function_manager;
     var shader_manager;
     var canvas_wrapper_main;
+    var canvas_wrapper_side;
     var input_parameter_wrapper;
 
     var data_changed = false;
     var settings_changed = false;
 
     var ui_seeds;
-    var global_data;
+    //var global_data;
     var time_last_tick = 0;
     var fps_display;
     var message_display;
@@ -55,21 +60,28 @@
         tab_manager = new TabManager();
 
         main_canvas = document.getElementById("main_canvas");
+        side_canvas = document.getElementById("side_canvas");
         fps_display = document.getElementById("fps_display");
         message_display = document.getElementById("message_display");
 
         input_changed_manager = new InputChangedManager();
         main_camera = new Camera("main_camera", input_changed_manager);
+        side_camera = new Camera("side_camera", input_changed_manager);
 
-        input_manager = new InputManager(main_canvas, main_camera);
+        input_manager = new InputManager(main_canvas, main_camera, side_canvas, side_camera);
         input_manager.initialize();
-        mouse_manager = new MouseManager(main_canvas, main_camera);
+        mouse_manager = new MouseManager(main_canvas, main_camera, side_canvas, side_camera);
         mouse_manager.initialize();
 
         buildErrorDictionary();
 
-        if (!(gl = getRenderingContext()))
+        if (!(gl = getRenderingContext(main_canvas)))
             return;
+        if (!(gl_side = getRenderingContext(side_canvas)))
+            return;
+        console.log(gl);
+        console.log(gl_side);
+        
 
         ui_seeds = new UISeeds();
         ui_seeds.generateDefaultSeeds();
@@ -81,9 +93,11 @@
 
         transfer_function_manager = new TransferFunctionManager();
 
-        global_data = new GlobalData(gl, lights, ui_seeds, transfer_function_manager);
+        //global_data = new GlobalData(gl, lights, ui_seeds, transfer_function_manager);
 
-        streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl);
+        ftle_manager = new FTLEManager();
+
+        streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
@@ -101,13 +115,32 @@
             document.getElementById("input_camera_up_y"),
             document.getElementById("input_camera_up_z"));
 
+        side_camera.SetRenderSizes(512, 384, 256, 192);
+        side_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
+        side_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
+        side_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
+
+        side_camera.LinkInput(
+            document.getElementById("input_camera_position_x"),
+            document.getElementById("input_camera_position_y"),
+            document.getElementById("input_camera_position_z"),
+            document.getElementById("input_camera_forward_x"),
+            document.getElementById("input_camera_forward_y"),
+            document.getElementById("input_camera_forward_z"),
+            document.getElementById("input_camera_up_x"),
+            document.getElementById("input_camera_up_y"),
+            document.getElementById("input_camera_up_z"));
+
         aliasing = new Aliasing();
 
 
 
         shader_manager = new ShaderManager();
 
-        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, "main", main_canvas, main_camera, aliasing, shader_manager, global_data);
+        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, CANVAS_WRAPPER_MAIN,
+            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, lights, ui_seeds, transfer_function_manager);
+        canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, CANVAS_WRAPPER_SIDE,
+            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, lights, ui_seeds, transfer_function_manager);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -128,7 +161,7 @@
     }
 
     function on_start_delayed() {
-        CalculateStreamlines(gl);
+        CalculateStreamlines();
         UpdateRenderSettings();
         UpdateGlobalData();
         on_fully_loaded();
@@ -145,47 +178,22 @@
     function on_update(time_now) {
         tick_counter++;
         var deltaTime = (time_now - time_last_tick) / 1000;
+        input_manager.on_update(deltaTime, mouse_manager.active_camera);
 
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_A)) {
-            var slow = false;
-            main_camera.moveLeft(deltaTime, slow);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_D)) {
-            var slow = false;
-            main_camera.moveRight(deltaTime, slow);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_W)) {
-            var slow = false;
-            main_camera.moveForward(deltaTime, slow);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_S)) {
-            var slow = false;
-            main_camera.moveBackward(deltaTime, slow);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_R)) {
-            var slow = false;
-            main_camera.moveUp(deltaTime, slow);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_F)) {
-            var slow = false;
-            main_camera.moveDown(deltaTime, slow);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_Q)) {
-            var left_handed = false;
-            main_camera.RollLeft(deltaTime, left_handed);
-        }
-        if (input_manager.isKeyDown(input_manager.KEY_INDEX_E)) {
-            var left_handed = false;
-            main_camera.RollRight(deltaTime, left_handed);
-        }
         main_camera.repositionCamera();
         main_camera.UpdateShaderValues();
         main_camera.WriteToInputFields();
 
+        side_camera.repositionCamera();
+        side_camera.UpdateShaderValues();
+        //side_camera.WriteToInputFields();//TODO_MARKER_2ND_VIEW        
+
         canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
+        canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
         main_camera.changed = false;
+        side_camera.changed = false;
         settings_changed = false;
         data_changed = false;
 
@@ -329,7 +337,7 @@
         var step_size = document.getElementById("input_step_size").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
         var direction = DIRECTION_FORWARD;
-        streamline_context_static.CalculateStreamlines(gl, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
+        streamline_context_static.CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
     }
@@ -337,6 +345,7 @@
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
         settings_changed = true;
+        //MAIN
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
@@ -364,12 +373,43 @@
         console.log("shader_formula_scalar_float", shader_formula_scalar_float);
         canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
+        //SIDE
+        canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
+        canvas_wrapper_side.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.fog_density = document.getElementById("input_fog_density").value;
+        canvas_wrapper_side.fog_type = document.getElementById("select_fog_type").value;
+        canvas_wrapper_side.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
+        canvas_wrapper_side.min_scalar = document.getElementById("input_min_scalar").value;
+        canvas_wrapper_side.max_scalar = document.getElementById("input_max_scalar").value;
+        canvas_wrapper_side.CalculateLimitedMaxRayDistance();
+        console.log("fog_type", canvas_wrapper_side.fog_type);
+        console.log("limited_max_distance", canvas_wrapper_side.limited_max_distance);
+        document.getElementById("input_limited_max_ray_distance").value = canvas_wrapper_side.limited_max_distance.toFixed(3);
+
+        canvas_wrapper_side.lod_index_panning = document.getElementById("select_lod_panning").value;
+        canvas_wrapper_side.lod_index_still = document.getElementById("select_lod_still").value;
+
+        var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
+        canvas_wrapper_side.UpdatePanningResolutionFactor(gl_side, panning_resolution_factor);
+
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+        document.getElementById("input_formula_scalar_float").value = shader_formula_scalar_float;
+        console.log("shader_formula_scalar", shader_formula_scalar);
+        console.log("shader_formula_scalar_float", shader_formula_scalar_float);
+        canvas_wrapper_side.ReplaceRaytracingShader(gl_side, shader_formula_scalar_float);
+
+        //
         input_changed_manager.UpdateDefaultValuesRenderSettings();
     }
 
     function UpdateGlobalData() {
-        global_data.UpdateDataUnit();
-        global_data.UpdateDataTextures(gl);
+        //global_data.UpdateDataUnit();
+        //global_data.UpdateDataTextures(gl);
+        canvas_wrapper_main.UpdateGlobalData(gl);
+        canvas_wrapper_side.UpdateGlobalData(gl_side);
     }
 
     function UpdateCamera() {

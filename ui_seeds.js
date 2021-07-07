@@ -105,18 +105,18 @@ class UISeed {
     }
 
     UpdateDefaultValues(name) {
-        if (name == CONST_GROUP_NAME_CALCULATE) {
+        if (name == GROUP_NAME_CALCULATE) {
             this.node_input_x.defaultValue = this.node_input_x.value;
             this.node_input_y.defaultValue = this.node_input_y.value;
             this.node_input_z.defaultValue = this.node_input_z.value;
         }
-        else if (name == CONST_GROUP_NAME_RENDER_SETTINGS) {
+        else if (name == GROUP_NAME_RENDER_SETTINGS) {
             this.node_input_c.defaultValue = this.node_input_c.value;
         }
     }
 
     HasValueChanged(name) {
-        if (name == CONST_GROUP_NAME_CALCULATE) {
+        if (name == GROUP_NAME_CALCULATE) {
             if (this.node_input_x.defaultValue != this.node_input_x.value)
                 return true;
             if (this.node_input_y.defaultValue != this.node_input_y.value)
@@ -124,7 +124,7 @@ class UISeed {
             if (this.node_input_z.defaultValue != this.node_input_z.value)
                 return true;
         }
-        else if (name == CONST_GROUP_NAME_RENDER_SETTINGS) {
+        else if (name == GROUP_NAME_RENDER_SETTINGS) {
             if (this.node_input_c.defaultValue != this.node_input_c.value)
                 return true;
         }

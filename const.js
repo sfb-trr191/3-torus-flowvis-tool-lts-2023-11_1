@@ -30,7 +30,16 @@ const PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 const PARAM_EXPORT_THUMBNAIL_NAME = "etn";
 const PARAM_RNG_SEED_POSITION = "rngp";
 
-CONST_GROUP_NAME_CALCULATE = "group_calculate";
-CONST_GROUP_NAME_MAIN_CAMERA = "group_main_camera";
-CONST_GROUP_NAME_RENDER_SETTINGS = "group_render_settings";
+const GROUP_NAME_CALCULATE = "group_calculate";
+const GROUP_NAME_MAIN_CAMERA = "group_main_camera";
+const GROUP_NAME_RENDER_SETTINGS = "group_render_settings";
+
+const CANVAS_WRAPPER_MAIN = "main";
+const CANVAS_WRAPPER_SIDE = "side";
+
+
+const CANVAS_MAIN_WIDTH = 1280;
+const CANVAS_MAIN_HEIGHT = 720;
+const CANVAS_SIDE_WIDTH = 512;
+const CANVAS_SIDE_HEIGHT = 384;
 
