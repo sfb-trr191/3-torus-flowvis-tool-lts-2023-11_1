@@ -59,7 +59,7 @@ class UniformLocationsResampling {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, lights, ui_seeds, transfer_function_manager) {
+    constructor(gl, streamline_context_static, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
@@ -68,7 +68,7 @@ class CanvasWrapper {
         this.camera = camera;
         this.aliasing = aliasing;
         this.shader_manager = shader_manager;
-        this.global_data = new GlobalData(gl, lights, ui_seeds, transfer_function_manager);
+        this.global_data = global_data;
         this.p_streamline_context_static = streamline_context_static;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
@@ -230,7 +230,7 @@ class CanvasWrapper {
             this.location_raytracing.location_texture_float,
             this.location_raytracing.location_texture_int);
 
-        this.global_data.bind(gl, 
+        this.global_data.bind(this.name, gl, 
             this.shader_uniforms_raytracing, 
             this.location_raytracing.location_texture_float_global, 
             this.location_raytracing.location_texture_int_global);
@@ -292,7 +292,7 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         gl.uniform1i(this.location_resampling.location_texture2, 1);
         */
-        this.global_data.bind(gl, 
+        this.global_data.bind(this.name, gl, 
             this.shader_uniforms_resampling, 
             this.location_resampling.location_texture_float_global, 
             this.location_resampling.location_texture_int_global);
@@ -354,9 +354,4 @@ class CanvasWrapper {
         return program_shader_uniforms;
     }
 
-    UpdateGlobalData(gl){
-        this.global_data.UpdateDataUnit();
-        this.global_data.UpdateDataTextures(gl);
-
-    }
 }

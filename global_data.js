@@ -1,6 +1,6 @@
 class GlobalData {
 
-    constructor(gl, p_lights, p_ui_seeds, p_transfer_function_manager) {
+    constructor(gl, gl_side, p_lights, p_ui_seeds, p_transfer_function_manager) {
 
         //---start region: references
         this.p_lights = p_lights;
@@ -19,6 +19,7 @@ class GlobalData {
         //---end region: data unit  
 
         this.data_textures = new DataTextures(gl, this.data_unit);
+        this.data_textures_side = new DataTextures(gl_side, this.data_unit);
     }
 
     UpdateDataUnit() {
@@ -30,18 +31,21 @@ class GlobalData {
         console.log("UpdateDataUnit completed");
     }
 
-    UpdateDataTextures(gl) {
+    UpdateDataTextures(gl, gl_side) {
         console.log("UpdateDataTextures");
         this.data_textures.update(gl);
+        this.data_textures_side.update(gl_side);
         console.log("UpdateDataTextures completed");
     }
 
-    bind(gl, shader_uniforms, location_texture_float_global, location_texture_int_global) {
+    bind(canvas_wrapper_name, gl, shader_uniforms, location_texture_float_global, location_texture_int_global) {
+        var data_textures = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_textures : this.data_textures_side;
+
         gl.activeTexture(gl.TEXTURE2);                  // added this and following line to be extra sure which texture is being used...
-        gl.bindTexture(gl.TEXTURE_3D, this.data_textures.texture_float.texture);
+        gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_float.texture);
         gl.uniform1i(location_texture_float_global, 2);
         gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_3D, this.data_textures.texture_int.texture);
+        gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_int.texture);
         gl.uniform1i(location_texture_int_global, 3);
 
         shader_uniforms.setUniform("start_index_int_dir_lights", this.data_unit.getIntStart("dir_lights"));

@@ -36,7 +36,7 @@
     var settings_changed = false;
 
     var ui_seeds;
-    //var global_data;
+    var global_data;
     var time_last_tick = 0;
     var fps_display;
     var message_display;
@@ -93,7 +93,7 @@
 
         transfer_function_manager = new TransferFunctionManager();
 
-        //global_data = new GlobalData(gl, lights, ui_seeds, transfer_function_manager);
+        global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager);
 
         ftle_manager = new FTLEManager();
 
@@ -138,9 +138,9 @@
         shader_manager = new ShaderManager();
 
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, CANVAS_WRAPPER_MAIN,
-            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, lights, ui_seeds, transfer_function_manager);
+            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data);
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, CANVAS_WRAPPER_SIDE,
-            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, lights, ui_seeds, transfer_function_manager);
+            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -401,15 +401,12 @@
         console.log("shader_formula_scalar_float", shader_formula_scalar_float);
         canvas_wrapper_side.ReplaceRaytracingShader(gl_side, shader_formula_scalar_float);
 
-        //
         input_changed_manager.UpdateDefaultValuesRenderSettings();
     }
 
     function UpdateGlobalData() {
-        //global_data.UpdateDataUnit();
-        //global_data.UpdateDataTextures(gl);
-        canvas_wrapper_main.UpdateGlobalData(gl);
-        canvas_wrapper_side.UpdateGlobalData(gl_side);
+        global_data.UpdateDataUnit();
+        global_data.UpdateDataTextures(gl, gl_side);
     }
 
     function UpdateCamera() {
