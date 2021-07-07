@@ -17,7 +17,9 @@ class UniformLocationsRayTracing {
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");     
         this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");   
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");   
-        this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");          
+        this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");      
+        this.location_cut_at_cube_faces = gl.getUniformLocation(program, "cut_at_cube_faces");    
+        this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");        
     }
 }
 
@@ -79,6 +81,7 @@ class CanvasWrapper {
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
         this.limited_max_distance = 0;
+        this.max_iteration_count = 1;
         this.min_scalar = 0;
         this.max_scalar = 0;
 
@@ -211,7 +214,7 @@ class CanvasWrapper {
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
-        gl.uniform1i(this.location_raytracing.location_max_iteration_count, Math.ceil(this.limited_max_distance) * 3);
+        gl.uniform1i(this.location_raytracing.location_max_iteration_count, this.max_iteration_count);
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
@@ -222,6 +225,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
         gl.uniform1f(this.location_raytracing.location_min_scalar, this.min_scalar);
         gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar); 
+
+        gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces); 
+        gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside); 
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;

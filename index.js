@@ -184,7 +184,7 @@
         main_camera.UpdateShaderValues();
         main_camera.WriteToInputFields();
 
-        side_camera.repositionCamera();
+        //side_camera.repositionCamera();
         side_camera.UpdateShaderValues();
         //side_camera.WriteToInputFields();//TODO_MARKER_2ND_VIEW        
 
@@ -353,7 +353,10 @@
         canvas_wrapper_main.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
         canvas_wrapper_main.min_scalar = document.getElementById("input_min_scalar").value;
         canvas_wrapper_main.max_scalar = document.getElementById("input_max_scalar").value;
+        canvas_wrapper_main.cut_at_cube_faces = false;
+        canvas_wrapper_main.handle_inside = false;
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
+        canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);
         console.log("limited_max_distance", canvas_wrapper_main.limited_max_distance);
         document.getElementById("input_limited_max_ray_distance").value = canvas_wrapper_main.limited_max_distance.toFixed(3);
@@ -381,7 +384,10 @@
         canvas_wrapper_side.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
         canvas_wrapper_side.min_scalar = document.getElementById("input_min_scalar").value;
         canvas_wrapper_side.max_scalar = document.getElementById("input_max_scalar").value;
+        canvas_wrapper_side.cut_at_cube_faces = true;
+        canvas_wrapper_side.handle_inside = false;
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
+        canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
         console.log("limited_max_distance", canvas_wrapper_side.limited_max_distance);
         document.getElementById("input_limited_max_ray_distance").value = canvas_wrapper_side.limited_max_distance.toFixed(3);

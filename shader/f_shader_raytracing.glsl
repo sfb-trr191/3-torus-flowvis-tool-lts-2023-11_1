@@ -152,6 +152,9 @@ uniform int shading_mode_streamlines;
 uniform float min_scalar;
 uniform float max_scalar;
 
+uniform bool cut_at_cube_faces;
+uniform bool handle_inside;
+
 uniform int width;
 uniform int height;
 const float epsilon_move_ray = 0.0000001;//DUMMY
@@ -212,6 +215,16 @@ vec3 GetObjectColor(inout HitInformation hit);
 float GetScalar(vec3 position);
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir);
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
+
+void IntersectUnitCube(Ray ray, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
+void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
+void HandleOutOfBound_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hitCube);
+void HandleOutOfBound_Cylinder(bool interactiveStreamline, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b);
+void HandleOutOfBound_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID);
+void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hit);
+void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
+void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
+
 //float clamp(float x, float min, float max);
 
 //**********************************************************
@@ -528,7 +541,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 				sphere.center, col, sphere.center, col, sphere.center, col);	
 		}
 	}
-
+  */
 	if(cut_at_cube_faces)
 	{
 		IntersectUnitCube(ray, doesIntersect, nearest_t, normal_face);
@@ -540,7 +553,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 			hitCube.position = ray.origin + nearest_t * ray.direction;		
 		}
 	}
-  */
+
 	//if(show_streamlines)
 	IntersectInstance_Tree(false, ray, maxRayDistance, hit, hitCube);
   /*
@@ -634,15 +647,13 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 		if(hitAABB)
 		{
 			nodeIndex = glNode.hitLink;
+            /*
 			if (glNode.type != 0)
 			{
 				//hit.hitType = 1;
 				IntersectLineSegment(interactiveStreamline, ray, ray_local_cutoff, glNode, hit);
 			}
-			//if (nodeIndex == 1){
-			//	hit.hitType = 1;
-			//}
-			/*			
+            */
 			if(hitCube.hitType != TYPE_IGNORE_CUBE)
 			{
 				//ray intersects cube --> check if cube hit is inside this object
@@ -659,12 +670,12 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 					if(handle_inside)
 					{
 						HandleInside_LineSegment(interactiveStreamline, ray, glNode.objectIndex, hit);
-					}*/
-					//IntersectLineSegment(interactiveStreamline, ray, ray_local_cutoff, glNode, hit);	
-          /*							
+					}
+					IntersectLineSegment(interactiveStreamline, ray, ray_local_cutoff, glNode, hit);	
+          						
 				}
-			}				
-      */				
+			}
+      				
 		}
 		else
 		{
@@ -1113,6 +1124,34 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 {			
 	ignore_override = ignore_override || hit.ignore_override;
 	vec3 resultColor = vec3(0,0,0);
+    if(hitCube.hitType>TYPE_NONE)
+	{
+		//gl_FragColor = vec4(0, 0, 0, 1);
+		//return;
+		bool transfer = true;
+		if(hit.hitType == TYPE_CLICKED_SPHERE)
+		{
+			bool outOfBounds = CheckOutOfBounds(hit.position);			
+			if(outOfBounds)
+				transfer = false;
+		}
+		else if(hit.hitType == TYPE_GL_CYLINDER)
+		{
+			if(hit.distance < hitCube.distance)
+				transfer = false;
+		}
+		if(transfer)
+		{
+			hit.hitType = hitCube.hitType;
+			hit.position = hitCube.position;
+			hit.positionCenter = hitCube.positionCenter;
+			hit.normal = hitCube.normal;
+			hit.distance = hitCube.distance;
+			hit.multiPolyID = hitCube.multiPolyID;
+			hit.velocity = hitCube.velocity;
+			hit.cost = hitCube.cost;
+		}
+	}
 
 	if(hit.hitType>TYPE_NONE && hit.distance < maxRayDistance)
 	{	
@@ -1242,6 +1281,317 @@ vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir)
 
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {
   return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
+void IntersectUnitCube(Ray ray, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal)
+{	
+	GL_CameraData cam = GetActiveCamera();
+	vec3 E = cam.E.xyz;
+	float error = 0.0;//0.0001;
+	//return;
+	vec3 normal;
+	float planeDistance;
+	doesIntersect = false;
+	nearest_t = 100000.0;
+	//return;
+	if (E.x > 1.0)
+	{
+		normal = vec3(1, 0, 0);
+		planeDistance = 1.0 + error;
+		IntersectUnitCubeFace(ray, normal, planeDistance, doesIntersect, nearest_t, out_normal);
+	}
+	if (E.x < 0.0)
+	{
+		normal = vec3(-1, 0, 0);
+		planeDistance = 0.0 - error;
+		IntersectUnitCubeFace(ray, normal, planeDistance, doesIntersect, nearest_t, out_normal);
+	}
+	
+	if (E.y > 1.0)
+	{
+		normal = vec3(0, 1, 0);
+		planeDistance = 1.0 + error;
+		IntersectUnitCubeFace(ray, normal, planeDistance, doesIntersect, nearest_t, out_normal);
+	}
+	if (E.y < 0.0)
+	{
+		normal = vec3(0, -1, 0);
+		planeDistance = 0.0 - error;
+		IntersectUnitCubeFace(ray, normal, planeDistance, doesIntersect, nearest_t, out_normal);
+	}
+	
+	if (E.z > 1.0)
+	{
+		normal = vec3(0, 0, 1);
+		planeDistance = 1.0 + error;
+		IntersectUnitCubeFace(ray, normal, planeDistance, doesIntersect, nearest_t, out_normal);
+	}
+	if (E.z < 0.0)
+	{
+		normal = vec3(0, 0, -1);
+		planeDistance = 0.0 - error;
+		IntersectUnitCubeFace(ray, normal, planeDistance, doesIntersect, nearest_t, out_normal);
+	}
+}
+
+void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal)
+{
+	float d_n = dot(ray.direction, planeNormal);
+	if(d_n == 0.0)
+		return;
+	float t = (planeDistance - dot(ray.origin, planeNormal)) / d_n;
+	if(t < 0.0)
+		return;
+	
+	//return;
+	float distance_os = t;
+	float distance = ray.rayDistance + distance_os;
+	vec3 position_os = ray.origin + distance_os * ray.direction;
+	
+	
+	for(int i=0; i<3; i++)
+	{
+		if(planeNormal[i] == 0.0)
+		{
+			if(position_os[i] < 0.0 || position_os[i] > 1.0)
+				return;
+		}
+	}
+	
+	if((!doesIntersect) || (t < nearest_t))
+	{
+		nearest_t = t;
+		out_normal = planeNormal;
+	}
+	doesIntersect = true;
+}
+
+void HandleOutOfBound_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hitCube)
+{	
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
+	bool copy = (lineSegment.copy == 1);
+	int multiPolyID = lineSegment.multiPolyID;
+	if(ignore_copy && copy)
+		return;
+
+	float cost_a = GetCost(lineSegment.indexA, interactiveStreamline);
+	float cost_b = GetCost(lineSegment.indexB, interactiveStreamline);
+	float cost_cutoff = growth_max_cost * scalar_cost_max;
+	if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost_a > cost_cutoff)
+				return;
+		}
+	}
+		
+	mat4 matrix = lineSegment.matrix;
+	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
+	vec3 b = GetPosition(lineSegment.indexB, interactiveStreamline);
+	float h = distance(a,b);
+	HandleOutOfBound_Cylinder(interactiveStreamline, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
+		
+	Sphere sphere;
+	sphere.radius = tubeRadius;	
+	sphere.center = a;
+	HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);
+
+	//sphere.center = b;
+	//HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);	
+
+	sphere.center = b;
+	float cost_b_value = cost_b;
+	if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost_b > cost_cutoff)
+			{
+				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
+				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
+				cost_b_value = cost_cutoff;
+				//sphere.radius = tubeRadius * 1.1;		
+			}
+		}
+	}
+	HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);	
+	//IntersectSphere(interactiveStreamline, ray, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
+}
+
+void HandleOutOfBound_Cylinder(bool interactiveStreamline, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
+{	
+	
+	vec3 position_face_os = (matrix * vec4(hitCube.position, 1)).xyz;
+	float f_z = position_face_os.z;
+	float f_x_2 = position_face_os.x * position_face_os.x; 
+	float f_y_2 = position_face_os.y * position_face_os.y; 
+	if(f_z > h || f_z < 0.0)
+		return;
+		
+	float distanceToCenter = sqrt(f_x_2 + f_y_2);
+	if(distanceToCenter > tubeRadius)
+		return;	
+
+	float local_percentage = f_z / h;
+	float cost = mix(cost_a, cost_b, local_percentage);
+	if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost > growth_max_cost * scalar_cost_max)
+				return;
+		}	
+	}
+
+	//if (not hit) this is the first hit
+	//otherwise hit is true and we only need to check the distance
+	if((hitCube.hitType==TYPE_NONE) || (distanceToCenter < hitCube.distanceToCenter))
+	{
+		hitCube.hitType = TYPE_STREAMLINE_SEGMENT;
+		hitCube.copy = copy;
+		hitCube.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
+		hitCube.distanceToCenter = distanceToCenter;
+		hitCube.positionCenter = vec3(-1, -1, -1);
+	}		
+}
+
+void HandleOutOfBound_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID)
+{	
+
+	float distanceToCenter = distance(hitCube.position, sphere.center);
+	if(distanceToCenter > sphere.radius)
+		return;
+		
+	//if (not hit) this is the first hit
+	//otherwise hit is true and we only need to check the distance
+	if((hitCube.hitType==TYPE_NONE) || (distanceToCenter < hitCube.distanceToCenter))
+	{
+		hitCube.hitType = TYPE_STREAMLINE_SEGMENT;
+		hitCube.copy = copy;
+		hitCube.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
+		hitCube.distanceToCenter = distanceToCenter;
+		hitCube.positionCenter = vec3(-1, -1, -1);
+	}	
+}
+
+void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hit)
+{	
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
+	bool copy = (lineSegment.copy == 1);
+	int multiPolyID = lineSegment.multiPolyID;
+	if(ignore_copy && copy)
+		return;
+
+	float cost_a = GetCost(lineSegment.indexA, interactiveStreamline);
+	float cost_b = GetCost(lineSegment.indexB, interactiveStreamline);
+	float cost_cutoff = growth_max_cost * scalar_cost_max;
+	if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost_a > cost_cutoff)
+				return;
+		}
+	}
+		
+	mat4 matrix = lineSegment.matrix;
+	mat4 matrix_inv = lineSegment.matrix_inv;
+	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
+	vec3 b = GetPosition(lineSegment.indexB, interactiveStreamline);
+	float h = distance(a,b);
+	HandleInside_Cylinder(interactiveStreamline, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
+		
+	Sphere sphere;
+	sphere.radius = tubeRadius;	
+	sphere.center = a;
+	HandleInside_Sphere(interactiveStreamline, sphere, hit, copy, multiPolyID, ray.origin, ray);
+
+	sphere.center = b;
+	float cost_b_value = cost_b;
+	if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost_b > cost_cutoff)
+			{
+				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
+				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
+				cost_b_value = cost_cutoff;
+				//sphere.radius = tubeRadius * 1.1;		
+			}
+		}
+	}
+	HandleInside_Sphere(interactiveStreamline, sphere, hit, copy, multiPolyID, ray.origin, ray);	
+}
+
+void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
+{	
+	
+	vec3 position_face_os = (matrix * vec4(position, 1)).xyz;
+	float f_z = position_face_os.z;
+	float f_x_2 = position_face_os.x * position_face_os.x; 
+	float f_y_2 = position_face_os.y * position_face_os.y; 
+	if(f_z > h || f_z < 0.0)
+		return;
+		
+	float distanceToCenter = sqrt(f_x_2 + f_y_2);
+	if(distanceToCenter > tubeRadius)
+		return;	
+
+	float local_percentage = f_z / h;
+	float cost = mix(cost_a, cost_b, local_percentage);
+	if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost > growth_max_cost * scalar_cost_max)
+				return;
+		}	
+	}
+
+	//if (not hit) this is the first hit
+	//otherwise hit is true and we only need to check the distance
+	if((hit.hitType==TYPE_NONE) || (distanceToCenter < hit.distanceToCenter)|| (ray.rayDistance < hit.distance))
+	{
+		vec3 tube_center = (matrix_inv * vec4(0,0, f_z, 1)).xyz;
+
+		hit.hitType = TYPE_STREAMLINE_SEGMENT;
+		hit.copy = copy;
+		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
+		hit.distanceToCenter = distanceToCenter;
+		hit.positionCenter = vec3(-1, -1, -1);
+		hit.position = position;
+		hit.normal = normalize(position - tube_center);//vec3(1, 0, 0);
+		hit.distance = ray.rayDistance;	
+		hit.ignore_override = false;
+		//hit.hitType = TYPE_GL_CYLINDER;//change
+		//hit.objectColor = vec3(1, 1, 0);
+	}		
+}
+
+void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray)
+{	
+
+	float distanceToCenter = distance(position, sphere.center);
+	if(distanceToCenter > sphere.radius)
+		return;
+		
+	//if (not hit) this is the first hit
+	//otherwise hit is true and we only need to check the distance
+	if((hit.hitType==TYPE_NONE) || (distanceToCenter < hit.distanceToCenter) || (ray.rayDistance < hit.distance))
+	{
+		hit.hitType = TYPE_STREAMLINE_SEGMENT;
+		hit.copy = copy;
+		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
+		hit.distanceToCenter = distanceToCenter;
+		hit.positionCenter = vec3(-1, -1, -1);
+		hit.position = position;
+		hit.normal = normalize(position - sphere.center);//vec3(1, 0, 0);
+		hit.distance = ray.rayDistance;
+		//hit.hitType = TYPE_GL_CYLINDER;//change
+		//hit.objectColor = vec3(1, 1, 0);
+	}	
 }
 
 /*
