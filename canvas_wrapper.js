@@ -19,7 +19,10 @@ class UniformLocationsRayTracing {
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");   
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");      
         this.location_cut_at_cube_faces = gl.getUniformLocation(program, "cut_at_cube_faces");    
-        this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");        
+        this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");       
+        this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");  
+        this.location_show_fat_origin = gl.getUniformLocation(program, "show_fat_origin");  
+               
     }
 }
 
@@ -228,6 +231,10 @@ class CanvasWrapper {
 
         gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces); 
         gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside); 
+        gl.uniform1i(this.location_raytracing.location_is_main_renderer, this.is_main_renderer); 
+        gl.uniform1i(this.location_raytracing.location_show_fat_origin, this.show_fat_origin); 
+
+        
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
@@ -332,6 +339,9 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_streamline_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_scalar_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }
@@ -356,6 +366,9 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_streamline_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_scalar_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }

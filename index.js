@@ -27,6 +27,7 @@
 
     var aliasing;
     var transfer_function_manager;
+    var object_manager;
     var shader_manager;
     var canvas_wrapper_main;
     var canvas_wrapper_side;
@@ -81,7 +82,7 @@
             return;
         console.log(gl);
         console.log(gl_side);
-        
+
 
         ui_seeds = new UISeeds();
         ui_seeds.generateDefaultSeeds();
@@ -92,8 +93,9 @@
         lights.GenerateDefaultLighting();
 
         transfer_function_manager = new TransferFunctionManager();
+        object_manager = new ObjectManager();
 
-        global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager);
+        global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager, object_manager);
 
         ftle_manager = new FTLEManager();
 
@@ -183,10 +185,27 @@
         main_camera.repositionCamera();
         main_camera.UpdateShaderValues();
         main_camera.WriteToInputFields();
+        object_manager.movable_axes_state_main.SetCameraData(
+            main_camera.position,
+            main_camera.forward,
+            main_camera.up,
+            main_camera.p_1m,
+            main_camera.q_x,
+            main_camera.q_y);
 
         //side_camera.repositionCamera();
         side_camera.UpdateShaderValues();
-        side_camera.WriteToInputFields();//TODO_MARKER_2ND_VIEW        
+        side_camera.WriteToInputFields();
+        object_manager.movable_axes_state_side.SetCameraData(
+            side_camera.position,
+            side_camera.forward,
+            side_camera.up,
+            side_camera.p_1m,
+            side_camera.q_x,
+            side_camera.q_y);
+
+        object_manager.Update();
+        UpdateGlobalDataIfDirty();
 
         canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
         canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
@@ -265,7 +284,7 @@
             UpdateSideCamera();
         });
 
-        
+
     }
 
     function addOnClickAddSeed() {
@@ -361,6 +380,9 @@
         canvas_wrapper_main.max_scalar = document.getElementById("input_max_scalar").value;
         canvas_wrapper_main.cut_at_cube_faces = false;
         canvas_wrapper_main.handle_inside = false;
+        canvas_wrapper_main.is_main_renderer = true;
+        canvas_wrapper_main.show_fat_origin = false;
+
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);
@@ -392,6 +414,9 @@
         canvas_wrapper_side.max_scalar = document.getElementById("input_max_scalar").value;
         canvas_wrapper_side.cut_at_cube_faces = true;
         canvas_wrapper_side.handle_inside = false;
+        canvas_wrapper_side.is_main_renderer = false;
+        canvas_wrapper_side.show_fat_origin = true;
+
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
@@ -417,6 +442,15 @@
     }
 
     function UpdateGlobalData() {
+        global_data.UpdateDataUnit();
+        global_data.UpdateDataTextures(gl, gl_side);
+    }
+
+    function UpdateGlobalDataIfDirty() {
+        if (!object_manager.dirty)
+            return;
+        console.log("UpdateGlobalDataIfDirty");
+        object_manager.dirty = false;
         global_data.UpdateDataUnit();
         global_data.UpdateDataTextures(gl, gl_side);
     }

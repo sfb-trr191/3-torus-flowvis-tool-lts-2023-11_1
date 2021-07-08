@@ -16,6 +16,8 @@ var DIR_LIGHT_FLOAT_COUNT = 16;
 var DIR_LIGHT_INT_COUNT = 0;
 var STREAMLINE_COLOR_FLOAT_COUNT = 4;
 var STREAMLINE_COLOR_INT_COUNT = 0;
+var CYLINDER_FLOAT_COUNT = 64;
+var CYLINDER_INT_COUNT = 0;
 
 class PositionData {
 
@@ -207,5 +209,64 @@ class StreamlineColor {
         for (var i = 0; i < 3; i++) {
             arrayf[start_index_f + i] = this.color[i];
         }
+    }
+}
+
+class Cylinder {
+
+    //integer based
+    
+    //float based
+    matrix = glMatrix.mat4.create();
+    matrix_inv = glMatrix.mat4.create();
+    position_a = glMatrix.vec4.create();
+    position_b = glMatrix.vec4.create();
+    color = glMatrix.vec4.create();
+    radius = 0.01;
+
+
+    constructor() {
+        //this.matrix[0] = 2;//TODO remove: test inverse
+        //glMatrix.mat4.invert(this.matrix_inv, this.matrix);//TODO remove: test inverse
+    }
+
+    print() {
+        console.log("matrix: " + this.matrix);
+        console.log("matrix_inv: " + this.matrix_inv);
+        console.log("position_a: " + this.position_a);
+        console.log("position_b: " + this.position_b);
+        console.log("color: " + this.color);
+        console.log("radius: " + this.radius);
+    }
+
+    getFloatCount() {
+        return CYLINDER_FLOAT_COUNT;
+    }
+
+    getIntCount() {
+        return CYLINDER_INT_COUNT;
+    }
+
+    writeToArrays(arrayf, arrayi, start_index_f, start_index_i) {
+        var index = start_index_i;
+        arrayi[index++] = this.indexA;
+        arrayi[index++] = this.indexB;
+        arrayi[index++] = this.multiPolyID;
+        arrayi[index++] = this.copy;
+        arrayi[index++] = this.beginning;
+
+        var index_f = start_index_f;
+        for (var i = 0; i < 16; i++) {
+            arrayf[index_f + i] = this.matrix[i];
+            arrayf[index_f + i + 16] = this.matrix_inv[i];
+        }
+        index_f += 32;
+        for (var i = 0; i < 4; i++) {
+            arrayf[index_f + i] = this.position_a[i];
+            arrayf[index_f + i + 4] = this.position_b[i];
+            arrayf[index_f + i + 8] = this.color[i];
+        }
+        index_f += 12;
+        arrayf[index_f++] = this.radius;
     }
 }

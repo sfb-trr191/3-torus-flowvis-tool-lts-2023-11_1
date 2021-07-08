@@ -32,6 +32,8 @@ uniform int start_index_int_streamline_color;
 uniform int start_index_float_streamline_color;
 uniform int start_index_int_scalar_color;
 uniform int start_index_float_scalar_color;
+uniform int start_index_int_cylinder;
+uniform int start_index_float_cylinder;
 
 vec3 GetScalarColor(int index);
 ivec3 GetIndex3D(int global_index);
@@ -48,10 +50,10 @@ void main()
     if(render_color_bar){
         int x = int(gl_FragCoord[0]);
         int y = int(gl_FragCoord[1]);
-        int color_bar_min_x = width-32;
-        int color_bar_max_x = width-16;
-        int color_bar_min_y = 16;
-        int color_bar_max_y = height-16;
+        int color_bar_min_x = 16;
+        int color_bar_max_x = 32;
+        int color_bar_min_y = 64;
+        int color_bar_max_y = height-64;
         int color_bar_padding = 2;
         int color_bar_min_y_inside = color_bar_min_y + color_bar_padding;
         int color_bar_max_y_inside = color_bar_max_y - color_bar_padding;

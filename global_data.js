@@ -1,11 +1,12 @@
 class GlobalData {
 
-    constructor(gl, gl_side, p_lights, p_ui_seeds, p_transfer_function_manager) {
+    constructor(gl, gl_side, p_lights, p_ui_seeds, p_transfer_function_manager, p_object_manager) {
 
         //---start region: references
         this.p_lights = p_lights;
         this.p_ui_seeds = p_ui_seeds;
         this.p_transfer_function_manager = p_transfer_function_manager;
+        this.p_object_manager = p_object_manager;
         //---end region: references
 
         //---start region: data unit 
@@ -13,9 +14,11 @@ class GlobalData {
         this.data_container_dir_lights = new DataContainer("dir_lights", new DirLight());
         this.data_container_streamline_color = new DataContainer("streamline_color", new StreamlineColor());
         this.data_container_scalar_color = new DataContainer("scalar_color", new StreamlineColor());
+        this.data_container_cylinders = new DataContainer("cylinders", new Cylinder());
         this.data_unit.registerDataCollection(this.data_container_dir_lights);
         this.data_unit.registerDataCollection(this.data_container_streamline_color);
         this.data_unit.registerDataCollection(this.data_container_scalar_color);
+        this.data_unit.registerDataCollection(this.data_container_cylinders);
         //---end region: data unit  
 
         this.data_textures = new DataTextures(gl, this.data_unit);
@@ -23,10 +26,11 @@ class GlobalData {
     }
 
     UpdateDataUnit() {
-        console.log("UpdateDataUnit");
+        console.log("UpdateDataUnit: ", this.data_unit.name);
         this.data_container_dir_lights.data = this.p_lights.dir_lights;
         this.data_container_streamline_color.data = this.p_ui_seeds.getStreamlineColors();
         this.data_container_scalar_color.data = this.p_transfer_function_manager.GetActiveTransferfunctionColorList();
+        this.data_container_cylinders.data = this.p_object_manager.cylinders;
         this.data_unit.generateArrays();
         console.log("UpdateDataUnit completed");
     }
@@ -51,11 +55,12 @@ class GlobalData {
         shader_uniforms.setUniform("start_index_int_dir_lights", this.data_unit.getIntStart("dir_lights"));
         shader_uniforms.setUniform("start_index_int_streamline_color", this.data_unit.getIntStart("streamline_color"));
         shader_uniforms.setUniform("start_index_int_scalar_color", this.data_unit.getIntStart("scalar_color"));
+        shader_uniforms.setUniform("start_index_int_cylinder", this.data_unit.getIntStart("cylinders"));
 
         shader_uniforms.setUniform("start_index_float_dir_lights", this.data_unit.getFloatStart("dir_lights"));
         shader_uniforms.setUniform("start_index_float_streamline_color", this.data_unit.getFloatStart("streamline_color"));
         shader_uniforms.setUniform("start_index_float_scalar_color", this.data_unit.getFloatStart("scalar_color"));
-
+        shader_uniforms.setUniform("start_index_float_cylinder", this.data_unit.getFloatStart("cylinders"));
 
         shader_uniforms.updateUniforms();
     }

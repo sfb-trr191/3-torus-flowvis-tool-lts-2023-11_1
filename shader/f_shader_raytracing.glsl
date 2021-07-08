@@ -67,6 +67,19 @@ struct GL_LineSegment
 	mat4 matrix_inv;
 };
 
+struct GL_Cylinder
+{
+	vec4 position_a;
+	vec4 position_b;
+	vec4 color;
+	mat4 matrix;
+	mat4 matrix_inv;
+	float radius;
+	float padding_2;
+	float padding_3;
+	float padding_4;
+};
+
 struct HitInformation
 {
 	vec3 position;
@@ -154,6 +167,8 @@ uniform float max_scalar;
 
 uniform bool cut_at_cube_faces;
 uniform bool handle_inside;
+uniform bool is_main_renderer;
+uniform bool show_fat_origin;
 
 uniform int width;
 uniform int height;
@@ -172,6 +187,11 @@ const float fogEnd = 1001.0;//DUMMY
 const vec3 fogColor = vec3(1,1,1);//DUMMY
 const float tubeShininess = 32.0;//DUMMY
 const bool blinn_phong = true;//DUMMY
+
+const float x_axesPixelOffset = 0.85;
+const float y_axesPixelOffset = 0.75;
+const bool show_bounding_box = true;
+const bool render_movable_axes = true;
 
 uniform GL_CameraData active_camera;
 
@@ -195,6 +215,7 @@ vec4 getValidationColor(bool valid);
 
 vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit);
 Ray GenerateRay(float x_offset, float y_offset);
+Ray GenerateRayWithPixelOffset(float x_offset, float y_offset);
 GL_CameraData GetActiveCamera();
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
@@ -202,6 +223,7 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 bool CheckOutOfBounds(vec3 position);
 vec3 MoveOutOfBounds(vec3 position);
 bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
+bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit);
 void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
 void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
@@ -225,6 +247,12 @@ void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegme
 void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
 void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
 
+void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
+void IntersectAxesCornerAABB(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube, int corner_index);
+void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float ray_local_cutoff, inout HitInformation hit, bool ignore_override);
+void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, int type, vec3 pos_1, vec3 col_1, vec3 pos_2, vec3 col_2, vec3 pos_3, vec3 col_3);
+void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
+
 //float clamp(float x, float min, float max);
 
 //**********************************************************
@@ -238,6 +266,7 @@ GL_AABB GetAABB(int index, bool interactiveStreamline);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
 vec3 GetScalarColor(int index);
+GL_Cylinder GetCylinder(int index);
 
 ivec3 GetIndex3D(int global_index);
 
@@ -403,6 +432,16 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
 	HitInformation hitCube;
 
 	//#decision render_movable_axes
+    if(render_movable_axes){
+        Ray rayPixelOffset = GenerateRayWithPixelOffset(x_offset, y_offset);
+        IntersectMovableAxes(rayPixelOffset, maxRayDistance, hit, hitCube);
+        if(hit.hitType > TYPE_NONE)
+        {
+            //return vec3(1,0,0);
+            vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true);
+            return resultColor;	
+        }
+    }
 
 	Ray ray = GenerateRay(x_offset, y_offset);	
   
@@ -418,7 +457,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
 
 Ray GenerateRay(float x_offset, float y_offset)
 {	
-  bool left_handed = false;//DUMMY
+    bool left_handed = false;//DUMMY
 
 
 	GL_CameraData cam = GetActiveCamera();
@@ -432,6 +471,38 @@ Ray GenerateRay(float x_offset, float y_offset)
 	float j = gl_FragCoord[1];//y
 	if(!left_handed)
 		j = float(height) - gl_FragCoord[1];//y
+	vec3 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
+	vec3 r_ij = normalize(p_ij);
+	
+	Ray ray;
+	ray.origin = E;
+	ray.direction = r_ij;
+	ray.dir_inv = 1.0/ray.direction;
+	ray.rayDistance = 0.0;
+	return ray;
+}
+
+//result is not 3D, uses central camera for both eyes
+Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
+{	
+    bool left_handed = false;//DUMMY
+
+	GL_CameraData cam = GetActiveCamera();
+	vec3 E = cam.E.xyz;
+	vec3 p_1m = cam.p_1m.xyz;
+	vec3 q_x = cam.q_x.xyz;
+	vec3 q_y = cam.q_y.xyz;
+
+    float width_f = float(width);
+    float height_f = float(height);
+
+	float i = gl_FragCoord[0] - (x_axesPixelOffset * width_f * 0.5);//x
+	//i = gl_FragCoord[0];//x
+	//float j = height - gl_FragCoord[1];//y
+	float j = gl_FragCoord[1] - (y_axesPixelOffset * height_f * 0.5);//y
+	//j = gl_FragCoord[1];//y
+	if(!left_handed)
+		j = height_f - gl_FragCoord[1] + (y_axesPixelOffset * height_f * 0.5);//y
 	vec3 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
 	vec3 r_ij = normalize(p_ij);
 	
@@ -581,13 +652,14 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		//sphere.center = blockCameraData[camIndexOther+2].E.xyz;
 		//IntersectSphere(interactiveStreamline, ray, sphere, hit, copy, multiPolyID, TYPE_CLICKED_SPHERE, velocity, cost);
 	}
-
+*/
 	
 	if(show_bounding_box)
 	{
 		IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
 	}
 
+/*
 	if(show_main_camera_axes)
 	{
 		//index 0 and 1 are the movable axes for main / multi renderer
@@ -770,6 +842,14 @@ bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin,
 	
 	bool segment_outside = tmax < 0.0 || tmin > ray_local_cutoff;
     return tmax > max(tmin, 0.0) && !segment_outside;
+}
+
+bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax) {    
+	GL_AABB aabb;
+	float radius = cylinder.radius;
+	aabb.min = min(cylinder.position_a, cylinder.position_b) + vec4(-radius, -radius, -radius, 0);
+	aabb.max = max(cylinder.position_a, cylinder.position_b) + vec4(radius, radius, radius, 0);
+    return IntersectGLAABB(aabb, r, ray_local_cutoff, tmin, tmax);
 }
 
 void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
@@ -1210,6 +1290,10 @@ vec3 GetObjectColor(inout HitInformation hit)
 	//return vec3(0.5,0.5,0.5);
 	vec3 objectColor = vec3(0, 0, 1);
 	
+    if(hit.hitType == TYPE_GL_CYLINDER)
+	{
+		objectColor = hit.objectColor;
+	}
 	if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
 	{
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_ID)
@@ -1594,6 +1678,283 @@ void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInf
 	}	
 }
 
+void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube){
+    bool check_bounds = false;
+    int corner_index = is_main_renderer ? 0 : 1;
+    IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, corner_index);
+}
+
+void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
+{
+	//index 0 and 1 are the movable axes for main / multi renderer
+	//index 2 is the main camera orientation
+	//indices 3 to 10 are the axes
+	//index 11 is the fat origin axes
+	int additional_index = show_fat_origin ? 1 : 0;
+	for(int i=3; i<11+additional_index; i++)
+		IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, i);
+
+}
+
+//improved version of IntersectAxesCorner. constructs AABB on the fly
+void IntersectAxesCornerAABB(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube, int corner_index)
+{ 	
+	float tmin;
+	float tmax;
+	bool hitAABB;
+	bool hitAnyAABB = false;
+
+	bool ignore_override = true;
+    GL_Cylinder cylinder_1 = GetCylinder(corner_index * 3);
+    GL_Cylinder cylinder_2 = GetCylinder(corner_index * 3 + 1);
+    GL_Cylinder cylinder_3 = GetCylinder(corner_index * 3 + 2);
+	vec3 pos_a = cylinder_1.position_a.xyz;
+	vec3 pos_b_1 = cylinder_1.position_b.xyz;
+	vec3 pos_b_2 = cylinder_2.position_b.xyz;
+	vec3 pos_b_3 = cylinder_3.position_b.xyz;
+	vec3 col_1 = cylinder_1.color.xyz;
+	vec3 col_2 = cylinder_2.color.xyz;
+	vec3 col_3 = cylinder_3.color.xyz;
+
+	Sphere sphere;
+	sphere.radius = cylinder_1.radius;
+
+	hitAABB = IntersectGLAABB(cylinder_1, ray, ray_local_cutoff, tmin, tmax);
+	if(hitAABB)
+	{
+		IntersectCylinder(check_bounds, cylinder_1, ray, ray_local_cutoff, hit, ignore_override);
+		sphere.center = pos_b_1;
+		IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b_1, col_1, pos_b_2, col_2, pos_b_3, col_3);
+		hitAnyAABB = true;
+	}
+
+	hitAABB = IntersectGLAABB(cylinder_2, ray, ray_local_cutoff, tmin, tmax);
+	if(hitAABB)
+	{
+		IntersectCylinder(check_bounds, cylinder_2, ray, ray_local_cutoff, hit, ignore_override);
+		sphere.center = pos_b_2;
+		IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b_1, col_1, pos_b_2, col_2, pos_b_3, col_3);
+		hitAnyAABB = true;
+	}
+
+	hitAABB = IntersectGLAABB(cylinder_3, ray, ray_local_cutoff, tmin, tmax);
+	if(hitAABB)
+	{
+		IntersectCylinder(check_bounds, cylinder_3, ray, ray_local_cutoff, hit, ignore_override);
+		sphere.center = pos_b_3;
+		IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b_1, col_1, pos_b_2, col_2, pos_b_3, col_3);
+		hitAnyAABB = true;
+	}
+
+	if(hitAnyAABB)
+	{
+		sphere.center = pos_a;
+		IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b_1, col_1, pos_b_2, col_2, pos_b_3, col_3);
+	}	
+}
+
+
+void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float ray_local_cutoff, inout HitInformation hit, bool ignore_override)
+{
+	
+	float r = cylinder.radius;
+	vec3 a = cylinder.position_a.xyz;
+	vec3 b = cylinder.position_b.xyz;
+	mat4 matrix = cylinder.matrix;
+	mat4 matrix_inv = cylinder.matrix_inv;
+	
+	//vec3 a_os = (matrix * vec4(a, 1)).xyz;
+	//vec3 b_os = (matrix * vec4(b, 1)).xyz;
+		
+	Ray ray_os;//Object Space of Cylinder
+	ray_os.origin = (matrix * vec4(ray.origin, 1)).xyz;
+	//ray_os.direction = (matrix_inv * vec4(ray.direction, 1)).xyz;
+	ray_os.direction = (matrix * vec4(ray.origin+ray.direction, 1)).xyz - ray_os.origin;
+	//ray_os.direction = normalize(ray_os.direction);
+		
+	//calculate discriminant in object space
+	float x_1 = ray_os.origin.x;
+	float x_2 = (ray_os.origin + ray_os.direction).x;
+	float y_1 = ray_os.origin.y;
+	float y_2 = (ray_os.origin + ray_os.direction).y;
+	float d_x =  x_2 - x_1;
+	float d_y =  y_2 - y_1;
+	float d_r = sqrt(d_x*d_x + d_y*d_y);
+	float d_r_squared = d_r * d_r;
+	float D = x_1 * y_2 - x_2 * y_1;
+	float discriminant = r*r * d_r_squared - D*D;
+	if(discriminant < 0.0)
+		return;
+
+	float d_r_squared_inv = 1.0/d_r_squared;
+	//calculate intersection points in object space	
+	float root = sqrt(discriminant);
+	float x_L = D * d_y;
+	float x_R = sign(d_y)*d_x*root;
+	//float y_L = -D * d_x;							//NOT NECESSARY
+	//float y_R = abs(d_y)*root;					//NOT NECESSARY
+	float p_x_1 = (x_L + x_R)/(d_r_squared);		
+	float p_x_2 = (x_L - x_R)/(d_r_squared);		
+	//vec2 p_x = vec2((x_L + x_R), (x_L - x_R)) * d_r_squared_inv;
+	//float p_y_1 = (y_L + y_R)/(d_r_squared);		//NOT NECESSARY
+	//float p_y_2 = (y_L - y_R)/(d_r_squared);		//NOT NECESSARY
+	//vec2 p_1 = vec2(p_x_1, p_y_1);				//NOT NECESSARY
+	//vec2 p_2 = vec2(p_x_2, p_y_2);				//NOT NECESSARY
+	
+	//calculate t in object space 
+	//equation: ray_os.origin.x + t * ray_os.direction.x = p_x_1
+	float t_1 = (p_x_1 - ray_os.origin.x) / ray_os.direction.x;
+	float t_2 = (p_x_2 - ray_os.origin.x) / ray_os.direction.x;
+	//float t_1 = (p_x[0] - ray_os.origin.x) / ray_os.direction.x;
+	//float t_2 = (p_x[1] - ray_os.origin.x) / ray_os.direction.x;
+	float t = 0.0;
+	bool bothInFront = false;
+	if(t_1 < 0.0)
+	{		
+		//t_1 is behind the camera
+		if(t_2 < 0.0)//both intersection points are behind the camera						
+			return;
+		//t_2 is in front of camera  
+		t = t_2;
+	}
+	else
+	{
+		if(t_2 < 0.0)//t_1 is in front of camera  
+			t = t_1;
+		else//both intersection points are in front of the camera	
+		{
+			t = min(t_1, t_2);
+			bothInFront = true;
+		}
+	}
+	
+	//calculate intersection point p in object space
+	//vec3 a_os = (matrix * vec4(a, 1)).xyz;		//NOT NECESSARY
+	//vec3 b_os = (matrix * vec4(b, 1)).xyz;		//NOT NECESSARY
+	//float z_min = a_os.z;
+	//float z_max = b_os.z;
+	vec3 p_os = ray_os.origin + t * ray_os.direction;
+	float z_os = p_os.z;
+	float h = distance(a,b);
+	
+	if(z_os > h || z_os < 0.0)
+	{
+		if(!bothInFront)
+			return;
+		return;
+		//We also need to check the other t if we are not rendering caps		
+		t = max(t_1, t_2);
+		p_os = ray_os.origin + t * ray_os.direction;
+		z_os = p_os.z;
+		if(z_os > h || z_os < 0.0)
+			return;
+	}
+	
+	float distance_os = distance(ray_os.origin, p_os);				
+	float distance = ray.rayDistance + distance_os;
+				
+	vec3 position_os = ray.origin + distance_os * ray.direction;
+	if(check_bounds)
+	{
+		bool outOfBounds = CheckOutOfBounds(position_os);	
+		if(outOfBounds)	
+			return;	
+	}
+	if(distance_os > ray_local_cutoff)
+		return;
+	
+	//if (not hit) this is the first hit
+	//otherwise hit is true and we only need to check the distance
+	if((hit.hitType==TYPE_NONE) || (distance < hit.distance))
+	{		
+		//calculate intersection point in world space
+		//vec3 p = (matrix_inv * vec4(p_os, 1)).xyz;
+		//calculate tube center in world space (for normal calculation)
+		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;	
+		hit.hitType = TYPE_GL_CYLINDER;//change
+		//hit.distance_os = distance_os;	
+		hit.distance = ray.rayDistance + distance_os;	
+		hit.position = position_os;	
+		hit.positionCenter = tube_center;
+		hit.normal = normalize(hit.position - tube_center);
+		hit.copy = false;//copy;
+		hit.multiPolyID = -1;//interactiveStreamline ? -1 : multiPolyID;
+		hit.velocity = -1.0;//mix(v_a, v_b, local_percentage);
+		hit.cost = -1.0;//cost;
+		hit.objectColor = cylinder.color.xyz;
+		hit.ignore_override = ignore_override;
+	}
+	
+}
+
+void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, int type, vec3 pos_1, vec3 col_1, vec3 pos_2, vec3 col_2, vec3 pos_3, vec3 col_3)
+{
+	vec3 z = ray.origin - sphere.center;//e-c
+	float a = dot(ray.direction, ray.direction);//unnecessary
+	float b = 2.0 * dot(ray.direction, z);
+	float c = dot(z, z) - sphere.radius * sphere.radius;
+
+	float discriminant = b*b - 4.0 * a *c;
+	if (discriminant < 0.0)
+		return;
+
+	float root = sqrt(discriminant);
+	float t1 = (-b + root) * 0.5f;
+	float t2 = (-b - root) * 0.5f;
+	//float distance = min(t1, t2);
+	//float distance = (-b - root) / (2.0f * a);
+	float distance_os = 0.0;
+		
+	if(t1 < 0.0)
+	{
+		if(t2 < 0.0)
+			return;
+		distance_os = t2;
+	}
+	else if (t2 < 0.0)
+		distance_os = t1;
+	else
+		distance_os = min(t1, t2);
+	
+	float distance_surface = ray.rayDistance + distance_os;
+		
+	vec3 position_os = ray.origin + distance_os * ray.direction;//intersection point in world space
+	if(check_bounds)
+	{
+		bool outOfBounds = CheckOutOfBounds(position_os);	
+		if(outOfBounds)	
+			return;	
+	}
+	if(distance_os > ray_local_cutoff)
+		return;
+		
+	//if (not hit) this is the first hit
+	//otherwise hit is true and we only need to check the distance
+	if((hit.hitType==TYPE_NONE) || (distance_surface < hit.distance))
+	{		
+		hit.hitType = type;
+		//hit.distance_os = distance_os;	
+		hit.distance = ray.rayDistance + distance_os;
+		hit.position = ray.origin + distance_os * ray.direction;
+		hit.positionCenter = sphere.center;
+		hit.normal = normalize(hit.position - sphere.center);
+		//hit.normal = normalize(sphere.center - hit.position);
+		hit.copy = false;//copy;
+		hit.multiPolyID = -1;//interactiveStreamline ? -1 : multiPolyID;
+		hit.velocity = -1.0;//velocity;
+		hit.cost = -1.0;//cost;
+		hit.ignore_override = true;
+
+		float d_1 = distance(pos_1, hit.position);
+		float d_2 = distance(pos_2, hit.position);
+		float d_3 = distance(pos_3, hit.position);
+		if(d_1 < d_2)		
+			hit.objectColor = d_1 < d_3 ? col_1 : col_3;
+		else
+			hit.objectColor = d_2 < d_3 ? col_2 : col_3;
+	}
+}
+
 /*
 float clamp(float x, float min, float max){
 	return (x < min) ? min : (x > max) ? max : x;
@@ -1617,6 +1978,8 @@ const int DIR_LIGHT_FLOAT_COUNT = 16;
 const int DIR_LIGHT_INT_COUNT = 0;
 const int STREAMLINE_COLOR_FLOAT_COUNT = 4;
 const int STREAMLINE_COLOR_INT_COUNT = 0;
+const int CYLINDER_FLOAT_COUNT = 64;
+const int CYLINDER_INT_COUNT = 0;
 
 //LOD DATA
 uniform int start_index_int_position_data;
@@ -1633,6 +1996,8 @@ uniform int start_index_int_streamline_color;
 uniform int start_index_float_streamline_color;
 uniform int start_index_int_scalar_color;
 uniform int start_index_float_scalar_color;
+uniform int start_index_int_cylinder;
+uniform int start_index_float_cylinder;
 
 //TEXTURE
 const int tex_n_x = 512;
@@ -1834,6 +2199,68 @@ vec3 GetScalarColor(int index)
 		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
 	);
 	return color;
+}
+
+GL_Cylinder GetCylinder(int index)
+{
+    GL_Cylinder cylinder;
+	ivec3 pointer = GetIndex3D(start_index_float_cylinder + index * CYLINDER_FLOAT_COUNT);
+  	cylinder.matrix = mat4(
+		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(3,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(4,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(5,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(6,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(7,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(8,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(9,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(10,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(11,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(12,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(13,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(14,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(15,0,0), 0).r
+  	);
+	cylinder.matrix_inv = mat4(
+		texelFetch(texture_float_global, pointer+ivec3(16,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(17,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(18,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(19,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(20,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(21,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(22,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(23,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(24,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(25,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(26,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(27,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(28,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(29,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(30,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(31,0,0), 0).r
+  	);
+    cylinder.position_a = vec4(
+		texelFetch(texture_float_global, pointer+ivec3(32,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(33,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(34,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(35,0,0), 0).r//unnecessary
+  	);
+    cylinder.position_b = vec4(
+		texelFetch(texture_float_global, pointer+ivec3(36,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(37,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(38,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(39,0,0), 0).r//unnecessary
+  	);
+    cylinder.color = vec4(
+		texelFetch(texture_float_global, pointer+ivec3(40,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(41,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(42,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(43,0,0), 0).r//unnecessary
+  	);
+	cylinder.radius = texelFetch(texture_float_global, pointer+ivec3(44,0,0), 0).r;
+  return cylinder;
 }
 
 `;
