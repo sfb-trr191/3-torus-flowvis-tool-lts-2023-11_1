@@ -32,6 +32,7 @@ const PARAM_RNG_SEED_POSITION = "rngp";
 
 const GROUP_NAME_CALCULATE = "group_calculate";
 const GROUP_NAME_MAIN_CAMERA = "group_main_camera";
+const GROUP_NAME_SIDE_CAMERA = "group_side_camera";
 const GROUP_NAME_RENDER_SETTINGS = "group_render_settings";
 
 const CANVAS_WRAPPER_MAIN = "main";

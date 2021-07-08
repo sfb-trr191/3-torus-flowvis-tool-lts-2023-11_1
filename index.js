@@ -121,15 +121,15 @@
         side_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
 
         side_camera.LinkInput(
-            document.getElementById("input_camera_position_x"),
-            document.getElementById("input_camera_position_y"),
-            document.getElementById("input_camera_position_z"),
-            document.getElementById("input_camera_forward_x"),
-            document.getElementById("input_camera_forward_y"),
-            document.getElementById("input_camera_forward_z"),
-            document.getElementById("input_camera_up_x"),
-            document.getElementById("input_camera_up_y"),
-            document.getElementById("input_camera_up_z"));
+            document.getElementById("input_side_camera_position_x"),
+            document.getElementById("input_side_camera_position_y"),
+            document.getElementById("input_side_camera_position_z"),
+            document.getElementById("input_side_camera_forward_x"),
+            document.getElementById("input_side_camera_forward_y"),
+            document.getElementById("input_side_camera_forward_z"),
+            document.getElementById("input_side_camera_up_x"),
+            document.getElementById("input_side_camera_up_y"),
+            document.getElementById("input_side_camera_up_z"));
 
         aliasing = new Aliasing();
 
@@ -186,7 +186,7 @@
 
         //side_camera.repositionCamera();
         side_camera.UpdateShaderValues();
-        //side_camera.WriteToInputFields();//TODO_MARKER_2ND_VIEW        
+        side_camera.WriteToInputFields();//TODO_MARKER_2ND_VIEW        
 
         canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
         canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
@@ -260,6 +260,12 @@
             console.log("onClickUpdateCamera");
             UpdateCamera();
         });
+        document.getElementById("button_update_side_camera").addEventListener("click", function () {
+            console.log("onClickUpdateSideCamera");
+            UpdateSideCamera();
+        });
+
+        
     }
 
     function addOnClickAddSeed() {
@@ -418,7 +424,13 @@
     function UpdateCamera() {
         console.log("UpdateCamera");
         main_camera.FromInput();
-        input_changed_manager.UpdateDefaultValuesMainCamera();
+        //input_changed_manager.UpdateDefaultValuesMainCamera();
+    }
+
+    function UpdateSideCamera() {
+        console.log("UpdateSideCamera");
+        side_camera.FromInput();
+        //input_changed_manager.UpdateDefaultValuesSideCamera();
     }
 
     function AddSeed() {

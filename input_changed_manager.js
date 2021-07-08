@@ -50,11 +50,14 @@ class InputChangedManager{
         this.groups_dict = {};
         this.group_calculate = new InputChangedGroup(GROUP_NAME_CALCULATE, document.getElementById("button_request_data"));
         this.group_main_camera = new InputChangedGroup(GROUP_NAME_MAIN_CAMERA, document.getElementById("button_update_camera"));
+        this.group_side_camera = new InputChangedGroup(GROUP_NAME_SIDE_CAMERA, document.getElementById("button_update_side_camera"));
         this.group_render_settings = new InputChangedGroup(GROUP_NAME_RENDER_SETTINGS, document.getElementById("button_render_settings"));
         this.groups.push(this.group_calculate);
         this.groups.push(this.group_main_camera);
+        this.groups.push(this.group_side_camera);
         this.groups.push(this.group_render_settings);
         this.groups_dict["main_camera"] = this.group_main_camera;
+        this.groups_dict["side_camera"] = this.group_side_camera;
         this.GenerateGroupCalculate();
         this.GenerateGroupCamera();
         this.GenerateGroupRenderSettings();
@@ -79,7 +82,16 @@ class InputChangedManager{
         this.group_main_camera.AddInput(document.getElementById("input_camera_up_x"));
         this.group_main_camera.AddInput(document.getElementById("input_camera_up_y"));
         this.group_main_camera.AddInput(document.getElementById("input_camera_up_z"));
-        
+
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_position_x"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_position_y"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_position_z"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_forward_x"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_forward_y"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_forward_z"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_up_x"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_up_y"));
+        this.group_side_camera.AddInput(document.getElementById("input_side_camera_up_z"));        
     }
 
     GenerateGroupRenderSettings(){

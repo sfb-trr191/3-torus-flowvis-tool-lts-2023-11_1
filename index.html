@@ -65,6 +65,59 @@
                 HTML5 canvas.</canvas>
             <p id="fps_display">FPS</p>
             <p id="message_display">activate javascript to see the content</p>
+            <div class="container">
+                <fieldset class="fieldset_camera">
+                    <legend>Main Camera</legend>    
+                    <div class="grid_container">
+                        <button type="button" id="button_update_camera">update camera</button>
+                        <label></label>
+                        <label>position</label>
+                        <div id="div_input_camera_position" class="horizontal_div_3">
+                            <input id="input_camera_position_x" type="text" value="0.5">
+                            <input id="input_camera_position_y" type="text" value="0.5">
+                            <input id="input_camera_position_z" type="text" value="0.5">
+                        </div>
+                        <label>forward</label>
+                        <div id="div_input_camera_forward" class="horizontal_div_3">
+                            <input id="input_camera_forward_x" type="text" value="0.0">
+                            <input id="input_camera_forward_y" type="text" value="1.0">
+                            <input id="input_camera_forward_z" type="text" value="0.0">
+                        </div>
+                        <label>up</label>
+                        <div id="div_input_camera_up" class="horizontal_div_3">
+                            <input id="input_camera_up_x" type="text" value="0.0">
+                            <input id="input_camera_up_y" type="text" value="0.0">
+                            <input id="input_camera_up_z" type="text" value="1.0">
+                        </div>
+                    </div>            
+                </fieldset>
+                <fieldset class="fieldset_camera">
+                    <legend>Side Camera</legend>    
+                    <div class="grid_container">
+                        <button type="button" id="button_update_side_camera">update camera</button>
+                        <label></label>
+                        <label>position</label>
+                        <div id="div_input_side_camera_position" class="horizontal_div_3">
+                            <input id="input_side_camera_position_x" type="text" value="0.5">
+                            <input id="input_side_camera_position_y" type="text" value="0.5">
+                            <input id="input_side_camera_position_z" type="text" value="0.5">
+                        </div>
+                        <label>forward</label>
+                        <div id="div_input_side_camera_forward" class="horizontal_div_3">
+                            <input id="input_side_camera_forward_x" type="text" value="0.0">
+                            <input id="input_side_camera_forward_y" type="text" value="1.0">
+                            <input id="input_side_camera_forward_z" type="text" value="0.0">
+                        </div>
+                        <label>up</label>
+                        <div id="div_input_side_camera_up" class="horizontal_div_3">
+                            <input id="input_side_camera_up_x" type="text" value="0.0">
+                            <input id="input_side_camera_up_y" type="text" value="0.0">
+                            <input id="input_side_camera_up_z" type="text" value="1.0">
+                        </div>
+                    </div>            
+                </fieldset>
+            </div>
+
         </div>
         <div class="column column-two">
             <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
@@ -108,28 +161,7 @@
                     </fieldset>
                     <fieldset id="fieldset_seeds">
                     </fieldset>
-                    <fieldset>
-                        <button type="button" id="button_update_camera">update camera</button>
-                        <label></label>
-                        <label>position</label>
-                        <div id="div_input_camera_position" class="horizontal_div_3">
-                            <input id="input_camera_position_x" type="text" value="0.5">
-                            <input id="input_camera_position_y" type="text" value="0.5">
-                            <input id="input_camera_position_z" type="text" value="0.5">
-                        </div>
-                        <label>forward</label>
-                        <div id="div_input_camera_forward" class="horizontal_div_3">
-                            <input id="input_camera_forward_x" type="text" value="0.0">
-                            <input id="input_camera_forward_y" type="text" value="1.0">
-                            <input id="input_camera_forward_z" type="text" value="0.0">
-                        </div>
-                        <label>up</label>
-                        <div id="div_input_camera_up" class="horizontal_div_3">
-                            <input id="input_camera_up_x" type="text" value="0.0">
-                            <input id="input_camera_up_y" type="text" value="0.0">
-                            <input id="input_camera_up_z" type="text" value="1.0">
-                        </div>
-                    </fieldset>
+
                     <fieldset>
                         <button type="button" id="button_render_settings">update render settings</button>
                         <label></label>

@@ -67,6 +67,26 @@ fieldset {
     margin-bottom: 2px;
 }
 
+.grid_container{
+    display: grid;
+    grid-template-columns: minmax(max-content, 12vw) auto;
+    grid-template-rows: auto auto;
+    position: relative;
+    padding-bottom: 2em;  
+    gap: 4px; 
+}
+
+.fieldset_camera{
+    display: block;
+}
+
+legend {
+    font-size: 16px;
+    text-align: left;
+    padding: 8px;
+}
+
+
 #fieldset_seeds {
     display: grid;
     grid-template-columns: 1fr;
