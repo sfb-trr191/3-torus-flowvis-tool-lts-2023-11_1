@@ -183,6 +183,12 @@ legend {
     cursor: pointer;
     padding: 14px 16px;
     transition: 0.3s;
+    background-repeat: no-repeat;
+    background-position-x: 8px;
+    background-position-y: 8px;
+    background-size: 32px 32px;
+    height: 48px;  
+    width: 48px;
 }
 
 /* Change background color of buttons on hover */
@@ -230,4 +236,28 @@ legend {
 
 .button_changed{
     background-color: rgb(255, 128, 0);
+}
+
+#button_tab_data{
+    background-image: url("icons/data-storage.png");
+}
+
+#button_tab_settings{
+    background-image: url("icons/settings.png");
+}
+
+#button_tab_information{
+    background-image: url("icons/info.png");
+}
+
+#button_tab_edit{
+    background-image: url("icons/pencil.png");
+}
+
+#button_tab_export{
+    background-image: url("icons/export.png");
+}
+
+#button_tab_help{
+    background-image: url("icons/question.png");
 }
