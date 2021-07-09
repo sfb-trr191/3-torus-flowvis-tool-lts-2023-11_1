@@ -347,7 +347,7 @@ class Camera {
         var UP = glMatrix.vec3.fromValues(0, 1, 0);
 
 
-        var handedness = left_handed ? 1 : -1;
+        var handedness = left_handed ? -1 : 1;
         var invert = true;
 
         var deltaX = x - this.xMouse_old;
@@ -378,7 +378,7 @@ class Camera {
     }
 
     RollLeft(deltaTime, left_handed) {
-        var handedness = left_handed ? 1 : -1;
+        var handedness = left_handed ? -1 : 1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
         glMatrix.quat.setAxisAngle(quaternion, this.forward, deltaTime * this.rollspeed * handedness);//quaternion = QQuaternion::fromAxisAndAngle(forward, deltaTime * -rollSpeed * handedness) * quaternion;
@@ -387,7 +387,7 @@ class Camera {
     }
 
     RollRight(deltaTime, left_handed) {
-        var handedness = left_handed ? 1 : -1;
+        var handedness = left_handed ? -1 : 1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
         glMatrix.quat.setAxisAngle(quaternion, this.forward, deltaTime * -this.rollspeed * handedness);//quaternion = QQuaternion::fromAxisAndAngle(forward, deltaTime * -rollSpeed * handedness) * quaternion;
@@ -447,7 +447,7 @@ class Camera {
 
     moveUp(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
-        var handedness = this.left_handed ? 1 : -1;
+        var handedness = this.left_handed ? -1 : 1;
 
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (deltaTime * v * handedness));
@@ -459,7 +459,7 @@ class Camera {
 
     moveDown(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
-        var handedness = this.left_handed ? 1 : -1;
+        var handedness = this.left_handed ? -1 : 1;
 
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (deltaTime * v * handedness));
