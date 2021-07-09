@@ -64,15 +64,17 @@ fieldset {
     display: grid;
     grid-template-columns: 200px 1fr;
     gap: 4px;
-    margin-bottom: 2px;
+    margin: 4px 4px 4px 4px;
+    padding: 4px 4px 4px 0px;
 }
 
 .grid_container{
     display: grid;
-    grid-template-columns: minmax(max-content, 12vw) auto;
+    grid-template-columns: 200px 1fr;
     grid-template-rows: auto auto;
     position: relative;
-    padding-bottom: 2em;  
+    margin: 0px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
     gap: 4px; 
 }
 
@@ -114,7 +116,6 @@ legend {
 .horizontal_div_2 {
     display: inline-grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 4px;
     gap: 4px;
 }
 

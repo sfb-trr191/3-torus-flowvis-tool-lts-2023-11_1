@@ -30,6 +30,7 @@ class TabManager{
 
     initTabs(){
         var tab_group_main = new TabGroup(this, "tab_group_main");
+        tab_group_main.addTab("tab_data", "button_tab_data", "tabcontent_data");
         tab_group_main.addTab("tab_settings", "button_tab_settings", "tabcontent_settings");
         tab_group_main.addTab("tab_information", "button_tab_information", "tabcontent_information");
         tab_group_main.addTab("tab_edit", "button_tab_edit", "tabcontent_edit");

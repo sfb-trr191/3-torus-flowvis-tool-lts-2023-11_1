@@ -331,6 +331,10 @@
     }
 
     function addOnClickTabs() {
+        document.getElementById("button_tab_data").addEventListener("click", function () {
+            console.log("onClick: button_tab_data");
+            tab_manager.selectTab("tab_group_main", "tab_data");
+        });
         document.getElementById("button_tab_settings").addEventListener("click", function () {
             console.log("onClick: button_tab_settings");
             tab_manager.selectTab("tab_group_main", "tab_settings");

@@ -88,7 +88,7 @@ class InputParameterWrapper {
         var tab = urlParams.get(PARAM_TAB_MAIN);
         var invalid_tab = tab === null || tab === "";
         if(invalid_tab)
-            tab = "tab_settings";
+            tab = "tab_data";
         this.tab_manager.selectTab("tab_group_main", tab);
     }
 

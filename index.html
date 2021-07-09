@@ -69,7 +69,7 @@
             <p id="message_display">activate javascript to see the content</p>
             <div class="container">
                 <fieldset class="fieldset_camera">
-                    <legend>Main Camera</legend>    
+                    <legend>Main Camera</legend>
                     <div class="grid_container">
                         <button type="button" id="button_update_camera">update camera</button>
                         <label></label>
@@ -91,10 +91,10 @@
                             <input id="input_camera_up_y" type="text" value="0.0">
                             <input id="input_camera_up_z" type="text" value="1.0">
                         </div>
-                    </div>            
+                    </div>
                 </fieldset>
                 <fieldset class="fieldset_camera">
-                    <legend>Side Camera</legend>    
+                    <legend>Side Camera</legend>
                     <div class="grid_container">
                         <button type="button" id="button_update_side_camera">update camera</button>
                         <label></label>
@@ -116,7 +116,7 @@
                             <input id="input_side_camera_up_y" type="text" value="0.0">
                             <input id="input_side_camera_up_z" type="text" value="1.0">
                         </div>
-                    </div>            
+                    </div>
                 </fieldset>
             </div>
 
@@ -125,123 +125,135 @@
             <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
                 HTML5 canvas.</canvas>
             <div class="tab">
+                <button id="button_tab_data" class="tablink">data</button>
                 <button id="button_tab_settings" class="tablink">settings</button>
                 <button id="button_tab_information" class="tablink">information</button>
                 <button id="button_tab_edit" class="tablink">edit</button>
                 <button id="button_tab_export" class="tablink">export</button>
                 <button id="button_tab_help" class="tablink">?</button>
             </div>
-            <div id="tabcontent_settings" class="tabcontent">
+            <div id="tabcontent_data" class="tabcontent">
                 <form>
-                    <fieldset>
-                        <button type="button" id="button_request_data">calculate</button>
-                        <button type="button" id="button_update_url">update url</button>
-                        <label>u</label>
-                        <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
-                        <label>v</label>
-                        <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
-                        <label>w</label>
-                        <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
-                        <label>points per streamline</label>
-                        <input id="input_num_points_per_streamline" type="text" value="2000">
-                        <label>step size</label>
-                        <input id="input_step_size" type="text" value="0.0125">
-                        <label>duplicator iterations</label>
-                        <input id="segment_duplicator_iterations" type="text" value="1">
-                    </fieldset>
-                    <fieldset>
-                        <button type="button" id="button_add_seed">add streamline seed</button>
-                        <div id="div_buttons_rng" class="horizontal_div_2">
-                            <button type="button" id="button_randomize_seed_positions">randomize positions</button>
-                            <button type="button" id="button_randomize_seed_colors">randomize colors</button>
-                            <!--
-                            <button type="button" id="button_randomize_seed_positions_new_seed">new rng</button>
-                            <input id="input_random_position_seed" type="text" value="1">
-                            -->
+                    <fieldset class="fieldset_camera">
+                        <div class="grid_container">
+                            <button type="button" id="button_request_data">calculate</button>
+                            <button type="button" id="button_update_url">update url</button>
+                            <label>u</label>
+                            <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
+                            <label>v</label>
+                            <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+                            <label>w</label>
+                            <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
+                            <label>points per streamline</label>
+                            <input id="input_num_points_per_streamline" type="text" value="2000">
+                            <label>step size</label>
+                            <input id="input_step_size" type="text" value="0.0125">
+                            <label>duplicator iterations</label>
+                            <input id="segment_duplicator_iterations" type="text" value="1">
                         </div>
-
                     </fieldset>
+                    <fieldset class="fieldset_camera">
+                        <div class="grid_container">
+                            <button type="button" id="button_add_seed">add streamline seed</button>
+                            <div id="div_buttons_rng" class="horizontal_div_2">
+                                <button type="button" id="button_randomize_seed_positions">randomize positions</button>
+                                <button type="button" id="button_randomize_seed_colors">randomize colors</button>
+                                <!--
+                                <button type="button" id="button_randomize_seed_positions_new_seed">new rng</button>
+                                <input id="input_random_position_seed" type="text" value="1">
+                                -->
+                            </div>                            
+                        </div>
+                    </fieldset class="fieldset_camera">
                     <fieldset id="fieldset_seeds">
-                    </fieldset>
-
-                    <fieldset>
-                        <button type="button" id="button_render_settings">update render settings</button>
-                        <label></label>
-                        <label>panning resolution factor</label>
-                        <input id="input_panning_resolution_factor" type="text" value="0.5">
-                        <label>max distance</label>
-                        <div id="div_input_max_distance" class="horizontal_div_2">
-                            <input id="input_max_ray_distance" type="text" value="100">
-                            <input class="input_readonly" id="input_limited_max_ray_distance" type="text" value="100"
-                                readonly>
-                        </div>
-                        <label>fog type</label>
-                        <select id="select_fog_type">
-                            <option value="2">exponential</option>
-                            <option value="3">squared exponential</option>
-                            <option value="1">linear</option>
-                            <option value="0">none</option>
-                        </select>
-                        <label>fog density</label>
-                        <input id="input_fog_density" type="text" value="0.01">
-                        <label>streamline shading</label>
-                        <select id="select_shading_mode_streamlines">
-                            <option value="0">id</option>
-                            <option value="1">scalar</option>
-                        </select>
-                        <label>scalar field</label>
-                        <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)">
-                        <label>scalar field debug</label>
-                        <input id="input_formula_scalar_float" class="input_readonly" type="text" value="" readonly>                        
-                        <label>scalar range</label>
-                        <div id="div_buttons_rng" class="horizontal_div_2">
-                            <input id="input_min_scalar" type="text" value="-1.0">
-                            <input id="input_max_scalar" type="text" value="1.0">
-                        </div>
-                        <label>tube radius factor</label>
-                        <input id="input_tube_radius_factor" type="text" value="1.0">
-                        <label>LOD still</label>
-                        <select id="select_lod_still">
-                            <option value="0">raw</option>
-                            <option value="1">high</option>
-                            <option value="2">medium</option>
-                            <option value="3">low</option>
-                        </select>
-                        <label>LOD panning</label>
-                        <select id="select_lod_panning">
-                            <option value="0">raw</option>
-                            <option value="1">high</option>
-                            <option value="2">medium</option>
-                            <option value="3">low</option>
-                        </select>
                     </fieldset>
                 </form>
             </div>
-            <div id="tabcontent_information" class="tabcontent">
+            <div id="tabcontent_settings" class="tabcontent">
+                <form>
+                    <fieldset class="fieldset_camera">
+                        <div class="grid_container">
+                            <button type="button" id="button_render_settings">update render settings</button>
+                            <label></label>
+                            <label>panning resolution factor</label>
+                            <input id="input_panning_resolution_factor" type="text" value="0.5">
+                            <label>max distance</label>
+                            <div id="div_input_max_distance" class="horizontal_div_2">
+                                <input id="input_max_ray_distance" type="text" value="100">
+                                <input class="input_readonly" id="input_limited_max_ray_distance" type="text"
+                                    value="100" readonly>
+                            </div>
+                            <label>fog type</label>
+                            <select id="select_fog_type">
+                                <option value="2">exponential</option>
+                                <option value="3">squared exponential</option>
+                                <option value="1">linear</option>
+                                <option value="0">none</option>
+                            </select>
+                            <label>fog density</label>
+                            <input id="input_fog_density" type="text" value="0.01">
+                            <label>streamline shading</label>
+                            <select id="select_shading_mode_streamlines">
+                                <option value="0">id</option>
+                                <option value="1">scalar</option>
+                            </select>
+                            <label>scalar field</label>
+                            <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)">
+                            <label>scalar field debug</label>
+                            <input id="input_formula_scalar_float" class="input_readonly" type="text" value="" readonly>
+                            <label>scalar range</label>
+                            <div id="div_buttons_rng" class="horizontal_div_2">
+                                <input id="input_min_scalar" type="text" value="-1.0">
+                                <input id="input_max_scalar" type="text" value="1.0">
+                            </div>
+                            <label>tube radius factor</label>
+                            <input id="input_tube_radius_factor" type="text" value="1.0">
+                            <label>LOD still</label>
+                            <select id="select_lod_still">
+                                <option value="0">raw</option>
+                                <option value="1">high</option>
+                                <option value="2">medium</option>
+                                <option value="3">low</option>
+                            </select>
+                            <label>LOD panning</label>
+                            <select id="select_lod_panning">
+                                <option value="0">raw</option>
+                                <option value="1">high</option>
+                                <option value="2">medium</option>
+                                <option value="3">low</option>
+                            </select>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
 
+            <div id="tabcontent_information" class="tabcontent">
+                
             </div>
             <div id="tabcontent_edit" class="tabcontent">
 
             </div>
             <div id="tabcontent_export" class="tabcontent">
                 <form>
-                    <fieldset>
-                        <button type="button" id="button_export">export</button>
-                        <button type="button" id="button_export_update_url">update url</button>
-                        <label>thumbnail URL</label>
-                        <input id="input_thumbnail" type="text" value="">
-                        <label>latex thumbnail dir</label>
-                        <input id="input_thumbnail_directory" type="text" value="images/">
-                        <label>latex thumbnail file</label>
-                        <input id="input_thumbnail_name" type="text" value="thumbnail">
-                        <label>selected tab</label>
-                        <select id="select_tab">
-                            <option value="tab_settings">settings</option>
-                            <option value="tab_information">information</option>
-                            <option value="tab_edit">edit</option>
-                            <option value="tab_export">export</option>
-                            <option value="tab_help">help</option>
-                        </select>
+                    <fieldset class="fieldset_camera">
+                        <div class="grid_container">
+                            <button type="button" id="button_export">export</button>
+                            <button type="button" id="button_export_update_url">update url</button>
+                            <label>thumbnail URL</label>
+                            <input id="input_thumbnail" type="text" value="">
+                            <label>latex thumbnail dir</label>
+                            <input id="input_thumbnail_directory" type="text" value="images/">
+                            <label>latex thumbnail file</label>
+                            <input id="input_thumbnail_name" type="text" value="thumbnail">
+                            <label>selected tab</label>
+                            <select id="select_tab">
+                                <option value="tab_settings">settings</option>
+                                <option value="tab_information">information</option>
+                                <option value="tab_edit">edit</option>
+                                <option value="tab_export">export</option>
+                                <option value="tab_help">help</option>
+                            </select>
+                        </div>                        
                     </fieldset>
                     <!--
                     <div id="h_export_warnings" class="warning">
@@ -296,7 +308,8 @@
             </div>
             <div id="tabcontent_help" class="tabcontent">
                 <div>
-                    <h1><a href="https://christian-lang-git.github.io/reeb-vector-fields-web-tutorial/index.html">Reeb Vector Fields Web Tutorial</a></h1>
+                    <h1><a href="https://christian-lang-git.github.io/reeb-vector-fields-web-tutorial/index.html">Reeb
+                            Vector Fields Web Tutorial</a></h1>
                 </div>
             </div>
         </div>
