@@ -22,7 +22,9 @@ class UniformLocationsRayTracing {
         this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");       
         this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");  
         this.location_show_fat_origin = gl.getUniformLocation(program, "show_fat_origin");  
-               
+        this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");  
+        this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");  
+        
     }
 }
 
@@ -87,6 +89,8 @@ class CanvasWrapper {
         this.max_iteration_count = 1;
         this.min_scalar = 0;
         this.max_scalar = 0;
+        this.show_bounding_box = false;
+        this.show_movable_axes = false;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -233,6 +237,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside); 
         gl.uniform1i(this.location_raytracing.location_is_main_renderer, this.is_main_renderer); 
         gl.uniform1i(this.location_raytracing.location_show_fat_origin, this.show_fat_origin); 
+        gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box); 
+        gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes); 
 
         
         

@@ -169,6 +169,8 @@ uniform bool cut_at_cube_faces;
 uniform bool handle_inside;
 uniform bool is_main_renderer;
 uniform bool show_fat_origin;
+uniform bool show_bounding_box;
+uniform bool show_movable_axes;
 
 uniform int width;
 uniform int height;
@@ -190,8 +192,6 @@ const bool blinn_phong = true;//DUMMY
 
 const float x_axesPixelOffset = 0.85;
 const float y_axesPixelOffset = 0.75;
-const bool show_bounding_box = true;
-const bool render_movable_axes = true;
 
 uniform GL_CameraData active_camera;
 
@@ -432,7 +432,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
 	HitInformation hitCube;
 
 	//#decision render_movable_axes
-    if(render_movable_axes){
+    if(show_movable_axes){
         Ray rayPixelOffset = GenerateRayWithPixelOffset(x_offset, y_offset);
         IntersectMovableAxes(rayPixelOffset, maxRayDistance, hit, hitCube);
         if(hit.hitType > TYPE_NONE)
