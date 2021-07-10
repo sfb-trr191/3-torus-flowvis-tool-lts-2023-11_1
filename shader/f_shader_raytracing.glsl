@@ -1680,7 +1680,7 @@ void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInf
 
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube){
     bool check_bounds = false;
-    int corner_index = is_main_renderer ? 0 : 1;
+    int corner_index = is_main_renderer ? 0 : 11;
     IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, corner_index);
 }
 
@@ -1690,8 +1690,14 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
 	//index 2 is the main camera orientation
 	//indices 3 to 10 are the axes
 	//index 11 is the fat origin axes
+
+    //index 0 is the movable axes
+    //index 1 is the other camera orientation
+    //indices 2 to 9 are the axes
+	//index 10 is the fat origin axes
 	int additional_index = show_origin_axes ? 1 : 0;
-	for(int i=3; i<11+additional_index; i++)
+    int offset = is_main_renderer ? 0 : 11;
+	for(int i=offset+2; i<offset+10+additional_index; i++)
 		IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, i);
 
 }

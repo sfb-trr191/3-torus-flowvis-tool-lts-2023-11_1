@@ -20,6 +20,7 @@
     var input_manager;
     var mouse_manager;
     var input_changed_manager;
+    var hide_manager;
     var lights;
     var streamline_context_static;//the static streamlines
     var streamline_context_dynamic;//interactive streamline placement
@@ -66,6 +67,7 @@
         message_display = document.getElementById("message_display");
 
         input_changed_manager = new InputChangedManager();
+        hide_manager = new HideManager();
         main_camera = new Camera("main_camera", input_changed_manager);
         side_camera = new Camera("side_camera", input_changed_manager);
 
@@ -157,6 +159,8 @@
 
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, tab_manager);
         input_parameter_wrapper.fromURL();
+
+        hide_manager.UpdateVisibility();
 
         message_display.innerHTML = "calculating...";
         setTimeout(on_start_delayed, 1000);
@@ -374,6 +378,29 @@
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
         settings_changed = true;
+
+        var cube_axes_radius_main = parseFloat(document.getElementById("input_cube_axes_radius_main").value);
+        var cube_axes_radius_origin_main = 0;
+        var cube_axes_length_main = parseFloat(document.getElementById("input_cube_axes_length_main").value);
+        var cube_axes_length_origin_main = 0;
+        var camera_axes_invert_color_main = true;
+        var cube_use_axes_colors_main = true;
+
+        var cube_axes_radius_side = parseFloat(document.getElementById("input_cube_axes_radius_side").value);
+        var cube_axes_radius_origin_side = parseFloat(document.getElementById("input_cube_axes_origin_radius_side").value);
+        var cube_axes_length_side = parseFloat(document.getElementById("input_cube_axes_length_side").value);
+        var cube_axes_length_origin_side = parseFloat(document.getElementById("input_cube_axes_origin_length_side").value);
+        var camera_axes_invert_color_side = true;
+        var cube_use_axes_colors_side = true;
+        object_manager.SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main, 
+            cube_axes_length_main, cube_axes_length_origin_main,
+            camera_axes_invert_color_main, cube_use_axes_colors_main,
+            cube_axes_radius_side, cube_axes_radius_origin_side, 
+            cube_axes_length_side, cube_axes_length_origin_side,
+            camera_axes_invert_color_side, cube_use_axes_colors_side);
+
+        console.log(object_manager.cylinders);
+
         //MAIN
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
@@ -387,7 +414,7 @@
         canvas_wrapper_main.is_main_renderer = true;
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
-        canvas_wrapper_main.show_origin_axes = document.getElementById("checkbox_show_origin_axes_main").checked;
+        canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
         
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;

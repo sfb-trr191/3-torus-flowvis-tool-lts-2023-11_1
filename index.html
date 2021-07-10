@@ -20,6 +20,7 @@
     <script src="input_manager.js" type="text/javascript"> </script>
     <script src="mouse_manager.js" type="text/javascript"> </script>
     <script src="input_changed_manager.js" type="text/javascript"> </script>
+    <script src="hide_manager.js" type="text/javascript"> </script>
     <script src="ui_seeds.js" type="text/javascript"> </script>
     <script src="tab_manager.js" type="text/javascript"> </script>
     <script src="input_parameter_wrapper.js" type="text/javascript"> </script>
@@ -141,7 +142,8 @@
                             <label>u</label>
                             <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
                             <label>v</label>
-                            <input id="input_field_equation_v" type="text" value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+                            <input id="input_field_equation_v" type="text"
+                                value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
                             <label>w</label>
                             <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
                             <label>points per streamline</label>
@@ -162,7 +164,7 @@
                                 <button type="button" id="button_randomize_seed_positions_new_seed">new rng</button>
                                 <input id="input_random_position_seed" type="text" value="1">
                                 -->
-                            </div>                            
+                            </div>
                         </div>
                     </fieldset class="fieldset_camera">
                     <fieldset id="fieldset_seeds">
@@ -173,91 +175,158 @@
                 <form>
                     <fieldset class="fieldset_camera">
                         <legend>General</legend>
-                        <div class="grid_container">
+                        <div class="vertical_container">
                             <button type="button" id="button_render_settings">update render settings</button>
-                            <label></label>
-                            <label>max distance</label>
-                            <div id="div_input_max_distance" class="horizontal_div_2">
-                                <input id="input_max_ray_distance" type="text" value="100">
-                                <input class="input_readonly" id="input_limited_max_ray_distance" type="text"
-                                    value="100" readonly>
-                            </div>   
-                            <label>tube radius factor</label>
-                            <input id="input_tube_radius_factor" type="text" value="1.0">
+                            <div class="input_row">
+                                <label>show settings</label>
+                                <select id="select_settings_mode">
+                                    <option value="0">basic</option>
+                                    <option value="1">advanced</option>
+                                    <option value="2">debug</option>
+                                </select>
+                            </div>
+                            <div class="input_row">
+                                <label>max distance</label>
+                                <div id="div_input_max_distance" class="horizontal_div_2">
+                                    <input id="input_max_ray_distance" type="text" value="100">
+                                    <input class="input_readonly" id="input_limited_max_ray_distance" type="text"
+                                        value="100" readonly>
+                                </div>
+                            </div>
+                            <div class="input_row">
+                                <label>tube radius factor</label>
+                                <input id="input_tube_radius_factor" type="text" value="1.0">
+                            </div>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
                         <legend>Shading</legend>
-                        <div class="grid_container">
-                            <label>streamline shading</label>
-                            <select id="select_shading_mode_streamlines">
-                                <option value="0">id</option>
-                                <option value="1">scalar</option>
-                            </select>
-                            <label>scalar field</label>
-                            <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)">
-                            <label>scalar field debug</label>
-                            <input id="input_formula_scalar_float" class="input_readonly" type="text" value="" readonly>
-                            <label>scalar range</label>
-                            <div id="div_buttons_rng" class="horizontal_div_2">
-                                <input id="input_min_scalar" type="text" value="-1.0">
-                                <input id="input_max_scalar" type="text" value="1.0">
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>streamline shading</label>
+                                <select id="select_shading_mode_streamlines">
+                                    <option value="0">id</option>
+                                    <option value="1">scalar</option>
+                                </select>
+                            </div>
+                            <div class="input_row">
+                                <label>scalar field</label>
+                                <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)">
+                            </div>
+                            <div class="input_row" id="input_row_scalar_field_debug">
+                                <label>scalar field debug</label>
+                                <input id="input_formula_scalar_float" class="input_readonly" type="text" value=""
+                                    readonly>
+                            </div>
+                            <div class="input_row">
+                                <label>scalar range</label>
+                                <div id="div_buttons_rng" class="horizontal_div_2">
+                                    <input id="input_min_scalar" type="text" value="-1.0">
+                                    <input id="input_max_scalar" type="text" value="1.0">
+                                </div>
                             </div>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
                         <legend>Fog</legend>
-                        <div class="grid_container">
-                            <label>fog type</label>
-                            <select id="select_fog_type">
-                                <option value="2">exponential</option>
-                                <option value="3">squared exponential</option>
-                                <option value="1">linear</option>
-                                <option value="0">none</option>
-                            </select>
-                            <label>fog density</label>
-                            <input id="input_fog_density" type="text" value="0.01">
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>fog type</label>
+                                <select id="select_fog_type">
+                                    <option value="2">exponential</option>
+                                    <option value="3">squared exponential</option>
+                                    <option value="1">linear</option>
+                                    <option value="0">none</option>
+                                </select>
+                            </div>
+                            <div class="input_row">
+                                <label>fog density</label>
+                                <input id="input_fog_density" type="text" value="0.01">
+                            </div>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
                         <legend>Axes</legend>
-                        <div class="grid_container">
-                            <label>show top right axes</label>
-                            <div class="horizontal_div_2">
-                                <input id="checkbox_show_movable_axes_main" type="checkbox" value="true" checked="true">
-                                <input id="checkbox_show_movable_axes_side" type="checkbox" value="true" >
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>show top right axes</label>
+                                <div class="horizontal_div_2">
+                                    <input id="checkbox_show_movable_axes_main" type="checkbox" value="true"
+                                        checked="true">
+                                    <input id="checkbox_show_movable_axes_side" type="checkbox" value="true">
+                                </div>
                             </div>
-                            <label>show bounding axes</label>
-                            <div class="horizontal_div_2">
-                                <input id="checkbox_show_bounding_axes_main" type="checkbox" value="true" >
-                                <input id="checkbox_show_bounding_axes_side" type="checkbox" value="true" checked="true">
+                            <div class="input_row">
+                                <label>show bounding axes</label>
+                                <div class="horizontal_div_2">
+                                    <input id="checkbox_show_bounding_axes_main" type="checkbox" value="true">
+                                    <input id="checkbox_show_bounding_axes_side" type="checkbox" value="true"
+                                        checked="true">
+                                </div>
                             </div>
-                            <label>emphasize origin axes</label>
-                            <div class="horizontal_div_2">
-                                <input id="checkbox_show_origin_axes_main" type="checkbox" value="true" disabled="disabled">
-                                <input id="checkbox_show_origin_axes_side" type="checkbox" value="true" checked="true">
+                            <div class="input_row">
+                                <label>length</label> 
+                                <div class="horizontal_div_2">
+                                    <input id="input_cube_axes_length_main" type="text" value="0.25">      
+                                    <input id="input_cube_axes_length_side" type="text" value="0.1">      
+                                </div>                      
+                            </div>                                 
+                            <div class="input_row">
+                                <label>radius</label> 
+                                <div class="horizontal_div_2">
+                                    <input id="input_cube_axes_radius_main" type="text" value="0.01">      
+                                    <input id="input_cube_axes_radius_side" type="text" value="0.01">      
+                                </div>                      
+                            </div>  
+                            <div class="input_row">
+                                <label>emphasize origin axes</label>
+                                <div class="horizontal_div_2">
+                                    <label></label>      
+                                    <input id="checkbox_show_origin_axes_side" type="checkbox" value="true"
+                                        checked="true">
+                                </div>
                             </div>
+                            <div class="input_row">
+                                <label>length</label> 
+                                <div class="horizontal_div_2">
+                                    <label></label>          
+                                    <input id="input_cube_axes_origin_length_side" type="text" value="0.9">      
+                                </div>                      
+                            </div>                                 
+                            <div class="input_row">
+                                <label>radius</label> 
+                                <div class="horizontal_div_2">
+                                    <label></label>      
+                                    <input id="input_cube_axes_origin_radius_side" type="text" value="0.01">      
+                                </div>                      
+                            </div>  
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
                         <legend>Quality</legend>
-                        <div class="grid_container">
-                            <label>panning resolution factor</label>
-                            <input id="input_panning_resolution_factor" type="text" value="0.5">
-                            <label>LOD still</label>
-                            <select id="select_lod_still">
-                                <option value="0">raw</option>
-                                <option value="1">high</option>
-                                <option value="2">medium</option>
-                                <option value="3">low</option>
-                            </select>
-                            <label>LOD panning</label>
-                            <select id="select_lod_panning">
-                                <option value="0">raw</option>
-                                <option value="1">high</option>
-                                <option value="2">medium</option>
-                                <option value="3">low</option>
-                            </select>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>panning resolution factor</label>
+                                <input id="input_panning_resolution_factor" type="text" value="0.5">
+                            </div>
+                            <div class="input_row">
+                                <label>LOD still</label>
+                                <select id="select_lod_still">
+                                    <option value="0">raw</option>
+                                    <option value="1">high</option>
+                                    <option value="2">medium</option>
+                                    <option value="3">low</option>
+                                </select>
+                            </div>
+                            <div class="input_row">
+                                <label>LOD panning</label>
+                                <select id="select_lod_panning">
+                                    <option value="0">raw</option>
+                                    <option value="1">high</option>
+                                    <option value="2">medium</option>
+                                    <option value="3">low</option>
+                                </select>
+                            </div>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
@@ -289,7 +358,7 @@
             </div>
 
             <div id="tabcontent_information" class="tabcontent">
-                
+
             </div>
             <div id="tabcontent_edit" class="tabcontent">
 
@@ -314,7 +383,7 @@
                                 <option value="tab_export">export</option>
                                 <option value="tab_help">help</option>
                             </select>
-                        </div>                        
+                        </div>
                     </fieldset>
                     <!--
                     <div id="h_export_warnings" class="warning">
@@ -372,7 +441,8 @@
                     <h1><a href="https://christian-lang-git.github.io/reeb-vector-fields-web-tutorial/index.html">Reeb
                             Vector Fields Web Tutorial</a></h1>
                 </div>
-                <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+                <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
+                        href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
             </div>
         </div>
     </div>

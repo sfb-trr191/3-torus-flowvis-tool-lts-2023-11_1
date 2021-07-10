@@ -78,6 +78,26 @@ fieldset {
     gap: 4px; 
 }
 
+.input_row{
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto auto;
+    position: relative;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+    gap: 0px; 
+}
+
+.vertical_container{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 0px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
+    gap: 4px; 
+}
+
 .fieldset_camera{
     display: block;
 }

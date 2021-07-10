@@ -13,20 +13,25 @@ class ObjectManager {
         this.movable_axes_state_side.SetSettings(offset_forward_side, 0, 0);
         //this.movable_axes_state_main2.SetSettings(0, 0, 0);
 
-        this.AddAxes();
+        this.AddAxes(true);
+        this.AddAxes(false);
         this.CalculateMatrices();
         console.log("this.cylinders: ", this.cylinders);
     }
 
-    AddAxes() {
+    AddAxes(is_main) {
         var radius = 0.01;
         var position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
         var directions = glMatrix.vec3.fromValues(1, 1, 1);
-        this.AddAxesCorner(position, directions, false, radius);//main movable axes
-        this.AddAxesCorner(position, directions, false, radius);//multi movable axes
-        this.AddAxesCorner(position, directions, false, radius);//main camera orientation
+        this.AddAxesCorner(position, directions, false, radius);//main or multi movable axes
+        this.AddAxesCorner(position, directions, false, radius);//other camera orientation
 
         //8 CORNERS
+        if (is_main)
+            this.INDEX_CYLINDER_FIRST_CUBE_AXES_MAIN = this.cylinders.length;
+        else
+            this.INDEX_CYLINDER_FIRST_CUBE_AXES_SIDE = this.cylinders.length;
+
         for (var x = 0; x < 2; x++)
             for (var y = 0; y < 2; y++)
                 for (var z = 0; z < 2; z++) {
@@ -43,6 +48,77 @@ class ObjectManager {
         position = glMatrix.vec3.fromValues(0, 0, 0);
         directions = glMatrix.vec3.fromValues(1, 1, 1);
         this.AddAxesCorner(position, directions, false, radius);
+    }
+
+    SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main, 
+        cube_axes_length_main, cube_axes_length_origin_main,
+        camera_axes_invert_color_main, cube_use_axes_colors_main,
+        cube_axes_radius_side, cube_axes_radius_origin_side, 
+        cube_axes_length_side, cube_axes_length_origin_side,
+        camera_axes_invert_color_side, cube_use_axes_colors_side) {
+        if (this.cube_axes_radius_main == cube_axes_radius_main
+            && this.cube_axes_radius_origin_main == cube_axes_radius_origin_main
+            && this.cube_axes_length_main == cube_axes_length_main
+            && this.cube_axes_length_origin_main == cube_axes_length_origin_main
+            && this.camera_axes_invert_color_main == camera_axes_invert_color_main
+            && this.cube_use_axes_colors_main == cube_use_axes_colors_main
+            && this.cube_axes_radius_side == cube_axes_radius_side
+            && this.cube_axes_radius_origin_side == cube_axes_radius_origin_side
+            && this.cube_axes_length_side == cube_axes_length_side
+            && this.cube_axes_length_origin_side == cube_axes_length_origin_side
+            && this.camera_axes_invert_color_side == camera_axes_invert_color_side
+            && this.cube_use_axes_colors_side == cube_use_axes_colors_side)
+            return;
+            
+        this.cube_axes_radius_main = cube_axes_radius_main;
+        this.cube_axes_radius_origin_main = cube_axes_radius_origin_main;
+        this.cube_axes_length_main = cube_axes_length_main;
+        this.cube_axes_length_origin_main = cube_axes_length_origin_main;
+        this.camera_axes_invert_color_main = camera_axes_invert_color_main;
+        this.cube_use_axes_colors_main = cube_use_axes_colors_main;
+
+        this.cube_axes_radius_side = cube_axes_radius_side;
+        this.cube_axes_radius_origin_side = cube_axes_radius_origin_side;
+        this.cube_axes_length_side = cube_axes_length_side;
+        this.cube_axes_length_origin_side = cube_axes_length_origin_side;
+        this.camera_axes_invert_color_side = camera_axes_invert_color_side;
+        this.cube_use_axes_colors_side = cube_use_axes_colors_side;
+
+        this.RecalculateAxes(true, this.INDEX_CYLINDER_FIRST_CUBE_AXES_MAIN, cube_axes_radius_main, cube_axes_radius_origin_main, cube_axes_length_main, cube_axes_length_origin_main);
+        this.RecalculateAxes(false, this.INDEX_CYLINDER_FIRST_CUBE_AXES_SIDE, cube_axes_radius_side, cube_axes_radius_origin_side, cube_axes_length_side, cube_axes_length_origin_side);
+    }
+
+    RecalculateAxes(is_main, start_index_cube_axes, cube_axes_radius, cube_axes_radius_origin, cube_axes_length, cube_axes_length_origin) {
+        var position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        var directions = glMatrix.vec3.fromValues(1, 1, 1);
+        //recalculate the dynamic axes
+        //for now skipped
+        //this.RecalculateAxesCorner(position, directions, false, radius);//main movable axes
+        //this.RecalculateAxesCorner(position, directions, false, radius);//multi movable axes
+        //this.RecalculateAxesCorner(position, directions, false, radius);//main camera orientation
+
+        //8 CORNERS
+        console.log("RecalculateAxes: ", start_index_cube_axes);
+        var start_index = start_index_cube_axes;
+        var radius = cube_axes_radius;
+        var length = cube_axes_length;
+        for (var x = 0; x < 2; x++)
+            for (var y = 0; y < 2; y++)
+                for (var z = 0; z < 2; z++) {
+                    var xx = x == 0 ? 1 : -1;
+                    var yy = y == 0 ? 1 : -1;
+                    var zz = z == 0 ? 1 : -1;
+                    position = glMatrix.vec3.fromValues(x, y, z);
+                    directions = glMatrix.vec3.fromValues(xx, yy, zz);
+                    start_index = this.RecalculateAxesCorner(position, directions, start_index, radius, length);
+                }
+
+        //FAT ORIGIN AXES
+        radius = cube_axes_radius_origin;
+        length = cube_axes_length_origin;
+        position = glMatrix.vec3.fromValues(0, 0, 0);
+        directions = glMatrix.vec3.fromValues(1, 1, 1);
+        start_index = this.RecalculateAxesCorner(position, directions, start_index, radius, length);
     }
 
     AddAxesCorner(position, directions, invert_color, radius) {
@@ -87,6 +163,45 @@ class ObjectManager {
         cylinder.position_b = vec4fromvec3(position_v_z, 1);
         cylinder.color = invert_color ? glMatrix.vec4.fromValues(1, 1, 0, 1) : glMatrix.vec4.fromValues(0, 0, 1, 1);
         this.cylinders.push(cylinder);
+    }
+
+    RecalculateAxesCorner(position, directions, start_index, radius, length) {
+        var v_x = glMatrix.vec3.fromValues(length, 0, 0);
+        var v_y = glMatrix.vec3.fromValues(0, length, 0);
+        var v_z = glMatrix.vec3.fromValues(0, 0, length);
+
+        var v_x_scaled = glMatrix.vec3.create();
+        var v_y_scaled = glMatrix.vec3.create();
+        var v_z_scaled = glMatrix.vec3.create();
+        var position_v_x = glMatrix.vec3.create();
+        var position_v_y = glMatrix.vec3.create();
+        var position_v_z = glMatrix.vec3.create();
+
+        glMatrix.vec3.scale(v_x_scaled, v_x, directions[0]);
+        glMatrix.vec3.scale(v_y_scaled, v_y, directions[1]);
+        glMatrix.vec3.scale(v_z_scaled, v_z, directions[2]);
+
+        glMatrix.vec3.add(position_v_x, position, v_x_scaled);
+        glMatrix.vec3.add(position_v_y, position, v_y_scaled);
+        glMatrix.vec3.add(position_v_z, position, v_z_scaled);
+
+
+        var cylinder = this.cylinders[start_index];
+        cylinder.radius = radius;
+        cylinder.position_a = vec4fromvec3(position, 1);
+        cylinder.position_b = vec4fromvec3(position_v_x, 1);
+
+        var cylinder = this.cylinders[start_index + 1];
+        cylinder.radius = radius;
+        cylinder.position_a = vec4fromvec3(position, 1);
+        cylinder.position_b = vec4fromvec3(position_v_y, 1);
+
+        var cylinder = this.cylinders[start_index + 2];
+        cylinder.radius = radius;
+        cylinder.position_a = vec4fromvec3(position, 1);
+        cylinder.position_b = vec4fromvec3(position_v_z, 1);
+
+        return start_index + 3;
     }
 
     CalculateMatrices() {
@@ -195,17 +310,17 @@ class ObjectManager {
         */
     }
 
-    Update(){
-        if(this.movable_axes_state_main.dirty){
+    Update() {
+        if (this.movable_axes_state_main.dirty) {
             this.movable_axes_state_main.Update(this.cylinders[0], this.cylinders[1], this.cylinders[2]);
             this.dirty = true;
         }
-        if(this.movable_axes_state_side.dirty){
-            this.movable_axes_state_side.Update(this.cylinders[3], this.cylinders[4], this.cylinders[5]);
+        if (this.movable_axes_state_side.dirty) {
+            this.movable_axes_state_side.Update(this.cylinders[33], this.cylinders[34], this.cylinders[35]);
             this.dirty = true;
         }
 
-        if(this.dirty){
+        if (this.dirty) {
             this.CalculateMatrices();
         }
     }
