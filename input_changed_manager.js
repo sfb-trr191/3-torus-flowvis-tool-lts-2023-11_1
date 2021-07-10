@@ -119,7 +119,13 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
-        this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));    
+        this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));   
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_main"));   
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_side"));    
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_radius_main"));   
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_radius_side"));   
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_origin_length_side"));   
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_origin_radius_side"));   
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_main"));    
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_side"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_main"));  
