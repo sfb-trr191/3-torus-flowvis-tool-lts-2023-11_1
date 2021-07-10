@@ -385,9 +385,9 @@
         canvas_wrapper_main.cut_at_cube_faces = false;
         canvas_wrapper_main.handle_inside = false;
         canvas_wrapper_main.is_main_renderer = true;
-        canvas_wrapper_main.show_fat_origin = false;
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
+        canvas_wrapper_main.show_origin_axes = document.getElementById("checkbox_show_origin_axes_main").checked;
         
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
@@ -421,10 +421,9 @@
         canvas_wrapper_side.cut_at_cube_faces = true;
         canvas_wrapper_side.handle_inside = false;
         canvas_wrapper_side.is_main_renderer = false;
-        canvas_wrapper_side.show_fat_origin = true;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
-        
+        canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
 
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;

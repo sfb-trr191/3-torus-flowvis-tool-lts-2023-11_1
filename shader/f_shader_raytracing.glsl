@@ -168,7 +168,7 @@ uniform float max_scalar;
 uniform bool cut_at_cube_faces;
 uniform bool handle_inside;
 uniform bool is_main_renderer;
-uniform bool show_fat_origin;
+uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
 
@@ -1690,7 +1690,7 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
 	//index 2 is the main camera orientation
 	//indices 3 to 10 are the axes
 	//index 11 is the fat origin axes
-	int additional_index = show_fat_origin ? 1 : 0;
+	int additional_index = show_origin_axes ? 1 : 0;
 	for(int i=3; i<11+additional_index; i++)
 		IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, i);
 

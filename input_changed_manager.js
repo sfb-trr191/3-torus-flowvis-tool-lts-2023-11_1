@@ -124,6 +124,8 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_side"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_side"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
     }
 
     LinkUISeeds(ui_seeds){
