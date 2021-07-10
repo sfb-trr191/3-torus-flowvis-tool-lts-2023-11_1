@@ -103,7 +103,8 @@ class Camera {
         //console.log("FromInput");
         this.position = new_vec3_from_input(this.input_camera_position_x, this.input_camera_position_y, this.input_camera_position_z);
         this.forward = new_vec3_from_input(this.input_camera_forward_x, this.input_camera_forward_y, this.input_camera_forward_z);
-        this.up = new_vec3_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z);
+        var up_negated = new_vec3_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z);
+        glMatrix.vec3.negate(this.up, up_negated);
         this.changed = true;
     }
 
@@ -112,15 +113,17 @@ class Camera {
             return;
         //console.log("WriteToInputFields")
         var decimals = 6;
+        var up_negated = glMatrix.vec3.create();
+        glMatrix.vec3.negate(up_negated, this.up);
         this.input_camera_position_x.value = this.position[0].toFixed(decimals);
         this.input_camera_position_y.value = this.position[1].toFixed(decimals);
         this.input_camera_position_z.value = this.position[2].toFixed(decimals);
         this.input_camera_forward_x.value = this.forward[0].toFixed(decimals);
         this.input_camera_forward_y.value = this.forward[1].toFixed(decimals);
         this.input_camera_forward_z.value = this.forward[2].toFixed(decimals);
-        this.input_camera_up_x.value = this.up[0].toFixed(decimals);
-        this.input_camera_up_y.value = this.up[1].toFixed(decimals);
-        this.input_camera_up_z.value = this.up[2].toFixed(decimals);
+        this.input_camera_up_x.value = up_negated[0].toFixed(decimals);
+        this.input_camera_up_y.value = up_negated[1].toFixed(decimals);
+        this.input_camera_up_z.value = up_negated[2].toFixed(decimals);
         this.input_changed_manager.UpdateDefaultValues(this.name);
     }
 
@@ -347,7 +350,7 @@ class Camera {
         var UP = glMatrix.vec3.fromValues(0, 1, 0);
 
 
-        var handedness = left_handed ? -1 : 1;
+        var handedness = left_handed ? 1 : -1;
         var invert = true;
 
         var deltaX = x - this.xMouse_old;
@@ -378,7 +381,7 @@ class Camera {
     }
 
     RollLeft(deltaTime, left_handed) {
-        var handedness = left_handed ? -1 : 1;
+        var handedness = left_handed ? 1 : -1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
         glMatrix.quat.setAxisAngle(quaternion, this.forward, deltaTime * this.rollspeed * handedness);//quaternion = QQuaternion::fromAxisAndAngle(forward, deltaTime * -rollSpeed * handedness) * quaternion;
@@ -387,7 +390,7 @@ class Camera {
     }
 
     RollRight(deltaTime, left_handed) {
-        var handedness = left_handed ? -1 : 1;
+        var handedness = left_handed ? 1 : -1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
         glMatrix.quat.setAxisAngle(quaternion, this.forward, deltaTime * -this.rollspeed * handedness);//quaternion = QQuaternion::fromAxisAndAngle(forward, deltaTime * -rollSpeed * handedness) * quaternion;
@@ -447,7 +450,7 @@ class Camera {
 
     moveUp(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
-        var handedness = this.left_handed ? -1 : 1;
+        var handedness = this.left_handed ? 1 : -1;
 
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (deltaTime * v * handedness));
@@ -459,7 +462,7 @@ class Camera {
 
     moveDown(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
-        var handedness = this.left_handed ? -1 : 1;
+        var handedness = this.left_handed ? 1 : -1;
 
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (deltaTime * v * handedness));

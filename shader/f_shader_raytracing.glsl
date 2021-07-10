@@ -470,7 +470,7 @@ Ray GenerateRay(float x_offset, float y_offset)
 	//float j = float(height) - gl_FragCoord[1];//y
 	float j = gl_FragCoord[1];//y
 	//if(!left_handed)
-	//	j = float(height) - gl_FragCoord[1];//y
+		j = float(height) - gl_FragCoord[1];//y
 	vec3 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
 	vec3 r_ij = normalize(p_ij);
 	
@@ -502,7 +502,7 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 	float j = gl_FragCoord[1] - (y_axesPixelOffset * height_f * 0.5);//y
 	//j = gl_FragCoord[1];//y
 	//if(!left_handed)
-	//	j = height_f - gl_FragCoord[1] + (y_axesPixelOffset * height_f * 0.5);//y
+		j = height_f - gl_FragCoord[1] + (y_axesPixelOffset * height_f * 0.5);//y
 	vec3 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
 	vec3 r_ij = normalize(p_ij);
 	
