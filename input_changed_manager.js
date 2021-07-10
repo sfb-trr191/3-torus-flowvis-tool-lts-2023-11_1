@@ -3,6 +3,7 @@ class InputChangedGroup{
     constructor(name, button){
         this.name = name;
         this.input_list = [];
+        this.checkbox_list = [];
         this.additional_check_list = [];
         this.button = button;
     }
@@ -11,13 +12,19 @@ class InputChangedGroup{
         this.input_list.push(input);
     }
 
+    AddCheckbox(input){
+        this.checkbox_list.push(input);
+        this.input_list.push(input);
+    }
+
     AddAdditionalCheck(input){
         this.additional_check_list.push(input);
     }
 
     UpdateDefaultValues(){
+        this.SynchronizeCheckBoxValues();
         for(var i=0; i<this.input_list.length; i++){
-            this.input_list[i].defaultValue = this.input_list[i].value;
+            this.input_list[i].default_value = this.input_list[i].value;
         }
         for(var i=0; i<this.additional_check_list.length; i++){
             this.additional_check_list[i].UpdateDefaultValues(this.name);
@@ -32,9 +39,16 @@ class InputChangedGroup{
         this.button.className = changed ? "button_changed" : "button";
     }
 
+    SynchronizeCheckBoxValues(){
+        for(var i=0; i<this.checkbox_list.length; i++){
+            this.checkbox_list[i].value = this.checkbox_list[i].checked;
+        }
+    }
+
     HasValueChanged(){
+        this.SynchronizeCheckBoxValues();
         for(var i=0; i<this.input_list.length; i++){
-            if(this.input_list[i].value != this.input_list[i].defaultValue){
+            if(this.input_list[i].value != this.input_list[i].default_value){
                 return true;
             }
         }
@@ -105,7 +119,11 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
-        this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));        
+        this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));    
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_main"));    
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_side"));  
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_main"));  
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_side"));     
     }
 
     LinkUISeeds(ui_seeds){

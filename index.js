@@ -118,9 +118,9 @@
             document.getElementById("input_camera_up_z"));
 
         side_camera.SetRenderSizes(512, 384, 256, 192);
-        side_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
-        side_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
-        side_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
+        side_camera.position = glMatrix.vec3.fromValues(-0.750000, 0.500000, 1.250000);
+        side_camera.forward = glMatrix.vec3.fromValues(0.824459, 0.005006, -0.565899);
+        side_camera.up = glMatrix.vec3.fromValues(0.565852, 0.008385, 0.824465);
 
         side_camera.LinkInput(
             document.getElementById("input_side_camera_position_x"),
