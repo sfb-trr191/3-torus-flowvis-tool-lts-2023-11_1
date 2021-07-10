@@ -15,13 +15,10 @@ class InputRow{
     }
 }
 
-class HideManager{
-    constructor(){        
+class HideGroup{
+    constructor(select_name){
         this.list_input_row = [];
-        this.select = document.getElementById("select_settings_mode");
-
-        this.list_input_row.push(new InputRow("input_row_scalar_field_debug", LEVEL_DEBUG));
-
+        this.select = document.getElementById(select_name);
         this.select.addEventListener("change", (event) => {
             this.UpdateVisibility();
         });
@@ -32,6 +29,26 @@ class HideManager{
         console.log("change: ", level);
         for(var i=0; i<this.list_input_row.length; i++){
             this.list_input_row[i].UpdateVisibility(level);
+        }
+    }
+
+    Add(input_row_name, level){
+        this.list_input_row.push(new InputRow(input_row_name, level));
+    }
+}
+
+class HideManager{
+    constructor(){        
+        this.groups = [];
+
+        this.group_settings = new HideGroup("select_settings_mode");
+        this.group_settings.Add("input_row_scalar_field_debug", LEVEL_DEBUG);
+        this.groups.push(this.group_settings);
+    }
+
+    UpdateVisibility(){
+        for(var i=0; i<this.groups.length; i++){
+            this.groups[i].UpdateVisibility();
         }
     }
 }
