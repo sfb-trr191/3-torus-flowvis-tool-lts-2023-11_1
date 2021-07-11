@@ -151,26 +151,45 @@
             </fieldset class="fieldset_camera">
             <div id="tabcontent_data" class="tabcontent">
                 <form>
-
                     <fieldset class="fieldset_camera">
-                        <div class="grid_container">
-
-                            <label>u</label>
-                            <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
-                            <label>v</label>
-                            <input id="input_field_equation_v" type="text"
-                                value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
-                            <label>w</label>
-                            <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
-                            <label>points per streamline</label>
-                            <input id="input_num_points_per_streamline" type="text" value="2000">
-                            <label>step size</label>
-                            <input id="input_step_size" type="text" value="0.0125">
-                            <label>duplicator iterations</label>
-                            <input id="segment_duplicator_iterations" type="text" value="1">
+                        <legend>Equations</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>u</label>
+                                <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
+                            </div>
+                            <div class="input_row">
+                                <label>v</label>
+                                <input id="input_field_equation_v" type="text"
+                                    value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+                            </div>
+                            <div class="input_row">
+                                <label>w</label>
+                                <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
+                            </div>
                         </div>
                     </fieldset>
-                    <fieldset id="fieldset_seeds">
+                    <fieldset class="fieldset_camera">
+                        <legend>Parameters</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>points per streamline</label>
+                                <input id="input_num_points_per_streamline" type="text" value="2000">
+                            </div>
+                            <div class="input_row">
+                                <label>step size</label>
+                                <input id="input_step_size" type="text" value="0.0125">
+                            </div>
+                            <div class="input_row">
+                                <label>duplicator iterations</label>
+                                <input id="segment_duplicator_iterations" type="text" value="1">
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="fieldset_camera">
+                        <legend>Seeds</legend>
+                        <div class="vertical_container" id="fieldset_seeds">
+                        </div>
                     </fieldset>
                 </form>
             </div>

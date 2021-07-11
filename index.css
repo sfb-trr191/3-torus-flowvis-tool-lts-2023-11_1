@@ -123,13 +123,14 @@ fieldset {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     position: relative;
-    margin: 0px 4px 4px 4px;
+    margin: -8px 4px 4px 4px;
     padding: 0px 0px 0px 0px;
     gap: 4px; 
 }
 
 .fieldset_camera{
     display: block;
+    margin: 0px 4px 0px 4px;
 }
 
 legend {
