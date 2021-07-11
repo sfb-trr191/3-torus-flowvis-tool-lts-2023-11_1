@@ -187,6 +187,7 @@ legend {
 
 .horizontal_div_seed input {
     min-width: 75px;
+    height: 100%;
 }
 
 .horizontal_div_seed button {
