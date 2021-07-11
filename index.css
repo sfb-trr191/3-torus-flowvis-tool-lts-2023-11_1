@@ -365,6 +365,10 @@ legend {
     background-image: url("icons/random_color.png");
 }
 
+#button_render_settings{
+    display: none;
+}
+
 #select_side_mode{
     width: 1fr;
     margin: 4px;
