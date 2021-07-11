@@ -279,6 +279,11 @@
             UpdateRenderSettings();
             UpdateGlobalData();
         });
+        document.getElementById("button_data_update_render_settings").addEventListener("click", function () {
+            console.log("onClickUpdateRenderSettings");
+            UpdateRenderSettings();
+            UpdateGlobalData();
+        });
     }
 
     function addOnClickUpdateCamera() {

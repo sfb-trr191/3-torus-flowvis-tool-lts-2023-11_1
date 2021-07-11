@@ -141,10 +141,19 @@
             </div>
             <div id="tabcontent_data" class="tabcontent">
                 <form>
+                    <fieldset class="toolbar">
+                        <div class="container">
+                            <button type="button" id="button_request_data"></button>
+                            <button type="button" id="button_data_update_render_settings"></button>
+                            <button type="button" id="button_update_url"></button>
+                            <button type="button" id="button_add_seed"></button>
+                            <button type="button" id="button_randomize_seed_positions"></button>
+                            <button type="button" id="button_randomize_seed_colors"></button>
+                        </div>
+                    </fieldset class="fieldset_camera">
                     <fieldset class="fieldset_camera">
                         <div class="grid_container">
-                            <button type="button" id="button_request_data">calculate</button>
-                            <button type="button" id="button_update_url">update url</button>
+
                             <label>u</label>
                             <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
                             <label>v</label>
@@ -160,19 +169,6 @@
                             <input id="segment_duplicator_iterations" type="text" value="1">
                         </div>
                     </fieldset>
-                    <fieldset class="fieldset_camera">
-                        <div class="grid_container">
-                            <button type="button" id="button_add_seed">add streamline seed</button>
-                            <div id="div_buttons_rng" class="horizontal_div_2">
-                                <button type="button" id="button_randomize_seed_positions">randomize positions</button>
-                                <button type="button" id="button_randomize_seed_colors">randomize colors</button>
-                                <!--
-                                <button type="button" id="button_randomize_seed_positions_new_seed">new rng</button>
-                                <input id="input_random_position_seed" type="text" value="1">
-                                -->
-                            </div>
-                        </div>
-                    </fieldset class="fieldset_camera">
                     <fieldset id="fieldset_seeds">
                     </fieldset>
                 </form>

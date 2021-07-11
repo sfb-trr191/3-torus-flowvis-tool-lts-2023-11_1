@@ -317,6 +317,53 @@ legend {
     background-image: url("icons/question.png");
 }
 
+.toolbar{
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+.toolbar button {
+    float: left;
+    cursor: pointer;
+    transition: 0.3s;
+    background-repeat: no-repeat;
+    background-position-x: 2px;
+    background-position-y: 2px;
+    background-size: 32px 32px;
+    height: 40px;  
+    width: 40px;
+    margin: 4px 0px 4px 4px;
+    padding: 0;
+}
+
+#button_request_data{
+    background-image: url("icons/calculator.png");
+}
+
+#button_data_update_render_settings{
+    background-image: url("icons/update_settings_2.png");
+}
+
+#button_update_url{
+    background-image: url("icons/website.png");
+}
+
+#button_add_seed{
+    background-image: url("icons/add_position.png");
+}
+
+#button_randomize_seed_positions{
+    background-image: url("icons/random_position.png");
+}
+
+#button_randomize_seed_colors{
+    background-image: url("icons/random_color.png");
+}
+
 #select_side_mode{
     width: 1fr;
     margin: 4px;

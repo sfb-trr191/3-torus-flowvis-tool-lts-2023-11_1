@@ -1,11 +1,11 @@
 class InputChangedGroup{
 
-    constructor(name, button){
+    constructor(name, button_list){
         this.name = name;
         this.input_list = [];
         this.checkbox_list = [];
         this.additional_check_list = [];
-        this.button = button;
+        this.button_list = button_list;
     }
 
     AddInput(input){
@@ -36,7 +36,9 @@ class InputChangedGroup{
         for(var i=0; i<this.additional_check_list.length; i++){
             changed = changed || this.additional_check_list[i].HasValueChanged(this.name);
         }
-        this.button.className = changed ? "button_changed" : "button";
+        for(var i=0; i<this.button_list.length; i++){
+            this.button_list[i].className = changed ? "button_changed" : "button";
+        }
     }
 
     SynchronizeCheckBoxValues(){
@@ -62,10 +64,11 @@ class InputChangedManager{
     constructor(){
         this.groups = [];
         this.groups_dict = {};
-        this.group_calculate = new InputChangedGroup(GROUP_NAME_CALCULATE, document.getElementById("button_request_data"));
-        this.group_main_camera = new InputChangedGroup(GROUP_NAME_MAIN_CAMERA, document.getElementById("button_update_camera"));
-        this.group_side_camera = new InputChangedGroup(GROUP_NAME_SIDE_CAMERA, document.getElementById("button_update_side_camera"));
-        this.group_render_settings = new InputChangedGroup(GROUP_NAME_RENDER_SETTINGS, document.getElementById("button_render_settings"));
+        this.group_calculate = new InputChangedGroup(GROUP_NAME_CALCULATE, [document.getElementById("button_request_data")]);
+        this.group_main_camera = new InputChangedGroup(GROUP_NAME_MAIN_CAMERA, [document.getElementById("button_update_camera")]);
+        this.group_side_camera = new InputChangedGroup(GROUP_NAME_SIDE_CAMERA, [document.getElementById("button_update_side_camera")]);
+        this.group_render_settings = new InputChangedGroup(GROUP_NAME_RENDER_SETTINGS, 
+            [document.getElementById("button_render_settings"), document.getElementById("button_data_update_render_settings")]);
         this.groups.push(this.group_calculate);
         this.groups.push(this.group_main_camera);
         this.groups.push(this.group_side_camera);
