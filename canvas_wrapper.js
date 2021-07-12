@@ -140,7 +140,8 @@ class CanvasWrapper {
         this.shader_uniforms_ftle_slice = this.loadShaderUniformsFTLESlice(gl, this.program_ftle_slice);
         this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
 
-        this.GenerateDummyBuffer(gl);
+        //this.GenerateDummyBuffer(gl);
+        this.dummy_quad = new DummyQuad(gl);
     }
 
     ReplaceRaytracingShader(gl, shader_formula_scalar) {
@@ -150,20 +151,6 @@ class CanvasWrapper {
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");
-    }
-
-    GenerateDummyBuffer(gl) {
-        this.dummy_buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.dummy_buffer);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array([
-                -1.0, -1.0,
-                1.0, -1.0,
-                -1.0, 1.0,
-                1.0, 1.0]),
-            gl.STATIC_DRAW
-        );
     }
 
     CalculateLimitedMaxRayDistance() {
@@ -298,7 +285,7 @@ class CanvasWrapper {
             this.location_raytracing.location_texture_float_global,
             this.location_raytracing.location_texture_int_global);
 
-        this.drawDummy(gl, this.attribute_location_dummy_program_raytracing);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
     }
 
     drawTextureAverage(gl, render_wrapper, width, height) {
@@ -316,7 +303,7 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_in.texture);
         gl.uniform1i(this.location_average.location_texture2, 1);
 
-        this.drawDummy(gl, this.attribute_location_dummy_program_average);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_average);
     }
 
     //copies data from render_texture_average_out to render_texture_average_in to prepare next frame
@@ -331,7 +318,7 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         gl.uniform1i(this.location_copy.location_texture1, 0);
 
-        this.drawDummy(gl, this.attribute_location_dummy_program_copy);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_copy);
     }
 
     drawResampling(gl, render_wrapper) {
@@ -360,7 +347,7 @@ class CanvasWrapper {
             this.location_resampling.location_texture_float_global,
             this.location_resampling.location_texture_int_global);
 
-        this.drawDummy(gl, this.shader_uniforms_resampling);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_resampling);
     }
 
     drawFTLESlice(gl, render_wrapper) {
@@ -379,18 +366,11 @@ class CanvasWrapper {
             this.location_resampling.location_texture_float_global,
             this.location_resampling.location_texture_int_global);
         */
-        this.drawDummy(gl, this.shader_uniforms_ftle_slice);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_ftle_slice);
     }
 
     isRenderingIncomplete() {
         return this.aliasing_index < this.aliasing.num_rays_per_pixel - 1;
-    }
-
-    drawDummy(gl, location) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.dummy_buffer);
-        gl.enableVertexAttribArray(location);
-        gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
     loadShaderUniformsRayTracing(gl, program) {

@@ -86,6 +86,11 @@
         console.log(gl);
         console.log(gl_side);
 
+        var ext = gl_side.getExtension('EXT_color_buffer_float');
+        if (!ext) {
+            alert("FTLE not supported: could not load EXT_color_buffer_float");
+            return;
+        }
 
         ui_seeds = new UISeeds();
         ui_seeds.generateDefaultSeeds();
@@ -100,9 +105,10 @@
 
         global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager, object_manager);
 
-        ftle_manager = new FTLEManager();
+        shader_manager = new ShaderManager();
 
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
+        ftle_manager = new FTLEManager(gl_side, streamline_context_static, shader_manager);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
@@ -143,7 +149,6 @@
 
 
 
-        shader_manager = new ShaderManager();
 
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, CANVAS_WRAPPER_MAIN,
             main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data);
@@ -272,6 +277,11 @@
             UpdateGlobalData();
             UpdateURL();
         });
+        document.getElementById("button_calculate_ftle").addEventListener("click", function () {
+            console.log("onClickCalculateFTLE");
+            CalculateFTLE();
+        });
+        
     }
 
     function addOnClickUpdateRenderSettings() {
@@ -389,6 +399,10 @@
         streamline_context_static.CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
+    }
+
+    function CalculateFTLE(){
+        ftle_manager.computeFlowMap(gl_side);
     }
 
     function UpdateRenderSettings() {

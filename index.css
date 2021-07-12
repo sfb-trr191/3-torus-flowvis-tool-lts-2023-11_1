@@ -347,6 +347,10 @@ legend {
     background-image: url("icons/calculator.png");
 }
 
+#button_calculate_ftle{
+    background-image: url("icons/calculate_ftle.png");
+}
+
 #button_data_update_render_settings{
     background-image: url("icons/update_settings_2.png");
 }

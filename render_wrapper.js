@@ -4,18 +4,15 @@ class RenderTexture {
     texture_settings;
     texture_data;
 
-    constructor(gl, texture_width, texture_height) {
+    constructor(gl, texture_width, texture_height, type, format, internalformat) {
         this.texture = gl.createTexture();
 
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         var target = gl.TEXTURE_2D;
         var level = 0;
-        var internalformat = gl.RGBA;
         var width = texture_width;
         var height = texture_height;
         var border = 0;
-        var format = gl.RGBA;
-        var type = gl.UNSIGNED_BYTE;
 
         this.texture_data = null;
         this.texture_settings = { target, level, internalformat, width, height, border, format, type };
@@ -57,9 +54,12 @@ class RenderWrapper {
     constructor(gl, name, texture_width, texture_height) {
         console.log("Construct RenderWrapper: ", name, texture_width, texture_height)
         this.name = name;
-        this.render_texture = new RenderTexture(gl, texture_width, texture_height);
-        this.render_texture_average_in = new RenderTexture(gl, texture_width, texture_height);
-        this.render_texture_average_out = new RenderTexture(gl, texture_width, texture_height);
+        var type = gl.UNSIGNED_BYTE;
+        var format = gl.RGBA;
+        var internalformat = gl.RGBA;
+        this.render_texture = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
+        this.render_texture_average_in = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
+        this.render_texture_average_out = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
 
         const attachmentPoint = gl.COLOR_ATTACHMENT0;
 
@@ -95,5 +95,32 @@ class RenderWrapper {
         //const attachmentPoint = gl.COLOR_ATTACHMENT0;
         //gl.framebufferTexture2D(
         //    gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, this.render_texture.texture, this.render_texture.texture_settings.level);
+    }
+}
+
+class ComputeWrapper {
+
+    constructor(gl, name, texture_width, texture_height) {
+        console.log("Construct ComputeWrapper: ", name, texture_width, texture_height)
+        this.name = name;
+        var type = gl.FLOAT;
+        var format = gl.RGBA;
+        var internalformat = gl.RGBA32F;
+        //var type = gl.UNSIGNED_BYTE;
+        //var format = gl.RGBA;
+        //var internalformat = gl.RGBA;
+        this.render_texture = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
+
+        const attachmentPoint = gl.COLOR_ATTACHMENT0;
+
+        this.frame_buffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.frame_buffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D,
+            this.render_texture.texture, this.render_texture.texture_settings.level);
+    }
+
+    resize(gl, texture_width, texture_height) {
+        console.log("resize ComputeWrapper: ", this.name, texture_width, texture_height)
+        this.render_texture.resize(gl, texture_width, texture_height);
     }
 }
