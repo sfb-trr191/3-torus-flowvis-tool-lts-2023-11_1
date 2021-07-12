@@ -28,6 +28,7 @@
     <script src="shader/f_shader_average.glsl" type="text/javascript"> </script>
     <script src="shader/f_shader_copy.glsl" type="text/javascript"> </script>
     <script src="shader/f_shader_resampling.glsl" type="text/javascript"> </script>
+    <script src="shader/f_shader_placeholder.glsl" type="text/javascript"> </script>
     <script src="shader/v_shader_raytracing.glsl" type="text/javascript"> </script>
     <script src="shader/v_shader_resampling.glsl" type="text/javascript"> </script>
     <script src="shader_manager.js" type="text/javascript"> </script>
@@ -128,8 +129,9 @@
                     HTML5 canvas.</canvas>
             </div>
             <select id="select_side_mode">
-                <option value="0">hide</option>
-                <option selected value="1">cube</option>
+                <option value="0">hide</option><!--DRAW_MODE_NONE-->
+                <option selected value="1">cube</option><!--DRAW_MODE_DEFAULT-->
+                <option value="2">FTLE slice</option><!--DRAW_MODE_FTLE_SLICE-->                
             </select>
             <div class="tab">
                 <button id="button_tab_data" class="tablink"></button>

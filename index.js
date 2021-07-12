@@ -57,6 +57,7 @@
         addOnClickUpdateURL();
         addOnClickExport();
         addOnClickTabs();
+        addChangedSideMode();
         //testWebGPU();
 
         tab_manager = new TabManager();
@@ -366,6 +367,13 @@
         document.getElementById("button_tab_help").addEventListener("click", function () {
             console.log("onClick: button_tab_help");
             tab_manager.selectTab("tab_group_main", "tab_help");
+        });
+    }
+
+    function addChangedSideMode(){
+        document.getElementById("select_side_mode").addEventListener("change", (event) => {
+            var value = document.getElementById("select_side_mode").value;
+            canvas_wrapper_side.set_draw_mode(parseInt(value));
         });
     }
 

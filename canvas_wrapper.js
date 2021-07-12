@@ -13,18 +13,18 @@ class UniformLocationsRayTracing {
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
-        this.location_fog_density = gl.getUniformLocation(program, "fog_density");     
-        this.location_fog_type = gl.getUniformLocation(program, "fog_type");     
-        this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");   
-        this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");   
-        this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");      
-        this.location_cut_at_cube_faces = gl.getUniformLocation(program, "cut_at_cube_faces");    
-        this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");       
-        this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");  
-        this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");  
-        this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");  
-        this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");  
-        
+        this.location_fog_density = gl.getUniformLocation(program, "fog_density");
+        this.location_fog_type = gl.getUniformLocation(program, "fog_type");
+        this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");
+        this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
+        this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
+        this.location_cut_at_cube_faces = gl.getUniformLocation(program, "cut_at_cube_faces");
+        this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");
+        this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");
+        this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
+        this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
+        this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
+
     }
 }
 
@@ -64,6 +64,14 @@ class UniformLocationsResampling {
     }
 }
 
+class UniformLocationsFTLESlice {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsFTLESlice: ", name)
+        this.location_width = gl.getUniformLocation(program, "width");
+        this.location_height = gl.getUniformLocation(program, "height");
+    }
+}
+
 class CanvasWrapper {
 
     constructor(gl, streamline_context_static, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data) {
@@ -92,6 +100,7 @@ class CanvasWrapper {
         this.show_bounding_box = false;
         this.show_movable_axes = false;
         this.show_origin_axes = false;
+        this.draw_mode = DRAW_MODE_DEFAULT;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -124,20 +133,26 @@ class CanvasWrapper {
         this.location_resampling = new UniformLocationsResampling(gl, this.program_resampling);
         this.shader_uniforms_resampling = this.loadShaderUniformsResampling(gl, this.program_resampling);
         this.attribute_location_dummy_program_resampling = gl.getAttribLocation(this.program_resampling, "a_position");
+        
+        this.program_ftle_slice = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_ftle_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
+        this.location_ftle_slice = new UniformLocationsFTLESlice(gl, this.program_ftle_slice);
+        this.shader_uniforms_ftle_slice = this.loadShaderUniformsFTLESlice(gl, this.program_ftle_slice);
+        this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
 
         this.GenerateDummyBuffer(gl);
     }
 
-    ReplaceRaytracingShader(gl, shader_formula_scalar){
+    ReplaceRaytracingShader(gl, shader_formula_scalar) {
         console.log("ReplaceRaytracingShader");
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetShader(shader_formula_scalar));
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
+        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");
     }
 
-    GenerateDummyBuffer(gl){
+    GenerateDummyBuffer(gl) {
         this.dummy_buffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.dummy_buffer);
         gl.bufferData(
@@ -148,19 +163,19 @@ class CanvasWrapper {
                 -1.0, 1.0,
                 1.0, 1.0]),
             gl.STATIC_DRAW
-            );
+        );
     }
 
-    CalculateLimitedMaxRayDistance(){
-        var d = this.fog_density;         
+    CalculateLimitedMaxRayDistance() {
+        var d = this.fog_density;
         this.limited_max_distance = this.max_ray_distance;
-        if (this.fog_type == FOG_EXPONENTIAL){            
-            this.limited_max_distance = Math.min(this.max_ray_distance, 6.90776/d);//js allows division by zero;
+        if (this.fog_type == FOG_EXPONENTIAL) {
+            this.limited_max_distance = Math.min(this.max_ray_distance, 6.90776 / d);//js allows division by zero;
         }
-        else if (this.fog_type == FOG_EXPONENTIAL_SQUARED){
+        else if (this.fog_type == FOG_EXPONENTIAL_SQUARED) {
             //see https://www.wolframalpha.com/input/?i=e%5E%28-%28d*z%29%5E2%29+%3E+0.001
-            this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d*d)));//js allows division by zero;
-        }              
+            this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d * d)));//js allows division by zero;
+        }
     }
 
     SetRenderSizes(width, height, width_panning, height_panning) {
@@ -171,7 +186,7 @@ class CanvasWrapper {
 
     }
 
-    ShouldRenderColorBar(){
+    ShouldRenderColorBar() {
         return this.shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR;
     }
 
@@ -194,22 +209,51 @@ class CanvasWrapper {
         if (this.aliasing_index == this.aliasing.num_rays_per_pixel)
             return;
 
-        if(this.aliasing_index > 0 && !mouse_in_canvas)
+        if (this.aliasing_index > 0 && !mouse_in_canvas)
             return;
 
         //console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);
         //console.log("offset_x: ", this.aliasing.offset_x[this.aliasing_index]);
         //console.log("offset_y: ", this.aliasing.offset_y[this.aliasing_index]);
-        console.log("draw CanvasWrapper: ", this.name);
-        console.log("CanvasWrapper gl: ", gl)
-        console.log("CanvasWrapper canvas: ", this.canvas)
+        //console.log("draw CanvasWrapper: ", this.name);
+        //console.log("CanvasWrapper gl: ", gl)
+        //console.log("CanvasWrapper canvas: ", this.canvas)
         var left_render_wrapper = this.camera.IsPanningOrForced() ? this.render_wrapper_raytracing_panning_left : this.render_wrapper_raytracing_still_left
+
+        switch (this.draw_mode) {
+            case DRAW_MODE_DEFAULT:
+                this.draw_mode_raytracing(gl, left_render_wrapper);
+                break;        
+            case DRAW_MODE_FTLE_SLICE:
+                this.draw_mode_ftle_slice(gl, left_render_wrapper);
+                break;    
+            default:
+                console.log("DRAW MODE ERROR", this.draw_mode);
+                break;
+        }
+        
+
+        this.aliasing_index += 1;
+    }
+
+    set_draw_mode(draw_mode){
+        if(this.draw_mode == draw_mode)
+            return;
+        console.log("change draw mode: ", draw_mode);
+        this.draw_mode = draw_mode;
+        this.aliasing_index = 0;
+        this.camera.changed = true;
+    }
+
+    draw_mode_raytracing(gl, left_render_wrapper) {
         this.drawTextureRaytracing(gl, left_render_wrapper);
         this.drawTextureAverage(gl, left_render_wrapper);
         this.drawResampling(gl, left_render_wrapper);
         this.drawTextureSumCopy(gl, left_render_wrapper);
+    }
 
-        this.aliasing_index += 1;
+    draw_mode_ftle_slice(gl, left_render_wrapper) {
+        this.drawFTLESlice(gl, left_render_wrapper);
     }
 
     drawTextureRaytracing(gl, render_wrapper, width, height) {
@@ -232,16 +276,16 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
         gl.uniform1f(this.location_raytracing.location_min_scalar, this.min_scalar);
-        gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar); 
+        gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar);
 
-        gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces); 
-        gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside); 
-        gl.uniform1i(this.location_raytracing.location_is_main_renderer, this.is_main_renderer); 
-        gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box); 
-        gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes); 
-        gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes); 
-        
-        
+        gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces);
+        gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside);
+        gl.uniform1i(this.location_raytracing.location_is_main_renderer, this.is_main_renderer);
+        gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box);
+        gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
+        gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
+
+
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(this.name, active_lod, gl,
@@ -249,9 +293,9 @@ class CanvasWrapper {
             this.location_raytracing.location_texture_float,
             this.location_raytracing.location_texture_int);
 
-        this.global_data.bind(this.name, gl, 
-            this.shader_uniforms_raytracing, 
-            this.location_raytracing.location_texture_float_global, 
+        this.global_data.bind(this.name, gl,
+            this.shader_uniforms_raytracing,
+            this.location_raytracing.location_texture_float_global,
             this.location_raytracing.location_texture_int_global);
 
         this.drawDummy(gl, this.attribute_location_dummy_program_raytracing);
@@ -311,19 +355,38 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         gl.uniform1i(this.location_resampling.location_texture2, 1);
         */
-        this.global_data.bind(this.name, gl, 
-            this.shader_uniforms_resampling, 
-            this.location_resampling.location_texture_float_global, 
+        this.global_data.bind(this.name, gl,
+            this.shader_uniforms_resampling,
+            this.location_resampling.location_texture_float_global,
             this.location_resampling.location_texture_int_global);
 
         this.drawDummy(gl, this.shader_uniforms_resampling);
     }
 
-    isRenderingIncomplete(){
+    drawFTLESlice(gl, render_wrapper) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, this.canvas_width, this.canvas_height);
+        gl.useProgram(this.program_ftle_slice);
+        gl.uniform1i(this.location_ftle_slice.location_width, this.canvas_width);
+        gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
+
+        //gl.activeTexture(gl.TEXTURE0);
+        //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
+        //gl.uniform1i(this.location_resampling.location_texture1, 0);
+        /*
+        this.global_data.bind(this.name, gl,
+            this.shader_uniforms_resampling,
+            this.location_resampling.location_texture_float_global,
+            this.location_resampling.location_texture_int_global);
+        */
+        this.drawDummy(gl, this.shader_uniforms_ftle_slice);
+    }
+
+    isRenderingIncomplete() {
         return this.aliasing_index < this.aliasing.num_rays_per_pixel - 1;
     }
 
-    drawDummy(gl, location){
+    drawDummy(gl, location) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.dummy_buffer);
         gl.enableVertexAttribArray(location);
         gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
@@ -351,7 +414,7 @@ class CanvasWrapper {
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }
-    
+
     loadShaderUniformsAverage(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();
@@ -375,6 +438,12 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
 
+        program_shader_uniforms.print();
+        return program_shader_uniforms;
+    }
+
+    loadShaderUniformsFTLESlice(gl, program) {
+        var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }
