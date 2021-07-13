@@ -69,12 +69,18 @@ class UniformLocationsFTLESlice {
         console.log("UniformLocationsFTLESlice: ", name)
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_height = gl.getUniformLocation(program, "height");
+        this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
+        this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
+        this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
+        this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
     }
 }
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data) {
+    constructor(gl, streamline_context_static, ftle_manager, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
@@ -85,6 +91,7 @@ class CanvasWrapper {
         this.shader_manager = shader_manager;
         this.global_data = global_data;
         this.p_streamline_context_static = streamline_context_static;
+        this.p_ftle_manager = ftle_manager;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
         this.tube_radius = 0;
@@ -101,6 +108,9 @@ class CanvasWrapper {
         this.show_movable_axes = false;
         this.show_origin_axes = false;
         this.draw_mode = DRAW_MODE_DEFAULT;
+        this.draw_slice_index = 0;
+        this.ftle_min_scalar = 0;
+        this.ftle_max_scalar = 1;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -133,9 +143,9 @@ class CanvasWrapper {
         this.location_resampling = new UniformLocationsResampling(gl, this.program_resampling);
         this.shader_uniforms_resampling = this.loadShaderUniformsResampling(gl, this.program_resampling);
         this.attribute_location_dummy_program_resampling = gl.getAttribLocation(this.program_resampling, "a_position");
-        
+
         this.program_ftle_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_ftle_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
+        loadShaderProgramFromCode(gl, this.program_ftle_slice, V_SHADER_RAYTRACING, F_SHADER_FLOW_MAP_SLICE);
         this.location_ftle_slice = new UniformLocationsFTLESlice(gl, this.program_ftle_slice);
         this.shader_uniforms_ftle_slice = this.loadShaderUniformsFTLESlice(gl, this.program_ftle_slice);
         this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
@@ -210,21 +220,21 @@ class CanvasWrapper {
         switch (this.draw_mode) {
             case DRAW_MODE_DEFAULT:
                 this.draw_mode_raytracing(gl, left_render_wrapper);
-                break;        
+                break;
             case DRAW_MODE_FTLE_SLICE:
                 this.draw_mode_ftle_slice(gl, left_render_wrapper);
-                break;    
+                break;
             default:
                 console.log("DRAW MODE ERROR", this.draw_mode);
                 break;
         }
-        
+
 
         this.aliasing_index += 1;
     }
 
-    set_draw_mode(draw_mode){
-        if(this.draw_mode == draw_mode)
+    set_draw_mode(draw_mode) {
+        if (this.draw_mode == draw_mode)
             return;
         console.log("change draw mode: ", draw_mode);
         this.draw_mode = draw_mode;
@@ -356,16 +366,30 @@ class CanvasWrapper {
         gl.useProgram(this.program_ftle_slice);
         gl.uniform1i(this.location_ftle_slice.location_width, this.canvas_width);
         gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
-
+        gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
+        gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
+        gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
+        
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         //gl.uniform1i(this.location_resampling.location_texture1, 0);
-        /*
+        
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_flowmap.texture.texture);
+        gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
+
         this.global_data.bind(this.name, gl,
-            this.shader_uniforms_resampling,
-            this.location_resampling.location_texture_float_global,
-            this.location_resampling.location_texture_int_global);
+            this.shader_uniforms_ftle_slice,
+            this.location_ftle_slice.location_texture_float_global,
+            this.location_ftle_slice.location_texture_int_global);
+        
+        /*
+         this.p_ftle_manager.bind(this.name, gl,
+             this.shader_uniforms_ftle_slice,
+             this.location_ftle_slice.location_texture_flow_map);
         */
+
+
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_ftle_slice);
     }
 
@@ -424,6 +448,15 @@ class CanvasWrapper {
 
     loadShaderUniformsFTLESlice(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
+        program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_streamline_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_streamline_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_scalar_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }

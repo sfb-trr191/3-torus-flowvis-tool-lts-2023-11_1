@@ -1,3 +1,5 @@
+const TRANSFER_FUNCTION_BINS = 512;
+
 class TransferFunctionPoint {
     constructor(t, r, g, b) {
         this.t = t;
@@ -68,7 +70,7 @@ class TransferFunctionManager {
     }
 
     CreateGreenLinear() {
-        var transfer_function = new TransferFunction("Green Linear", 128);
+        var transfer_function = new TransferFunction("Green Linear", TRANSFER_FUNCTION_BINS);
         this.transfer_functions[transfer_function.name] = transfer_function;
 
         transfer_function.addPoint(0.00, 255, 252, 247);

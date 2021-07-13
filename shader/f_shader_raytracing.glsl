@@ -142,6 +142,8 @@ const int SHADING_MODE_STREAMLINES_ID = 0;
 const int SHADING_MODE_STREAMLINES_SCALAR = 1;
 
 const float PI = 3.1415926535897932384626433832795;
+const int TRANSFER_FUNCTION_BINS = 512;
+const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -1305,8 +1307,8 @@ vec3 GetObjectColor(inout HitInformation hit)
         {
             float scalar = GetScalar(hit.positionCenter);
             float t = (scalar - min_scalar) / (max_scalar - min_scalar);
-            int bin = int(float(127) * t);
-            bin = clamp(bin, 0, 127);
+            int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+            bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
             return GetScalarColor(bin);
         }
 	}

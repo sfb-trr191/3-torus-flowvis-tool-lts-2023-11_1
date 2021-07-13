@@ -68,4 +68,10 @@ function rgbToHex(r, g, b) {
 
 function lerp(a, b, t) {
     return (1 - t) * a + t * b;
-  }
+}
+
+function regexIntToFloat(input_string){
+    return input_string.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+        return ($2 == ".") ? $0 : $0 + ".0";
+    });
+}

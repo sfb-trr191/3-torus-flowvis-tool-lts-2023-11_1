@@ -6,17 +6,73 @@ precision highp sampler3D;
 
 uniform int width;
 uniform int height;
-
+uniform float z;
+uniform float step_size;
+uniform float advection_time;//T
 out vec4 outputColor;
+const int max_iterations = 10;
 
+vec3 f(vec3 vector);
+
+const float PI = 3.1415926535897932384626433832795;
 //! [0]
 void main()
 {
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
-    float t_x = float(x) / float(width);
-    float t_y = float(y) / float(height);
-    outputColor = vec4(t_x,t_y,0,1);
+    float t_x = float(x) / float(width-1);
+    float t_y = float(y) / float(height-1);
+
+    vec3 previous_position = vec3(t_x, t_y, z);
+    vec3 previous_f = f(previous_position);
+    float previous_speed = length(previous_f);
+    float previous_cost = 0.0;//cost = time
+
+    vec3 current_position;
+    vec3 current_f;
+    float current_speed = 0.0;
+    float current_cost = 0.0;//cost = time
+
+    float segment_length = 0.0;
+    float average_speed = 0.0;
+    float arc_length = 0.0;
+    for (int i=0; i<max_iterations; i++){
+        vec3 k1 = step_size * f(previous_position);
+		vec3 k2 = step_size * f(previous_position + k1/2.0);
+		vec3 k3 = step_size * f(previous_position + k2/2.0);
+		vec3 k4 = step_size * f(previous_position + k3);
+				
+		current_position = previous_position + k1 / 6.0 + k2 / 3.0 + k3 / 3.0 + k4 / 6.0;
+        current_f = f(current_position);
+        current_speed = length(current_f);
+        vec3 difference = current_position - previous_position;
+        segment_length = length(difference);
+        arc_length += segment_length;
+        average_speed = (previous_speed + current_speed) * 0.5;
+        current_cost = previous_cost + (segment_length / average_speed);
+
+        //stop if speed is below threshold or advection time is reached
+        if(current_cost > advection_time)
+            break;
+
+        //prepare next iteration
+        previous_position = current_position;
+        previous_f = current_f;
+        previous_cost = current_cost;
+        previous_speed = current_speed;
+    }
+    outputColor = vec4(current_position,arc_length);
+}
+
+vec3 f(vec3 vector)
+{
+	float x = vector.x;
+	float y = vector.y;
+	float z = vector.z;
+	float u = shader_formula_u;
+	float v = shader_formula_v;
+	float w = shader_formula_w;
+	return vec3(u,v,w);	
 }
 
 `;

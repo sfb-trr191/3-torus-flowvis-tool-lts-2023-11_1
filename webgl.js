@@ -65,7 +65,7 @@ function loadShaderProgramFromCode(gl, program, v_source, f_source) {
         return;
     }
 }
-
+/*
 function generateDataTextureFloat(gl) {
     var internalformat = gl.R32F;
     var format = gl.RED;
@@ -128,7 +128,7 @@ function updateDataTexture(gl, texture, texture_data, texture_settings) {
     console.log("depth: " + depth);
     gl.texImage3D(target, level, internalformat, width, height, depth, border, format, type, texture_data);
 }
-
+*/
 function vec4fromvec3(vec3, w) {
     return glMatrix.vec4.fromValues(vec3[0], vec3[1], vec3[2], w);
 }

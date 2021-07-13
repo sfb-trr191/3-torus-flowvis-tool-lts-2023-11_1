@@ -150,9 +150,9 @@
 
 
 
-        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, CANVAS_WRAPPER_MAIN,
+        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, ftle_manager, CANVAS_WRAPPER_MAIN,
             main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data);
-        canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, CANVAS_WRAPPER_SIDE,
+        canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
             side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data);
 
         tick_counter = 0;
@@ -385,6 +385,13 @@
             var value = document.getElementById("select_side_mode").value;
             canvas_wrapper_side.set_draw_mode(parseInt(value));
         });
+
+        document.getElementById("slide_slice_index").addEventListener("change", (event) => {
+            var value = document.getElementById("slide_slice_index").value;
+            canvas_wrapper_side.draw_slice_index = value;
+            canvas_wrapper_side.aliasing_index = 0;
+            console.log("slice_index", value);
+        });        
     }
 
     function CalculateStreamlines() {

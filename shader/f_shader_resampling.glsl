@@ -39,6 +39,8 @@ vec3 GetScalarColor(int index);
 ivec3 GetIndex3D(int global_index);
 //varying vec2 v_texcoord;
 
+const int TRANSFER_FUNCTION_BINS = 512;
+const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 //! [0]
 void main()
 {
@@ -61,8 +63,8 @@ void main()
             outputColor = vec4(1,1,1,1);
             if(x >= color_bar_min_x + color_bar_padding && x <= color_bar_max_x - color_bar_padding && y >= color_bar_min_y_inside && y <= color_bar_max_y_inside){
                 float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
-                int bin = int(float(127) * scalar);
-                bin = clamp(bin, 0, 127);
+                int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
+                bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
                 outputColor = vec4(GetScalarColor(bin),1);
                 return;
             }
