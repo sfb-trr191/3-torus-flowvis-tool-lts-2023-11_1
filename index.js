@@ -13,6 +13,16 @@ const v_shader_resampling = require("./shader/v_shader_resampling.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");
+const {
+    Matrix,
+    inverse,
+    solve,
+    linearDependencies,
+    QrDecomposition,
+    LuDecomposition,
+    CholeskyDecomposition,
+    EigenvalueDecomposition
+  } = require('ml-matrix');
 
 //########## OWN MODULES ##########
 const TabManager = require("./tab_manager");
@@ -100,8 +110,8 @@ const Export = module_export.Export;
         addOnClickTabs();
         addChangedSideMode();
         //testWebGPU();
-
-
+        //testEigenvalueDecomposition();
+        
         tab_manager = new TabManager();
 
         main_canvas = document.getElementById("main_canvas");
@@ -704,6 +714,25 @@ const Export = module_export.Export;
         });
 
         console.log('E');
+    }
+
+    function testEigenvalueDecomposition(){
+        console.log("EigenvalueDecomposition test");
+        var A = new Matrix([[5, 2, 0], [2, 5, 0], [-3, 4, 6]]);
+        var e = new EigenvalueDecomposition(A);
+        var real = e.realEigenvalues;
+        var imaginary = e.imaginaryEigenvalues;
+        var S = e.eigenvectorMatrix;
+        var S_inverse = inverse(S);
+        var J = new Matrix([[real[0], 0, 0], [0, real[1], 0], [0, 0, real[2]]]);
+        var M = S.mmul(J).mmul(S_inverse);
+
+        console.log("real", real);
+        console.log("imaginary", imaginary);
+        console.log("S", S);
+        console.log("J", J);
+        console.log("S_inverse", S_inverse);
+        console.log("reconstructed M", M);
     }
 
     function selectTab(evt, id) {
