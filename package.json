@@ -1,0 +1,32 @@
+{
+  "name": "reeb-vector-fields-web",
+  "version": "1.0.0",
+  "description": "description: TODO",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify index.js -o bundle.js",
+    "watch": "watchify index.js -o bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christian-lang-git/reeb-vector-fields-web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/christian-lang-git/reeb-vector-fields-web/issues"
+  },
+  "homepage": "https://github.com/christian-lang-git/reeb-vector-fields-web#readme",
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "watchify": "^4.0.0"
+  },
+  "dependencies": {
+    "file-saver": "^2.0.5",
+    "gl-matrix": "^3.3.0",
+    "jszip": "^3.6.0",
+    "mathjs": "^9.4.4",
+    "seedrandom": "^3.0.5"
+  }
+}

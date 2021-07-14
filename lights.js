@@ -1,3 +1,6 @@
+const glMatrix = require("gl-matrix");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+
 class Lights {
 
     constructor() {
@@ -29,3 +32,5 @@ class Lights {
         this.dir_lights.push(l2)
     }
 }
+
+module.exports = Lights;

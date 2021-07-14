@@ -1,4 +1,4 @@
-var SHADER_PULSATING = `#version 300 es
+global.SHADER_PULSATING = `#version 300 es
 precision mediump int;
 precision mediump float;
 precision mediump sampler3D;

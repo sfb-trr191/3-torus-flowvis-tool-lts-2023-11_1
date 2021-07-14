@@ -1,3 +1,8 @@
+const RawData = require("./raw_data");
+const StreamlineGenerator = require("./streamline_generator");
+const SegmentDuplicator = require("./segment_duplicator");
+const LODData = require("./lod_data");
+
 class StreamlineContext {
 
     constructor(name, p_lights, ui_seeds, gl, gl_side) {
@@ -113,3 +118,5 @@ class StreamlineContext {
 
 
 }
+
+module.exports = StreamlineContext;

@@ -1,3 +1,5 @@
+const glMatrix = require("gl-matrix");
+
 /*
 Requirements for use in the data container:
 The class must implement:
@@ -270,3 +272,5 @@ class Cylinder {
         arrayf[index_f++] = this.radius;
     }
 }
+
+module.exports = { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder }

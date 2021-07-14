@@ -1,3 +1,5 @@
+const glMatrix = require("gl-matrix");
+
 vec3_add_scalar = function (out, a, s) {
     out[0] = a[0] + s;
     out[1] = a[1] + s;
@@ -35,6 +37,10 @@ vec4_from_vec3_1 = function (out, vec3) {
     return out;
 };
 
+exports.vec4fromvec3 = function(vec3, w) {
+    return glMatrix.vec4.fromValues(vec3[0], vec3[1], vec3[2], w);
+}
+
 new_vec3_from_input = function (field_0, field_1, field_2) {
     var v0 = field_0.value;
     var v1 = field_1.value;
@@ -48,3 +54,4 @@ new_vec3_from_input_name = function (field_name_0, field_name_1, field_name_2) {
     var v2 = document.getElementById(field_name_2).value;
     return glMatrix.vec3.fromValues(v0, v1, v2);
 }
+

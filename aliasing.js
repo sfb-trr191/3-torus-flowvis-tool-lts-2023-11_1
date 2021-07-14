@@ -13,3 +13,5 @@ class Aliasing {
         }
     }
 }
+
+module.exports = Aliasing;

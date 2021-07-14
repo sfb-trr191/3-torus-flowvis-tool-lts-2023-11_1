@@ -1,3 +1,6 @@
+const module_utility = require("./utility");
+const setCSS = module_utility.setCSS;
+
 class InputFieldWrapper {
 
     constructor(input_parameter_wrapper, input_field_name, url_parameter_name) {
@@ -40,7 +43,7 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
         //new InputFieldWrapper(this, "input_random_position_seed", PARAM_RNG_SEED_POSITION);
     }
-    
+
     fromURL() {
         console.log("fromURL:", window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
@@ -67,7 +70,7 @@ class InputParameterWrapper {
         const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
         console.log("thumbnail_url:", thumbnail_url)
         var invalid_thumbnail = thumbnail_url === null || thumbnail_url === "";
-        if(!invalid_thumbnail)
+        if (!invalid_thumbnail)
             document.getElementById("image_thumbnail").src = thumbnail_url;
 
         switch (style) {
@@ -87,7 +90,7 @@ class InputParameterWrapper {
 
         var tab = urlParams.get(PARAM_TAB_MAIN);
         var invalid_tab = tab === null || tab === "";
-        if(invalid_tab)
+        if (invalid_tab)
             tab = "tab_data";
         this.tab_manager.selectTab("tab_group_main", tab);
     }
@@ -127,3 +130,5 @@ class InputParameterWrapper {
         return query_string;
     }
 }
+
+module.exports = InputParameterWrapper;

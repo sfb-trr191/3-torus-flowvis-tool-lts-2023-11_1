@@ -1,4 +1,7 @@
-function Export(input_parameter_wrapper) {
+const JSZip = require("jszip");
+const FileSaver = require("file-saver");
+
+exports.Export = function(input_parameter_wrapper) {
     console.log("Export");
     document.getElementById("button_export").disabled = true;
     var zip = new JSZip();
@@ -28,7 +31,7 @@ function Export(input_parameter_wrapper) {
         zip.file(file_name+".png", blob);
         zip.generateAsync({ type: "blob" })
             .then(function (content) {
-                saveAs(content, "RVF-exported.zip");
+                FileSaver.saveAs(content, "RVF-exported.zip");
                 document.getElementById("button_export").disabled = false;
             });
     });        

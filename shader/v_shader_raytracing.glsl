@@ -1,4 +1,4 @@
-var V_SHADER_RAYTRACING = `#version 300 es
+global.V_SHADER_RAYTRACING = `#version 300 es
 precision highp int;
 precision highp float;
 

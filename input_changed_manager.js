@@ -1,3 +1,5 @@
+//const GROUP_NAME_CALCULATE = require("./const");
+
 class InputChangedGroup{
 
     constructor(name, button_list){
@@ -160,3 +162,5 @@ class InputChangedManager{
         }  
     }
 }
+
+module.exports = InputChangedManager;

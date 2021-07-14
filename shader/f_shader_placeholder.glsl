@@ -1,4 +1,4 @@
-var F_SHADER_PLACEHOLDER = `#version 300 es
+global.F_SHADER_PLACEHOLDER = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
 precision highp float;

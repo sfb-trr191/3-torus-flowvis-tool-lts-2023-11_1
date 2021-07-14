@@ -1,3 +1,5 @@
+const glMatrix = require("gl-matrix");
+
 class AABB {
 
     constructor() {
@@ -84,3 +86,5 @@ class AABB {
         return difference[0] * difference[1] * difference[2];
     }
 }
+
+module.exports = AABB;

@@ -1,3 +1,8 @@
+const glMatrix = require("gl-matrix");
+const module_utility = require("./utility");
+const lerp = module_utility.lerp;
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+
 const TRANSFER_FUNCTION_BINS = 512;
 
 class TransferFunctionPoint {
@@ -89,3 +94,5 @@ class TransferFunctionManager {
         return this.transfer_functions[this.active_transfer_function].list_colors;
     }
 }
+
+module.exports = TransferFunctionManager;

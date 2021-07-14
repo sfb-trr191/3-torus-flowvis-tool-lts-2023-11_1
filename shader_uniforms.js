@@ -50,3 +50,5 @@ class ShaderUniforms {
     }
 
 }
+
+module.exports = ShaderUniforms;

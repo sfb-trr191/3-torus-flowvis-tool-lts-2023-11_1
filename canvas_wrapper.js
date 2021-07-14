@@ -1,3 +1,9 @@
+const DummyQuad = require("./dummy_quad");
+const RenderWrapper = require("./render_wrapper");
+const ShaderUniforms = require("./shader_uniforms");
+const module_webgl = require("./webgl");
+const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
+
 class UniformLocationsRayTracing {
     constructor(gl, program, name) {
         console.log("UniformLocationsRayTracing: ", name)
@@ -462,3 +468,5 @@ class CanvasWrapper {
     }
 
 }
+
+module.exports = CanvasWrapper;

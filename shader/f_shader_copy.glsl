@@ -1,4 +1,4 @@
-var F_SHADER_COPY = `#version 300 es
+global.F_SHADER_COPY = `#version 300 es
 precision highp int;
 precision highp float;
 

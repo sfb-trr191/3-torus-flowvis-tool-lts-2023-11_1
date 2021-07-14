@@ -1,3 +1,12 @@
+const glMatrix = require("gl-matrix");
+const DataUnit = require("./data_unit");
+const DataContainer = require("./data_container");
+const {DataTextures, DataTexture3D_RGBA } = require("./data_textures");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const BVH_AA = require("./bvh_aa");
+const module_utility = require("./utility");
+const distancePointToLine = module_utility.distancePointToLine;
+
 class PolyLineSegment {
 
     constructor() {
@@ -446,3 +455,5 @@ class LODData {
         console.log("nodes: " + this.tree_nodes.length);
     }
 }
+
+module.exports = LODData;

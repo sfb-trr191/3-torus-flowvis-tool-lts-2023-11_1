@@ -68,3 +68,5 @@ class DataContainer {
         this.setByName("total_int_count", this.arrayi.length);
     }
 }
+
+module.exports = DataContainer;

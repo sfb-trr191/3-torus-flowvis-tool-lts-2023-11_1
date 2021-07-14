@@ -1,3 +1,10 @@
+const glMatrix = require("gl-matrix");
+const module_gl_matrix_extensions = require("./gl_matrix_extensions");
+const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
+const MovableAxesState = require("./movable_axes_state");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+
+
 class ObjectManager {
 
     constructor() {
@@ -325,3 +332,5 @@ class ObjectManager {
         }
     }
 }
+
+module.exports = ObjectManager;

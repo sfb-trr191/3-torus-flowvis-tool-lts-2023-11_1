@@ -84,3 +84,6 @@ class HideManager{
         }
     }
 }
+
+
+module.exports = HideManager;

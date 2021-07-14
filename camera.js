@@ -1,3 +1,7 @@
+const glMatrix = require("gl-matrix");
+const module_gl_matrix_extensions = require("./gl_matrix_extensions");
+const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
+
 class GL_CameraData {
     constructor() {
         this.q_x = glMatrix.vec4.create();
@@ -322,7 +326,7 @@ class Camera {
         this.SetCorrectResolution();
     }
 
-    SetCorrectResolution(){
+    SetCorrectResolution() {
         if (this.panning_forced || this.panning) {
             this.width = this.width_panning;
             this.height = this.height_panning;
@@ -484,3 +488,5 @@ class Camera {
     }
 
 }
+
+module.exports = Camera;

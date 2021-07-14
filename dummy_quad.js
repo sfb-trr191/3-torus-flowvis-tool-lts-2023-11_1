@@ -21,3 +21,5 @@ class DummyQuad{
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 }
+
+module.exports = DummyQuad;

@@ -89,7 +89,7 @@ class DataUnit {
         this.texture_size_int_z = Math.ceil(this.total_int_count / (this.texture_size_x * this.texture_size_y));
         //this.texture_size_float_z = 10;//this somehow works on windows
         //this.texture_size_int_z = 10;//this somehow works on windows
-        console.warn(this.texture_size_float_z + ", " + typeof (this.texture_size_float_z));
+        //console.warn(this.texture_size_float_z + ", " + typeof (this.texture_size_float_z));
 
         this.arrayf = new Float32Array(this.texture_size_x * this.texture_size_y * this.texture_size_float_z);
         //this.arrayi = new Int32Array(this.total_int_count);
@@ -142,3 +142,5 @@ class DataUnit {
         target_array.set(source_array, target_start_index);
     }
 }
+
+module.exports = DataUnit;

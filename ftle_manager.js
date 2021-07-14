@@ -1,3 +1,14 @@
+const ComputeWrapper = require("./compute_wraper");
+const ShaderUniforms = require("./shader_uniforms");
+const DummyQuad = require("./dummy_quad");
+const {DataTextures, DataTexture3D_RGBA } = require("./data_textures");
+const module_webgl = require("./webgl");
+const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
+const module_utility = require("./utility");
+const regexIntToFloat = module_utility.regexIntToFloat;
+//const V_SHADER_RAYTRACING = require("./shader/v_shader_raytracing.js");
+//const F_SHADER_PLACEHOLDER = require("./shader/f_shader_placeholder.glsl");
+
 class UniformLocationsComputeFlowMapSlice {
     constructor(gl, program, name) {
         console.log("UniformLocationsComputeFlowMapSlice: ", name)
@@ -103,3 +114,5 @@ class FTLEManager{
         return program_shader_uniforms;
     }
 }
+
+module.exports = FTLEManager;

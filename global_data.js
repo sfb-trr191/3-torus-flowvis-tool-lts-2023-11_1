@@ -1,3 +1,8 @@
+const DataUnit = require("./data_unit");
+const DataContainer = require("./data_container");
+const {DataTextures, DataTexture3D_RGBA } = require("./data_textures");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+
 class GlobalData {
 
     constructor(gl, gl_side, p_lights, p_ui_seeds, p_transfer_function_manager, p_object_manager) {
@@ -65,3 +70,5 @@ class GlobalData {
         shader_uniforms.updateUniforms();
     }
 }
+
+module.exports = GlobalData;

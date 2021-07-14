@@ -184,3 +184,5 @@ class DataTexture3D_RGBA {
         this.texture.update(gl);
     }
 }
+
+module.exports = {DataTextures, DataTexture3D_RGBA };

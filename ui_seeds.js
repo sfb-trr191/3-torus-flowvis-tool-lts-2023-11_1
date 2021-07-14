@@ -1,3 +1,9 @@
+const glMatrix = require("gl-matrix");
+const seedrandom = require("seedrandom");
+const module_utility = require("./utility");
+const rgbToHex = module_utility.rgbToHex;
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+
 class UISeed {
     constructor(ui_seeds, index) {
         this.ui_seeds = ui_seeds;
@@ -137,7 +143,7 @@ class UISeeds {
         this.changed_count = false;
         this.element = document.getElementById("fieldset_seeds");
         this.list = [];
-        this.rng_positions = new Math.seedrandom();
+        this.rng_positions = seedrandom();
         //this.rng_positions_seed_string = 'hello.';
     }
 
@@ -312,3 +318,5 @@ class UISeeds {
 </div>
 </fieldset>
 */
+
+module.exports = UISeeds;

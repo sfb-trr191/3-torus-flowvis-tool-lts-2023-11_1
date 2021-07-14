@@ -21,3 +21,5 @@ class ShaderManager {
         return code;  
     }
 }
+
+module.exports = ShaderManager;

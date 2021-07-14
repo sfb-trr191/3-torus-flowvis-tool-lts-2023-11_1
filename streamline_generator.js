@@ -1,3 +1,6 @@
+const glMatrix = require("gl-matrix");
+const math = require("mathjs");
+
 class StreamlineGenerator {
 
     constructor(p_streamline_context) {
@@ -328,3 +331,5 @@ class StreamlineGenerator {
     }
 
 }
+
+module.exports = StreamlineGenerator;

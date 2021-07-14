@@ -1,3 +1,44 @@
+//########## GLOBALS ##########
+const module_const = require("./const");
+const f_shader_average = require("./shader/f_shader_average.glsl");
+const f_shader_compute_flow_map_slice = require("./shader/f_shader_compute_flow_map_slice.glsl");
+const f_shader_copy = require("./shader/f_shader_copy.glsl");
+const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl");
+const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
+const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
+const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
+const f_shader_sum = require("./shader/f_shader_sum.glsl");
+const v_shader_raytracing = require("./shader/v_shader_raytracing.glsl");
+const v_shader_resampling = require("./shader/v_shader_resampling.glsl");
+
+//########## THIRD PARTY MODULES ##########
+const glMatrix = require("gl-matrix");
+
+//########## OWN MODULES ##########
+const TabManager = require("./tab_manager");
+const InputChangedManager = require("./input_changed_manager");
+const HideManager = require("./hide_manager");
+const Camera = require("./camera");
+const InputManager = require("./input_manager");
+const MouseManager = require("./mouse_manager");
+const module_webgl = require("./webgl");
+const getRenderingContext = module_webgl.getRenderingContext;
+const UISeeds = require("./ui_seeds");
+const Lights = require("./lights");
+const TransferFunctionManager = require("./transfer_function_manager");
+const ObjectManager = require("./object_manager");
+const GlobalData = require("./global_data");
+const ShaderManager = require("./shader_manager");
+const StreamlineContext = require("./streamline_context");
+const FTLEManager = require("./ftle_manager");
+const Aliasing = require("./aliasing");
+const CanvasWrapper = require("./canvas_wrapper");
+const InputParameterWrapper = require("./input_parameter_wrapper");
+const module_utility = require("./utility");
+const setCSS = module_utility.setCSS;
+const module_export = require("./export");
+const Export = module_export.Export;
+
 ; (function () {
     "use strict"
     window.addEventListener("load", onStart, false);
@@ -60,6 +101,7 @@
         addChangedSideMode();
         //testWebGPU();
 
+
         tab_manager = new TabManager();
 
         main_canvas = document.getElementById("main_canvas");
@@ -67,17 +109,18 @@
         fps_display = document.getElementById("fps_display");
         message_display = document.getElementById("message_display");
 
+
         input_changed_manager = new InputChangedManager();
         hide_manager = new HideManager();
         main_camera = new Camera("main_camera", input_changed_manager);
         side_camera = new Camera("side_camera", input_changed_manager);
 
+
         input_manager = new InputManager(main_canvas, main_camera, side_canvas, side_camera);
         input_manager.initialize();
         mouse_manager = new MouseManager(main_canvas, main_camera, side_canvas, side_camera);
         mouse_manager.initialize();
-
-        buildErrorDictionary();
+        //buildErrorDictionary();
 
         if (!(gl = getRenderingContext(main_canvas)))
             return;
@@ -106,7 +149,6 @@
         global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager, object_manager);
 
         shader_manager = new ShaderManager();
-
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
         ftle_manager = new FTLEManager(gl_side, streamline_context_static, shader_manager);
 
@@ -281,7 +323,7 @@
             console.log("onClickCalculateFTLE");
             CalculateFTLE();
         });
-        
+
     }
 
     function addOnClickUpdateRenderSettings() {
@@ -380,7 +422,7 @@
         });
     }
 
-    function addChangedSideMode(){
+    function addChangedSideMode() {
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
             var value = document.getElementById("select_side_mode").value;
             canvas_wrapper_side.set_draw_mode(parseInt(value));
@@ -391,7 +433,7 @@
             canvas_wrapper_side.draw_slice_index = value;
             canvas_wrapper_side.aliasing_index = 0;
             console.log("slice_index", value);
-        });        
+        });
     }
 
     function CalculateStreamlines() {
@@ -408,7 +450,7 @@
         input_changed_manager.UpdateDefaultValuesCalculate();
     }
 
-    function CalculateFTLE(){
+    function CalculateFTLE() {
         ftle_manager.computeFlowMap(gl_side);
     }
 
@@ -429,10 +471,10 @@
         var cube_axes_length_origin_side = parseFloat(document.getElementById("input_cube_axes_origin_length_side").value);
         var camera_axes_invert_color_side = true;
         var cube_use_axes_colors_side = true;
-        object_manager.SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main, 
+        object_manager.SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main,
             cube_axes_length_main, cube_axes_length_origin_main,
             camera_axes_invert_color_main, cube_use_axes_colors_main,
-            cube_axes_radius_side, cube_axes_radius_origin_side, 
+            cube_axes_radius_side, cube_axes_radius_origin_side,
             cube_axes_length_side, cube_axes_length_origin_side,
             camera_axes_invert_color_side, cube_use_axes_colors_side);
 
@@ -452,7 +494,7 @@
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
-        
+
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);

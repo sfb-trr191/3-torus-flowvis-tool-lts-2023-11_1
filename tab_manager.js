@@ -61,3 +61,5 @@ class TabManager{
         document.getElementById(tab.id_button).className += " active";
     }
 }
+
+module.exports = TabManager;

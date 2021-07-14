@@ -1,3 +1,5 @@
+const glMatrix = require("gl-matrix");
+
 function getMousePosition(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
@@ -8,7 +10,7 @@ function getMousePosition(canvas, event) {
     };
 }
 
-function getMousePositionPercentage(canvas, event) {
+exports.getMousePositionPercentage = function (canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = (event.clientX - rect.left) / rect.width;
     let y = (event.clientY - rect.top) / rect.height;
@@ -18,7 +20,7 @@ function getMousePositionPercentage(canvas, event) {
     };
 }
 
-function GetIndexInList(value, vector) {
+exports.GetIndexInList = function (value, vector) {
     for (var i = 0; i < vector.length; i++) {
         if (vector[i] == value)
             return i;
@@ -32,7 +34,7 @@ function GetIndexInList(value, vector) {
  * @param {*} a point on the line 
  * @param {*} n direction of the line 
  */
-function distancePointToLine(p, a, n) {
+exports.distancePointToLine = function (p, a, n) {
 
     var a_minus_p = glMatrix.vec3.create();
     glMatrix.vec3.subtract(a_minus_p, a, p);
@@ -47,7 +49,7 @@ function distancePointToLine(p, a, n) {
 }
 
 
-function setCSS(value) {
+exports.setCSS = function (value) {
 
     // Obtain the name of stylesheet 
     // as a parameter and set it 
@@ -62,16 +64,17 @@ function componentToHex(c) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-function rgbToHex(r, g, b) {
+exports.rgbToHex = function (r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-function lerp(a, b, t) {
+exports.lerp = function (a, b, t) {
     return (1 - t) * a + t * b;
 }
 
-function regexIntToFloat(input_string){
+exports.regexIntToFloat = function(input_string) {
     return input_string.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
         return ($2 == ".") ? $0 : $0 + ".0";
     });
 }
+

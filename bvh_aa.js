@@ -1,3 +1,9 @@
+const glMatrix = require("gl-matrix");
+const AABB = require("./aabb");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const module_utility = require("./utility");
+const GetIndexInList = module_utility.GetIndexInList;
+
 class BVH_AA_Node {
 
     constructor() {
@@ -286,3 +292,5 @@ class BVH_AA {
     }
 
 }
+
+module.exports = BVH_AA;

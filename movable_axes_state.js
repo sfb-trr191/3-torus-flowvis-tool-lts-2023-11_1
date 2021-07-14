@@ -1,3 +1,7 @@
+const glMatrix = require("gl-matrix");
+const module_gl_matrix_extensions = require("./gl_matrix_extensions");
+const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
+
 class MovableAxesState {
 
     camera_position = glMatrix.vec3.create();//QVector3D
@@ -245,3 +249,5 @@ class MovableAxesState {
     }
     */
 };
+
+module.exports = MovableAxesState;

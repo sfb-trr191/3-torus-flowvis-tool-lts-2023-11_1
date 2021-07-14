@@ -1,3 +1,6 @@
+const module_utility = require("./utility");
+const getMousePositionPercentage = module_utility.getMousePositionPercentage;
+
 class MouseManager {
 
     constructor(canvas, camera, side_canvas, side_camera) {
@@ -92,3 +95,6 @@ class MouseManager {
 
     }
 }
+
+
+module.exports = MouseManager;

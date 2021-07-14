@@ -1,11 +1,11 @@
-function getRenderingContext(canvas) {
+exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
     var gl = canvas.getContext("webgl2", {preserveDrawingBuffer: true})
         || canvas.getContext("experimental-webgl");
     if (!gl) {
-        displayError(ERROR_ID_GET_WEB_GL_CONTEXT);
+        //displayError(ERROR_ID_GET_WEB_GL_CONTEXT);
         return null;
     }
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -14,7 +14,9 @@ function getRenderingContext(canvas) {
     return gl;
 }
 
-function loadShaderProgramFromCode(gl, program, v_source, f_source) {
+exports.loadShaderProgramFromCode = function(gl, program, v_source, f_source) {
+    //console.log("loadShaderProgramFromCode");
+    //console.log("v_source", v_source);
     var source = v_source;
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, source);
@@ -129,6 +131,4 @@ function updateDataTexture(gl, texture, texture_data, texture_settings) {
     gl.texImage3D(target, level, internalformat, width, height, depth, border, format, type, texture_data);
 }
 */
-function vec4fromvec3(vec3, w) {
-    return glMatrix.vec4.fromValues(vec3[0], vec3[1], vec3[2], w);
-}
+
