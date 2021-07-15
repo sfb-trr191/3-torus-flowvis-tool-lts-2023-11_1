@@ -148,9 +148,7 @@ class DataTextures {
 
 class DataTexture3D_RGBA {
 
-    constructor(gl, p_data_unit) {
-        this.p_data_unit = p_data_unit;
-
+    constructor(gl) {
         var internalformat = gl.RGBA32F;
         var format = gl.RGBA;
         var type = gl.FLOAT;
@@ -185,4 +183,41 @@ class DataTexture3D_RGBA {
     }
 }
 
-module.exports = {DataTextures, DataTexture3D_RGBA };
+class DataTexture3D_R {
+
+    constructor(gl) {
+        var internalformat = gl.R32F;
+        var format = gl.RED;
+        var type = gl.FLOAT;
+        var color_dim = 1;
+        this.texture = new DataTexture(gl, internalformat, format, type, color_dim);
+        this.texture.test();
+    }
+
+    initDimensions(gl, width, height, depth) {
+        var changed = this.texture.texture_settings.width != width
+            || this.texture.texture_settings.height != height
+            || this.texture.texture_settings.depth != depth;
+        if(!changed)
+            return;
+        var data = new Float32Array(width * height * depth * this.texture.texture_settings.color_dim).fill(0);
+        this.updateData(gl, width, height, depth, data);
+    }
+
+    updateData(gl, width, height, depth, data) {
+        this.texture.texture_settings.width = width;
+        this.texture.texture_settings.height = height;
+        this.texture.texture_settings.depth = depth;
+        this.texture.updateDataTexture(gl, data);
+    }
+
+    updateSlice(gl, slice_index, slice_data) {
+        this.texture.updateDataSlice(gl, slice_index, slice_data);
+    }
+
+    update(gl) {
+        this.texture.update(gl);
+    }
+}
+
+module.exports = {DataTextures, DataTexture3D_RGBA, DataTexture3D_R};

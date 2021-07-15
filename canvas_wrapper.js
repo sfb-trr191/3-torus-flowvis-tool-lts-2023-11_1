@@ -375,13 +375,15 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
+        gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
+        gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
         
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         //gl.uniform1i(this.location_resampling.location_texture1, 0);
         
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_flowmap.texture.texture);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
 
         this.global_data.bind(this.name, gl,

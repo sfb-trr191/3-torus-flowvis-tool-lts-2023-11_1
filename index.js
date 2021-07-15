@@ -2,6 +2,7 @@
 const module_const = require("./const");
 const f_shader_average = require("./shader/f_shader_average.glsl");
 const f_shader_compute_flow_map_slice = require("./shader/f_shader_compute_flow_map_slice.glsl");
+const f_shader_compute_finite_differences = require("./shader/f_shader_compute_finite_differences.glsl");
 const f_shader_copy = require("./shader/f_shader_copy.glsl");
 const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl");
 const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
@@ -461,7 +462,7 @@ const Export = module_export.Export;
     }
 
     function CalculateFTLE() {
-        ftle_manager.computeFlowMap(gl_side);
+        ftle_manager.compute(gl_side);
     }
 
     function UpdateRenderSettings() {

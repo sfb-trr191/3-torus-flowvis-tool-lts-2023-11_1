@@ -55,9 +55,9 @@ void main()
     int y_index = int(float(100) * t_y);
 
     ivec3 pointer = ivec3(x_index,y_index,slice_index);
-    vec4 value = texelFetch(texture_flow_map, pointer, 0);
+    //vec4 value = texelFetch(texture_flow_map, pointer, 0);
 
-    float scalar = value[3];
+    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
     float t = (scalar - min_scalar) / (max_scalar - min_scalar);
     int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);

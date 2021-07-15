@@ -404,7 +404,7 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":10,"./utility":1026,"gl-matrix":52}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":10,"./utility":1027,"gl-matrix":52}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -1275,13 +1275,15 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
+        gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
+        gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
         
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         //gl.uniform1i(this.location_resampling.location_texture1, 0);
         
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_flowmap.texture.texture);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
 
         this.global_data.bind(this.name, gl,
@@ -1370,7 +1372,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":12,"./render_wrapper":1007,"./shader_uniforms":1020,"./webgl":1027}],6:[function(require,module,exports){
+},{"./dummy_quad":12,"./render_wrapper":1007,"./shader_uniforms":1021,"./webgl":1028}],6:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -1679,9 +1681,7 @@ class DataTextures {
 
 class DataTexture3D_RGBA {
 
-    constructor(gl, p_data_unit) {
-        this.p_data_unit = p_data_unit;
-
+    constructor(gl) {
         var internalformat = gl.RGBA32F;
         var format = gl.RGBA;
         var type = gl.FLOAT;
@@ -1716,7 +1716,44 @@ class DataTexture3D_RGBA {
     }
 }
 
-module.exports = {DataTextures, DataTexture3D_RGBA };
+class DataTexture3D_R {
+
+    constructor(gl) {
+        var internalformat = gl.R32F;
+        var format = gl.RED;
+        var type = gl.FLOAT;
+        var color_dim = 1;
+        this.texture = new DataTexture(gl, internalformat, format, type, color_dim);
+        this.texture.test();
+    }
+
+    initDimensions(gl, width, height, depth) {
+        var changed = this.texture.texture_settings.width != width
+            || this.texture.texture_settings.height != height
+            || this.texture.texture_settings.depth != depth;
+        if(!changed)
+            return;
+        var data = new Float32Array(width * height * depth * this.texture.texture_settings.color_dim).fill(0);
+        this.updateData(gl, width, height, depth, data);
+    }
+
+    updateData(gl, width, height, depth, data) {
+        this.texture.texture_settings.width = width;
+        this.texture.texture_settings.height = height;
+        this.texture.texture_settings.depth = depth;
+        this.texture.updateDataTexture(gl, data);
+    }
+
+    updateSlice(gl, slice_index, slice_data) {
+        this.texture.updateDataSlice(gl, slice_index, slice_data);
+    }
+
+    update(gl) {
+        this.texture.update(gl);
+    }
+}
+
+module.exports = {DataTextures, DataTexture3D_RGBA, DataTexture3D_R};
 },{}],10:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
@@ -2220,11 +2257,21 @@ function GenerateExportString_HTML(url, class_name){
 const ComputeWrapper = require("./compute_wraper");
 const ShaderUniforms = require("./shader_uniforms");
 const DummyQuad = require("./dummy_quad");
-const {DataTextures, DataTexture3D_RGBA } = require("./data_textures");
+const {DataTextures, DataTexture3D_RGBA, DataTexture3D_R} = require("./data_textures");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 const module_utility = require("./utility");
 const regexIntToFloat = module_utility.regexIntToFloat;
+const {
+    Matrix,
+    inverse,
+    solve,
+    linearDependencies,
+    QrDecomposition,
+    LuDecomposition,
+    CholeskyDecomposition,
+    EigenvalueDecomposition
+  } = require('ml-matrix');
 //const V_SHADER_RAYTRACING = require("./shader/v_shader_raytracing.js");
 //const F_SHADER_PLACEHOLDER = require("./shader/f_shader_placeholder.glsl");
 
@@ -2239,9 +2286,22 @@ class UniformLocationsComputeFlowMapSlice {
     }
 }
 
-class FTLEManager{
+class UniformLocationsComputeFiniteDifferences {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsComputeFiniteDifferences: ", name)
+        this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_direction = gl.getUniformLocation(program, "direction");
+        this.location_h2 = gl.getUniformLocation(program, "h2");
+    }
+}
 
-    constructor(gl, p_streamline_context, p_shader_manager){
+class FTLEManager {
+
+    constructor(gl, p_streamline_context, p_shader_manager) {
         this.p_streamline_context = p_streamline_context;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.p_shader_manager = p_shader_manager;
@@ -2252,13 +2312,25 @@ class FTLEManager{
         this.advection_time = 0.5;
         this.compute_wrapper_flowmap = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
         this.data_texture_flowmap = new DataTexture3D_RGBA(gl);
-        
+        this.data_texture_diff_x = new DataTexture3D_RGBA(gl);
+        this.data_texture_diff_y = new DataTexture3D_RGBA(gl);
+        this.data_texture_diff_z = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle = new DataTexture3D_R(gl);
+        this.ftle_max_value = 0;
+        this.ftle_min_value = 0;
+
 
         this.program_compute_flowmap_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
         this.location_compute_flowmap_slice = new UniformLocationsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.shader_uniforms_compute_flowmap_slice = this.loadShaderUniformsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
+
+        this.program_compute_finite_differences = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FINITE_DIFFERENCES);
+        this.location_compute_finite_differences = new UniformLocationsComputeFiniteDifferences(gl, this.program_compute_finite_differences);
+        this.shader_uniforms_compute_finite_differences = this.loadShaderUniformsComputeFiniteDifferences(gl, this.program_compute_finite_differences);
+        this.attribute_location_dummy_program_compute_finite_differences = gl.getAttribLocation(this.program_compute_finite_differences, "a_position");
 
         this.dummy_quad = new DummyQuad(gl);
     }
@@ -2278,26 +2350,32 @@ class FTLEManager{
         console.log("shader_formula_w: ", shader_formula_w_float);
 
         this.program_compute_flowmap_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING, 
+        loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING,
             this.p_shader_manager.GetShaderComputeFlowMapSlice(shader_formula_u_float, shader_formula_v_float, shader_formula_w_float));
         this.location_compute_flowmap_slice = new UniformLocationsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.shader_uniforms_compute_flowmap_slice = this.loadShaderUniformsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
     }
 
-    computeFlowMap(gl){
+    compute(gl) {
+        this.computeFlowMap(gl);
+        this.computeFiniteDifferences(gl);
+        this.computeFTLE(gl);
+    }
+
+    computeFlowMap(gl) {
         console.log("computeFlowMap");
         console.log(gl);
         this.data_texture_flowmap.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
         this.ReplaceComputeFlowMapSliceShader(gl);
-        for(var i=0; i<this.dim_z; i++){
+        for (var i = 0; i < this.dim_z; i++) {
             this.computeFlowMapSlice(gl, i);
         }
         this.data_texture_flowmap.update(gl);
     }
 
-    computeFlowMapSlice(gl, slice_index){
-        var z = slice_index / (this.dim_z-1);
+    computeFlowMapSlice(gl, slice_index) {
+        var z = slice_index / (this.dim_z - 1);
         console.log("computeFlowMapSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_flowmap.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
@@ -2307,19 +2385,118 @@ class FTLEManager{
         gl.uniform1f(this.location_compute_flowmap_slice.location_step_size, this.step_size);
         gl.uniform1f(this.location_compute_flowmap_slice.location_z, z);
         gl.uniform1f(this.location_compute_flowmap_slice.location_advection_time, this.advection_time);
-        
-        //console.log(this.data_texture_flowmap.texture.texture_data);
+
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
         var slice_data = this.readPixelsRGBA(gl);
-        //console.log(slice_data);
-        console.log(slice_data[3]);
-        //console.log(slice_data[7]);
-        
         this.data_texture_flowmap.updateSlice(gl, slice_index, slice_data);
-        //console.log(this.data_texture_flowmap.texture.texture_data);
     }
 
-    readPixelsRGBA(gl){
+    computeFiniteDifferences(gl) {
+        console.log("computeFiniteDifferences");
+        console.log(gl);
+        var h2_x = 2 / (this.dim_x - 1);
+        var h2_y = 2 / (this.dim_y - 1);
+        var h2_z = 2 / (this.dim_z - 1);
+        this.computeFiniteDifferencesDirection(gl, 0, this.data_texture_diff_x, h2_x);
+        this.computeFiniteDifferencesDirection(gl, 1, this.data_texture_diff_y, h2_y);
+        this.computeFiniteDifferencesDirection(gl, 2, this.data_texture_diff_z, h2_z);
+    }
+
+    computeFiniteDifferencesDirection(gl, direction, data_texture, h2) {
+        data_texture.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
+        for (var i = 0; i < this.dim_z; i++) {
+            this.computeFiniteDifferencesSlice(gl, i, direction, data_texture, h2);
+        }
+        data_texture.update(gl);
+    }
+
+    computeFiniteDifferencesSlice(gl, slice_index, direction, data_texture, h2) {
+        var z = slice_index / (this.dim_z - 1);
+        console.log("computeFiniteDifferencesSlice: ", slice_index, z);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_flowmap.frame_buffer);
+        gl.viewport(0, 0, this.dim_x, this.dim_y);
+        gl.useProgram(this.program_compute_finite_differences);
+        gl.uniform1i(this.location_compute_finite_differences.location_dim_x, this.dim_x);
+        gl.uniform1i(this.location_compute_finite_differences.location_dim_y, this.dim_y);
+        gl.uniform1i(this.location_compute_finite_differences.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_finite_differences.location_slice_index, slice_index);
+        gl.uniform1i(this.location_compute_finite_differences.location_direction, direction);
+        gl.uniform1f(this.location_compute_finite_differences.location_h2, h2);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_3D, this.data_texture_flowmap.texture.texture);
+        gl.uniform1i(this.location_compute_finite_differences.location_texture_flow_map, 0);
+
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_finite_differences);
+        var slice_data = this.readPixelsRGBA(gl);
+        data_texture.updateSlice(gl, slice_index, slice_data);
+    }
+
+    computeFTLE(gl) {
+        console.log("computeFTLE");
+        this.ftle_max_value = 0;
+        this.ftle_min_value = 0;
+        this.data_texture_ftle.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
+        for (var i = 0; i < this.dim_z; i++) {
+            this.computeFTLESlice(gl, i);
+        }
+        this.data_texture_ftle.update(gl);
+
+        console.log(this.data_texture_diff_x.texture.texture_data)
+    }
+
+    computeFTLESlice(gl, slice_index) {
+        var z = slice_index / (this.dim_z - 1);
+        console.log("computeFTLESlice: ", slice_index, z);
+
+        var slice_data = new Float32Array(this.dim_x * this.dim_y);
+        for (var x = 0; x < this.dim_x; x++) {
+            for (var y = 0; y < this.dim_y; y++) {
+                var index = x + y * this.dim_x;
+                slice_data[index] = this.computeFTLETexel(x, y, slice_index);
+            }
+        }
+        this.data_texture_ftle.updateSlice(gl, slice_index, slice_data);
+
+
+        //console.log(this.data_texture_ftle.texture.texture_data)
+    }
+
+    computeFTLETexel(x, y, z) {
+        var index = 4 * (x + y * this.dim_x + z * this.dim_x * this.dim_y);
+        //finite differences in x direction
+        var data = this.data_texture_diff_x.texture.texture_data;
+        var df0_dx0 = data[index];
+        var df1_dx0 = data[index+1];
+        var df2_dx0 = data[index+2];
+        //finite differences in y direction
+        var data = this.data_texture_diff_y.texture.texture_data;
+        var df0_dx1 = data[index];
+        var df1_dx1 = data[index+1];
+        var df2_dx1 = data[index+2];
+        //finite differences in z direction
+        var data = this.data_texture_diff_z.texture.texture_data;
+        var df0_dx2 = data[index];
+        var df1_dx2 = data[index+1];
+        var df2_dx2 = data[index+2];
+        //J = jacobian matrix
+        var J = new Matrix([[df0_dx0, df0_dx1, df0_dx2], [df1_dx0, df1_dx1, df1_dx2], [df2_dx0, df2_dx1, df2_dx2]]);
+        var J_T = J.transpose();
+        //C = cauchy-green tensor = J^T * J
+        var C = J_T.mmul(J);
+
+        //compute biggest eigenvalue lambda_max
+        var e = new EigenvalueDecomposition(C);
+        var real = e.realEigenvalues;
+        var lambda_max = Math.max(real[0], real[1], real[2]);
+        //calculate FTLE
+        var ftle =1 / this.advection_time * Math.log(Math.sqrt(lambda_max));
+        this.ftle_max_value = Math.max(ftle, this.ftle_max_value);
+        this.ftle_min_value = Math.min(ftle, this.ftle_min_value);
+        return ftle;
+    }
+
+    readPixelsRGBA(gl) {
         var pixels = new Float32Array(this.dim_x * this.dim_y * 4);
         var format = gl.RGBA;
         var type = gl.FLOAT;
@@ -2332,10 +2509,16 @@ class FTLEManager{
         program_shader_uniforms.print();
         return program_shader_uniforms;
     }
+
+    loadShaderUniformsComputeFiniteDifferences(gl, program) {
+        var program_shader_uniforms = new ShaderUniforms(gl, program);
+        program_shader_uniforms.print();
+        return program_shader_uniforms;
+    }
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":6,"./data_textures":9,"./dummy_quad":12,"./shader_uniforms":1020,"./utility":1026,"./webgl":1027}],15:[function(require,module,exports){
+},{"./compute_wraper":6,"./data_textures":9,"./dummy_quad":12,"./shader_uniforms":1021,"./utility":1027,"./webgl":1028,"ml-matrix":989}],15:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -2397,7 +2580,7 @@ new_vec3_from_input_name = function (field_name_0, field_name_1, field_name_2) {
 },{"gl-matrix":52}],16:[function(require,module,exports){
 const DataUnit = require("./data_unit");
 const DataContainer = require("./data_container");
-const {DataTextures, DataTexture3D_RGBA } = require("./data_textures");
+const {DataTextures, DataTexture3D_RGBA, DataTexture3D_R} = require("./data_textures");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
 class GlobalData {
@@ -2564,6 +2747,7 @@ module.exports = HideManager;
 const module_const = require("./const");
 const f_shader_average = require("./shader/f_shader_average.glsl");
 const f_shader_compute_flow_map_slice = require("./shader/f_shader_compute_flow_map_slice.glsl");
+const f_shader_compute_finite_differences = require("./shader/f_shader_compute_finite_differences.glsl");
 const f_shader_copy = require("./shader/f_shader_copy.glsl");
 const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl");
 const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
@@ -3023,7 +3207,7 @@ const Export = module_export.Export;
     }
 
     function CalculateFTLE() {
-        ftle_manager.computeFlowMap(gl_side);
+        ftle_manager.compute(gl_side);
     }
 
     function UpdateRenderSettings() {
@@ -3320,7 +3504,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./const":7,"./export":13,"./ftle_manager":14,"./global_data":16,"./hide_manager":17,"./input_changed_manager":19,"./input_manager":20,"./input_parameter_wrapper":21,"./lights":22,"./mouse_manager":24,"./object_manager":1003,"./shader/f_shader_average.glsl":1009,"./shader/f_shader_compute_flow_map_slice.glsl":1010,"./shader/f_shader_copy.glsl":1011,"./shader/f_shader_flow_map_slice.glsl":1012,"./shader/f_shader_placeholder.glsl":1013,"./shader/f_shader_raytracing.glsl":1014,"./shader/f_shader_resampling.glsl":1015,"./shader/f_shader_sum.glsl":1016,"./shader/v_shader_raytracing.glsl":1017,"./shader/v_shader_resampling.glsl":1018,"./shader_manager":1019,"./streamline_context":1021,"./tab_manager":1023,"./transfer_function_manager":1024,"./ui_seeds":1025,"./utility":1026,"./webgl":1027,"gl-matrix":52,"ml-matrix":989}],19:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./const":7,"./export":13,"./ftle_manager":14,"./global_data":16,"./hide_manager":17,"./input_changed_manager":19,"./input_manager":20,"./input_parameter_wrapper":21,"./lights":22,"./mouse_manager":24,"./object_manager":1003,"./shader/f_shader_average.glsl":1009,"./shader/f_shader_compute_finite_differences.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_copy.glsl":1012,"./shader/f_shader_flow_map_slice.glsl":1013,"./shader/f_shader_placeholder.glsl":1014,"./shader/f_shader_raytracing.glsl":1015,"./shader/f_shader_resampling.glsl":1016,"./shader/f_shader_sum.glsl":1017,"./shader/v_shader_raytracing.glsl":1018,"./shader/v_shader_resampling.glsl":1019,"./shader_manager":1020,"./streamline_context":1022,"./tab_manager":1024,"./transfer_function_manager":1025,"./ui_seeds":1026,"./utility":1027,"./webgl":1028,"gl-matrix":52,"ml-matrix":989}],19:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -3777,7 +3961,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1026}],22:[function(require,module,exports){
+},{"./utility":1027}],22:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -3819,7 +4003,7 @@ module.exports = Lights;
 const glMatrix = require("gl-matrix");
 const DataUnit = require("./data_unit");
 const DataContainer = require("./data_container");
-const {DataTextures, DataTexture3D_RGBA } = require("./data_textures");
+const {DataTextures, DataTexture3D_RGBA, DataTexture3D_R} = require("./data_textures");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 const BVH_AA = require("./bvh_aa");
 const module_utility = require("./utility");
@@ -4275,7 +4459,7 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":8,"./data_textures":9,"./data_types":10,"./data_unit":11,"./utility":1026,"gl-matrix":52}],24:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":8,"./data_textures":9,"./data_types":10,"./data_unit":11,"./utility":1027,"gl-matrix":52}],24:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 
@@ -4376,7 +4560,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1026}],25:[function(require,module,exports){
+},{"./utility":1027}],25:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -110682,6 +110866,91 @@ void main()
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],1010:[function(require,module,exports){
 (function (global){(function (){
+global.F_SHADER_COMPUTE_FINITE_DIFFERENCES = `#version 300 es
+precision highp int;                //high precision required for indices / ids etc.
+precision highp isampler3D;         //high precision required for indices / ids etc.
+precision highp float;
+precision highp sampler3D;
+
+uniform sampler3D texture_flow_map;
+
+uniform int dim_x;
+uniform int dim_y;
+uniform int dim_z;
+uniform int slice_index;
+uniform int direction;//x,y,z = 0,1,2
+uniform float h2;// h2 = 2h from the equation f'(x_i) = (f(x_{i+1}) - f(x_{i-1})) / (2h)
+
+out vec4 outputColor;
+
+vec3 f(vec3 vector);
+
+const float PI = 3.1415926535897932384626433832795;
+//! [0]
+void main()
+{
+    int x = int(gl_FragCoord[0]);
+    int y = int(gl_FragCoord[1]);
+
+    int forward_x = x;
+    int forward_y = y;
+    int forward_z = slice_index;
+
+    int backward_x = x;
+    int backward_y = y;
+    int backward_z = slice_index;
+
+    //identify the correct neighboring index. usually +1 and -1, wrap around at the border.
+    //direction X
+    if(direction == 0){
+        forward_x += 1;
+        if(forward_x == dim_x)
+            forward_x = 1;
+
+        backward_x -= 1;
+        if(backward_x == -1)
+            backward_x = dim_x-2;
+    }
+    //direction Y
+    else if(direction == 1){
+        forward_y += 1;
+        if(forward_y == dim_y)
+            forward_y = 1;
+
+        backward_y -= 1;
+        if(backward_y == -1)
+            backward_y = dim_y-2;
+    }
+    //direction Z
+    else{
+        forward_z += 1;  
+        if(forward_z == dim_z)
+            forward_z = 1;   
+
+        backward_z -= 1;
+        if(backward_z == -1)
+            backward_z = dim_z-2;
+    }
+
+    //ivec3 pointer = ivec3(x,y,slice_index);
+    //vec3 value = texelFetch(texture_flow_map, pointer, 0).rgb;
+
+    ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
+    vec3 forward_value = texelFetch(texture_flow_map, pointer, 0).rgb;
+    
+    pointer = ivec3(backward_x,backward_y,backward_z);
+    vec3 backward_value = texelFetch(texture_flow_map, pointer, 0).rgb;
+
+    vec3 central_difference = (forward_value - backward_value) / h2;
+    outputColor = vec4(central_difference,1);
+    //outputColor = vec4(x,y,slice_index,1);
+    //outputColor = vec4(forward_value,1);
+}
+
+`;
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],1011:[function(require,module,exports){
+(function (global){(function (){
 global.F_SHADER_COMPUTE_FLOW_MAP_SLICE = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
@@ -110761,7 +111030,7 @@ vec3 f(vec3 vector)
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1011:[function(require,module,exports){
+},{}],1012:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_COPY = `#version 300 es
 precision highp int;
@@ -110784,7 +111053,7 @@ void main()
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1012:[function(require,module,exports){
+},{}],1013:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_FLOW_MAP_SLICE = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
@@ -110843,9 +111112,9 @@ void main()
     int y_index = int(float(100) * t_y);
 
     ivec3 pointer = ivec3(x_index,y_index,slice_index);
-    vec4 value = texelFetch(texture_flow_map, pointer, 0);
+    //vec4 value = texelFetch(texture_flow_map, pointer, 0);
 
-    float scalar = value[3];
+    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
     float t = (scalar - min_scalar) / (max_scalar - min_scalar);
     int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
@@ -110879,7 +111148,7 @@ vec3 GetScalarColor(int index)
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1013:[function(require,module,exports){
+},{}],1014:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_PLACEHOLDER = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
@@ -110904,7 +111173,7 @@ void main()
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1014:[function(require,module,exports){
+},{}],1015:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_RAYTRACING = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
@@ -113181,7 +113450,7 @@ GL_Cylinder GetCylinder(int index)
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1015:[function(require,module,exports){
+},{}],1016:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_RESAMPLING = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
@@ -113336,7 +113605,7 @@ vec3 GetScalarColor(int index)
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1016:[function(require,module,exports){
+},{}],1017:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_SUM = `#version 300 es
 precision highp int;
@@ -113364,7 +113633,7 @@ void main()
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1017:[function(require,module,exports){
+},{}],1018:[function(require,module,exports){
 (function (global){(function (){
 global.V_SHADER_RAYTRACING = `#version 300 es
 precision highp int;
@@ -113379,7 +113648,7 @@ void main() {
 `;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1018:[function(require,module,exports){
+},{}],1019:[function(require,module,exports){
 (function (global){(function (){
 global.V_SHADER_RESAMPLING = `#version 300 es
 precision highp int;
@@ -113401,7 +113670,7 @@ void main()
 
 `;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1019:[function(require,module,exports){
+},{}],1020:[function(require,module,exports){
 class ShaderManager {
     constructor() {
 
@@ -113427,7 +113696,7 @@ class ShaderManager {
 }
 
 module.exports = ShaderManager;
-},{}],1020:[function(require,module,exports){
+},{}],1021:[function(require,module,exports){
 class ShaderUniform {
 
     constructor(gl, program, name, type, value) {
@@ -113482,7 +113751,7 @@ class ShaderUniforms {
 }
 
 module.exports = ShaderUniforms;
-},{}],1021:[function(require,module,exports){
+},{}],1022:[function(require,module,exports){
 const RawData = require("./raw_data");
 const StreamlineGenerator = require("./streamline_generator");
 const SegmentDuplicator = require("./segment_duplicator");
@@ -113605,7 +113874,7 @@ class StreamlineContext {
 }
 
 module.exports = StreamlineContext;
-},{"./lod_data":23,"./raw_data":1004,"./segment_duplicator":1008,"./streamline_generator":1022}],1022:[function(require,module,exports){
+},{"./lod_data":23,"./raw_data":1004,"./segment_duplicator":1008,"./streamline_generator":1023}],1023:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const math = require("mathjs");
 
@@ -113941,7 +114210,7 @@ class StreamlineGenerator {
 }
 
 module.exports = StreamlineGenerator;
-},{"gl-matrix":52,"mathjs":908}],1023:[function(require,module,exports){
+},{"gl-matrix":52,"mathjs":908}],1024:[function(require,module,exports){
 class TabEntry{
     constructor(name, id_button, id_content){
         this.name = name;
@@ -114007,7 +114276,7 @@ class TabManager{
 }
 
 module.exports = TabManager;
-},{}],1024:[function(require,module,exports){
+},{}],1025:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const lerp = module_utility.lerp;
@@ -114106,7 +114375,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":10,"./utility":1026,"gl-matrix":52}],1025:[function(require,module,exports){
+},{"./data_types":10,"./utility":1027,"gl-matrix":52}],1026:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -114429,7 +114698,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":10,"./utility":1026,"gl-matrix":52,"seedrandom":992}],1026:[function(require,module,exports){
+},{"./data_types":10,"./utility":1027,"gl-matrix":52,"seedrandom":992}],1027:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 function getMousePosition(canvas, event) {
@@ -114511,7 +114780,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":52}],1027:[function(require,module,exports){
+},{"gl-matrix":52}],1028:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
