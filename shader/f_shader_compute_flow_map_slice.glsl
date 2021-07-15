@@ -19,7 +19,7 @@ uniform int slice_index;
 uniform float step_size;
 uniform float advection_time;//T
 out vec4 outputColor;
-const int max_iterations = 10;
+const int max_iterations = 1000;
 
 vec3 f(vec3 vector);
 

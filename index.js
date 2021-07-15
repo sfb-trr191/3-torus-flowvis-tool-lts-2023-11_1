@@ -23,7 +23,7 @@ const {
     LuDecomposition,
     CholeskyDecomposition,
     EigenvalueDecomposition
-  } = require('ml-matrix');
+} = require('ml-matrix');
 
 //########## OWN MODULES ##########
 const TabManager = require("./tab_manager");
@@ -47,6 +47,7 @@ const CanvasWrapper = require("./canvas_wrapper");
 const InputParameterWrapper = require("./input_parameter_wrapper");
 const module_utility = require("./utility");
 const setCSS = module_utility.setCSS;
+const lerp = module_utility.lerp;
 const module_export = require("./export");
 const Export = module_export.Export;
 
@@ -112,7 +113,7 @@ const Export = module_export.Export;
         addChangedSideMode();
         //testWebGPU();
         //testEigenvalueDecomposition();
-        
+
         tab_manager = new TabManager();
 
         main_canvas = document.getElementById("main_canvas");
@@ -246,6 +247,9 @@ const Export = module_export.Export;
     function on_update(time_now) {
         tick_counter++;
         var deltaTime = (time_now - time_last_tick) / 1000;
+
+        UpdateAnimation(time_now, deltaTime);
+
         input_manager.on_update(deltaTime, mouse_manager.active_camera);
 
         main_camera.repositionCamera();
@@ -471,11 +475,11 @@ const Export = module_export.Export;
         var dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
         var advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
         var step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
-        ftle_manager.compute(gl_side, dim_x, dim_y, dim_z, advection_time, step_size); 
+        ftle_manager.compute(gl_side, dim_x, dim_y, dim_z, advection_time, step_size);
 
         var slider = document.getElementById("slide_slice_index");
-        var value = Math.min(slider.value, dim_z-1);
-        slider.max = dim_z-1;
+        var value = Math.min(slider.value, dim_z - 1);
+        slider.max = dim_z - 1;
         slider.value = value;
 
         canvas_wrapper_side.draw_slice_index = value;
@@ -736,7 +740,7 @@ const Export = module_export.Export;
         console.log('E');
     }
 
-    function testEigenvalueDecomposition(){
+    function testEigenvalueDecomposition() {
         console.log("EigenvalueDecomposition test");
         var A = new Matrix([[5, 2, 0], [2, 5, 0], [-3, 4, 6]]);
         var e = new EigenvalueDecomposition(A);
@@ -775,6 +779,26 @@ const Export = module_export.Export;
         // Show the current tab, and add an "active" class to the button that opened the tab
         document.getElementById(id).style.display = "block";
         evt.currentTarget.className += " active";
+    }
+
+    function UpdateAnimation(time_now, deltaTime) {
+        var animate = document.getElementById("checkbox_animate_slice_index").checked
+        if (!animate)
+            return;
+
+        var slider = document.getElementById("slide_slice_index");
+        var max_index = ftle_manager.dim_z - 1;
+
+        var loop_time_s = 10;
+        var time_now_s = time_now / 1000;
+        var fraction = time_now_s / loop_time_s;
+        var completed_loops = Math.floor(fraction);
+        var t = fraction - completed_loops;
+        var index = Math.round(lerp(0, max_index, t));
+
+        slider.value = index;
+        canvas_wrapper_side.draw_slice_index = index;
+        canvas_wrapper_side.aliasing_index = 0;
     }
 
 })();

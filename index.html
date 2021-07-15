@@ -80,13 +80,13 @@
                     HTML5 canvas.</canvas>
             </div>
             <select id="select_side_mode">
-                <option value="0">hide</option><!--DRAW_MODE_NONE-->
-                <option selected value="1">cube</option><!--DRAW_MODE_DEFAULT-->
-                <option value="2">FTLE slice</option><!--DRAW_MODE_FTLE_SLICE-->                
+                <option value="0">hide</option>
+                <!--DRAW_MODE_NONE-->
+                <option selected value="1">cube</option>
+                <!--DRAW_MODE_DEFAULT-->
+                <option value="2">FTLE slice</option>
+                <!--DRAW_MODE_FTLE_SLICE-->
             </select>
-            <div class="slide_container">
-                <input type="range" min="0" max="99" value="49" class="slider" id="slide_slice_index">
-            </div>
             <div class="tab">
                 <button id="button_tab_data" class="tablink"></button>
                 <button id="button_tab_ftle" class="tablink"></button>
@@ -153,6 +153,22 @@
             </div>
             <div id="tabcontent_ftle" class="tabcontent">
                 <form>
+                    <fieldset class="fieldset_camera">
+                        <legend>Slice</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>index</label>
+                                <div class="slide_container">
+                                    <input type="range" min="0" max="99" value="49" class="slider"
+                                        id="slide_slice_index">
+                                </div>
+                            </div>
+                            <div class="input_row">
+                                <label>animate</label>
+                                <input id="checkbox_animate_slice_index" type="checkbox" value="true" checked="true">
+                            </div>
+                        </div>
+                    </fieldset>
                     <fieldset class="fieldset_camera">
                         <legend>Resolution</legend>
                         <div class="vertical_container">
