@@ -89,6 +89,7 @@
             </div>
             <div class="tab">
                 <button id="button_tab_data" class="tablink"></button>
+                <button id="button_tab_ftle" class="tablink"></button>
                 <button id="button_tab_settings" class="tablink"></button>
                 <button id="button_tab_information" class="tablink"></button>
                 <button id="button_tab_edit" class="tablink"></button>
@@ -146,6 +147,40 @@
                     <fieldset class="fieldset_camera">
                         <legend>Seeds</legend>
                         <div class="vertical_container" id="fieldset_seeds">
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div id="tabcontent_ftle" class="tabcontent">
+                <form>
+                    <fieldset class="fieldset_camera">
+                        <legend>Resolution</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>x</label>
+                                <input id="input_ftle_dim_x" type="text" value="100">
+                            </div>
+                            <div class="input_row">
+                                <label>y</label>
+                                <input id="input_ftle_dim_y" type="text" value="100">
+                            </div>
+                            <div class="input_row">
+                                <label>z</label>
+                                <input id="input_ftle_dim_z" type="text" value="100">
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="fieldset_camera">
+                        <legend>Parameters</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>advection time</label>
+                                <input id="input_ftle_advection_time" type="text" value="0.5">
+                            </div>
+                            <div class="input_row">
+                                <label>step size</label>
+                                <input id="input_ftle_step_size" type="text" value="0.0125">
+                            </div>
                         </div>
                     </fieldset>
                 </form>

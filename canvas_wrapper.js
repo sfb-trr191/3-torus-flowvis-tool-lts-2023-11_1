@@ -75,6 +75,8 @@ class UniformLocationsFTLESlice {
         console.log("UniformLocationsFTLESlice: ", name)
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_height = gl.getUniformLocation(program, "height");
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
         this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
@@ -373,6 +375,8 @@ class CanvasWrapper {
         gl.useProgram(this.program_ftle_slice);
         gl.uniform1i(this.location_ftle_slice.location_width, this.canvas_width);
         gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
+        gl.uniform1i(this.location_ftle_slice.location_dim_x, this.p_ftle_manager.dim_x);
+        gl.uniform1i(this.location_ftle_slice.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);

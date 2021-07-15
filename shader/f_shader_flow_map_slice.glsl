@@ -9,6 +9,10 @@ uniform sampler3D texture_flow_map;
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
 
+
+uniform int dim_x;
+uniform int dim_y;
+
 uniform int width;
 uniform int height;
 uniform int slice_index;
@@ -52,8 +56,8 @@ void main()
     float t_x = float(x-x_start) / float(min_canvas_dim-1);
     float t_y = float(y) / float(min_canvas_dim-1);
 
-    int x_index = int(float(100) * t_x);
-    int y_index = int(float(100) * t_y);
+    int x_index = int(float(dim_x) * t_x);
+    int y_index = int(float(dim_y) * t_y);
 
     ivec3 pointer = ivec3(x_index,y_index,slice_index);
     //vec4 value = texelFetch(texture_flow_map, pointer, 0);

@@ -975,6 +975,8 @@ class UniformLocationsFTLESlice {
         console.log("UniformLocationsFTLESlice: ", name)
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_height = gl.getUniformLocation(program, "height");
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
         this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
@@ -1273,6 +1275,8 @@ class CanvasWrapper {
         gl.useProgram(this.program_ftle_slice);
         gl.uniform1i(this.location_ftle_slice.location_width, this.canvas_width);
         gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
+        gl.uniform1i(this.location_ftle_slice.location_dim_x, this.p_ftle_manager.dim_x);
+        gl.uniform1i(this.location_ftle_slice.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
@@ -2259,7 +2263,7 @@ function GenerateExportString_HTML(url, class_name){
 const ComputeWrapper = require("./compute_wraper");
 const ShaderUniforms = require("./shader_uniforms");
 const DummyQuad = require("./dummy_quad");
-const {DataTextures, DataTexture3D_RGBA, DataTexture3D_R} = require("./data_textures");
+const { DataTextures, DataTexture3D_RGBA, DataTexture3D_R } = require("./data_textures");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 const module_utility = require("./utility");
@@ -2273,7 +2277,7 @@ const {
     LuDecomposition,
     CholeskyDecomposition,
     EigenvalueDecomposition
-  } = require('ml-matrix');
+} = require('ml-matrix');
 //const V_SHADER_RAYTRACING = require("./shader/v_shader_raytracing.js");
 //const F_SHADER_PLACEHOLDER = require("./shader/f_shader_placeholder.glsl");
 
@@ -2318,14 +2322,14 @@ class FTLEManager {
         this.dim_x = 100;
         this.dim_y = 100;
         this.dim_z = 100;
-        this.UpdateExtendedDims();
+        this.UpdateExtendedDims(gl);
         this.step_size = 0.0125;
         this.advection_time = 0.5;
 
-        this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
+        //this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap = new DataTexture3D_RGBA(gl);
 
-        this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
+        //this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
         this.data_texture_diff_x = new DataTexture3D_RGBA(gl);
         this.data_texture_diff_y = new DataTexture3D_RGBA(gl);
         this.data_texture_diff_z = new DataTexture3D_RGBA(gl);
@@ -2349,20 +2353,33 @@ class FTLEManager {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    UpdateExtendedDims(){
-        var h_x = 1 / (this.dim_x-1)
-        var h_y = 1 / (this.dim_y-1)
-        var h_z = 1 / (this.dim_z-1)
+    UpdateExtendedDims(gl) {
+        var h_x = 1 / (this.dim_x - 1)
+        var h_y = 1 / (this.dim_y - 1)
+        var h_z = 1 / (this.dim_z - 1)
 
-        this.dim_x_extended = this.dim_x + 2;
-        this.dim_y_extended = this.dim_y + 2;
-        this.dim_z_extended = this.dim_z + 2;
+        var dim_x_extended = this.dim_x + 2;
+        var dim_y_extended = this.dim_y + 2;
+        var dim_z_extended = this.dim_z + 2;
         this.extended_min_x = 0 - h_x;
         this.extended_min_y = 0 - h_y;
         this.extended_min_z = 0 - h_z;
         this.extended_max_x = 1 + h_x;
         this.extended_max_y = 1 + h_y;
         this.extended_max_z = 1 + h_z;
+
+        var changed = dim_x_extended != this.dim_x_extended
+            || dim_y_extended != this.dim_y_extended
+            || dim_z_extended != this.dim_z_extended;
+
+        this.dim_x_extended = dim_x_extended;
+        this.dim_y_extended = dim_y_extended;
+        this.dim_z_extended = dim_z_extended;
+
+        if(changed){
+            this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
+            this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
+        }
     }
 
     ReplaceComputeFlowMapSliceShader(gl) {
@@ -2387,7 +2404,13 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
     }
 
-    compute(gl) {
+    compute(gl, dim_x, dim_y, dim_z, advection_time, step_size) {
+        this.dim_x = dim_x;
+        this.dim_y = dim_y;
+        this.dim_z = dim_z;
+        this.UpdateExtendedDims(gl);
+        this.advection_time = advection_time;
+        this.step_size = step_size;
         this.computeFlowMap(gl);
         console.log(this.data_texture_flowmap.texture.texture_data);
 
@@ -2514,18 +2537,18 @@ class FTLEManager {
         //finite differences in x direction
         var data = this.data_texture_diff_x.texture.texture_data;
         var df0_dx0 = data[index];
-        var df1_dx0 = data[index+1];
-        var df2_dx0 = data[index+2];
+        var df1_dx0 = data[index + 1];
+        var df2_dx0 = data[index + 2];
         //finite differences in y direction
         var data = this.data_texture_diff_y.texture.texture_data;
         var df0_dx1 = data[index];
-        var df1_dx1 = data[index+1];
-        var df2_dx1 = data[index+2];
+        var df1_dx1 = data[index + 1];
+        var df2_dx1 = data[index + 2];
         //finite differences in z direction
         var data = this.data_texture_diff_z.texture.texture_data;
         var df0_dx2 = data[index];
-        var df1_dx2 = data[index+1];
-        var df2_dx2 = data[index+2];
+        var df1_dx2 = data[index + 1];
+        var df2_dx2 = data[index + 2];
         //J = jacobian matrix
         var J = new Matrix([[df0_dx0, df0_dx1, df0_dx2], [df1_dx0, df1_dx1, df1_dx2], [df2_dx0, df2_dx1, df2_dx2]]);
         var J_T = J.transpose();
@@ -2537,7 +2560,7 @@ class FTLEManager {
         var real = e.realEigenvalues;
         var lambda_max = Math.max(real[0], real[1], real[2]);
         //calculate FTLE
-        var ftle =1 / this.advection_time * Math.log(Math.sqrt(lambda_max));
+        var ftle = 1 / this.advection_time * Math.log(Math.sqrt(lambda_max));
         this.ftle_max_value = Math.max(ftle, this.ftle_max_value);
         this.ftle_min_value = Math.min(ftle, this.ftle_min_value);
         return ftle;
@@ -3203,6 +3226,10 @@ const Export = module_export.Export;
             console.log("onClick: button_tab_data");
             tab_manager.selectTab("tab_group_main", "tab_data");
         });
+        document.getElementById("button_tab_ftle").addEventListener("click", function () {
+            console.log("onClick: button_tab_ftle");
+            tab_manager.selectTab("tab_group_main", "tab_ftle");
+        });
         document.getElementById("button_tab_settings").addEventListener("click", function () {
             console.log("onClick: button_tab_settings");
             tab_manager.selectTab("tab_group_main", "tab_settings");
@@ -3254,7 +3281,22 @@ const Export = module_export.Export;
     }
 
     function CalculateFTLE() {
-        ftle_manager.compute(gl_side);
+        var dim_x = parseInt(document.getElementById("input_ftle_dim_x").value);
+        var dim_y = parseInt(document.getElementById("input_ftle_dim_y").value);
+        var dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
+        var advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
+        var step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
+        ftle_manager.compute(gl_side, dim_x, dim_y, dim_z, advection_time, step_size); 
+
+        var slider = document.getElementById("slide_slice_index");
+        var value = Math.min(slider.value, dim_z-1);
+        slider.max = dim_z-1;
+        slider.value = value;
+
+        canvas_wrapper_side.draw_slice_index = value;
+        canvas_wrapper_side.aliasing_index = 0;
+
+        console.log("draw_slice_index", value);
     }
 
     function UpdateRenderSettings() {
@@ -111128,6 +111170,10 @@ uniform sampler3D texture_flow_map;
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
 
+
+uniform int dim_x;
+uniform int dim_y;
+
 uniform int width;
 uniform int height;
 uniform int slice_index;
@@ -111171,8 +111217,8 @@ void main()
     float t_x = float(x-x_start) / float(min_canvas_dim-1);
     float t_y = float(y) / float(min_canvas_dim-1);
 
-    int x_index = int(float(100) * t_x);
-    int y_index = int(float(100) * t_y);
+    int x_index = int(float(dim_x) * t_x);
+    int y_index = int(float(dim_y) * t_y);
 
     ivec3 pointer = ivec3(x_index,y_index,slice_index);
     //vec4 value = texelFetch(texture_flow_map, pointer, 0);
@@ -114340,6 +114386,7 @@ class TabManager{
     initTabs(){
         var tab_group_main = new TabGroup(this, "tab_group_main");
         tab_group_main.addTab("tab_data", "button_tab_data", "tabcontent_data");
+        tab_group_main.addTab("tab_ftle", "button_tab_ftle", "tabcontent_ftle");
         tab_group_main.addTab("tab_settings", "button_tab_settings", "tabcontent_settings");
         tab_group_main.addTab("tab_information", "button_tab_information", "tabcontent_information");
         tab_group_main.addTab("tab_edit", "button_tab_edit", "tabcontent_edit");

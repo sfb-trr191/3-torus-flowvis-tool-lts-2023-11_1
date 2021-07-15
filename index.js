@@ -411,6 +411,10 @@ const Export = module_export.Export;
             console.log("onClick: button_tab_data");
             tab_manager.selectTab("tab_group_main", "tab_data");
         });
+        document.getElementById("button_tab_ftle").addEventListener("click", function () {
+            console.log("onClick: button_tab_ftle");
+            tab_manager.selectTab("tab_group_main", "tab_ftle");
+        });
         document.getElementById("button_tab_settings").addEventListener("click", function () {
             console.log("onClick: button_tab_settings");
             tab_manager.selectTab("tab_group_main", "tab_settings");
@@ -462,7 +466,22 @@ const Export = module_export.Export;
     }
 
     function CalculateFTLE() {
-        ftle_manager.compute(gl_side);
+        var dim_x = parseInt(document.getElementById("input_ftle_dim_x").value);
+        var dim_y = parseInt(document.getElementById("input_ftle_dim_y").value);
+        var dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
+        var advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
+        var step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
+        ftle_manager.compute(gl_side, dim_x, dim_y, dim_z, advection_time, step_size); 
+
+        var slider = document.getElementById("slide_slice_index");
+        var value = Math.min(slider.value, dim_z-1);
+        slider.max = dim_z-1;
+        slider.value = value;
+
+        canvas_wrapper_side.draw_slice_index = value;
+        canvas_wrapper_side.aliasing_index = 0;
+
+        console.log("draw_slice_index", value);
     }
 
     function UpdateRenderSettings() {

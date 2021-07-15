@@ -299,6 +299,10 @@ legend {
     background-image: url("icons/data-storage.png");
 }
 
+#button_tab_ftle{
+    background-image: url("icons/arrows.png");
+}
+
 #button_tab_settings{
     background-image: url("icons/settings.png");
 }
