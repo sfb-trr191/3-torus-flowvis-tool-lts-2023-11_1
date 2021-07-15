@@ -81,6 +81,7 @@ class UniformLocationsFTLESlice {
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
+        this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
     }
 }
 
@@ -377,6 +378,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
+        gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
         
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);

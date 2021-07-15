@@ -36,42 +36,42 @@ void main()
     //direction X
     if(direction == 0){
         forward_x += 1;
-        if(forward_x == dim_x)
-            forward_x = 1;
+        //if(forward_x == dim_x)
+        //    forward_x = 1;
 
         backward_x -= 1;
-        if(backward_x == -1)
-            backward_x = dim_x-2;
+        //if(backward_x == -1)
+        //    backward_x = dim_x-2;
     }
     //direction Y
     else if(direction == 1){
         forward_y += 1;
-        if(forward_y == dim_y)
-            forward_y = 1;
+        //if(forward_y == dim_y)
+        //    forward_y = 1;
 
         backward_y -= 1;
-        if(backward_y == -1)
-            backward_y = dim_y-2;
+        //if(backward_y == -1)
+        //    backward_y = dim_y-2;
     }
     //direction Z
     else{
         forward_z += 1;  
-        if(forward_z == dim_z)
-            forward_z = 1;   
+        //if(forward_z == dim_z)
+        //    forward_z = 1;   
 
         backward_z -= 1;
-        if(backward_z == -1)
-            backward_z = dim_z-2;
+        //if(backward_z == -1)
+        //    backward_z = dim_z-2;
     }
 
     //ivec3 pointer = ivec3(x,y,slice_index);
     //vec3 value = texelFetch(texture_flow_map, pointer, 0).rgb;
-
+    ivec3 extended_offset = ivec3(1,1,1);
     ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
-    vec3 forward_value = texelFetch(texture_flow_map, pointer, 0).rgb;
+    vec3 forward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
     
     pointer = ivec3(backward_x,backward_y,backward_z);
-    vec3 backward_value = texelFetch(texture_flow_map, pointer, 0).rgb;
+    vec3 backward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
 
     vec3 central_difference = (forward_value - backward_value) / h2;
     outputColor = vec4(central_difference,1);

@@ -981,6 +981,7 @@ class UniformLocationsFTLESlice {
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
+        this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
     }
 }
 
@@ -1277,6 +1278,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
+        gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
         
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
@@ -2278,11 +2280,19 @@ const {
 class UniformLocationsComputeFlowMapSlice {
     constructor(gl, program, name) {
         console.log("UniformLocationsComputeFlowMapSlice: ", name)
-        this.location_width = gl.getUniformLocation(program, "width");
-        this.location_height = gl.getUniformLocation(program, "height");
-        this.location_z = gl.getUniformLocation(program, "z");
+        this.location_dim_x_extended = gl.getUniformLocation(program, "dim_x_extended");
+        this.location_dim_y_extended = gl.getUniformLocation(program, "dim_y_extended");
+        this.location_dim_z_extended = gl.getUniformLocation(program, "dim_z_extended");
+        this.location_extended_min_x = gl.getUniformLocation(program, "extended_min_x");
+        this.location_extended_min_y = gl.getUniformLocation(program, "extended_min_y");
+        this.location_extended_min_z = gl.getUniformLocation(program, "extended_min_z");
+        this.location_extended_max_x = gl.getUniformLocation(program, "extended_max_x");
+        this.location_extended_max_y = gl.getUniformLocation(program, "extended_max_y");
+        this.location_extended_max_z = gl.getUniformLocation(program, "extended_max_z");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_step_size = gl.getUniformLocation(program, "step_size");
         this.location_advection_time = gl.getUniformLocation(program, "advection_time");
+
     }
 }
 
@@ -2308,10 +2318,14 @@ class FTLEManager {
         this.dim_x = 100;
         this.dim_y = 100;
         this.dim_z = 100;
+        this.UpdateExtendedDims();
         this.step_size = 0.0125;
         this.advection_time = 0.5;
-        this.compute_wrapper_flowmap = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
+
+        this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap = new DataTexture3D_RGBA(gl);
+
+        this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
         this.data_texture_diff_x = new DataTexture3D_RGBA(gl);
         this.data_texture_diff_y = new DataTexture3D_RGBA(gl);
         this.data_texture_diff_z = new DataTexture3D_RGBA(gl);
@@ -2333,6 +2347,22 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_finite_differences = gl.getAttribLocation(this.program_compute_finite_differences, "a_position");
 
         this.dummy_quad = new DummyQuad(gl);
+    }
+
+    UpdateExtendedDims(){
+        var h_x = 1 / (this.dim_x-1)
+        var h_y = 1 / (this.dim_y-1)
+        var h_z = 1 / (this.dim_z-1)
+
+        this.dim_x_extended = this.dim_x + 2;
+        this.dim_y_extended = this.dim_y + 2;
+        this.dim_z_extended = this.dim_z + 2;
+        this.extended_min_x = 0 - h_x;
+        this.extended_min_y = 0 - h_y;
+        this.extended_min_z = 0 - h_z;
+        this.extended_max_x = 1 + h_x;
+        this.extended_max_y = 1 + h_y;
+        this.extended_max_z = 1 + h_z;
     }
 
     ReplaceComputeFlowMapSliceShader(gl) {
@@ -2359,35 +2389,52 @@ class FTLEManager {
 
     compute(gl) {
         this.computeFlowMap(gl);
+        console.log(this.data_texture_flowmap.texture.texture_data);
+
         this.computeFiniteDifferences(gl);
         this.computeFTLE(gl);
     }
 
     computeFlowMap(gl) {
         console.log("computeFlowMap");
-        console.log(gl);
-        this.data_texture_flowmap.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
+        console.log("this.dim_x_extended: ", this.dim_x_extended);
+        console.log("this.dim_y_extended: ", this.dim_y_extended);
+        console.log("this.dim_z_extended: ", this.dim_z_extended);
+        console.log("this.extended_min_x: ", this.extended_min_x);
+        console.log("this.extended_min_y: ", this.extended_min_y);
+        console.log("this.extended_min_z: ", this.extended_min_z);
+        console.log("this.extended_max_x: ", this.extended_max_x);
+        console.log("this.extended_max_y: ", this.extended_max_y);
+        console.log("this.extended_max_z: ", this.extended_max_z);
+        this.data_texture_flowmap.initDimensions(gl, this.dim_x_extended, this.dim_y_extended, this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(gl);
-        for (var i = 0; i < this.dim_z; i++) {
+        for (var i = 0; i < this.dim_z_extended; i++) {
             this.computeFlowMapSlice(gl, i);
         }
         this.data_texture_flowmap.update(gl);
     }
 
     computeFlowMapSlice(gl, slice_index) {
-        var z = slice_index / (this.dim_z - 1);
-        console.log("computeFlowMapSlice: ", slice_index, z);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_flowmap.frame_buffer);
-        gl.viewport(0, 0, this.dim_x, this.dim_y);
+        //var z = slice_index / (this.dim_z - 1);
+        console.log("computeFlowMapSlice: ", slice_index);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_extended.frame_buffer);
+        gl.viewport(0, 0, this.dim_x_extended, this.dim_y_extended);
         gl.useProgram(this.program_compute_flowmap_slice);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_width, this.dim_x);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_height, this.dim_y);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_x_extended, this.dim_x_extended);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_y_extended, this.dim_y_extended);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_z_extended, this.dim_z_extended);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_x, this.extended_min_x);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_y, this.extended_min_y);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_z, this.extended_min_z);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_x, this.extended_max_x);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_y, this.extended_max_y);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_z, this.extended_max_z);
         gl.uniform1f(this.location_compute_flowmap_slice.location_step_size, this.step_size);
-        gl.uniform1f(this.location_compute_flowmap_slice.location_z, z);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_slice_index, slice_index);
         gl.uniform1f(this.location_compute_flowmap_slice.location_advection_time, this.advection_time);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
-        var slice_data = this.readPixelsRGBA(gl);
+        var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap.updateSlice(gl, slice_index, slice_data);
     }
 
@@ -2413,7 +2460,7 @@ class FTLEManager {
     computeFiniteDifferencesSlice(gl, slice_index, direction, data_texture, h2) {
         var z = slice_index / (this.dim_z - 1);
         console.log("computeFiniteDifferencesSlice: ", slice_index, z);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_flowmap.frame_buffer);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
         gl.useProgram(this.program_compute_finite_differences);
         gl.uniform1i(this.location_compute_finite_differences.location_dim_x, this.dim_x);
@@ -2428,7 +2475,7 @@ class FTLEManager {
         gl.uniform1i(this.location_compute_finite_differences.location_texture_flow_map, 0);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_finite_differences);
-        var slice_data = this.readPixelsRGBA(gl);
+        var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
         data_texture.updateSlice(gl, slice_index, slice_data);
     }
 
@@ -2496,11 +2543,11 @@ class FTLEManager {
         return ftle;
     }
 
-    readPixelsRGBA(gl) {
-        var pixels = new Float32Array(this.dim_x * this.dim_y * 4);
+    readPixelsRGBA(gl, dim_x, dim_y) {
+        var pixels = new Float32Array(dim_x * dim_y * 4);
         var format = gl.RGBA;
         var type = gl.FLOAT;
-        gl.readPixels(0, 0, this.dim_x, this.dim_y, format, type, pixels);
+        gl.readPixels(0, 0, dim_x, dim_y, format, type, pixels);
         return pixels;
     }
 
@@ -110904,42 +110951,42 @@ void main()
     //direction X
     if(direction == 0){
         forward_x += 1;
-        if(forward_x == dim_x)
-            forward_x = 1;
+        //if(forward_x == dim_x)
+        //    forward_x = 1;
 
         backward_x -= 1;
-        if(backward_x == -1)
-            backward_x = dim_x-2;
+        //if(backward_x == -1)
+        //    backward_x = dim_x-2;
     }
     //direction Y
     else if(direction == 1){
         forward_y += 1;
-        if(forward_y == dim_y)
-            forward_y = 1;
+        //if(forward_y == dim_y)
+        //    forward_y = 1;
 
         backward_y -= 1;
-        if(backward_y == -1)
-            backward_y = dim_y-2;
+        //if(backward_y == -1)
+        //    backward_y = dim_y-2;
     }
     //direction Z
     else{
         forward_z += 1;  
-        if(forward_z == dim_z)
-            forward_z = 1;   
+        //if(forward_z == dim_z)
+        //    forward_z = 1;   
 
         backward_z -= 1;
-        if(backward_z == -1)
-            backward_z = dim_z-2;
+        //if(backward_z == -1)
+        //    backward_z = dim_z-2;
     }
 
     //ivec3 pointer = ivec3(x,y,slice_index);
     //vec3 value = texelFetch(texture_flow_map, pointer, 0).rgb;
-
+    ivec3 extended_offset = ivec3(1,1,1);
     ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
-    vec3 forward_value = texelFetch(texture_flow_map, pointer, 0).rgb;
+    vec3 forward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
     
     pointer = ivec3(backward_x,backward_y,backward_z);
-    vec3 backward_value = texelFetch(texture_flow_map, pointer, 0).rgb;
+    vec3 backward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
 
     vec3 central_difference = (forward_value - backward_value) / h2;
     outputColor = vec4(central_difference,1);
@@ -110957,9 +111004,18 @@ precision highp isampler3D;         //high precision required for indices / ids 
 precision highp float;
 precision highp sampler3D;
 
-uniform int width;
-uniform int height;
-uniform float z;
+uniform int dim_x_extended;
+uniform int dim_y_extended;
+uniform int dim_z_extended;
+
+uniform float extended_min_x;
+uniform float extended_min_y;
+uniform float extended_min_z;
+uniform float extended_max_x;
+uniform float extended_max_y;
+uniform float extended_max_z;
+
+uniform int slice_index;
 uniform float step_size;
 uniform float advection_time;//T
 out vec4 outputColor;
@@ -110973,10 +111029,16 @@ void main()
 {
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
-    float t_x = float(x) / float(width-1);
-    float t_y = float(y) / float(height-1);
+    float t_x = float(x) / float(dim_x_extended-1);
+    float t_y = float(y) / float(dim_y_extended-1);
+    float t_z = float(slice_index) / float(dim_z_extended-1);
 
-    vec3 previous_position = vec3(t_x, t_y, z);
+    float val_x = mix(extended_min_x, extended_max_x, t_x);
+    float val_y = mix(extended_min_y, extended_max_y, t_y);
+    float val_z = mix(extended_min_z, extended_max_z, t_z);
+
+    vec3 previous_position = vec3(val_x, val_y, val_z);
+
     vec3 previous_f = f(previous_position);
     float previous_speed = length(previous_f);
     float previous_cost = 0.0;//cost = time
@@ -111073,6 +111135,7 @@ uniform int slice_index;
 uniform float min_scalar;
 uniform float max_scalar;
 
+uniform bool render_color_bar;
 
 //DATA SIZES
 const int STREAMLINE_COLOR_FLOAT_COUNT = 4;
@@ -111121,6 +111184,34 @@ void main()
     outputColor = vec4(GetScalarColor(bin),1);
     //outputColor = vec4(scalar,0,0,1);
     //outputColor = vec4(t_x,t_y,0,1);
+
+
+    if(render_color_bar){
+        int x = int(gl_FragCoord[0]);
+        int y = int(gl_FragCoord[1]);
+        int color_bar_min_x = 16;
+        int color_bar_max_x = 32;
+        int color_bar_min_y = 64;
+        int color_bar_max_y = height-64;
+        int color_bar_padding = 2;
+        int color_bar_min_x_inside = color_bar_min_x + 2 * color_bar_padding;
+        int color_bar_max_x_inside = color_bar_max_x - 2 * color_bar_padding;
+        int color_bar_min_y_inside = color_bar_min_y + 2 * color_bar_padding;
+        int color_bar_max_y_inside = color_bar_max_y - 2 * color_bar_padding;
+        if(x >= color_bar_min_x && x <= color_bar_max_x && y >= color_bar_min_y && y <= color_bar_max_y){
+            outputColor = vec4(0,0,0,1);
+            if(x >= color_bar_min_x + color_bar_padding && x <= color_bar_max_x - color_bar_padding && y >= color_bar_min_y + color_bar_padding && y <= color_bar_max_y - color_bar_padding ){
+                outputColor = vec4(1,1,1,1);
+                if(x >= color_bar_min_x_inside && x <= color_bar_max_x_inside && y >= color_bar_min_y_inside && y <= color_bar_max_y_inside){
+                    float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
+                    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
+                    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+                    outputColor = vec4(GetScalarColor(bin),1);
+                    return;
+                }
+            }
+        }
+    }
 }
 
 //TEXTURE
@@ -113511,16 +113602,21 @@ void main()
         int color_bar_min_y = 64;
         int color_bar_max_y = height-64;
         int color_bar_padding = 2;
-        int color_bar_min_y_inside = color_bar_min_y + color_bar_padding;
-        int color_bar_max_y_inside = color_bar_max_y - color_bar_padding;
+        int color_bar_min_x_inside = color_bar_min_x + 2 * color_bar_padding;
+        int color_bar_max_x_inside = color_bar_max_x - 2 * color_bar_padding;
+        int color_bar_min_y_inside = color_bar_min_y + 2 * color_bar_padding;
+        int color_bar_max_y_inside = color_bar_max_y - 2 * color_bar_padding;
         if(x >= color_bar_min_x && x <= color_bar_max_x && y >= color_bar_min_y && y <= color_bar_max_y){
-            outputColor = vec4(1,1,1,1);
-            if(x >= color_bar_min_x + color_bar_padding && x <= color_bar_max_x - color_bar_padding && y >= color_bar_min_y_inside && y <= color_bar_max_y_inside){
-                float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
-                int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
-                bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-                outputColor = vec4(GetScalarColor(bin),1);
-                return;
+            outputColor = vec4(0,0,0,1);
+            if(x >= color_bar_min_x + color_bar_padding && x <= color_bar_max_x - color_bar_padding && y >= color_bar_min_y + color_bar_padding && y <= color_bar_max_y - color_bar_padding ){
+                outputColor = vec4(1,1,1,1);
+                if(x >= color_bar_min_x_inside && x <= color_bar_max_x_inside && y >= color_bar_min_y_inside && y <= color_bar_max_y_inside){
+                    float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
+                    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
+                    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+                    outputColor = vec4(GetScalarColor(bin),1);
+                    return;
+                }
             }
         }
     }

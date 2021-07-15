@@ -57,16 +57,21 @@ void main()
         int color_bar_min_y = 64;
         int color_bar_max_y = height-64;
         int color_bar_padding = 2;
-        int color_bar_min_y_inside = color_bar_min_y + color_bar_padding;
-        int color_bar_max_y_inside = color_bar_max_y - color_bar_padding;
+        int color_bar_min_x_inside = color_bar_min_x + 2 * color_bar_padding;
+        int color_bar_max_x_inside = color_bar_max_x - 2 * color_bar_padding;
+        int color_bar_min_y_inside = color_bar_min_y + 2 * color_bar_padding;
+        int color_bar_max_y_inside = color_bar_max_y - 2 * color_bar_padding;
         if(x >= color_bar_min_x && x <= color_bar_max_x && y >= color_bar_min_y && y <= color_bar_max_y){
-            outputColor = vec4(1,1,1,1);
-            if(x >= color_bar_min_x + color_bar_padding && x <= color_bar_max_x - color_bar_padding && y >= color_bar_min_y_inside && y <= color_bar_max_y_inside){
-                float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
-                int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
-                bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-                outputColor = vec4(GetScalarColor(bin),1);
-                return;
+            outputColor = vec4(0,0,0,1);
+            if(x >= color_bar_min_x + color_bar_padding && x <= color_bar_max_x - color_bar_padding && y >= color_bar_min_y + color_bar_padding && y <= color_bar_max_y - color_bar_padding ){
+                outputColor = vec4(1,1,1,1);
+                if(x >= color_bar_min_x_inside && x <= color_bar_max_x_inside && y >= color_bar_min_y_inside && y <= color_bar_max_y_inside){
+                    float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
+                    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
+                    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+                    outputColor = vec4(GetScalarColor(bin),1);
+                    return;
+                }
             }
         }
     }

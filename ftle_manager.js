@@ -22,11 +22,19 @@ const {
 class UniformLocationsComputeFlowMapSlice {
     constructor(gl, program, name) {
         console.log("UniformLocationsComputeFlowMapSlice: ", name)
-        this.location_width = gl.getUniformLocation(program, "width");
-        this.location_height = gl.getUniformLocation(program, "height");
-        this.location_z = gl.getUniformLocation(program, "z");
+        this.location_dim_x_extended = gl.getUniformLocation(program, "dim_x_extended");
+        this.location_dim_y_extended = gl.getUniformLocation(program, "dim_y_extended");
+        this.location_dim_z_extended = gl.getUniformLocation(program, "dim_z_extended");
+        this.location_extended_min_x = gl.getUniformLocation(program, "extended_min_x");
+        this.location_extended_min_y = gl.getUniformLocation(program, "extended_min_y");
+        this.location_extended_min_z = gl.getUniformLocation(program, "extended_min_z");
+        this.location_extended_max_x = gl.getUniformLocation(program, "extended_max_x");
+        this.location_extended_max_y = gl.getUniformLocation(program, "extended_max_y");
+        this.location_extended_max_z = gl.getUniformLocation(program, "extended_max_z");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_step_size = gl.getUniformLocation(program, "step_size");
         this.location_advection_time = gl.getUniformLocation(program, "advection_time");
+
     }
 }
 
@@ -52,10 +60,14 @@ class FTLEManager {
         this.dim_x = 100;
         this.dim_y = 100;
         this.dim_z = 100;
+        this.UpdateExtendedDims();
         this.step_size = 0.0125;
         this.advection_time = 0.5;
-        this.compute_wrapper_flowmap = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
+
+        this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap = new DataTexture3D_RGBA(gl);
+
+        this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
         this.data_texture_diff_x = new DataTexture3D_RGBA(gl);
         this.data_texture_diff_y = new DataTexture3D_RGBA(gl);
         this.data_texture_diff_z = new DataTexture3D_RGBA(gl);
@@ -77,6 +89,22 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_finite_differences = gl.getAttribLocation(this.program_compute_finite_differences, "a_position");
 
         this.dummy_quad = new DummyQuad(gl);
+    }
+
+    UpdateExtendedDims(){
+        var h_x = 1 / (this.dim_x-1)
+        var h_y = 1 / (this.dim_y-1)
+        var h_z = 1 / (this.dim_z-1)
+
+        this.dim_x_extended = this.dim_x + 2;
+        this.dim_y_extended = this.dim_y + 2;
+        this.dim_z_extended = this.dim_z + 2;
+        this.extended_min_x = 0 - h_x;
+        this.extended_min_y = 0 - h_y;
+        this.extended_min_z = 0 - h_z;
+        this.extended_max_x = 1 + h_x;
+        this.extended_max_y = 1 + h_y;
+        this.extended_max_z = 1 + h_z;
     }
 
     ReplaceComputeFlowMapSliceShader(gl) {
@@ -103,35 +131,52 @@ class FTLEManager {
 
     compute(gl) {
         this.computeFlowMap(gl);
+        console.log(this.data_texture_flowmap.texture.texture_data);
+
         this.computeFiniteDifferences(gl);
         this.computeFTLE(gl);
     }
 
     computeFlowMap(gl) {
         console.log("computeFlowMap");
-        console.log(gl);
-        this.data_texture_flowmap.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
+        console.log("this.dim_x_extended: ", this.dim_x_extended);
+        console.log("this.dim_y_extended: ", this.dim_y_extended);
+        console.log("this.dim_z_extended: ", this.dim_z_extended);
+        console.log("this.extended_min_x: ", this.extended_min_x);
+        console.log("this.extended_min_y: ", this.extended_min_y);
+        console.log("this.extended_min_z: ", this.extended_min_z);
+        console.log("this.extended_max_x: ", this.extended_max_x);
+        console.log("this.extended_max_y: ", this.extended_max_y);
+        console.log("this.extended_max_z: ", this.extended_max_z);
+        this.data_texture_flowmap.initDimensions(gl, this.dim_x_extended, this.dim_y_extended, this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(gl);
-        for (var i = 0; i < this.dim_z; i++) {
+        for (var i = 0; i < this.dim_z_extended; i++) {
             this.computeFlowMapSlice(gl, i);
         }
         this.data_texture_flowmap.update(gl);
     }
 
     computeFlowMapSlice(gl, slice_index) {
-        var z = slice_index / (this.dim_z - 1);
-        console.log("computeFlowMapSlice: ", slice_index, z);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_flowmap.frame_buffer);
-        gl.viewport(0, 0, this.dim_x, this.dim_y);
+        //var z = slice_index / (this.dim_z - 1);
+        console.log("computeFlowMapSlice: ", slice_index);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_extended.frame_buffer);
+        gl.viewport(0, 0, this.dim_x_extended, this.dim_y_extended);
         gl.useProgram(this.program_compute_flowmap_slice);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_width, this.dim_x);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_height, this.dim_y);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_x_extended, this.dim_x_extended);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_y_extended, this.dim_y_extended);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_z_extended, this.dim_z_extended);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_x, this.extended_min_x);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_y, this.extended_min_y);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_z, this.extended_min_z);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_x, this.extended_max_x);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_y, this.extended_max_y);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_z, this.extended_max_z);
         gl.uniform1f(this.location_compute_flowmap_slice.location_step_size, this.step_size);
-        gl.uniform1f(this.location_compute_flowmap_slice.location_z, z);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_slice_index, slice_index);
         gl.uniform1f(this.location_compute_flowmap_slice.location_advection_time, this.advection_time);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
-        var slice_data = this.readPixelsRGBA(gl);
+        var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap.updateSlice(gl, slice_index, slice_data);
     }
 
@@ -157,7 +202,7 @@ class FTLEManager {
     computeFiniteDifferencesSlice(gl, slice_index, direction, data_texture, h2) {
         var z = slice_index / (this.dim_z - 1);
         console.log("computeFiniteDifferencesSlice: ", slice_index, z);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_flowmap.frame_buffer);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
         gl.useProgram(this.program_compute_finite_differences);
         gl.uniform1i(this.location_compute_finite_differences.location_dim_x, this.dim_x);
@@ -172,7 +217,7 @@ class FTLEManager {
         gl.uniform1i(this.location_compute_finite_differences.location_texture_flow_map, 0);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_finite_differences);
-        var slice_data = this.readPixelsRGBA(gl);
+        var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
         data_texture.updateSlice(gl, slice_index, slice_data);
     }
 
@@ -240,11 +285,11 @@ class FTLEManager {
         return ftle;
     }
 
-    readPixelsRGBA(gl) {
-        var pixels = new Float32Array(this.dim_x * this.dim_y * 4);
+    readPixelsRGBA(gl, dim_x, dim_y) {
+        var pixels = new Float32Array(dim_x * dim_y * 4);
         var format = gl.RGBA;
         var type = gl.FLOAT;
-        gl.readPixels(0, 0, this.dim_x, this.dim_y, format, type, pixels);
+        gl.readPixels(0, 0, dim_x, dim_y, format, type, pixels);
         return pixels;
     }
 
