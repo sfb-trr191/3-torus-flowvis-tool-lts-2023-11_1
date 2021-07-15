@@ -77,10 +77,12 @@ class UniformLocationsFTLESlice {
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
         this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_draw_slice_axes_order = gl.getUniformLocation(program, "draw_slice_axes_order");        
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
         this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
@@ -118,6 +120,7 @@ class CanvasWrapper {
         this.show_origin_axes = false;
         this.draw_mode = DRAW_MODE_DEFAULT;
         this.draw_slice_index = 0;
+        this.draw_slice_axes_order = DRAW_SLICE_AXES_ORDER_HX_VY;
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
 
@@ -377,7 +380,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
         gl.uniform1i(this.location_ftle_slice.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_ftle_slice.location_dim_y, this.p_ftle_manager.dim_y);
+        gl.uniform1i(this.location_ftle_slice.location_dim_z, this.p_ftle_manager.dim_z);
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
+        gl.uniform1i(this.location_ftle_slice.location_draw_slice_axes_order, this.draw_slice_axes_order);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);

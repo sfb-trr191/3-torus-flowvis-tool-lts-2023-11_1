@@ -12,6 +12,7 @@ uniform isampler3D texture_int_global;
 
 uniform int dim_x;
 uniform int dim_y;
+uniform int dim_z;
 
 uniform int width;
 uniform int height;
@@ -41,6 +42,11 @@ ivec3 GetIndex3D(int global_index);
 const int TRANSFER_FUNCTION_BINS = 512;
 const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
+uniform int draw_slice_axes_order;
+const int DRAW_SLICE_AXES_ORDER_HX_VY = 0;
+const int DRAW_SLICE_AXES_ORDER_HX_VZ = 1;
+const int DRAW_SLICE_AXES_ORDER_HZ_VY = 2;
+
 out vec4 outputColor;
 //! [0]
 void main()
@@ -58,8 +64,19 @@ void main()
 
     int x_index = int(float(dim_x) * t_x);
     int y_index = int(float(dim_y) * t_y);
+    int z_index = slice_index;
+    if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HX_VZ){
+        x_index = int(float(dim_x) * t_x);
+        y_index = slice_index;
+        z_index = int(float(dim_z) * t_y);
+    }
+    else if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HZ_VY){
+        x_index = slice_index;
+        y_index = int(float(dim_y) * t_y);
+        z_index = int(float(dim_z) * t_x);
+    }
 
-    ivec3 pointer = ivec3(x_index,y_index,slice_index);
+    ivec3 pointer = ivec3(x_index,y_index,z_index);
     //vec4 value = texelFetch(texture_flow_map, pointer, 0);
 
     float scalar = texelFetch(texture_flow_map, pointer, 0).r;

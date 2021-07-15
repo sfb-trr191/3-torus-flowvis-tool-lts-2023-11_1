@@ -977,10 +977,12 @@ class UniformLocationsFTLESlice {
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
         this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_draw_slice_axes_order = gl.getUniformLocation(program, "draw_slice_axes_order");        
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
         this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
@@ -1018,6 +1020,7 @@ class CanvasWrapper {
         this.show_origin_axes = false;
         this.draw_mode = DRAW_MODE_DEFAULT;
         this.draw_slice_index = 0;
+        this.draw_slice_axes_order = DRAW_SLICE_AXES_ORDER_HX_VY;
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
 
@@ -1277,7 +1280,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
         gl.uniform1i(this.location_ftle_slice.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_ftle_slice.location_dim_y, this.p_ftle_manager.dim_y);
+        gl.uniform1i(this.location_ftle_slice.location_dim_z, this.p_ftle_manager.dim_z);
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
+        gl.uniform1i(this.location_ftle_slice.location_draw_slice_axes_order, this.draw_slice_axes_order);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
@@ -1416,6 +1421,10 @@ global.FIXED_LENGTH_RANDOM_SEED_POSITION = 4;
 global.DRAW_MODE_NONE = 0;
 global.DRAW_MODE_DEFAULT = 1;
 global.DRAW_MODE_FTLE_SLICE = 2;
+
+global.DRAW_SLICE_AXES_ORDER_HX_VY = 0;
+global.DRAW_SLICE_AXES_ORDER_HX_VZ = 1;
+global.DRAW_SLICE_AXES_ORDER_HZ_VY = 2;
 
 global.DIRECTION_FORWARD = 1;
 global.DIRECTION_BACKWARD = 2;
@@ -3612,6 +3621,7 @@ const Export = module_export.Export;
         var index = Math.round(lerp(0, max_index, t));
 
         slider.value = index;
+        canvas_wrapper_side.draw_slice_axes_order = parseInt(document.getElementById("select_slice_axes_order").value);
         canvas_wrapper_side.draw_slice_index = index;
         canvas_wrapper_side.aliasing_index = 0;
     }
@@ -111197,6 +111207,7 @@ uniform isampler3D texture_int_global;
 
 uniform int dim_x;
 uniform int dim_y;
+uniform int dim_z;
 
 uniform int width;
 uniform int height;
@@ -111226,6 +111237,11 @@ ivec3 GetIndex3D(int global_index);
 const int TRANSFER_FUNCTION_BINS = 512;
 const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
+uniform int draw_slice_axes_order;
+const int DRAW_SLICE_AXES_ORDER_HX_VY = 0;
+const int DRAW_SLICE_AXES_ORDER_HX_VZ = 1;
+const int DRAW_SLICE_AXES_ORDER_HZ_VY = 2;
+
 out vec4 outputColor;
 //! [0]
 void main()
@@ -111243,8 +111259,19 @@ void main()
 
     int x_index = int(float(dim_x) * t_x);
     int y_index = int(float(dim_y) * t_y);
+    int z_index = slice_index;
+    if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HX_VZ){
+        x_index = int(float(dim_x) * t_x);
+        y_index = slice_index;
+        z_index = int(float(dim_z) * t_y);
+    }
+    else if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HZ_VY){
+        x_index = slice_index;
+        y_index = int(float(dim_y) * t_y);
+        z_index = int(float(dim_z) * t_x);
+    }
 
-    ivec3 pointer = ivec3(x_index,y_index,slice_index);
+    ivec3 pointer = ivec3(x_index,y_index,z_index);
     //vec4 value = texelFetch(texture_flow_map, pointer, 0);
 
     float scalar = texelFetch(texture_flow_map, pointer, 0).r;

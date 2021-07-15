@@ -797,6 +797,7 @@ const Export = module_export.Export;
         var index = Math.round(lerp(0, max_index, t));
 
         slider.value = index;
+        canvas_wrapper_side.draw_slice_axes_order = parseInt(document.getElementById("select_slice_axes_order").value);
         canvas_wrapper_side.draw_slice_index = index;
         canvas_wrapper_side.aliasing_index = 0;
     }
