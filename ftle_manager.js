@@ -149,6 +149,7 @@ class FTLEManager {
         this.UpdateExtendedDims(gl);
         this.advection_time = advection_time;
         this.step_size = step_size;
+        this.highest_iteration_count = 0;
         this.computeFlowMap(gl);
         console.log(this.data_texture_flowmap.texture.texture_data);
 
@@ -197,6 +198,14 @@ class FTLEManager {
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap.updateSlice(gl, slice_index, slice_data);
+
+        var highest_iteration_count_slice = 0;
+        var size = this.dim_x * this.dim_y * 4;
+        for (var i=3; i<size; i+=4){
+            highest_iteration_count_slice = Math.max(slice_data[i], highest_iteration_count_slice);
+        }
+        this.highest_iteration_count = Math.max(highest_iteration_count_slice, this.highest_iteration_count);
+        console.log("highest_iteration_count: ", highest_iteration_count_slice, this.highest_iteration_count);
     }
 
     computeFiniteDifferences(gl) {

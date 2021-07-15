@@ -2420,6 +2420,7 @@ class FTLEManager {
         this.UpdateExtendedDims(gl);
         this.advection_time = advection_time;
         this.step_size = step_size;
+        this.highest_iteration_count = 0;
         this.computeFlowMap(gl);
         console.log(this.data_texture_flowmap.texture.texture_data);
 
@@ -2468,6 +2469,14 @@ class FTLEManager {
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap.updateSlice(gl, slice_index, slice_data);
+
+        var highest_iteration_count_slice = 0;
+        var size = this.dim_x * this.dim_y * 4;
+        for (var i=3; i<size; i+=4){
+            highest_iteration_count_slice = Math.max(slice_data[i], highest_iteration_count_slice);
+        }
+        this.highest_iteration_count = Math.max(highest_iteration_count_slice, this.highest_iteration_count);
+        console.log("highest_iteration_count: ", highest_iteration_count_slice, this.highest_iteration_count);
     }
 
     computeFiniteDifferences(gl) {
@@ -111095,7 +111104,7 @@ uniform int slice_index;
 uniform float step_size;
 uniform float advection_time;//T
 out vec4 outputColor;
-const int max_iterations = 1000;
+const int max_iterations = 10000;
 
 vec3 f(vec3 vector);
 
@@ -111127,6 +111136,7 @@ void main()
     float segment_length = 0.0;
     float average_speed = 0.0;
     float arc_length = 0.0;
+    int iteration_count = 0;
     for (int i=0; i<max_iterations; i++){
         vec3 k1 = step_size * f(previous_position);
 		vec3 k2 = step_size * f(previous_position + k1/2.0);
@@ -111151,8 +111161,9 @@ void main()
         previous_f = current_f;
         previous_cost = current_cost;
         previous_speed = current_speed;
+        iteration_count = i;
     }
-    outputColor = vec4(current_position,arc_length);
+    outputColor = vec4(current_position,iteration_count);
 }
 
 vec3 f(vec3 vector)

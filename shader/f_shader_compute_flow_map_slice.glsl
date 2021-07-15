@@ -19,7 +19,7 @@ uniform int slice_index;
 uniform float step_size;
 uniform float advection_time;//T
 out vec4 outputColor;
-const int max_iterations = 1000;
+const int max_iterations = 10000;
 
 vec3 f(vec3 vector);
 
@@ -51,6 +51,7 @@ void main()
     float segment_length = 0.0;
     float average_speed = 0.0;
     float arc_length = 0.0;
+    int iteration_count = 0;
     for (int i=0; i<max_iterations; i++){
         vec3 k1 = step_size * f(previous_position);
 		vec3 k2 = step_size * f(previous_position + k1/2.0);
@@ -75,8 +76,9 @@ void main()
         previous_f = current_f;
         previous_cost = current_cost;
         previous_speed = current_speed;
+        iteration_count = i;
     }
-    outputColor = vec4(current_position,arc_length);
+    outputColor = vec4(current_position,iteration_count);
 }
 
 vec3 f(vec3 vector)
