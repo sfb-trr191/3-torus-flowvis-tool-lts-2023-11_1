@@ -11,6 +11,7 @@ uniform int dim_y;
 uniform int dim_z;
 uniform int slice_index;
 uniform int direction;//x,y,z = 0,1,2
+uniform bool is_forward;
 uniform float h2;// h2 = 2h from the equation f'(x_i) = (f(x_{i+1}) - f(x_{i-1})) / (2h)
 
 out vec4 outputColor;
@@ -62,6 +63,11 @@ void main()
         backward_z -= 1;
         //if(backward_z == -1)
         //    backward_z = dim_z-2;
+    }
+
+    if(!is_forward){
+        forward_z += dim_z+2; 
+        backward_z += dim_z+2;
     }
 
     //ivec3 pointer = ivec3(x,y,slice_index);

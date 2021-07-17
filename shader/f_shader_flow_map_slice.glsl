@@ -36,6 +36,7 @@ uniform int start_index_float_scalar_color;
 uniform int start_index_int_cylinder;
 uniform int start_index_float_cylinder;
 
+void DrawOneTexture(bool is_forward);
 vec3 GetScalarColor(int index);
 ivec3 GetIndex3D(int global_index);
 
@@ -47,45 +48,20 @@ const int DRAW_SLICE_AXES_ORDER_HX_VY = 0;
 const int DRAW_SLICE_AXES_ORDER_HX_VZ = 1;
 const int DRAW_SLICE_AXES_ORDER_HZ_VY = 2;
 
+uniform int draw_slice_mode;
+const int DRAW_SLICE_MODE_COMBINED = 0;
+const int DRAW_SLICE_MODE_FORWARD = 1;
+const int DRAW_SLICE_MODE_BACKWARD = 2;
+
 out vec4 outputColor;
 //! [0]
 void main()
 {
-    int min_canvas_dim = min(width, height);
-    int x = int(gl_FragCoord[0]);
-    int y = int(gl_FragCoord[1]);
-    int x_start = 0;
-    if(width > height){
-        x_start = (width - height) / 2;
-    }
 
-    float t_x = float(x-x_start) / float(min_canvas_dim-1);
-    float t_y = float(y) / float(min_canvas_dim-1);
-
-    int x_index = int(float(dim_x) * t_x);
-    int y_index = int(float(dim_y) * t_y);
-    int z_index = slice_index;
-    if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HX_VZ){
-        x_index = int(float(dim_x) * t_x);
-        y_index = slice_index;
-        z_index = int(float(dim_z) * t_y);
-    }
-    else if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HZ_VY){
-        x_index = slice_index;
-        y_index = int(float(dim_y) * t_y);
-        z_index = int(float(dim_z) * t_x);
-    }
-
-    ivec3 pointer = ivec3(x_index,y_index,z_index);
-    //vec4 value = texelFetch(texture_flow_map, pointer, 0);
-
-    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
-    float t = (scalar - min_scalar) / (max_scalar - min_scalar);
-    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
-    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-    outputColor = vec4(GetScalarColor(bin),1);
-    //outputColor = vec4(scalar,0,0,1);
-    //outputColor = vec4(t_x,t_y,0,1);
+    if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD)
+        DrawOneTexture(true);
+    else if (draw_slice_mode == DRAW_SLICE_MODE_BACKWARD)
+        DrawOneTexture(false);
 
 
     if(render_color_bar){
@@ -114,6 +90,52 @@ void main()
             }
         }
     }
+}
+
+void DrawOneTexture(bool is_forward)
+{
+    int min_canvas_dim = min(width, height);
+    int x = int(gl_FragCoord[0]);
+    int y = int(gl_FragCoord[1]);
+    int x_start = 0;
+    if(width > height){
+        x_start = (width - height) / 2;
+    }
+
+    float t_x = float(x-x_start) / float(min_canvas_dim-1);
+    float t_y = float(y) / float(min_canvas_dim-1);
+
+    bool outside = t_x < 0.0 || t_x > 1.0 || t_y < 0.0 || t_y > 1.0;
+    if(outside)
+        return;
+
+    int x_index = int(floor(0.5 + float(dim_x-1) * t_x));
+    int y_index = int(floor(0.5 + float(dim_y-1) * t_y));
+    int z_index = slice_index;
+    if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HX_VZ){
+        x_index = int(floor(0.5 + float(dim_x-1) * t_x));
+        y_index = slice_index;
+        z_index = int(floor(0.5 + float(dim_z-1) * t_y));
+    }
+    else if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HZ_VY){
+        x_index = slice_index;
+        y_index = int(floor(0.5 + float(dim_y-1) * t_y));
+        z_index = int(floor(0.5 + float(dim_z-1) * t_x));
+    }
+
+    z_index = clamp(z_index, 0, dim_z-1);
+    if(!is_forward)
+        z_index += dim_z;
+    ivec3 pointer = ivec3(x_index,y_index,z_index);
+    //vec4 value = texelFetch(texture_flow_map, pointer, 0);
+
+    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
+    float t = (scalar - min_scalar) / (max_scalar - min_scalar);
+    int bin = int(floor(0.5 + float(TRANSFER_FUNCTION_LAST_BIN) * t));
+    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+    outputColor = vec4(GetScalarColor(bin),1);
+    //outputColor = vec4(scalar,0,0,1);
+    //outputColor = vec4(t_x,t_y,0,1);
 }
 
 //TEXTURE

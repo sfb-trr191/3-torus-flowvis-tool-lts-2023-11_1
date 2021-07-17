@@ -450,8 +450,8 @@ const Export = module_export.Export;
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
             var value = document.getElementById("slide_slice_index").value;
             canvas_wrapper_side.draw_slice_index = value;
-            canvas_wrapper_side.aliasing_index = 0;
             console.log("slice_index", value);
+            UpdateSliceSettings();
         });
     }
 
@@ -782,11 +782,13 @@ const Export = module_export.Export;
     }
 
     function UpdateAnimation(time_now, deltaTime) {
+        if(canvas_wrapper_side.draw_mode != DRAW_MODE_FTLE_SLICE)
+            return;
+        
+        UpdateSliceSettings();
+
         var animate = document.getElementById("checkbox_animate_slice_index").checked
         if (!animate)
-            return;
-
-        if(canvas_wrapper_side.draw_mode != DRAW_MODE_FTLE_SLICE)
             return;
 
         var slider = document.getElementById("slide_slice_index");
@@ -800,8 +802,13 @@ const Export = module_export.Export;
         var index = Math.round(lerp(0, max_index, t));
 
         slider.value = index;
-        canvas_wrapper_side.draw_slice_axes_order = parseInt(document.getElementById("select_slice_axes_order").value);
+
         canvas_wrapper_side.draw_slice_index = index;
+    }
+
+    function UpdateSliceSettings(){
+        canvas_wrapper_side.draw_slice_axes_order = parseInt(document.getElementById("select_slice_axes_order").value);
+        canvas_wrapper_side.draw_slice_mode = parseInt(document.getElementById("select_slice_mode").value);
         canvas_wrapper_side.aliasing_index = 0;
     }
 

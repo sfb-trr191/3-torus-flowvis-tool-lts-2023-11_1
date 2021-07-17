@@ -32,6 +32,7 @@ class UniformLocationsComputeFlowMapSlice {
         this.location_extended_max_y = gl.getUniformLocation(program, "extended_max_y");
         this.location_extended_max_z = gl.getUniformLocation(program, "extended_max_z");
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_sign_f = gl.getUniformLocation(program, "sign_f");        
         this.location_step_size = gl.getUniformLocation(program, "step_size");
         this.location_advection_time = gl.getUniformLocation(program, "advection_time");
 
@@ -48,6 +49,7 @@ class UniformLocationsComputeFiniteDifferences {
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_direction = gl.getUniformLocation(program, "direction");
         this.location_h2 = gl.getUniformLocation(program, "h2");
+        this.location_is_forward = gl.getUniformLocation(program, "is_forward");
     }
 }
 
@@ -168,15 +170,21 @@ class FTLEManager {
         console.log("this.extended_max_x: ", this.extended_max_x);
         console.log("this.extended_max_y: ", this.extended_max_y);
         console.log("this.extended_max_z: ", this.extended_max_z);
-        this.data_texture_flowmap.initDimensions(gl, this.dim_x_extended, this.dim_y_extended, this.dim_z_extended);
+        this.data_texture_flowmap.initDimensions(gl, this.dim_x_extended, this.dim_y_extended, 2*this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(gl);
         for (var i = 0; i < this.dim_z_extended; i++) {
-            this.computeFlowMapSlice(gl, i);
+            this.computeFlowMapSlice(gl, i, true);
+        }
+        for (var i = 0; i < this.dim_z_extended; i++) {
+            this.computeFlowMapSlice(gl, i, false);
         }
         this.data_texture_flowmap.update(gl);
     }
 
-    computeFlowMapSlice(gl, slice_index) {
+    computeFlowMapSlice(gl, slice_index, is_forward) {
+        var sign_f = is_forward ? 1.0 : -1.0;
+        //var sign_f = 1.0;
+        var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z_extended;
         //var z = slice_index / (this.dim_z - 1);
         console.log("computeFlowMapSlice: ", slice_index);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_extended.frame_buffer);
@@ -193,11 +201,12 @@ class FTLEManager {
         gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_z, this.extended_max_z);
         gl.uniform1f(this.location_compute_flowmap_slice.location_step_size, this.step_size);
         gl.uniform1i(this.location_compute_flowmap_slice.location_slice_index, slice_index);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_sign_f, sign_f);        
         gl.uniform1f(this.location_compute_flowmap_slice.location_advection_time, this.advection_time);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
-        this.data_texture_flowmap.updateSlice(gl, slice_index, slice_data);
+        this.data_texture_flowmap.updateSlice(gl, slice_index_combined_texture, slice_data);
 
         var highest_iteration_count_slice = 0;
         var size = this.dim_x * this.dim_y * 4;
@@ -220,14 +229,19 @@ class FTLEManager {
     }
 
     computeFiniteDifferencesDirection(gl, direction, data_texture, h2) {
-        data_texture.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
+        data_texture.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
         for (var i = 0; i < this.dim_z; i++) {
-            this.computeFiniteDifferencesSlice(gl, i, direction, data_texture, h2);
+            this.computeFiniteDifferencesSlice(gl, i, direction, data_texture, h2, true);
+        }
+        for (var i = 0; i < this.dim_z; i++) {
+            this.computeFiniteDifferencesSlice(gl, i, direction, data_texture, h2, false);
         }
         data_texture.update(gl);
     }
 
-    computeFiniteDifferencesSlice(gl, slice_index, direction, data_texture, h2) {
+    computeFiniteDifferencesSlice(gl, slice_index, direction, data_texture, h2, is_forward) {
+        var sign_f = is_forward ? 1.0 : -1.0;
+        var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
         console.log("computeFiniteDifferencesSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
@@ -238,6 +252,7 @@ class FTLEManager {
         gl.uniform1i(this.location_compute_finite_differences.location_dim_z, this.dim_z);
         gl.uniform1i(this.location_compute_finite_differences.location_slice_index, slice_index);
         gl.uniform1i(this.location_compute_finite_differences.location_direction, direction);
+        gl.uniform1i(this.location_compute_finite_differences.location_is_forward, is_forward);
         gl.uniform1f(this.location_compute_finite_differences.location_h2, h2);
 
         gl.activeTexture(gl.TEXTURE0);
@@ -246,41 +261,48 @@ class FTLEManager {
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_finite_differences);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
-        data_texture.updateSlice(gl, slice_index, slice_data);
+        data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
     }
 
     computeFTLE(gl) {
         console.log("computeFTLE");
         this.ftle_max_value = 0;
         this.ftle_min_value = 0;
-        this.data_texture_ftle.initDimensions(gl, this.dim_x, this.dim_y, this.dim_z);
+        this.data_texture_ftle.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
         for (var i = 0; i < this.dim_z; i++) {
-            this.computeFTLESlice(gl, i);
+            this.computeFTLESlice(gl, i, true);
+        }
+        for (var i = 0; i < this.dim_z; i++) {
+            this.computeFTLESlice(gl, i, false);
         }
         this.data_texture_ftle.update(gl);
 
         console.log(this.data_texture_diff_x.texture.texture_data)
     }
 
-    computeFTLESlice(gl, slice_index) {
+    computeFTLESlice(gl, slice_index, is_forward) {
+        var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFTLESlice: ", slice_index, z);
+        console.log("computeFTLESlice: ", slice_index, z, slice_index_combined_texture);
 
         var slice_data = new Float32Array(this.dim_x * this.dim_y);
         for (var x = 0; x < this.dim_x; x++) {
             for (var y = 0; y < this.dim_y; y++) {
                 var index = x + y * this.dim_x;
-                slice_data[index] = this.computeFTLETexel(x, y, slice_index);
+                slice_data[index] = this.computeFTLETexel(x, y, slice_index, is_forward);
             }
         }
-        this.data_texture_ftle.updateSlice(gl, slice_index, slice_data);
+        this.data_texture_ftle.updateSlice(gl, slice_index_combined_texture, slice_data);
 
 
         //console.log(this.data_texture_ftle.texture.texture_data)
     }
 
-    computeFTLETexel(x, y, z) {
+    computeFTLETexel(x, y, z, is_forward) {
         var index = 4 * (x + y * this.dim_x + z * this.dim_x * this.dim_y);
+        if(!is_forward)
+            index += 4 * (this.dim_x * this.dim_y * this.dim_z);
+        //index += is_forward ? 0 : this.dim_x * this.dim_y * this.dim_z;
         //finite differences in x direction
         var data = this.data_texture_diff_x.texture.texture_data;
         var df0_dx0 = data[index];
@@ -308,8 +330,10 @@ class FTLEManager {
         var lambda_max = Math.max(real[0], real[1], real[2]);
         //calculate FTLE
         var ftle = 1 / this.advection_time * Math.log(Math.sqrt(lambda_max));
+        //ftle= is_forward ? x : y;
         this.ftle_max_value = Math.max(ftle, this.ftle_max_value);
         this.ftle_min_value = Math.min(ftle, this.ftle_min_value);
+
         return ftle;
     }
 

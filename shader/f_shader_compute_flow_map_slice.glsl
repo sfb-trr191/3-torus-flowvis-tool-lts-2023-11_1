@@ -16,6 +16,7 @@ uniform float extended_max_y;
 uniform float extended_max_z;
 
 uniform int slice_index;
+uniform float sign_f;//1.0 for forward direction, -1.0 for backward direction
 uniform float step_size;
 uniform float advection_time;//T
 out vec4 outputColor;
@@ -89,7 +90,7 @@ vec3 f(vec3 vector)
 	float u = shader_formula_u;
 	float v = shader_formula_v;
 	float w = shader_formula_w;
-	return vec3(u,v,w);	
+	return vec3(u*sign_f, v*sign_f, w*sign_f);	
 }
 
 `;
