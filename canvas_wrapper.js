@@ -87,6 +87,8 @@ class UniformLocationsFTLESlice {
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
         this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
+        this.location_transfer_function_index = gl.getUniformLocation(program, "transfer_function_index");
+        this.location_transfer_function_index_backward = gl.getUniformLocation(program, "transfer_function_index_backward");        
     }
 }
 
@@ -123,6 +125,8 @@ class CanvasWrapper {
         this.draw_slice_index = 0;
         this.draw_slice_axes_order = DRAW_SLICE_AXES_ORDER_HX_VY;
         this.draw_slice_mode = DRAW_SLICE_MODE_COMBINED;
+        this.ftle_transfer_function_index = 2;
+        this.ftle_transfer_function_index_backward = 3;
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
 
@@ -391,6 +395,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
         gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
+        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index, this.ftle_transfer_function_index);
+        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.ftle_transfer_function_index_backward);
         
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);

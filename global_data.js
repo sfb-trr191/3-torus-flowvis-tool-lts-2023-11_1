@@ -34,7 +34,7 @@ class GlobalData {
         console.log("UpdateDataUnit: ", this.data_unit.name);
         this.data_container_dir_lights.data = this.p_lights.dir_lights;
         this.data_container_streamline_color.data = this.p_ui_seeds.getStreamlineColors();
-        this.data_container_scalar_color.data = this.p_transfer_function_manager.GetActiveTransferfunctionColorList();
+        this.data_container_scalar_color.data = this.p_transfer_function_manager.GetConcatenatedTransferfunctionColorList();
         this.data_container_cylinders.data = this.p_object_manager.cylinders;
         this.data_unit.generateArrays();
         console.log("UpdateDataUnit completed");

@@ -65,18 +65,37 @@ class TransferFunction {
 class TransferFunctionManager {
 
     constructor() {
-        this.transfer_functions = {};
+        this.transfer_function_list = [];
+        this.transfer_function_dict = {};
+        this.concatenated_colors = [];
         this.active_transfer_function = "Green Linear";
         this.CreateDefaultTransferFunctions();
+        this.Concatenate();
+    }
+
+    Concatenate(){
+        this.concatenated_colors = [];
+        for(var i=0; i<this.transfer_function_list.length; i++){
+            this.concatenated_colors = this.concatenated_colors.concat(this.transfer_function_list[i].list_colors);
+        }
+        console.log("Concatenate ", this.concatenated_colors)
+    }
+
+    GetConcatenatedTransferfunctionColorList(){
+        return this.concatenated_colors;
     }
 
     CreateDefaultTransferFunctions() {
         this.CreateGreenLinear();
+        this.CreateCoolToWarm();
+        this.CreateWhiteToBlue();
+        this.CreateWhiteToRed();
     }
 
     CreateGreenLinear() {
         var transfer_function = new TransferFunction("Green Linear", TRANSFER_FUNCTION_BINS);
-        this.transfer_functions[transfer_function.name] = transfer_function;
+        this.transfer_function_dict[transfer_function.name] = transfer_function;
+        this.transfer_function_list.push(transfer_function);
 
         transfer_function.addPoint(0.00, 255, 252, 247);
         transfer_function.addPoint(0.11, 241, 228, 162);
@@ -90,8 +109,42 @@ class TransferFunctionManager {
         transfer_function.fillBins();
     }
 
+    CreateCoolToWarm() {
+        var transfer_function = new TransferFunction("Cool to Warm", TRANSFER_FUNCTION_BINS);
+        this.transfer_function_dict[transfer_function.name] = transfer_function;
+        this.transfer_function_list.push(transfer_function);
+
+        transfer_function.addPoint(0.00, 0, 0, 255);
+        transfer_function.addPoint(0.5, 255, 255, 255);
+        transfer_function.addPoint(1.00, 255, 0, 0);
+
+        transfer_function.fillBins();
+    }
+
+    CreateWhiteToBlue() {
+        var transfer_function = new TransferFunction("White to Blue", TRANSFER_FUNCTION_BINS);
+        this.transfer_function_dict[transfer_function.name] = transfer_function;
+        this.transfer_function_list.push(transfer_function);
+
+        transfer_function.addPoint(0.00, 255, 255, 255);
+        transfer_function.addPoint(1.00, 0, 0, 255);
+
+        transfer_function.fillBins();
+    }
+
+    CreateWhiteToRed() {
+        var transfer_function = new TransferFunction("White to Red", TRANSFER_FUNCTION_BINS);
+        this.transfer_function_dict[transfer_function.name] = transfer_function;
+        this.transfer_function_list.push(transfer_function);
+
+        transfer_function.addPoint(0.00, 255, 255, 255);
+        transfer_function.addPoint(1.00, 255, 0, 0);
+
+        transfer_function.fillBins();
+    }
+
     GetActiveTransferfunctionColorList(){
-        return this.transfer_functions[this.active_transfer_function].list_colors;
+        return this.transfer_function_dict[this.active_transfer_function].list_colors;
     }
 }
 
