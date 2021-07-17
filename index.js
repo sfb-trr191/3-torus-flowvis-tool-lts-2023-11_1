@@ -786,6 +786,9 @@ const Export = module_export.Export;
         if (!animate)
             return;
 
+        if(canvas_wrapper_side.draw_mode != DRAW_MODE_FTLE_SLICE)
+            return;
+
         var slider = document.getElementById("slide_slice_index");
         var max_index = ftle_manager.dim_z - 1;
 
