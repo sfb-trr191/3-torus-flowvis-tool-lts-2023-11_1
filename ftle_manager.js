@@ -42,7 +42,7 @@ class UniformLocationsComputeFlowMapSlice {
 class UniformLocationsComputeFlowMapFiniteDifferences {
     constructor(gl, program, name) {
         console.log("UniformLocationsComputeFlowMapFiniteDifferences: ", name)
-        this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
+        this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");        
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
         this.location_dim_z = gl.getUniformLocation(program, "dim_z");

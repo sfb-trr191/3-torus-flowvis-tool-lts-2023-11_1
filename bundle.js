@@ -979,6 +979,7 @@ class UniformLocationsFTLESlice {
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
         this.location_dim_z = gl.getUniformLocation(program, "dim_z");
         this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
+        this.location_texture_ftle_differences = gl.getUniformLocation(program, "texture_ftle_differences");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
@@ -1306,6 +1307,10 @@ class CanvasWrapper {
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
 
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
+        gl.uniform1i(this.location_ftle_slice.location_texture_ftle_differences, 1);
+
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_ftle_slice,
             this.location_ftle_slice.location_texture_float_global,
@@ -1438,6 +1443,8 @@ global.DRAW_SLICE_AXES_ORDER_HZ_VY = 2;
 global.DRAW_SLICE_MODE_COMBINED = 0;
 global.DRAW_SLICE_MODE_FORWARD = 1;
 global.DRAW_SLICE_MODE_BACKWARD = 2;
+global.DRAW_SLICE_MODE_FORWARD_NORMAL = 3;
+global.DRAW_SLICE_MODE_BACKWARD_NORMAL = 4;
 
 global.DIRECTION_FORWARD = 1;
 global.DIRECTION_BACKWARD = 2;
@@ -2326,7 +2333,7 @@ class UniformLocationsComputeFlowMapSlice {
 class UniformLocationsComputeFlowMapFiniteDifferences {
     constructor(gl, program, name) {
         console.log("UniformLocationsComputeFlowMapFiniteDifferences: ", name)
-        this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
+        this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");        
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
         this.location_dim_z = gl.getUniformLocation(program, "dim_z");
@@ -111438,6 +111445,7 @@ precision highp float;
 precision highp sampler3D;
 
 uniform sampler3D texture_flow_map;
+uniform sampler3D texture_ftle_differences;
 
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
@@ -111471,7 +111479,10 @@ uniform int start_index_float_scalar_color;
 uniform int start_index_int_cylinder;
 uniform int start_index_float_cylinder;
 
+vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
+bool GetPointer(bool is_forward, inout ivec3 pointer);
 vec4 GetTextureColor(bool is_forward, int transfer_function_index);
+vec4 GetNormalColor(bool is_forward);
 vec3 GetScalarColor(int index, int transfer_function_index);
 ivec3 GetIndex3D(int global_index);
 void RenderColorBar(int transfer_function_index, int color_bar_min_x, int color_bar_max_x);
@@ -111488,6 +111499,8 @@ uniform int draw_slice_mode;
 const int DRAW_SLICE_MODE_COMBINED = 0;
 const int DRAW_SLICE_MODE_FORWARD = 1;
 const int DRAW_SLICE_MODE_BACKWARD = 2;
+const int DRAW_SLICE_MODE_FORWARD_NORMAL = 3;
+const int DRAW_SLICE_MODE_BACKWARD_NORMAL = 4;
 
 out vec4 outputColor;
 //! [0]
@@ -111502,6 +111515,12 @@ void main()
         vec4 col_forward = GetTextureColor(true, transfer_function_index);
         vec4 col_backward = GetTextureColor(false, transfer_function_index_backward);
         outputColor = (col_forward + col_backward) * 0.5;
+    }
+    else if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD_NORMAL){
+        outputColor = GetNormalColor(true);
+    }
+    else if(draw_slice_mode == DRAW_SLICE_MODE_BACKWARD_NORMAL){
+        outputColor = GetNormalColor(false);
     }
 
     if(render_color_bar){
@@ -111543,6 +111562,34 @@ void RenderColorBar(int transfer_function_index, int color_bar_min_x, int color_
 
 vec4 GetTextureColor(bool is_forward, int transfer_function_index)
 {
+    ivec3 pointer;
+    bool is_inside = GetPointer(is_forward, pointer);
+    if(!is_inside){
+        return vec4(0,0,0,1);
+    }
+
+    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
+    float t = (scalar - min_scalar) / (max_scalar - min_scalar);
+    int bin = int(floor(0.5 + float(TRANSFER_FUNCTION_LAST_BIN) * t));
+    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+    return vec4(GetScalarColor(bin, transfer_function_index),1);
+}
+
+vec4 GetNormalColor(bool is_forward)
+{
+    ivec3 pointer;
+    bool is_inside = GetPointer(is_forward, pointer);
+    if(!is_inside){
+        return vec4(0,0,0,1);
+    }
+
+    vec3 vector = texelFetch(texture_ftle_differences, pointer, 0).rgb;
+    vec3 normal = normalize(vector);
+    vec3 normal_mapped = map(normal, vec3(-1,-1,-1), vec3(1,1,1), vec3(0,0,0), vec3(1,1,1));
+    return vec4(normal_mapped, 1);
+}
+
+bool GetPointer(bool is_forward, inout ivec3 pointer){
     int min_canvas_dim = min(width, height);
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
@@ -111556,7 +111603,7 @@ vec4 GetTextureColor(bool is_forward, int transfer_function_index)
 
     bool outside = t_x < 0.0 || t_x > 1.0 || t_y < 0.0 || t_y > 1.0;
     if(outside)
-        return vec4(0,0,0,1);
+        return false;
 
     int x_index = int(floor(0.5 + float(dim_x-1) * t_x));
     int y_index = int(floor(0.5 + float(dim_y-1) * t_y));
@@ -111575,17 +111622,12 @@ vec4 GetTextureColor(bool is_forward, int transfer_function_index)
     z_index = clamp(z_index, 0, dim_z-1);
     if(!is_forward)
         z_index += dim_z;
-    ivec3 pointer = ivec3(x_index,y_index,z_index);
-    //vec4 value = texelFetch(texture_flow_map, pointer, 0);
+    pointer = ivec3(x_index,y_index,z_index);
+    return true;
+}
 
-    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
-    float t = (scalar - min_scalar) / (max_scalar - min_scalar);
-    int bin = int(floor(0.5 + float(TRANSFER_FUNCTION_LAST_BIN) * t));
-    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-    //outputColor = vec4(GetScalarColor(bin),1);
-    return vec4(GetScalarColor(bin, transfer_function_index),1);
-    //outputColor = vec4(scalar,0,0,1);
-    //outputColor = vec4(t_x,t_y,0,1);
+vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {
+  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
 }
 
 //TEXTURE
