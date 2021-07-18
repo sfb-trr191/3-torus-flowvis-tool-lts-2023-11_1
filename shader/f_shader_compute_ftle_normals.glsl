@@ -1,4 +1,4 @@
-global.F_SHADER_COMPUTE_FTLE_FINITE_DIFFERENCES = `#version 300 es
+global.F_SHADER_COMPUTE_FTLE_NORMALS = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
 precision highp float;
@@ -27,9 +27,9 @@ void main()
     float dx = CalculateCentralDifference(0, h2_x);
     float dy = CalculateCentralDifference(1, h2_y);
     float dz = CalculateCentralDifference(2, h2_z);
-    outputColor = vec4(dx, dy, dz, 1);
-    //outputColor = vec4(x,y,slice_index,1);
-    //outputColor = vec4(forward_value,1);
+    vec3 vector = vec3(dx, dy, dz);
+    vec3 normal = normalize(vector);
+    outputColor = vec4(normal, 1);
 }
 
 float CalculateCentralDifference(int direction, float h2){

@@ -143,8 +143,9 @@ vec4 GetNormalColor(bool is_forward)
         return vec4(0,0,0,1);
     }
 
-    vec3 vector = texelFetch(texture_ftle_differences, pointer, 0).rgb;
-    vec3 normal = normalize(vector);
+    //vec3 vector = texelFetch(texture_ftle_differences, pointer, 0).rgb;
+    //vec3 normal = normalize(vector);
+    vec3 normal = texelFetch(texture_ftle_differences, pointer, 0).rgb;
     vec3 normal_mapped = map(normal, vec3(-1,-1,-1), vec3(1,1,1), vec3(0,0,0), vec3(1,1,1));
     return vec4(normal_mapped, 1);
 }

@@ -53,9 +53,9 @@ class UniformLocationsComputeFlowMapFiniteDifferences {
     }
 }
 
-class UniformLocationsComputeFTLEFiniteDifferences {
+class UniformLocationsComputeFTLENormals {
     constructor(gl, program, name) {
-        console.log("UniformLocationsComputeFTLEFiniteDifferences: ", name)
+        console.log("UniformLocationsComputeFTLENormals: ", name)
         this.location_texture_ftle = gl.getUniformLocation(program, "texture_ftle");
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
@@ -105,11 +105,11 @@ class FTLEManager {
         this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
 
-        this.program_compute_ftle_finite_differences = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_ftle_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FTLE_FINITE_DIFFERENCES);
-        this.location_compute_ftle_finite_differences = new UniformLocationsComputeFTLEFiniteDifferences(gl, this.program_compute_ftle_finite_differences);
-        this.shader_uniforms_compute_ftle_finite_differences = this.loadShaderUniformsComputeFTLEFiniteDifferences(gl, this.program_compute_ftle_finite_differences);
-        this.attribute_location_dummy_program_compute_ftle_finite_differences = gl.getAttribLocation(this.program_compute_ftle_finite_differences, "a_position");
+        this.program_compute_ftle_normals = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_ftle_normals, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FTLE_NORMALS);
+        this.location_compute_ftle_normals = new UniformLocationsComputeFTLENormals(gl, this.program_compute_ftle_normals);
+        this.shader_uniforms_compute_ftle_normals = this.loadShaderUniformsComputeFTLENormals(gl, this.program_compute_ftle_normals);
+        this.attribute_location_dummy_program_compute_ftle_normals = gl.getAttribLocation(this.program_compute_ftle_normals, "a_position");
         
         this.dummy_quad = new DummyQuad(gl);
     }
@@ -178,7 +178,7 @@ class FTLEManager {
 
         this.computeFlowMapFiniteDifferences(gl);
         this.computeFTLE(gl);
-        this.computeFTLEFiniteDifferences(gl);
+        this.computeFTLENormals(gl);
     }
 
     computeFlowMap(gl) {
@@ -359,8 +359,8 @@ class FTLEManager {
         return ftle;
     }
 
-    computeFTLEFiniteDifferences(gl) {
-        console.log("computeFTLEFiniteDifferences");
+    computeFTLENormals(gl) {
+        console.log("computeFTLENormals");
         console.log(gl);
         var h2_x = 2 / (this.dim_x - 1);
         var h2_y = 2 / (this.dim_y - 1);
@@ -368,37 +368,37 @@ class FTLEManager {
 
         this.data_texture_ftle_differences.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
         for (var i = 0; i < this.dim_z; i++) {
-            this.computeFTLEFiniteDifferencesSlice(gl, i, this.data_texture_ftle_differences, h2_x, h2_y, h2_z, true);
+            this.computeFTLENormalsSlice(gl, i, this.data_texture_ftle_differences, h2_x, h2_y, h2_z, true);
         }
         for (var i = 0; i < this.dim_z; i++) {
-            this.computeFTLEFiniteDifferencesSlice(gl, i, this.data_texture_ftle_differences, h2_x, h2_y, h2_z, false);
+            this.computeFTLENormalsSlice(gl, i, this.data_texture_ftle_differences, h2_x, h2_y, h2_z, false);
         }
         this.data_texture_ftle_differences.update(gl);
 
         console.log(this.data_texture_ftle_differences.texture.texture_data)
     }
 
-    computeFTLEFiniteDifferencesSlice(gl, slice_index, data_texture, h2_x, h2_y, h2_z, is_forward) {
+    computeFTLENormalsSlice(gl, slice_index, data_texture, h2_x, h2_y, h2_z, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFTLEFiniteDifferencesSlice: ", slice_index, z);
+        console.log("computeFTLENormalsSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
-        gl.useProgram(this.program_compute_ftle_finite_differences);
-        gl.uniform1i(this.location_compute_ftle_finite_differences.location_dim_x, this.dim_x);
-        gl.uniform1i(this.location_compute_ftle_finite_differences.location_dim_y, this.dim_y);
-        gl.uniform1i(this.location_compute_ftle_finite_differences.location_dim_z, this.dim_z);
-        gl.uniform1i(this.location_compute_ftle_finite_differences.location_slice_index, slice_index);
-        gl.uniform1i(this.location_compute_ftle_finite_differences.location_is_forward, is_forward);
-        gl.uniform1f(this.location_compute_ftle_finite_differences.location_h2_x, h2_x);
-        gl.uniform1f(this.location_compute_ftle_finite_differences.location_h2_y, h2_y);
-        gl.uniform1f(this.location_compute_ftle_finite_differences.location_h2_z, h2_z);
+        gl.useProgram(this.program_compute_ftle_normals);
+        gl.uniform1i(this.location_compute_ftle_normals.location_dim_x, this.dim_x);
+        gl.uniform1i(this.location_compute_ftle_normals.location_dim_y, this.dim_y);
+        gl.uniform1i(this.location_compute_ftle_normals.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_ftle_normals.location_slice_index, slice_index);
+        gl.uniform1i(this.location_compute_ftle_normals.location_is_forward, is_forward);
+        gl.uniform1f(this.location_compute_ftle_normals.location_h2_x, h2_x);
+        gl.uniform1f(this.location_compute_ftle_normals.location_h2_y, h2_y);
+        gl.uniform1f(this.location_compute_ftle_normals.location_h2_z, h2_z);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle.texture.texture);
-        gl.uniform1i(this.location_compute_ftle_finite_differences.location_texture_ftle, 0);
+        gl.uniform1i(this.location_compute_ftle_normals.location_texture_ftle, 0);
 
-        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_ftle_finite_differences);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_ftle_normals);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
         data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
     }
@@ -423,7 +423,7 @@ class FTLEManager {
         return program_shader_uniforms;
     }
 
-    loadShaderUniformsComputeFTLEFiniteDifferences(gl, program) {
+    loadShaderUniformsComputeFTLENormals(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();
         return program_shader_uniforms;
