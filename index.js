@@ -811,6 +811,8 @@ const Export = module_export.Export;
         canvas_wrapper_side.draw_slice_axes_order = parseInt(document.getElementById("select_slice_axes_order").value);
         canvas_wrapper_side.draw_slice_mode = parseInt(document.getElementById("select_slice_mode").value);
         canvas_wrapper_side.aliasing_index = 0;
+        canvas_wrapper_side.ftle_slice_interpolate = document.getElementById("checkbox_ftle_slice_interpolate").checked;
+        
     }
 
 })();

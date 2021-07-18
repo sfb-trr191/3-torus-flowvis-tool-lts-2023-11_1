@@ -89,7 +89,9 @@ class UniformLocationsFTLESlice {
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
         this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
         this.location_transfer_function_index = gl.getUniformLocation(program, "transfer_function_index");
-        this.location_transfer_function_index_backward = gl.getUniformLocation(program, "transfer_function_index_backward");        
+        this.location_transfer_function_index_backward = gl.getUniformLocation(program, "transfer_function_index_backward");    
+        this.location_interpolate = gl.getUniformLocation(program, "interpolate");    
+        
     }
 }
 
@@ -130,6 +132,7 @@ class CanvasWrapper {
         this.ftle_transfer_function_index_backward = 3;
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
+        this.ftle_slice_interpolate = true;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -398,7 +401,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
         gl.uniform1i(this.location_ftle_slice.location_transfer_function_index, this.ftle_transfer_function_index);
         gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.ftle_transfer_function_index_backward);
-        
+        gl.uniform1i(this.location_ftle_slice.location_interpolate, this.ftle_slice_interpolate);
+           
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         //gl.uniform1i(this.location_resampling.location_texture1, 0);

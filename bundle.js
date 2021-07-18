@@ -989,7 +989,9 @@ class UniformLocationsFTLESlice {
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
         this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
         this.location_transfer_function_index = gl.getUniformLocation(program, "transfer_function_index");
-        this.location_transfer_function_index_backward = gl.getUniformLocation(program, "transfer_function_index_backward");        
+        this.location_transfer_function_index_backward = gl.getUniformLocation(program, "transfer_function_index_backward");    
+        this.location_interpolate = gl.getUniformLocation(program, "interpolate");    
+        
     }
 }
 
@@ -1030,6 +1032,7 @@ class CanvasWrapper {
         this.ftle_transfer_function_index_backward = 3;
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
+        this.ftle_slice_interpolate = true;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -1298,7 +1301,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
         gl.uniform1i(this.location_ftle_slice.location_transfer_function_index, this.ftle_transfer_function_index);
         gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.ftle_transfer_function_index_backward);
-        
+        gl.uniform1i(this.location_ftle_slice.location_interpolate, this.ftle_slice_interpolate);
+           
         //gl.activeTexture(gl.TEXTURE0);
         //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
         //gl.uniform1i(this.location_resampling.location_texture1, 0);
@@ -3760,6 +3764,8 @@ const Export = module_export.Export;
         canvas_wrapper_side.draw_slice_axes_order = parseInt(document.getElementById("select_slice_axes_order").value);
         canvas_wrapper_side.draw_slice_mode = parseInt(document.getElementById("select_slice_mode").value);
         canvas_wrapper_side.aliasing_index = 0;
+        canvas_wrapper_side.ftle_slice_interpolate = document.getElementById("checkbox_ftle_slice_interpolate").checked;
+        
     }
 
 })();
@@ -111462,6 +111468,7 @@ uniform int slice_index;
 uniform float min_scalar;
 uniform float max_scalar;
 
+uniform bool interpolate;
 uniform bool render_color_bar;
 uniform int transfer_function_index;
 uniform int transfer_function_index_backward;
@@ -111480,12 +111487,16 @@ uniform int start_index_int_cylinder;
 uniform int start_index_float_cylinder;
 
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
+bool GetTextureCoordinates(bool is_forward, inout vec3 coordinates);
 bool GetPointer(bool is_forward, inout ivec3 pointer);
 vec4 GetTextureColor(bool is_forward, int transfer_function_index);
 vec4 GetNormalColor(bool is_forward);
 vec3 GetScalarColor(int index, int transfer_function_index);
 ivec3 GetIndex3D(int global_index);
 void RenderColorBar(int transfer_function_index, int color_bar_min_x, int color_bar_max_x);
+
+vec3 InterpolateVec3(sampler3D texture, vec3 texture_coordinate, int z_offset);
+float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset);
 
 const int TRANSFER_FUNCTION_BINS = 512;
 const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
@@ -111562,13 +111573,24 @@ void RenderColorBar(int transfer_function_index, int color_bar_min_x, int color_
 
 vec4 GetTextureColor(bool is_forward, int transfer_function_index)
 {
-    ivec3 pointer;
-    bool is_inside = GetPointer(is_forward, pointer);
-    if(!is_inside){
-        return vec4(0,0,0,1);
+    float scalar;
+    if(interpolate){
+        vec3 texture_coordinate;
+        bool is_inside = GetTextureCoordinates(is_forward, texture_coordinate);
+        if(!is_inside){
+            return vec4(0,0,0,1);
+        }
+        int z_offset = is_forward ? 0 : dim_z;
+        scalar = InterpolateFloat(texture_flow_map, texture_coordinate, z_offset);
     }
-
-    float scalar = texelFetch(texture_flow_map, pointer, 0).r;
+    else{
+        ivec3 pointer;
+        bool is_inside = GetPointer(is_forward, pointer);
+        if(!is_inside){
+            return vec4(0,0,0,1);
+        }
+        scalar = texelFetch(texture_flow_map, pointer, 0).r;        
+    }
     float t = (scalar - min_scalar) / (max_scalar - min_scalar);
     int bin = int(floor(0.5 + float(TRANSFER_FUNCTION_LAST_BIN) * t));
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
@@ -111577,15 +111599,25 @@ vec4 GetTextureColor(bool is_forward, int transfer_function_index)
 
 vec4 GetNormalColor(bool is_forward)
 {
-    ivec3 pointer;
-    bool is_inside = GetPointer(is_forward, pointer);
-    if(!is_inside){
-        return vec4(0,0,0,1);
-    }
+    vec3 normal;
+    if(interpolate){
+        vec3 texture_coordinate;
+        bool is_inside = GetTextureCoordinates(is_forward, texture_coordinate);
+        if(!is_inside){
+            return vec4(0,0,0,1);
+        }
+        int z_offset = is_forward ? 0 : dim_z;
+        normal = normalize(InterpolateVec3(texture_ftle_differences, texture_coordinate, z_offset));
 
-    //vec3 vector = texelFetch(texture_ftle_differences, pointer, 0).rgb;
-    //vec3 normal = normalize(vector);
-    vec3 normal = texelFetch(texture_ftle_differences, pointer, 0).rgb;
+    }
+    else{
+        ivec3 pointer;
+        bool is_inside = GetPointer(is_forward, pointer);
+        if(!is_inside){
+            return vec4(0,0,0,1);
+        }
+        normal = texelFetch(texture_ftle_differences, pointer, 0).rgb;
+    }
     vec3 normal_mapped = map(normal, vec3(-1,-1,-1), vec3(1,1,1), vec3(0,0,0), vec3(1,1,1));
     return vec4(normal_mapped, 1);
 }
@@ -111627,6 +111659,40 @@ bool GetPointer(bool is_forward, inout ivec3 pointer){
     return true;
 }
 
+bool GetTextureCoordinates(bool is_forward, inout vec3 coordinates){
+    int min_canvas_dim = min(width, height);
+    int x = int(gl_FragCoord[0]);
+    int y = int(gl_FragCoord[1]);
+    int x_start = 0;
+    if(width > height){
+        x_start = (width - height) / 2;
+    }
+
+    float t_x = float(x-x_start) / float(min_canvas_dim-1);
+    float t_y = float(y) / float(min_canvas_dim-1);
+
+    bool outside = t_x < 0.0 || t_x > 1.0 || t_y < 0.0 || t_y > 1.0;
+    if(outside)
+        return false;
+
+    float x_coordinate = t_x;
+    float y_coordinate = t_y;
+    float z_coordinate = float(slice_index) / float(dim_z-1);
+    if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HX_VZ){
+        x_coordinate = t_x;
+        y_coordinate = float(slice_index) / float(dim_y-1);
+        z_coordinate = t_y;
+    }
+    else if(draw_slice_axes_order == DRAW_SLICE_AXES_ORDER_HZ_VY){
+        x_coordinate = float(slice_index) / float(dim_x-1);
+        y_coordinate = t_y;
+        z_coordinate = t_x;
+    }
+
+    coordinates = vec3(x_coordinate,y_coordinate,z_coordinate);
+    return true;
+}
+
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {
   return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
 }
@@ -111654,6 +111720,94 @@ vec3 GetScalarColor(int index, int transfer_function_index)
 		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
 	);
 	return color;
+}
+
+vec3 InterpolateVec3(sampler3D texture, vec3 texture_coordinate, int z_offset)
+{
+    float dx = 1.0 / float(dim_x-1);
+    float dy = 1.0 / float(dim_y-1);
+    float dz = 1.0 / float(dim_z-1);
+
+    float x = texture_coordinate.r;
+    float y = texture_coordinate.g;
+    float z = texture_coordinate.b;
+
+    int i = int(floor(x / dx));
+    int j = int(floor(y / dy));
+    int k = int(floor(z / dz));
+
+    float t_x = (x - (float(i) * dx)) / dx;
+    float t_y = (y - (float(j) * dy)) / dy;
+    float t_z = (z - (float(k) * dz)) / dz;
+
+    //get the 8 cell vertices
+    vec3 v_000 = texelFetch(texture, ivec3(i+0, j+0, k+0+z_offset), 0).rgb;
+    vec3 v_001 = texelFetch(texture, ivec3(i+0, j+0, k+1+z_offset), 0).rgb;
+    vec3 v_010 = texelFetch(texture, ivec3(i+0, j+1, k+0+z_offset), 0).rgb;
+    vec3 v_011 = texelFetch(texture, ivec3(i+0, j+1, k+1+z_offset), 0).rgb;
+    vec3 v_100 = texelFetch(texture, ivec3(i+1, j+0, k+0+z_offset), 0).rgb;
+    vec3 v_101 = texelFetch(texture, ivec3(i+1, j+0, k+1+z_offset), 0).rgb;
+    vec3 v_110 = texelFetch(texture, ivec3(i+1, j+1, k+0+z_offset), 0).rgb;
+    vec3 v_111 = texelFetch(texture, ivec3(i+1, j+1, k+1+z_offset), 0).rgb;
+
+    //interpolate 4 points along x axis using t_x
+    vec3 v_00 = mix(v_000, v_100, t_x);
+    vec3 v_10 = mix(v_010, v_110, t_x);
+    vec3 v_01 = mix(v_001, v_101, t_x);
+    vec3 v_11 = mix(v_011, v_111, t_x);
+
+    //interpolate 2 points along y axis using t_y
+    vec3 v_0 = mix(v_00, v_10, t_y);
+    vec3 v_1 = mix(v_01, v_11, t_y);
+
+    //interpolate 1 points along z axis using t_z
+    vec3 v = mix(v_0, v_1, t_z);
+
+    return v;
+}
+
+float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
+{
+    float dx = 1.0 / float(dim_x-1);
+    float dy = 1.0 / float(dim_y-1);
+    float dz = 1.0 / float(dim_z-1);
+
+    float x = texture_coordinate.r;
+    float y = texture_coordinate.g;
+    float z = texture_coordinate.b;
+
+    int i = int(floor(x / dx));
+    int j = int(floor(y / dy));
+    int k = int(floor(z / dz));
+
+    float t_x = (x - (float(i) * dx)) / dx;
+    float t_y = (y - (float(j) * dy)) / dy;
+    float t_z = (z - (float(k) * dz)) / dz;
+
+    //get the 8 cell vertices
+    float v_000 = texelFetch(texture, ivec3(i+0, j+0, k+0+z_offset), 0).r;
+    float v_001 = texelFetch(texture, ivec3(i+0, j+0, k+1+z_offset), 0).r;
+    float v_010 = texelFetch(texture, ivec3(i+0, j+1, k+0+z_offset), 0).r;
+    float v_011 = texelFetch(texture, ivec3(i+0, j+1, k+1+z_offset), 0).r;
+    float v_100 = texelFetch(texture, ivec3(i+1, j+0, k+0+z_offset), 0).r;
+    float v_101 = texelFetch(texture, ivec3(i+1, j+0, k+1+z_offset), 0).r;
+    float v_110 = texelFetch(texture, ivec3(i+1, j+1, k+0+z_offset), 0).r;
+    float v_111 = texelFetch(texture, ivec3(i+1, j+1, k+1+z_offset), 0).r;
+
+    //interpolate 4 points along x axis using t_x
+    float v_00 = mix(v_000, v_100, t_x);
+    float v_10 = mix(v_010, v_110, t_x);
+    float v_01 = mix(v_001, v_101, t_x);
+    float v_11 = mix(v_011, v_111, t_x);
+
+    //interpolate 2 points along y axis using t_y
+    float v_0 = mix(v_00, v_10, t_y);
+    float v_1 = mix(v_01, v_11, t_y);
+
+    //interpolate 1 points along z axis using t_z
+    float v = mix(v_0, v_1, t_z);
+
+    return v;
 }
 
 `;
