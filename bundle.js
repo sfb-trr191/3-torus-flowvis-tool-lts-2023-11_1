@@ -2323,9 +2323,9 @@ class UniformLocationsComputeFlowMapSlice {
     }
 }
 
-class UniformLocationsComputeFiniteDifferences {
+class UniformLocationsComputeFlowMapFiniteDifferences {
     constructor(gl, program, name) {
-        console.log("UniformLocationsComputeFiniteDifferences: ", name)
+        console.log("UniformLocationsComputeFlowMapFiniteDifferences: ", name)
         this.location_texture_flow_map = gl.getUniformLocation(program, "texture_flow_map");
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
@@ -2368,11 +2368,11 @@ class FTLEManager {
         this.shader_uniforms_compute_flowmap_slice = this.loadShaderUniformsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
 
-        this.program_compute_finite_differences = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FINITE_DIFFERENCES);
-        this.location_compute_finite_differences = new UniformLocationsComputeFiniteDifferences(gl, this.program_compute_finite_differences);
-        this.shader_uniforms_compute_finite_differences = this.loadShaderUniformsComputeFiniteDifferences(gl, this.program_compute_finite_differences);
-        this.attribute_location_dummy_program_compute_finite_differences = gl.getAttribLocation(this.program_compute_finite_differences, "a_position");
+        this.program_compute_flowmap_finite_differences = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES);
+        this.location_compute_flowmap_finite_differences = new UniformLocationsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
+        this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
+        this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
 
         this.dummy_quad = new DummyQuad(gl);
     }
@@ -2530,20 +2530,20 @@ class FTLEManager {
         console.log("computeFiniteDifferencesSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
-        gl.useProgram(this.program_compute_finite_differences);
-        gl.uniform1i(this.location_compute_finite_differences.location_dim_x, this.dim_x);
-        gl.uniform1i(this.location_compute_finite_differences.location_dim_y, this.dim_y);
-        gl.uniform1i(this.location_compute_finite_differences.location_dim_z, this.dim_z);
-        gl.uniform1i(this.location_compute_finite_differences.location_slice_index, slice_index);
-        gl.uniform1i(this.location_compute_finite_differences.location_direction, direction);
-        gl.uniform1i(this.location_compute_finite_differences.location_is_forward, is_forward);
-        gl.uniform1f(this.location_compute_finite_differences.location_h2, h2);
+        gl.useProgram(this.program_compute_flowmap_finite_differences);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_x, this.dim_x);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_y, this.dim_y);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_slice_index, slice_index);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_direction, direction);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_is_forward, is_forward);
+        gl.uniform1f(this.location_compute_flowmap_finite_differences.location_h2, h2);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.data_texture_flowmap.texture.texture);
-        gl.uniform1i(this.location_compute_finite_differences.location_texture_flow_map, 0);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_texture_flow_map, 0);
 
-        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_finite_differences);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_finite_differences);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
         data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
     }
@@ -2635,7 +2635,7 @@ class FTLEManager {
         return program_shader_uniforms;
     }
 
-    loadShaderUniformsComputeFiniteDifferences(gl, program) {
+    loadShaderUniformsComputeFlowMapFiniteDifferences(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();
         return program_shader_uniforms;
@@ -2872,7 +2872,7 @@ module.exports = HideManager;
 const module_const = require("./const");
 const f_shader_average = require("./shader/f_shader_average.glsl");
 const f_shader_compute_flow_map_slice = require("./shader/f_shader_compute_flow_map_slice.glsl");
-const f_shader_compute_finite_differences = require("./shader/f_shader_compute_finite_differences.glsl");
+const f_shader_compute_flowmap_finite_differences = require("./shader/f_shader_compute_flowmap_finite_differences.glsl");
 const f_shader_copy = require("./shader/f_shader_copy.glsl");
 const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl");
 const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
@@ -3683,7 +3683,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./const":7,"./export":13,"./ftle_manager":14,"./global_data":16,"./hide_manager":17,"./input_changed_manager":19,"./input_manager":20,"./input_parameter_wrapper":21,"./lights":22,"./mouse_manager":24,"./object_manager":1003,"./shader/f_shader_average.glsl":1009,"./shader/f_shader_compute_finite_differences.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_copy.glsl":1012,"./shader/f_shader_flow_map_slice.glsl":1013,"./shader/f_shader_placeholder.glsl":1014,"./shader/f_shader_raytracing.glsl":1015,"./shader/f_shader_resampling.glsl":1016,"./shader/f_shader_sum.glsl":1017,"./shader/v_shader_raytracing.glsl":1018,"./shader/v_shader_resampling.glsl":1019,"./shader_manager":1020,"./streamline_context":1022,"./tab_manager":1024,"./transfer_function_manager":1025,"./ui_seeds":1026,"./utility":1027,"./webgl":1028,"gl-matrix":52,"ml-matrix":989}],19:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./const":7,"./export":13,"./ftle_manager":14,"./global_data":16,"./hide_manager":17,"./input_changed_manager":19,"./input_manager":20,"./input_parameter_wrapper":21,"./lights":22,"./mouse_manager":24,"./object_manager":1003,"./shader/f_shader_average.glsl":1009,"./shader/f_shader_compute_flow_map_slice.glsl":1010,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1011,"./shader/f_shader_copy.glsl":1012,"./shader/f_shader_flow_map_slice.glsl":1013,"./shader/f_shader_placeholder.glsl":1014,"./shader/f_shader_raytracing.glsl":1015,"./shader/f_shader_resampling.glsl":1016,"./shader/f_shader_sum.glsl":1017,"./shader/v_shader_raytracing.glsl":1018,"./shader/v_shader_resampling.glsl":1019,"./shader_manager":1020,"./streamline_context":1022,"./tab_manager":1024,"./transfer_function_manager":1025,"./ui_seeds":1026,"./utility":1027,"./webgl":1028,"gl-matrix":52,"ml-matrix":989}],19:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -111045,97 +111045,6 @@ void main()
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],1010:[function(require,module,exports){
 (function (global){(function (){
-global.F_SHADER_COMPUTE_FINITE_DIFFERENCES = `#version 300 es
-precision highp int;                //high precision required for indices / ids etc.
-precision highp isampler3D;         //high precision required for indices / ids etc.
-precision highp float;
-precision highp sampler3D;
-
-uniform sampler3D texture_flow_map;
-
-uniform int dim_x;
-uniform int dim_y;
-uniform int dim_z;
-uniform int slice_index;
-uniform int direction;//x,y,z = 0,1,2
-uniform bool is_forward;
-uniform float h2;// h2 = 2h from the equation f'(x_i) = (f(x_{i+1}) - f(x_{i-1})) / (2h)
-
-out vec4 outputColor;
-
-vec3 f(vec3 vector);
-
-const float PI = 3.1415926535897932384626433832795;
-//! [0]
-void main()
-{
-    int x = int(gl_FragCoord[0]);
-    int y = int(gl_FragCoord[1]);
-
-    int forward_x = x;
-    int forward_y = y;
-    int forward_z = slice_index;
-
-    int backward_x = x;
-    int backward_y = y;
-    int backward_z = slice_index;
-
-    //identify the correct neighboring index. usually +1 and -1, wrap around at the border.
-    //direction X
-    if(direction == 0){
-        forward_x += 1;
-        //if(forward_x == dim_x)
-        //    forward_x = 1;
-
-        backward_x -= 1;
-        //if(backward_x == -1)
-        //    backward_x = dim_x-2;
-    }
-    //direction Y
-    else if(direction == 1){
-        forward_y += 1;
-        //if(forward_y == dim_y)
-        //    forward_y = 1;
-
-        backward_y -= 1;
-        //if(backward_y == -1)
-        //    backward_y = dim_y-2;
-    }
-    //direction Z
-    else{
-        forward_z += 1;  
-        //if(forward_z == dim_z)
-        //    forward_z = 1;   
-
-        backward_z -= 1;
-        //if(backward_z == -1)
-        //    backward_z = dim_z-2;
-    }
-
-    if(!is_forward){
-        forward_z += dim_z+2; 
-        backward_z += dim_z+2;
-    }
-
-    //ivec3 pointer = ivec3(x,y,slice_index);
-    //vec3 value = texelFetch(texture_flow_map, pointer, 0).rgb;
-    ivec3 extended_offset = ivec3(1,1,1);
-    ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
-    vec3 forward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
-    
-    pointer = ivec3(backward_x,backward_y,backward_z);
-    vec3 backward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
-
-    vec3 central_difference = (forward_value - backward_value) / h2;
-    outputColor = vec4(central_difference,1);
-    //outputColor = vec4(x,y,slice_index,1);
-    //outputColor = vec4(forward_value,1);
-}
-
-`;
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],1011:[function(require,module,exports){
-(function (global){(function (){
 global.F_SHADER_COMPUTE_FLOW_MAP_SLICE = `#version 300 es
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
@@ -111229,6 +111138,97 @@ vec3 f(vec3 vector)
 	float v = shader_formula_v;
 	float w = shader_formula_w;
 	return vec3(u*sign_f, v*sign_f, w*sign_f);	
+}
+
+`;
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],1011:[function(require,module,exports){
+(function (global){(function (){
+global.F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES = `#version 300 es
+precision highp int;                //high precision required for indices / ids etc.
+precision highp isampler3D;         //high precision required for indices / ids etc.
+precision highp float;
+precision highp sampler3D;
+
+uniform sampler3D texture_flow_map;
+
+uniform int dim_x;
+uniform int dim_y;
+uniform int dim_z;
+uniform int slice_index;
+uniform int direction;//x,y,z = 0,1,2
+uniform bool is_forward;
+uniform float h2;// h2 = 2h from the equation f'(x_i) = (f(x_{i+1}) - f(x_{i-1})) / (2h)
+
+out vec4 outputColor;
+
+vec3 f(vec3 vector);
+
+const float PI = 3.1415926535897932384626433832795;
+//! [0]
+void main()
+{
+    int x = int(gl_FragCoord[0]);
+    int y = int(gl_FragCoord[1]);
+
+    int forward_x = x;
+    int forward_y = y;
+    int forward_z = slice_index;
+
+    int backward_x = x;
+    int backward_y = y;
+    int backward_z = slice_index;
+
+    //identify the correct neighboring index. usually +1 and -1, wrap around at the border.
+    //direction X
+    if(direction == 0){
+        forward_x += 1;
+        //if(forward_x == dim_x)
+        //    forward_x = 1;
+
+        backward_x -= 1;
+        //if(backward_x == -1)
+        //    backward_x = dim_x-2;
+    }
+    //direction Y
+    else if(direction == 1){
+        forward_y += 1;
+        //if(forward_y == dim_y)
+        //    forward_y = 1;
+
+        backward_y -= 1;
+        //if(backward_y == -1)
+        //    backward_y = dim_y-2;
+    }
+    //direction Z
+    else{
+        forward_z += 1;  
+        //if(forward_z == dim_z)
+        //    forward_z = 1;   
+
+        backward_z -= 1;
+        //if(backward_z == -1)
+        //    backward_z = dim_z-2;
+    }
+
+    if(!is_forward){
+        forward_z += dim_z+2; 
+        backward_z += dim_z+2;
+    }
+
+    //ivec3 pointer = ivec3(x,y,slice_index);
+    //vec3 value = texelFetch(texture_flow_map, pointer, 0).rgb;
+    ivec3 extended_offset = ivec3(1,1,1);
+    ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
+    vec3 forward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
+    
+    pointer = ivec3(backward_x,backward_y,backward_z);
+    vec3 backward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
+
+    vec3 central_difference = (forward_value - backward_value) / h2;
+    outputColor = vec4(central_difference,1);
+    //outputColor = vec4(x,y,slice_index,1);
+    //outputColor = vec4(forward_value,1);
 }
 
 `;
