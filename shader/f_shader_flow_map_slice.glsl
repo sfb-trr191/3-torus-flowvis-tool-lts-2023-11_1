@@ -71,11 +71,15 @@ out vec4 outputColor;
 //! [0]
 void main()
 {
+    int transfer_function_index_first = transfer_function_index;
+    bool allow_color_bar = true;
 
     if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD)
         outputColor = GetTextureColor(true, transfer_function_index);
-    else if (draw_slice_mode == DRAW_SLICE_MODE_BACKWARD)
-        outputColor = GetTextureColor(false, transfer_function_index);
+    else if (draw_slice_mode == DRAW_SLICE_MODE_BACKWARD){
+        transfer_function_index_first = transfer_function_index_backward;
+        outputColor = GetTextureColor(false, transfer_function_index_backward);
+    }
     else if (draw_slice_mode == DRAW_SLICE_MODE_COMBINED){
         vec4 col_forward = GetTextureColor(true, transfer_function_index);
         vec4 col_backward = GetTextureColor(false, transfer_function_index_backward);
@@ -83,15 +87,18 @@ void main()
     }
     else if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD_NORMAL){
         outputColor = GetNormalColor(true);
+        allow_color_bar = false;
     }
     else if(draw_slice_mode == DRAW_SLICE_MODE_BACKWARD_NORMAL){
         outputColor = GetNormalColor(false);
+        allow_color_bar = false;
     }
 
-    if(render_color_bar){
+    if(render_color_bar && allow_color_bar){
         int color_bar_min_x = 16;
         int color_bar_max_x = 32;
-        RenderColorBar(transfer_function_index, color_bar_min_x, color_bar_max_x);
+        int index_forward = transfer_function_index;
+        RenderColorBar(transfer_function_index_first, color_bar_min_x, color_bar_max_x);
         if (draw_slice_mode == DRAW_SLICE_MODE_COMBINED){
             int color_bar_min_x = 32;
             int color_bar_max_x = 48;
