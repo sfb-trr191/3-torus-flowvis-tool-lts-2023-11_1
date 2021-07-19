@@ -529,7 +529,8 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
-
+        canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
+        
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);
@@ -565,6 +566,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
+        canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
 
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;

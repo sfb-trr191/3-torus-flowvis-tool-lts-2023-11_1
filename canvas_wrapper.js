@@ -30,7 +30,8 @@ class UniformLocationsRayTracing {
         this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
-
+        this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
+        
     }
 }
 
@@ -133,6 +134,7 @@ class CanvasWrapper {
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
+        this.show_volume_rendering = false;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -304,7 +306,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
 
-
+        gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
+        
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(this.name, active_lod, gl,

@@ -184,9 +184,9 @@
                             <div class="input_row">
                                 <label>axes</label>
                                 <select id="select_slice_axes_order">
-                                    <option value="0">horizontal: x   vertical: y</option>
-                                    <option value="1">horizontal: x   vertical: z</option>
-                                    <option value="2">horizontal: z   vertical: y</option>
+                                    <option value="0">horizontal: x vertical: y</option>
+                                    <option value="1">horizontal: x vertical: z</option>
+                                    <option value="2">horizontal: z vertical: y</option>
                                 </select>
                             </div>
                         </div>
@@ -350,6 +350,18 @@
                                 <div class="horizontal_div_2">
                                     <label></label>
                                     <input id="input_cube_axes_origin_radius_side" type="text" value="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="fieldset_camera">
+                        <legend>Volume Rendering</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>show</label>
+                                <div class="horizontal_div_2">
+                                    <input id="checkbox_show_volume_main" type="checkbox" value="true" checked="true">
+                                    <input id="checkbox_show_volume_side" type="checkbox" value="true" checked="true">
                                 </div>
                             </div>
                         </div>

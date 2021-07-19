@@ -173,6 +173,7 @@ uniform bool is_main_renderer;
 uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
+uniform bool show_volume_rendering;
 
 uniform int width;
 uniform int height;
@@ -670,6 +671,11 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		IntersectAxesCornerAABB(false, ray, maxRayDistance, hit, hitCube, 2);
 	}	
   */
+
+    if (show_volume_rendering)
+    {
+
+    }
 }
 
 void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)

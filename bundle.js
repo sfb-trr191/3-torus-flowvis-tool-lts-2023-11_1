@@ -930,7 +930,8 @@ class UniformLocationsRayTracing {
         this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
-
+        this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
+        
     }
 }
 
@@ -1033,6 +1034,7 @@ class CanvasWrapper {
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
+        this.show_volume_rendering = false;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -1204,7 +1206,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
 
-
+        gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
+        
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
         this.p_streamline_context_static.bind_lod(this.name, active_lod, gl,
@@ -3482,7 +3485,8 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
-
+        canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
+        
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);
@@ -3518,6 +3522,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
+        canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
 
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;
@@ -3909,6 +3914,8 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_side"));     
         //this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_main"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));     
     }
 
     LinkUISeeds(ui_seeds){
@@ -112023,6 +112030,7 @@ uniform bool is_main_renderer;
 uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
+uniform bool show_volume_rendering;
 
 uniform int width;
 uniform int height;
@@ -112520,6 +112528,11 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		IntersectAxesCornerAABB(false, ray, maxRayDistance, hit, hitCube, 2);
 	}	
   */
+
+    if (show_volume_rendering)
+    {
+
+    }
 }
 
 void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
