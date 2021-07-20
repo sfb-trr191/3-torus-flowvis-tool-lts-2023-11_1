@@ -113975,7 +113975,7 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
     float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
     int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-    vec3 color = GetScalarColor(bin, transfer_function_index_streamline_scalar);
+    vec3 color = GetScalarColor(bin, transfer_function_index);
     float alpha = t;
     //uniform int transfer_function_index_streamline_scalar;
     //uniform int transfer_function_index_ftle_forward;
