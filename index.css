@@ -317,6 +317,10 @@ legend {
     background-image: url("icons/settings.png");
 }
 
+#button_tab_transfer_function{
+    background-image: url("icons/transfer_function.png");
+}
+
 #button_tab_information{
     background-image: url("icons/info.png");
 }
