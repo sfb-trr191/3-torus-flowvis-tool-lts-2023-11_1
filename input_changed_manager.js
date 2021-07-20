@@ -138,7 +138,9 @@ class InputChangedManager{
         //this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_main"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));        
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
     }
 
     LinkUISeeds(ui_seeds){

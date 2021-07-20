@@ -912,6 +912,8 @@ class UniformLocationsRayTracing {
         this.location_texture_int = gl.getUniformLocation(program, "texture_int");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
+        this.location_texture_ftle = gl.getUniformLocation(program, "texture_ftle");
+        this.location_texture_ftle_differences = gl.getUniformLocation(program, "texture_ftle_differences");
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_offset_x = gl.getUniformLocation(program, "offset_x");
@@ -931,7 +933,19 @@ class UniformLocationsRayTracing {
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
+        this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
+        this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
         
+        
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
+        this.location_min_scalar_ftle = gl.getUniformLocation(program, "min_scalar_ftle");
+        this.location_max_scalar_ftle = gl.getUniformLocation(program, "max_scalar_ftle");  
+        this.location_transfer_function_index_streamline_scalar = gl.getUniformLocation(program, "transfer_function_index_streamline_scalar");
+        this.location_transfer_function_index_ftle_forward = gl.getUniformLocation(program, "transfer_function_index_ftle_forward");
+        this.location_transfer_function_index_ftle_backward = gl.getUniformLocation(program, "transfer_function_index_ftle_backward");
+                
     }
 }
 
@@ -1035,7 +1049,12 @@ class CanvasWrapper {
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
-
+        this.volume_rendering_distance_between_points = 0.01;
+        this.volume_rendering_termination_opacity = 0.99;
+        this.transfer_function_index_streamline_scalar = 0;
+        this.transfer_function_index_ftle_forward = 2;
+        this.transfer_function_index_ftle_backward = 3;
+        
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_panning_left = new RenderWrapper(gl, name + "_raytracing_panning_left", camera.width_panning, camera.height_panning);
@@ -1207,6 +1226,18 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
 
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
+        gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
+        gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
+        
+        gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
+        gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
+        gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);
+        gl.uniform1f(this.location_raytracing.location_min_scalar_ftle, this.p_ftle_manager.ftle_min_value);
+        gl.uniform1f(this.location_raytracing.location_max_scalar_ftle, this.p_ftle_manager.ftle_max_value);
+        gl.uniform1i(this.location_raytracing.location_transfer_function_index_streamline_scalar, this.transfer_function_index_streamline_scalar);
+        gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_forward, this.transfer_function_index_ftle_forward);
+        gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);
+        
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
@@ -1219,6 +1250,14 @@ class CanvasWrapper {
             this.shader_uniforms_raytracing,
             this.location_raytracing.location_texture_float_global,
             this.location_raytracing.location_texture_int_global);
+
+        gl.activeTexture(gl.TEXTURE4);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
+        gl.uniform1i(this.location_raytracing.location_texture_ftle, 4);
+
+        gl.activeTexture(gl.TEXTURE5);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
+        gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
     }
@@ -1297,8 +1336,6 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_slice_index, this.draw_slice_index);
         gl.uniform1i(this.location_ftle_slice.location_draw_slice_axes_order, this.draw_slice_axes_order);
         gl.uniform1i(this.location_ftle_slice.location_draw_slice_mode, this.draw_slice_mode);
-        gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.ftle_min_scalar);
-        gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.ftle_max_scalar);
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
         gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
@@ -3486,7 +3523,9 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
         canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
-        
+        canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
+        canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
+       
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);
@@ -3523,7 +3562,9 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
-
+        canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
+        canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
+       
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
@@ -3915,7 +3956,9 @@ class InputChangedManager{
         //this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_main"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));        
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
     }
 
     LinkUISeeds(ui_seeds){
@@ -111946,7 +111989,7 @@ struct HitInformation
 	//bool terminate;
 	int hitType;
 	bool copy;
-	//float distance_os;
+	float distance_iteration;
 	float distance;
 	float distanceToCenter;
 	int multiPolyID;
@@ -111960,6 +112003,9 @@ struct HitInformation
 	vec3 transparentNormal;
 
 	bool ignore_override;
+
+    float vol_accumulated_opacity;
+    vec3 vol_accumulated_color;
 };
 
 struct Ray
@@ -112013,6 +112059,8 @@ uniform sampler3D texture_float;
 uniform isampler3D texture_int;
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
+uniform sampler3D texture_ftle;
+uniform sampler3D texture_ftle_differences;
 uniform float offset_x;
 uniform float offset_y;
 uniform float maxRayDistance;
@@ -112031,9 +112079,20 @@ uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
 uniform bool show_volume_rendering;
+uniform float volume_rendering_distance_between_points;
+uniform float volume_rendering_termination_opacity;
+uniform float min_scalar_ftle;
+uniform float max_scalar_ftle;
+
+uniform int transfer_function_index_streamline_scalar;
+uniform int transfer_function_index_ftle_forward;
+uniform int transfer_function_index_ftle_backward;
 
 uniform int width;
 uniform int height;
+uniform int dim_x;//dim of volume texture
+uniform int dim_y;//dim of volume texture
+uniform int dim_z;//dim of volume texture
 const float epsilon_move_ray = 0.0000001;//DUMMY
 const float epsilon_out_of_bounds = 0.000001;//DUMMY
 const bool ignore_copy = false;//DUMMY
@@ -112113,7 +112172,14 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, int type, vec3 pos_1, vec3 col_1, vec3 pos_2, vec3 col_2, vec3 pos_3, vec3 col_3);
 void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 
-//float clamp(float x, float min, float max);
+//**********************************************************
+
+void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube);
+
+//**********************************************************
+
+vec3 InterpolateVec3(sampler3D texture, vec3 texture_coordinate, int z_offset);
+float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset);
 
 //**********************************************************
 
@@ -112125,7 +112191,7 @@ GL_TreeNode GetNode(int index, bool interactiveStreamline);
 GL_AABB GetAABB(int index, bool interactiveStreamline);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
-vec3 GetScalarColor(int index);
+vec3 GetScalarColor(int index, int transfer_function_index);
 GL_Cylinder GetCylinder(int index);
 
 ivec3 GetIndex3D(int global_index);
@@ -112271,13 +112337,15 @@ vec4 getValidationColor(bool valid)
 
 vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
 {
-
 	hit.hitType = TYPE_NONE;
 	hit.distance = 0.0;	
+    hit.distance_iteration = 0.0;
 	hit.transparentHit = false;
 	hit.transparentNearest = 0.0;
 	hit.clickTarget = false;
 	hit.ignore_override = false;
+    hit.vol_accumulated_opacity = 0.0;
+    hit.vol_accumulated_color = vec3(0,0,0);
   /*
 	if(clicked == 1)
 	{
@@ -112395,13 +112463,6 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 	while(true)
 	{		
 		IntersectInstance(variableRay, hit, hitCube);
-		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
-			break;
-
-		count++;		
-		if(count >= maxIterationCount)
-			break;
-		
 		//calculate exit (the point where ray leaves the current instance)
 		//formula: target = origin + t * direction
 		//float tar_x = (variableRay.direction.x > 0) ? 1 : 0;	
@@ -112414,6 +112475,21 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 		vec3 t_v = (tar - variableRay.origin) * variableRay.dir_inv;	
 		float t = min(t_v.x, min(t_v.y, t_v.z));		
 		vec3 exit = variableRay.origin + t * variableRay.direction;
+
+        if (show_volume_rendering && hit.vol_accumulated_opacity < volume_rendering_termination_opacity)
+        {        
+            float distance_exit = t;
+            IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
+        }
+
+		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
+			break;
+
+		count++;		
+		if(count >= maxIterationCount)
+			break;
+		
+
 		
 		//update distance "traveled" using value from this instance
 		variableRay.rayDistance += t;
@@ -112528,11 +112604,6 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		IntersectAxesCornerAABB(false, ray, maxRayDistance, hit, hitCube, 2);
 	}	
   */
-
-    if (show_volume_rendering)
-    {
-
-    }
 }
 
 void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
@@ -112625,8 +112696,8 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 
 bool CheckOutOfBounds(vec3 position)
 {
-	if(!check_bounds)
-		return false;
+	//if(!check_bounds)
+	//	return false;
 	//float error = 0.0001;
 	//return true;
 	for(int i=0; i<3; i++)
@@ -112959,7 +113030,7 @@ void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cuto
 		float v_a = GetVelocity(lineSegment.indexA, interactiveStreamline);
 		float v_b = GetVelocity(lineSegment.indexB, interactiveStreamline);		
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
-		//hit.distance_os = distance_os;	
+		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_os;	
 		hit.positionCenter = tube_center;
@@ -113046,7 +113117,7 @@ void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff
 	if((hit.hitType==TYPE_NONE) || (distance_surface < hit.distance))
 	{		
 		hit.hitType = type;
-		//hit.distance_os = distance_os;	
+		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = ray.origin + distance_os * ray.direction;
 		hit.positionCenter = sphere.center;
@@ -113069,6 +113140,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 {			
 	ignore_override = ignore_override || hit.ignore_override;
 	vec3 resultColor = vec3(0,0,0);
+    vec3 surface_color = vec3(0,0,0);
     if(hitCube.hitType>TYPE_NONE)
 	{
 		//gl_FragColor = vec4(0, 0, 0, 1);
@@ -113118,13 +113190,18 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
         float fogFactor = CalculateFogFactor(hit.distance);
 		
 		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
-		resultColor = mix(fogColor, lightColor, fogFactor);
+		surface_color = mix(fogColor, lightColor, fogFactor);
 	}
 	else
 	{
 		//no hit found, use background color
-		resultColor = vec3(1, 1, 1);
+		surface_color = vec3(1, 1, 1);
 	}
+
+    //blend volume with surface
+    resultColor = mix(surface_color, hit.vol_accumulated_color, hit.vol_accumulated_opacity);
+    
+	//return hitCube.hitType>TYPE_NONE ? surface_color : resultColor;
 	return resultColor;
 }
 
@@ -113172,7 +113249,7 @@ vec3 GetObjectColor(inout HitInformation hit)
             float t = (scalar - min_scalar) / (max_scalar - min_scalar);
             int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
             bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-            return GetScalarColor(bin);
+            return GetScalarColor(bin, transfer_function_index_streamline_scalar);
         }
 	}
 	
@@ -113513,6 +113590,7 @@ void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_
 		hit.position = position;
 		hit.normal = normalize(position - tube_center);//vec3(1, 0, 0);
 		hit.distance = ray.rayDistance;	
+        hit.distance_iteration = 0.0;
 		hit.ignore_override = false;
 		//hit.hitType = TYPE_GL_CYLINDER;//change
 		//hit.objectColor = vec3(1, 1, 0);
@@ -113538,6 +113616,7 @@ void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInf
 		hit.position = position;
 		hit.normal = normalize(position - sphere.center);//vec3(1, 0, 0);
 		hit.distance = ray.rayDistance;
+        hit.distance_iteration = 0.0;
 		//hit.hitType = TYPE_GL_CYLINDER;//change
 		//hit.objectColor = vec3(1, 1, 0);
 	}	
@@ -113743,7 +113822,7 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 		//calculate tube center in world space (for normal calculation)
 		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;	
 		hit.hitType = TYPE_GL_CYLINDER;//change
-		//hit.distance_os = distance_os;	
+        hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_os;	
 		hit.positionCenter = tube_center;
@@ -113804,7 +113883,7 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 	if((hit.hitType==TYPE_NONE) || (distance_surface < hit.distance))
 	{		
 		hit.hitType = type;
-		//hit.distance_os = distance_os;	
+		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = ray.origin + distance_os * ray.direction;
 		hit.positionCenter = sphere.center;
@@ -113826,11 +113905,177 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 	}
 }
 
-/*
-float clamp(float x, float min, float max){
-	return (x < min) ? min : (x > max) ? max : x;
+////////////////////////////////////////////////////////////////////
+//
+//                 START REGION VOLUME
+//
+////////////////////////////////////////////////////////////////////
+
+void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube)
+{
+    int sample_index_iteration = 0;
+    float delta = volume_rendering_distance_between_points;
+    while(sample_index_iteration < 10000){
+        //check termination condition
+        float sample_distance_iteration = float(sample_index_iteration) * delta;
+        bool has_hit = hit.hitType > TYPE_NONE;
+        bool has_hit_cube = hitCube.hitType > TYPE_NONE;
+        bool has_hit_any = has_hit || has_hit_cube;
+        bool no_hit_any = !has_hit_any;
+        bool sample_in_front_of_hit = sample_distance_iteration < hit.distance_iteration;
+        bool sample_in_front_of_hit_cube = sample_distance_iteration < hitCube.distance_iteration;
+        float min_hit_distance = has_hit && has_hit_cube
+            ? min(hit.distance_iteration, hitCube.distance_iteration)
+            : has_hit ? hit.distance_iteration : hitCube.distance_iteration;
+        bool sample_in_front_of_hit_any = sample_distance_iteration < min_hit_distance;
+        bool sample_in_front_of_exit = sample_distance_iteration < distance_exit;
+        bool ok = (no_hit_any && sample_in_front_of_exit)
+            || (has_hit_any && sample_in_front_of_hit_any);
+        if(!ok)
+            break;
+
+        //calculate forward sample
+        int z_offset = 0;
+        vec3 sample_position = ray.origin + ray.direction * sample_distance_iteration;
+        bool out_of_bounds = CheckOutOfBounds(sample_position);
+        if(out_of_bounds){
+            //prepare next sample
+            sample_index_iteration++;
+            continue;
+        }
+
+        //calculate forward position/scalar/normal
+        float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
+        vec3 sample_normal = normalize(InterpolateVec3(texture_ftle_differences, sample_position, z_offset));
+
+        //apply transfer function
+        float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+        int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+        bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+        vec3 color = GetScalarColor(bin, transfer_function_index_streamline_scalar);
+        float alpha = t;
+        //uniform int transfer_function_index_streamline_scalar;
+        //uniform int transfer_function_index_ftle_forward;
+        //uniform int transfer_function_index_ftle_backward;
+        //apply phong shading
+		vec3 lightColor = vec3(0, 0, 0);
+		vec3 viewDir = -ray.direction;
+		vec3 normal = sample_normal;	
+		for(int i=0; i<numDirLights; i++)
+		{
+			GL_DirLight light = GetDirLight(i);
+			lightColor += CalcDirLight(light, normal, viewDir);
+		}
+		lightColor *= color;
+
+        //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
+        float alpha_in = hit.vol_accumulated_opacity;
+        hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * alpha;
+        //apply compositing: C_out = C_in + (1-alpha_in) * C';        
+        vec3 C_in = hit.vol_accumulated_color;
+        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * lightColor; 
+
+        //prepare next sample
+        sample_index_iteration++;
+
+        if(hit.vol_accumulated_opacity >= volume_rendering_termination_opacity)
+            break;
+    } 
 }
-*/
+
+////////////////////////////////////////////////////////////////////
+//
+//                 START REGION UTILITY
+//
+////////////////////////////////////////////////////////////////////
+
+vec3 InterpolateVec3(sampler3D texture, vec3 texture_coordinate, int z_offset)
+{
+    float dx = 1.0 / float(dim_x-1);
+    float dy = 1.0 / float(dim_y-1);
+    float dz = 1.0 / float(dim_z-1);
+
+    float x = texture_coordinate.r;
+    float y = texture_coordinate.g;
+    float z = texture_coordinate.b;
+
+    int i = int(floor(x / dx));
+    int j = int(floor(y / dy));
+    int k = int(floor(z / dz));
+
+    float t_x = (x - (float(i) * dx)) / dx;
+    float t_y = (y - (float(j) * dy)) / dy;
+    float t_z = (z - (float(k) * dz)) / dz;
+
+    //get the 8 cell vertices
+    vec3 v_000 = texelFetch(texture, ivec3(i+0, j+0, k+0+z_offset), 0).rgb;
+    vec3 v_001 = texelFetch(texture, ivec3(i+0, j+0, k+1+z_offset), 0).rgb;
+    vec3 v_010 = texelFetch(texture, ivec3(i+0, j+1, k+0+z_offset), 0).rgb;
+    vec3 v_011 = texelFetch(texture, ivec3(i+0, j+1, k+1+z_offset), 0).rgb;
+    vec3 v_100 = texelFetch(texture, ivec3(i+1, j+0, k+0+z_offset), 0).rgb;
+    vec3 v_101 = texelFetch(texture, ivec3(i+1, j+0, k+1+z_offset), 0).rgb;
+    vec3 v_110 = texelFetch(texture, ivec3(i+1, j+1, k+0+z_offset), 0).rgb;
+    vec3 v_111 = texelFetch(texture, ivec3(i+1, j+1, k+1+z_offset), 0).rgb;
+
+    //interpolate 4 points along x axis using t_x
+    vec3 v_00 = mix(v_000, v_100, t_x);
+    vec3 v_10 = mix(v_010, v_110, t_x);
+    vec3 v_01 = mix(v_001, v_101, t_x);
+    vec3 v_11 = mix(v_011, v_111, t_x);
+
+    //interpolate 2 points along y axis using t_y
+    vec3 v_0 = mix(v_00, v_10, t_y);
+    vec3 v_1 = mix(v_01, v_11, t_y);
+
+    //interpolate 1 points along z axis using t_z
+    vec3 v = mix(v_0, v_1, t_z);
+
+    return v;
+}
+
+float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
+{
+    float dx = 1.0 / float(dim_x-1);
+    float dy = 1.0 / float(dim_y-1);
+    float dz = 1.0 / float(dim_z-1);
+
+    float x = texture_coordinate.r;
+    float y = texture_coordinate.g;
+    float z = texture_coordinate.b;
+
+    int i = int(floor(x / dx));
+    int j = int(floor(y / dy));
+    int k = int(floor(z / dz));
+
+    float t_x = (x - (float(i) * dx)) / dx;
+    float t_y = (y - (float(j) * dy)) / dy;
+    float t_z = (z - (float(k) * dz)) / dz;
+
+    //get the 8 cell vertices
+    float v_000 = texelFetch(texture, ivec3(i+0, j+0, k+0+z_offset), 0).r;
+    float v_001 = texelFetch(texture, ivec3(i+0, j+0, k+1+z_offset), 0).r;
+    float v_010 = texelFetch(texture, ivec3(i+0, j+1, k+0+z_offset), 0).r;
+    float v_011 = texelFetch(texture, ivec3(i+0, j+1, k+1+z_offset), 0).r;
+    float v_100 = texelFetch(texture, ivec3(i+1, j+0, k+0+z_offset), 0).r;
+    float v_101 = texelFetch(texture, ivec3(i+1, j+0, k+1+z_offset), 0).r;
+    float v_110 = texelFetch(texture, ivec3(i+1, j+1, k+0+z_offset), 0).r;
+    float v_111 = texelFetch(texture, ivec3(i+1, j+1, k+1+z_offset), 0).r;
+
+    //interpolate 4 points along x axis using t_x
+    float v_00 = mix(v_000, v_100, t_x);
+    float v_10 = mix(v_010, v_110, t_x);
+    float v_01 = mix(v_001, v_101, t_x);
+    float v_11 = mix(v_011, v_111, t_x);
+
+    //interpolate 2 points along y axis using t_y
+    float v_0 = mix(v_00, v_10, t_y);
+    float v_1 = mix(v_01, v_11, t_y);
+
+    //interpolate 1 points along z axis using t_z
+    float v = mix(v_0, v_1, t_z);
+
+    return v;
+}
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -114061,7 +114306,7 @@ vec3 GetStreamlineColor(int index)
 	return color;
 }
 
-vec3 GetScalarColor(int index)
+vec3 GetScalarColor(int index, int transfer_function_index)
 {
 	ivec3 pointer = GetIndex3D(start_index_float_scalar_color + index * STREAMLINE_COLOR_FLOAT_COUNT);
 	vec3 color = vec3(
