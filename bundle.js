@@ -112175,6 +112175,7 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
 //**********************************************************
 
 void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube);
+vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index);
 
 //**********************************************************
 
@@ -113934,8 +113935,7 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         if(!ok)
             break;
 
-        //calculate forward sample
-        int z_offset = 0;
+        //calculate sample position
         vec3 sample_position = ray.origin + ray.direction * sample_distance_iteration;
         bool out_of_bounds = CheckOutOfBounds(sample_position);
         if(out_of_bounds){
@@ -113945,35 +113945,18 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         }
 
         //calculate forward position/scalar/normal
-        float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
-        vec3 sample_normal = normalize(InterpolateVec3(texture_ftle_differences, sample_position, z_offset));
-
-        //apply transfer function
-        float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
-        int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
-        bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec3 color = GetScalarColor(bin, transfer_function_index_streamline_scalar);
-        float alpha = t;
-        //uniform int transfer_function_index_streamline_scalar;
-        //uniform int transfer_function_index_ftle_forward;
-        //uniform int transfer_function_index_ftle_backward;
-        //apply phong shading
-		vec3 lightColor = vec3(0, 0, 0);
-		vec3 viewDir = -ray.direction;
-		vec3 normal = sample_normal;	
-		for(int i=0; i<numDirLights; i++)
-		{
-			GL_DirLight light = GetDirLight(i);
-			lightColor += CalcDirLight(light, normal, viewDir);
-		}
-		lightColor *= color;
+        int z_offset = 0;
+        vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);
+        
+        vec3 combined_color = rgba_forward.rgb;
+        float combined_alpha = rgba_forward.a;
 
         //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
         float alpha_in = hit.vol_accumulated_opacity;
-        hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * alpha;
+        hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
         //apply compositing: C_out = C_in + (1-alpha_in) * C';        
         vec3 C_in = hit.vol_accumulated_color;
-        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * lightColor; 
+        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color; 
 
         //prepare next sample
         sample_index_iteration++;
@@ -113981,6 +113964,33 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         if(hit.vol_accumulated_opacity >= volume_rendering_termination_opacity)
             break;
     } 
+}
+
+vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)
+{
+    float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
+    vec3 sample_normal = normalize(InterpolateVec3(texture_ftle_differences, sample_position, z_offset));
+
+    //apply transfer function
+    float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+    vec3 color = GetScalarColor(bin, transfer_function_index_streamline_scalar);
+    float alpha = t;
+    //uniform int transfer_function_index_streamline_scalar;
+    //uniform int transfer_function_index_ftle_forward;
+    //uniform int transfer_function_index_ftle_backward;
+    //apply phong shading
+    vec3 lightColor = vec3(0, 0, 0);
+    vec3 viewDir = -ray.direction;
+    vec3 normal = sample_normal;	
+    for(int i=0; i<numDirLights; i++)
+    {
+        GL_DirLight light = GetDirLight(i);
+        lightColor += CalcDirLight(light, normal, viewDir);
+    }
+    lightColor *= color;
+    return vec4(lightColor, alpha);
 }
 
 ////////////////////////////////////////////////////////////////////
