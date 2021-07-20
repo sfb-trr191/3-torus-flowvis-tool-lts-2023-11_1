@@ -424,6 +424,10 @@ const Export = module_export.Export;
             console.log("onClick: button_tab_settings");
             tab_manager.selectTab("tab_group_main", "tab_settings");
         });
+        document.getElementById("button_tab_transfer_function").addEventListener("click", function () {
+            console.log("onClick: button_tab_transfer_function");
+            tab_manager.selectTab("tab_group_main", "tab_transfer_function");
+        });        
         document.getElementById("button_tab_information").addEventListener("click", function () {
             console.log("onClick: button_tab_information");
             tab_manager.selectTab("tab_group_main", "tab_information");

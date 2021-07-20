@@ -91,6 +91,7 @@
                 <button id="button_tab_data" class="tablink"></button>
                 <button id="button_tab_ftle" class="tablink"></button>
                 <button id="button_tab_settings" class="tablink"></button>
+                <button id="button_tab_transfer_function" class="tablink"></button>
                 <button id="button_tab_information" class="tablink"></button>
                 <button id="button_tab_edit" class="tablink"></button>
                 <button id="button_tab_export" class="tablink"></button>
@@ -397,6 +398,28 @@
                                     <option value="1">high</option>
                                     <option value="2">medium</option>
                                     <option value="3">low</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div id="tabcontent_transfer_function" class="tabcontent">
+                <form>
+                    <fieldset class="fieldset_camera">
+                        <legend>Visual Editor</legend>
+                        <div class="vertical_container">
+                            <canvas id="transfer_function_canvas" tabindex="3"></canvas>
+                        </div>
+                    </fieldset>
+                    <fieldset class="fieldset_camera">
+                        <legend>General</legend>
+                        <div class="vertical_container">
+                            <div class="input_row">
+                                <label>edit mode</label>
+                                <select id="select_transfer_function_mode">
+                                    <option value="0">edit color</option>
+                                    <option value="1">edit opacity</option>
                                 </select>
                             </div>
                         </div>
