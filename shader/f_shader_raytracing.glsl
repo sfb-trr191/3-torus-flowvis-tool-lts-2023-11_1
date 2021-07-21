@@ -292,7 +292,7 @@ GL_TreeNode GetNode(int index, bool interactiveStreamline);
 GL_AABB GetAABB(int index, bool interactiveStreamline);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
-vec3 GetScalarColor(int index, int transfer_function_index);
+vec4 GetScalarColor(int index, int transfer_function_index);
 GL_Cylinder GetCylinder(int index);
 
 ivec3 GetIndex3D(int global_index);
@@ -1350,7 +1350,7 @@ vec3 GetObjectColor(inout HitInformation hit)
             float t = (scalar - min_scalar) / (max_scalar - min_scalar);
             int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
             bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-            return GetScalarColor(bin, transfer_function_index_streamline_scalar);
+            return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
         }
 	}
 	
@@ -2078,8 +2078,9 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
     float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
     int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-    vec3 color = GetScalarColor(bin, transfer_function_index);
-    float alpha = t;
+    vec4 rgba = GetScalarColor(bin, transfer_function_index);
+    vec3 color = rgba.rgb;
+    float alpha = rgba.a;
 
     //apply phong shading
     vec3 lightColor = vec3(0, 0, 0);
@@ -2417,15 +2418,16 @@ vec3 GetStreamlineColor(int index)
 	return color;
 }
 
-vec3 GetScalarColor(int index, int transfer_function_index)
+vec4 GetScalarColor(int index, int transfer_function_index)
 {
     ivec3 pointer = GetIndex3D(start_index_float_scalar_color 
         + transfer_function_index * TRANSFER_FUNCTION_BINS * STREAMLINE_COLOR_FLOAT_COUNT
         + index * STREAMLINE_COLOR_FLOAT_COUNT);
-	vec3 color = vec3(
+	vec4 color = vec4(
 		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
-		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(3,0,0), 0).r
 	);
 	return color;
 }

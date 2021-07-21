@@ -192,6 +192,7 @@ class StreamlineColor {
     //integer based
     //float based
     color = glMatrix.vec3.create();
+    opacity = 1;
 
     constructor() { }
 
@@ -211,6 +212,7 @@ class StreamlineColor {
         for (var i = 0; i < 3; i++) {
             arrayf[start_index_f + i] = this.color[i];
         }
+        arrayf[start_index_f + 3] = this.opacity;
     }
 }
 
