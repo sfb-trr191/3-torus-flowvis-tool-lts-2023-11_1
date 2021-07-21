@@ -144,8 +144,10 @@ const Export = module_export.Export;
         console.log(gl);
         console.log(gl_side);
 
-        var ext = gl_side.getExtension('EXT_color_buffer_float');
-        if (!ext) {
+        var ext = gl.getExtension('EXT_color_buffer_float');
+        var ext_side = gl_side.getExtension('EXT_color_buffer_float');
+
+        if ((!ext) || (!ext_side)) {
             alert("FTLE not supported: could not load EXT_color_buffer_float");
             return;
         }
@@ -166,7 +168,7 @@ const Export = module_export.Export;
 
         shader_manager = new ShaderManager();
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
-        ftle_manager = new FTLEManager(gl_side, streamline_context_static, shader_manager);
+        ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
@@ -485,7 +487,7 @@ const Export = module_export.Export;
         var dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
         var advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
         var step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
-        ftle_manager.compute(gl_side, dim_x, dim_y, dim_z, advection_time, step_size);
+        ftle_manager.compute(gl, gl_side, dim_x, dim_y, dim_z, advection_time, step_size);
 
         var slider = document.getElementById("slide_slice_index");
         var value = Math.min(slider.value, dim_z - 1);
@@ -493,7 +495,7 @@ const Export = module_export.Export;
         slider.value = value;
 
         canvas_wrapper_side.draw_slice_index = value;
-        canvas_wrapper_side.aliasing_index = 0;
+        data_changed = true;
 
         console.log("draw_slice_index", value);
     }

@@ -351,13 +351,21 @@ class CanvasWrapper {
             this.location_raytracing.location_texture_float_global,
             this.location_raytracing.location_texture_int_global);
 
+        //this.p_ftle_manager.bind(this.name, gl,
+        //    this.location_raytracing.location_texture_ftle,
+        //    this.location_raytracing.location_texture_ftle_differences);
+
+        this.p_ftle_manager.bind(this.name, gl,
+            this.location_raytracing.location_texture_ftle, gl.TEXTURE4, 4,
+            this.location_raytracing.location_texture_ftle_differences, gl.TEXTURE5, 5);
+            /*
         gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_raytracing.location_texture_ftle, 4);
 
         gl.activeTexture(gl.TEXTURE5);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
-        gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);
+        gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);*/
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
     }
@@ -443,10 +451,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.ftle_transfer_function_index_backward);
         gl.uniform1i(this.location_ftle_slice.location_interpolate, this.ftle_slice_interpolate);
            
-        //gl.activeTexture(gl.TEXTURE0);
-        //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
-        //gl.uniform1i(this.location_resampling.location_texture1, 0);
-        
+        /*
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
@@ -454,12 +459,15 @@ class CanvasWrapper {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_ftle_differences, 1);
-
+        */
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_ftle_slice,
             this.location_ftle_slice.location_texture_float_global,
             this.location_ftle_slice.location_texture_int_global);
         
+        this.p_ftle_manager.bind(this.name, gl,
+            this.location_ftle_slice.location_texture_ftle, gl.TEXTURE0, 0,
+            this.location_ftle_slice.location_texture_ftle_differences, gl.TEXTURE1, 1);
         /*
          this.p_ftle_manager.bind(this.name, gl,
              this.shader_uniforms_ftle_slice,

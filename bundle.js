@@ -1251,13 +1251,21 @@ class CanvasWrapper {
             this.location_raytracing.location_texture_float_global,
             this.location_raytracing.location_texture_int_global);
 
+        //this.p_ftle_manager.bind(this.name, gl,
+        //    this.location_raytracing.location_texture_ftle,
+        //    this.location_raytracing.location_texture_ftle_differences);
+
+        this.p_ftle_manager.bind(this.name, gl,
+            this.location_raytracing.location_texture_ftle, gl.TEXTURE4, 4,
+            this.location_raytracing.location_texture_ftle_differences, gl.TEXTURE5, 5);
+            /*
         gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_raytracing.location_texture_ftle, 4);
 
         gl.activeTexture(gl.TEXTURE5);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
-        gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);
+        gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);*/
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
     }
@@ -1343,10 +1351,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.ftle_transfer_function_index_backward);
         gl.uniform1i(this.location_ftle_slice.location_interpolate, this.ftle_slice_interpolate);
            
-        //gl.activeTexture(gl.TEXTURE0);
-        //gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_average_out.texture);
-        //gl.uniform1i(this.location_resampling.location_texture1, 0);
-        
+        /*
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
@@ -1354,12 +1359,15 @@ class CanvasWrapper {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_ftle_differences, 1);
-
+        */
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_ftle_slice,
             this.location_ftle_slice.location_texture_float_global,
             this.location_ftle_slice.location_texture_int_global);
         
+        this.p_ftle_manager.bind(this.name, gl,
+            this.location_ftle_slice.location_texture_ftle, gl.TEXTURE0, 0,
+            this.location_ftle_slice.location_texture_ftle_differences, gl.TEXTURE1, 1);
         /*
          this.p_ftle_manager.bind(this.name, gl,
              this.shader_uniforms_ftle_slice,
@@ -1793,6 +1801,14 @@ class DataTexture3D_RGBA {
     update(gl) {
         this.texture.update(gl);
     }
+
+    copyFrom(gl, other){
+        this.texture.texture_settings.width = other.texture.texture_settings.width;
+        this.texture.texture_settings.height = other.texture.texture_settings.height;
+        this.texture.texture_settings.depth = other.texture.texture_settings.depth;
+        var data = other.texture.texture_data;
+        this.texture.updateDataTexture(gl, data);
+    }
 }
 
 class DataTexture3D_R {
@@ -1829,6 +1845,14 @@ class DataTexture3D_R {
 
     update(gl) {
         this.texture.update(gl);
+    }
+
+    copyFrom(gl, other){
+        this.texture.texture_settings.width = other.texture.texture_settings.width;
+        this.texture.texture_settings.height = other.texture.texture_settings.height;
+        this.texture.texture_settings.depth = other.texture.texture_settings.depth;
+        var data = other.texture.texture_data;
+        this.texture.updateDataTexture(gl, data);
     }
 }
 
@@ -2407,7 +2431,7 @@ class UniformLocationsComputeFTLENormals {
 
 class FTLEManager {
 
-    constructor(gl, p_streamline_context, p_shader_manager) {
+    constructor(gl, gl_side, p_streamline_context, p_shader_manager) {
         this.p_streamline_context = p_streamline_context;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.p_shader_manager = p_shader_manager;
@@ -2429,6 +2453,9 @@ class FTLEManager {
         this.data_texture_ftle_differences = new DataTexture3D_RGBA(gl);
         this.ftle_max_value = 0;
         this.ftle_min_value = 0;
+
+        this.data_texture_ftle_side = new DataTexture3D_R(gl_side);
+        this.data_texture_ftle_differences_side = new DataTexture3D_RGBA(gl_side);
 
         this.program_compute_flowmap_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
@@ -2502,7 +2529,22 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
     }
 
-    compute(gl, dim_x, dim_y, dim_z, advection_time, step_size) {
+    bind(canvas_wrapper_name, gl, 
+        location_texture_ftle, texture_ftle_active, texture_ftle_index, 
+        location_texture_ftle_differences, texture_ftle_differences_active, texture_ftle_differences_index) {
+        var data_texture_ftle = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle : this.data_texture_ftle_side;
+        var data_texture_ftle_differences = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_differences : this.data_texture_ftle_differences_side;
+
+        gl.activeTexture(texture_ftle_active);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle.texture.texture);
+        gl.uniform1i(location_texture_ftle, texture_ftle_index);
+
+        gl.activeTexture(texture_ftle_differences_active);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_differences.texture.texture);
+        gl.uniform1i(location_texture_ftle_differences, texture_ftle_differences_index);
+    }
+
+    compute(gl, gl_side, dim_x, dim_y, dim_z, advection_time, step_size) {
         this.dim_x = dim_x;
         this.dim_y = dim_y;
         this.dim_z = dim_z;
@@ -2516,6 +2558,9 @@ class FTLEManager {
         this.computeFlowMapFiniteDifferences(gl);
         this.computeFTLE(gl);
         this.computeFTLENormals(gl);
+
+        this.data_texture_ftle_side.copyFrom(gl_side, this.data_texture_ftle);
+        this.data_texture_ftle_differences_side.copyFrom(gl_side, this.data_texture_ftle_differences);
     }
 
     computeFlowMap(gl) {
@@ -3139,8 +3184,10 @@ const Export = module_export.Export;
         console.log(gl);
         console.log(gl_side);
 
-        var ext = gl_side.getExtension('EXT_color_buffer_float');
-        if (!ext) {
+        var ext = gl.getExtension('EXT_color_buffer_float');
+        var ext_side = gl_side.getExtension('EXT_color_buffer_float');
+
+        if ((!ext) || (!ext_side)) {
             alert("FTLE not supported: could not load EXT_color_buffer_float");
             return;
         }
@@ -3161,7 +3208,7 @@ const Export = module_export.Export;
 
         shader_manager = new ShaderManager();
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
-        ftle_manager = new FTLEManager(gl_side, streamline_context_static, shader_manager);
+        ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
@@ -3480,7 +3527,7 @@ const Export = module_export.Export;
         var dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
         var advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
         var step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
-        ftle_manager.compute(gl_side, dim_x, dim_y, dim_z, advection_time, step_size);
+        ftle_manager.compute(gl, gl_side, dim_x, dim_y, dim_z, advection_time, step_size);
 
         var slider = document.getElementById("slide_slice_index");
         var value = Math.min(slider.value, dim_z - 1);
@@ -3488,7 +3535,7 @@ const Export = module_export.Export;
         slider.value = value;
 
         canvas_wrapper_side.draw_slice_index = value;
-        canvas_wrapper_side.aliasing_index = 0;
+        data_changed = true;
 
         console.log("draw_slice_index", value);
     }

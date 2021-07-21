@@ -70,7 +70,7 @@ class UniformLocationsComputeFTLENormals {
 
 class FTLEManager {
 
-    constructor(gl, p_streamline_context, p_shader_manager) {
+    constructor(gl, gl_side, p_streamline_context, p_shader_manager) {
         this.p_streamline_context = p_streamline_context;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.p_shader_manager = p_shader_manager;
@@ -92,6 +92,9 @@ class FTLEManager {
         this.data_texture_ftle_differences = new DataTexture3D_RGBA(gl);
         this.ftle_max_value = 0;
         this.ftle_min_value = 0;
+
+        this.data_texture_ftle_side = new DataTexture3D_R(gl_side);
+        this.data_texture_ftle_differences_side = new DataTexture3D_RGBA(gl_side);
 
         this.program_compute_flowmap_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
@@ -165,7 +168,22 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
     }
 
-    compute(gl, dim_x, dim_y, dim_z, advection_time, step_size) {
+    bind(canvas_wrapper_name, gl, 
+        location_texture_ftle, texture_ftle_active, texture_ftle_index, 
+        location_texture_ftle_differences, texture_ftle_differences_active, texture_ftle_differences_index) {
+        var data_texture_ftle = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle : this.data_texture_ftle_side;
+        var data_texture_ftle_differences = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_differences : this.data_texture_ftle_differences_side;
+
+        gl.activeTexture(texture_ftle_active);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle.texture.texture);
+        gl.uniform1i(location_texture_ftle, texture_ftle_index);
+
+        gl.activeTexture(texture_ftle_differences_active);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_differences.texture.texture);
+        gl.uniform1i(location_texture_ftle_differences, texture_ftle_differences_index);
+    }
+
+    compute(gl, gl_side, dim_x, dim_y, dim_z, advection_time, step_size) {
         this.dim_x = dim_x;
         this.dim_y = dim_y;
         this.dim_z = dim_z;
@@ -179,6 +197,9 @@ class FTLEManager {
         this.computeFlowMapFiniteDifferences(gl);
         this.computeFTLE(gl);
         this.computeFTLENormals(gl);
+
+        this.data_texture_ftle_side.copyFrom(gl_side, this.data_texture_ftle);
+        this.data_texture_ftle_differences_side.copyFrom(gl_side, this.data_texture_ftle_differences);
     }
 
     computeFlowMap(gl) {

@@ -181,6 +181,14 @@ class DataTexture3D_RGBA {
     update(gl) {
         this.texture.update(gl);
     }
+
+    copyFrom(gl, other){
+        this.texture.texture_settings.width = other.texture.texture_settings.width;
+        this.texture.texture_settings.height = other.texture.texture_settings.height;
+        this.texture.texture_settings.depth = other.texture.texture_settings.depth;
+        var data = other.texture.texture_data;
+        this.texture.updateDataTexture(gl, data);
+    }
 }
 
 class DataTexture3D_R {
@@ -217,6 +225,14 @@ class DataTexture3D_R {
 
     update(gl) {
         this.texture.update(gl);
+    }
+
+    copyFrom(gl, other){
+        this.texture.texture_settings.width = other.texture.texture_settings.width;
+        this.texture.texture_settings.height = other.texture.texture_settings.height;
+        this.texture.texture_settings.depth = other.texture.texture_settings.depth;
+        var data = other.texture.texture_data;
+        this.texture.updateDataTexture(gl, data);
     }
 }
 
