@@ -218,6 +218,24 @@ legend {
     min-width: 32px;
 }
 
+.horizontal_div_tranfer_function_color input {
+    min-width: 75px;
+    height: 100%;
+}
+
+.horizontal_div_tranfer_function_color button {
+    min-width: 32px;
+}
+
+.horizontal_div_tranfer_function_opacity input {
+    min-width: 75px;
+    height: 100%;
+}
+
+.horizontal_div_tranfer_function_opacity button {
+    min-width: 32px;
+}
+
 #fps_display {
     z-index: 100;
     position: absolute;
