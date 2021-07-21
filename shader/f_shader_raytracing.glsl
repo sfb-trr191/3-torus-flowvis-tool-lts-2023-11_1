@@ -2047,7 +2047,10 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         //calculate forward position/scalar/normal
         int z_offset = 0;
         vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);
-        
+            
+    //uniform int transfer_function_index_streamline_scalar;
+    //uniform int transfer_function_index_ftle_forward;
+    //uniform int transfer_function_index_ftle_backward;
         vec3 combined_color = rgba_forward.rgb;
         float combined_alpha = rgba_forward.a;
 
@@ -2056,7 +2059,7 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
         //apply compositing: C_out = C_in + (1-alpha_in) * C';        
         vec3 C_in = hit.vol_accumulated_color;
-        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color; 
+        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * combined_alpha; 
 
         //prepare next sample
         sample_index_iteration++;
@@ -2077,9 +2080,7 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
     vec3 color = GetScalarColor(bin, transfer_function_index);
     float alpha = t;
-    //uniform int transfer_function_index_streamline_scalar;
-    //uniform int transfer_function_index_ftle_forward;
-    //uniform int transfer_function_index_ftle_backward;
+
     //apply phong shading
     vec3 lightColor = vec3(0, 0, 0);
     vec3 viewDir = -ray.direction;
@@ -2418,7 +2419,9 @@ vec3 GetStreamlineColor(int index)
 
 vec3 GetScalarColor(int index, int transfer_function_index)
 {
-	ivec3 pointer = GetIndex3D(start_index_float_scalar_color + index * STREAMLINE_COLOR_FLOAT_COUNT);
+    ivec3 pointer = GetIndex3D(start_index_float_scalar_color 
+        + transfer_function_index * TRANSFER_FUNCTION_BINS * STREAMLINE_COLOR_FLOAT_COUNT
+        + index * STREAMLINE_COLOR_FLOAT_COUNT);
 	vec3 color = vec3(
 		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
