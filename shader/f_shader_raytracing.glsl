@@ -143,6 +143,7 @@ const int FOG_EXPONENTIAL_SQUARED = 3;
 
 const int SHADING_MODE_STREAMLINES_ID = 0;
 const int SHADING_MODE_STREAMLINES_SCALAR = 1;
+const int SHADING_MODE_STREAMLINES_FTLE = 2;
 
 const float PI = 3.1415926535897932384626433832795;
 const int TRANSFER_FUNCTION_BINS = 512;
@@ -254,7 +255,7 @@ float ExtractLinearPercentage(float a, float b, float value);
 
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override);
 float CalculateFogFactor(float dist);
-vec3 GetObjectColor(inout HitInformation hit);
+vec3 GetObjectColor(Ray ray, inout HitInformation hit);
 float GetScalar(vec3 position);
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir);
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
@@ -1292,7 +1293,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 			lightColor += CalcDirLight(light, normal, viewDir);
 		}
 
-		vec3 objectColor = GetObjectColor(hit);	
+		vec3 objectColor = GetObjectColor(ray, hit);	
 		lightColor *= objectColor;
 		
         float fogFactor = CalculateFogFactor(hit.distance);
@@ -1335,7 +1336,7 @@ float CalculateFogFactor(float dist)
     return fogFactor;
 }
 
-vec3 GetObjectColor(inout HitInformation hit)
+vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 {
 	//return vec3(0.5,0.5,0.5);
 	vec3 objectColor = vec3(0, 0, 1);
@@ -1359,6 +1360,14 @@ vec3 GetObjectColor(inout HitInformation hit)
             bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
             return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
         }
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_FTLE)
+        {
+            int z_offset = 0;
+            vec3 sample_position = hit.position;
+            vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);
+            return rgba_forward.rgb;
+        }
+        
 	}
 	
 	return objectColor;
