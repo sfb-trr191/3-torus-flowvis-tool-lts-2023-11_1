@@ -919,6 +919,7 @@ class UniformLocationsRayTracing {
         this.location_offset_x = gl.getUniformLocation(program, "offset_x");
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
+        this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
@@ -932,6 +933,7 @@ class UniformLocationsRayTracing {
         this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
+        this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
@@ -1049,11 +1051,13 @@ class CanvasWrapper {
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
+        this.show_streamlines = true;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
         this.transfer_function_index_ftle_forward = 2;
         this.transfer_function_index_ftle_backward = 3;
+        this.max_volume_distance = 0;// 0=same as limited_max_distance
         
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -1211,6 +1215,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
+        gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
@@ -1224,6 +1229,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box);
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
+        gl.uniform1i(this.location_raytracing.location_show_streamlines, this.show_streamlines);
 
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
@@ -3570,6 +3576,7 @@ const Export = module_export.Export;
 
         //MAIN
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
+        canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_main.fog_type = document.getElementById("select_fog_type").value;
@@ -3583,6 +3590,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
         canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
+        canvas_wrapper_main.show_streamlines = document.getElementById("checkbox_show_streamlines_main").checked;
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -3622,6 +3630,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
+        canvas_wrapper_side.show_streamlines = document.getElementById("checkbox_show_streamlines_side").checked;
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -4016,7 +4025,9 @@ class InputChangedManager{
         //this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_main"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));        
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_side"));        
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
     }
@@ -112124,6 +112135,7 @@ uniform sampler3D texture_ftle_differences;
 uniform float offset_x;
 uniform float offset_y;
 uniform float maxRayDistance;
+uniform float max_volume_distance;
 uniform int maxIterationCount;
 uniform float tubeRadius;
 uniform float fog_density;
@@ -112138,6 +112150,7 @@ uniform bool is_main_renderer;
 uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
+uniform bool show_streamlines;
 uniform bool show_volume_rendering;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
@@ -112537,10 +112550,15 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 		float t = min(t_v.x, min(t_v.y, t_v.z));		
 		vec3 exit = variableRay.origin + t * variableRay.direction;
 
-        if (show_volume_rendering && hit.vol_accumulated_opacity < volume_rendering_termination_opacity)
+        if (show_volume_rendering)
         {        
-            float distance_exit = t;
-            IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
+            bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
+                && variableRay.rayDistance < max_volume_distance;
+            if(volume_flag)
+            {
+                float distance_exit = t;
+                IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
+            }
         }
 
 		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
@@ -112622,8 +112640,8 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		}
 	}
 
-	//if(show_streamlines)
-	IntersectInstance_Tree(false, ray, maxRayDistance, hit, hitCube);
+	if(show_streamlines)
+	    IntersectInstance_Tree(false, ray, maxRayDistance, hit, hitCube);
   /*
 	if(show_interactive_streamline)
 		IntersectInstance_Tree(true, ray, maxRayDistance, hit, hitCube);
@@ -113979,6 +113997,10 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
     while(sample_index_iteration < 10000){
         //check termination condition
         float sample_distance_iteration = float(sample_index_iteration) * delta;
+        bool max_range_reached = ray.rayDistance + sample_distance_iteration > max_volume_distance;
+        if(max_range_reached)
+            break;
+
         bool has_hit = hit.hitType > TYPE_NONE;
         bool has_hit_cube = hitCube.hitType > TYPE_NONE;
         bool has_hit_any = has_hit || has_hit_cube;

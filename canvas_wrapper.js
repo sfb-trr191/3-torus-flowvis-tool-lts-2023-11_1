@@ -19,6 +19,7 @@ class UniformLocationsRayTracing {
         this.location_offset_x = gl.getUniformLocation(program, "offset_x");
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
+        this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
@@ -32,6 +33,7 @@ class UniformLocationsRayTracing {
         this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
+        this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
@@ -149,11 +151,13 @@ class CanvasWrapper {
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
+        this.show_streamlines = true;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
         this.transfer_function_index_ftle_forward = 2;
         this.transfer_function_index_ftle_backward = 3;
+        this.max_volume_distance = 0;// 0=same as limited_max_distance
         
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
@@ -311,6 +315,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
+        gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
@@ -324,6 +329,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box);
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
+        gl.uniform1i(this.location_raytracing.location_show_streamlines, this.show_streamlines);
 
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);

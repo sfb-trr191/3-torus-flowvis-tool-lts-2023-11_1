@@ -164,6 +164,7 @@ uniform sampler3D texture_ftle_differences;
 uniform float offset_x;
 uniform float offset_y;
 uniform float maxRayDistance;
+uniform float max_volume_distance;
 uniform int maxIterationCount;
 uniform float tubeRadius;
 uniform float fog_density;
@@ -178,6 +179,7 @@ uniform bool is_main_renderer;
 uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
+uniform bool show_streamlines;
 uniform bool show_volume_rendering;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
@@ -577,10 +579,15 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 		float t = min(t_v.x, min(t_v.y, t_v.z));		
 		vec3 exit = variableRay.origin + t * variableRay.direction;
 
-        if (show_volume_rendering && hit.vol_accumulated_opacity < volume_rendering_termination_opacity)
+        if (show_volume_rendering)
         {        
-            float distance_exit = t;
-            IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
+            bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
+                && variableRay.rayDistance < max_volume_distance;
+            if(volume_flag)
+            {
+                float distance_exit = t;
+                IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
+            }
         }
 
 		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
@@ -662,8 +669,8 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		}
 	}
 
-	//if(show_streamlines)
-	IntersectInstance_Tree(false, ray, maxRayDistance, hit, hitCube);
+	if(show_streamlines)
+	    IntersectInstance_Tree(false, ray, maxRayDistance, hit, hitCube);
   /*
 	if(show_interactive_streamline)
 		IntersectInstance_Tree(true, ray, maxRayDistance, hit, hitCube);
@@ -2019,6 +2026,10 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
     while(sample_index_iteration < 10000){
         //check termination condition
         float sample_distance_iteration = float(sample_index_iteration) * delta;
+        bool max_range_reached = ray.rayDistance + sample_distance_iteration > max_volume_distance;
+        if(max_range_reached)
+            break;
+
         bool has_hit = hit.hitType > TYPE_NONE;
         bool has_hit_cube = hitCube.hitType > TYPE_NONE;
         bool has_hit_any = has_hit || has_hit_cube;
