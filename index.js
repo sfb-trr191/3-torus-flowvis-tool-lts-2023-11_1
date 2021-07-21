@@ -36,6 +36,7 @@ const MouseManager = require("./mouse_manager");
 const module_webgl = require("./webgl");
 const getRenderingContext = module_webgl.getRenderingContext;
 const UISeeds = require("./ui_seeds");
+const UITransferFunctions = require("./ui_transfer_functions");
 const Lights = require("./lights");
 const TransferFunctionManager = require("./transfer_function_manager");
 const ObjectManager = require("./object_manager");
@@ -92,6 +93,7 @@ const Export = module_export.Export;
     var settings_changed = false;
 
     var ui_seeds;
+    var ui_transfer_functions;
     var global_data;
     var time_last_tick = 0;
     var fps_display;
@@ -152,11 +154,12 @@ const Export = module_export.Export;
         ui_seeds.generateDefaultSeeds();
         input_changed_manager.LinkUISeeds(ui_seeds);
 
+        ui_transfer_functions = new UITransferFunctions();
 
         lights = new Lights();
         lights.GenerateDefaultLighting();
 
-        transfer_function_manager = new TransferFunctionManager();
+        transfer_function_manager = new TransferFunctionManager(ui_transfer_functions);
         object_manager = new ObjectManager();
 
         global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager, object_manager);
@@ -223,6 +226,8 @@ const Export = module_export.Export;
 
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, tab_manager);
         input_parameter_wrapper.fromURL();
+
+
 
         hide_manager.UpdateVisibility();
 
@@ -496,6 +501,8 @@ const Export = module_export.Export;
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
         settings_changed = true;
+
+        transfer_function_manager.UpdateFromUI();
 
         var cube_axes_radius_main = parseFloat(document.getElementById("input_cube_axes_radius_main").value);
         var cube_axes_radius_origin_main = 0;

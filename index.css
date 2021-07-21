@@ -191,6 +191,20 @@ legend {
     gap: 4px;
 }
 
+.horizontal_div_tranfer_function_color {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_tranfer_function_opacity {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
 .horizontal_div_3 input {
     min-width: 75px;
 }

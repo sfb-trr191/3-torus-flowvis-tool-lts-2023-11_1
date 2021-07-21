@@ -404,7 +404,7 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":10,"./utility":1028,"gl-matrix":52}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":10,"./utility":1029,"gl-matrix":52}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -1441,7 +1441,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":12,"./render_wrapper":1007,"./shader_uniforms":1022,"./webgl":1029}],6:[function(require,module,exports){
+},{"./dummy_quad":12,"./render_wrapper":1007,"./shader_uniforms":1022,"./webgl":1030}],6:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -2768,7 +2768,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":6,"./data_textures":9,"./dummy_quad":12,"./shader_uniforms":1022,"./utility":1028,"./webgl":1029,"ml-matrix":989}],15:[function(require,module,exports){
+},{"./compute_wraper":6,"./data_textures":9,"./dummy_quad":12,"./shader_uniforms":1022,"./utility":1029,"./webgl":1030,"ml-matrix":989}],15:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -3031,6 +3031,7 @@ const MouseManager = require("./mouse_manager");
 const module_webgl = require("./webgl");
 const getRenderingContext = module_webgl.getRenderingContext;
 const UISeeds = require("./ui_seeds");
+const UITransferFunctions = require("./ui_transfer_functions");
 const Lights = require("./lights");
 const TransferFunctionManager = require("./transfer_function_manager");
 const ObjectManager = require("./object_manager");
@@ -3087,6 +3088,7 @@ const Export = module_export.Export;
     var settings_changed = false;
 
     var ui_seeds;
+    var ui_transfer_functions;
     var global_data;
     var time_last_tick = 0;
     var fps_display;
@@ -3147,11 +3149,12 @@ const Export = module_export.Export;
         ui_seeds.generateDefaultSeeds();
         input_changed_manager.LinkUISeeds(ui_seeds);
 
+        ui_transfer_functions = new UITransferFunctions();
 
         lights = new Lights();
         lights.GenerateDefaultLighting();
 
-        transfer_function_manager = new TransferFunctionManager();
+        transfer_function_manager = new TransferFunctionManager(ui_transfer_functions);
         object_manager = new ObjectManager();
 
         global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager, object_manager);
@@ -3218,6 +3221,8 @@ const Export = module_export.Export;
 
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, tab_manager);
         input_parameter_wrapper.fromURL();
+
+
 
         hide_manager.UpdateVisibility();
 
@@ -3491,6 +3496,8 @@ const Export = module_export.Export;
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
         settings_changed = true;
+
+        transfer_function_manager.UpdateFromUI();
 
         var cube_axes_radius_main = parseFloat(document.getElementById("input_cube_axes_radius_main").value);
         var cube_axes_radius_origin_main = 0;
@@ -3821,7 +3828,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./const":7,"./export":13,"./ftle_manager":14,"./global_data":16,"./hide_manager":17,"./input_changed_manager":19,"./input_manager":20,"./input_parameter_wrapper":21,"./lights":22,"./mouse_manager":24,"./object_manager":1003,"./shader/f_shader_average.glsl":1009,"./shader/f_shader_compute_flow_map_slice.glsl":1010,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1011,"./shader/f_shader_compute_ftle_normals.glsl":1012,"./shader/f_shader_copy.glsl":1013,"./shader/f_shader_flow_map_slice.glsl":1014,"./shader/f_shader_placeholder.glsl":1015,"./shader/f_shader_raytracing.glsl":1016,"./shader/f_shader_resampling.glsl":1017,"./shader/f_shader_sum.glsl":1018,"./shader/v_shader_raytracing.glsl":1019,"./shader/v_shader_resampling.glsl":1020,"./shader_manager":1021,"./streamline_context":1023,"./tab_manager":1025,"./transfer_function_manager":1026,"./ui_seeds":1027,"./utility":1028,"./webgl":1029,"gl-matrix":52,"ml-matrix":989}],19:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./const":7,"./export":13,"./ftle_manager":14,"./global_data":16,"./hide_manager":17,"./input_changed_manager":19,"./input_manager":20,"./input_parameter_wrapper":21,"./lights":22,"./mouse_manager":24,"./object_manager":1003,"./shader/f_shader_average.glsl":1009,"./shader/f_shader_compute_flow_map_slice.glsl":1010,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1011,"./shader/f_shader_compute_ftle_normals.glsl":1012,"./shader/f_shader_copy.glsl":1013,"./shader/f_shader_flow_map_slice.glsl":1014,"./shader/f_shader_placeholder.glsl":1015,"./shader/f_shader_raytracing.glsl":1016,"./shader/f_shader_resampling.glsl":1017,"./shader/f_shader_sum.glsl":1018,"./shader/v_shader_raytracing.glsl":1019,"./shader/v_shader_resampling.glsl":1020,"./shader_manager":1021,"./streamline_context":1023,"./tab_manager":1025,"./transfer_function_manager":1026,"./ui_seeds":1027,"./ui_transfer_functions":1028,"./utility":1029,"./webgl":1030,"gl-matrix":52,"ml-matrix":989}],19:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -4282,7 +4289,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1028}],22:[function(require,module,exports){
+},{"./utility":1029}],22:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -4780,7 +4787,7 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":8,"./data_textures":9,"./data_types":10,"./data_unit":11,"./utility":1028,"gl-matrix":52}],24:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":8,"./data_textures":9,"./data_types":10,"./data_unit":11,"./utility":1029,"gl-matrix":52}],24:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 
@@ -4881,7 +4888,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1028}],25:[function(require,module,exports){
+},{"./utility":1029}],25:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -115257,6 +115264,19 @@ class TransferFunctionOpacityPoint {
         this.t = t;
         this.a = a;
     }
+
+    toString() {
+        var s = this.t + "~"
+            + this.a;
+        return s;
+    }
+
+    fromString(s) {
+        var split = s.split("~");
+        this.t = split[0];
+        this.a = split[1];
+    }
+
 }
 
 class TransferFunction {
@@ -115269,12 +115289,53 @@ class TransferFunction {
         this.list_colors = [];//StreamlineColor
     }
 
+    toString() {
+        var s = "";
+        for (var i = 0; i < this.list_opacity_points.length; i++) {
+            if (i > 0)
+                s += "!"
+            s += this.list_opacity_points[i].toString();
+        }
+        return s;
+    }
+
+    fromString(s) {
+        console.log("fromString");
+        console.log("s:", s);
+        if (s === null)
+            return;
+        if (!s.includes("!")) {
+            return;
+        }
+        var split = s.split("!");
+
+        while (split.length > this.list_opacity_points.length) {
+            this.addOpacityPoint(0, 0);
+        }
+        while (this.list_opacity_points.length > split.length) {
+            //this.removeOpacityPoint(this.list_opacity_points.length - 1);
+            this.removeLastOpacityPoint();
+        }
+
+        for (var i = 0; i < split.length; i++) {
+            console.log("i:", i, split[i]);
+            this.list_opacity_points[i].fromString(split[i]);
+        }
+
+        this.fillBins();
+    }
+
     addColorPoint(t, r, g, b) {
         this.list_color_points.push(new TransferFunctionColorPoint(t, r/255, g/255, b/255));
     }
 
     addOpacityPoint(t, a) {
         this.list_opacity_points.push(new TransferFunctionOpacityPoint(t, a/255));
+    }
+
+    removeLastOpacityPoint() {
+        console.log("removeLastOpacityPoint");
+        this.list_opacity_points.pop();
     }
 
     fillBins() {
@@ -115328,12 +115389,23 @@ class TransferFunction {
 
 class TransferFunctionManager {
 
-    constructor() {
+    constructor(p_ui_transfer_functions) {
+        this.p_ui_transfer_functions = p_ui_transfer_functions;
         this.transfer_function_list = [];
         this.transfer_function_dict = {};
         this.concatenated_colors = [];
         this.active_transfer_function = "Green Linear";
         this.CreateDefaultTransferFunctions();
+        this.Concatenate();
+        this.UpdateToUI();
+    }
+
+    UpdateToUI(){
+        this.p_ui_transfer_functions.fromString(this.transfer_function_list[0].toString());
+    }
+
+    UpdateFromUI(){
+        this.transfer_function_list[0].fromString(this.p_ui_transfer_functions.toString());
         this.Concatenate();
     }
 
@@ -115371,8 +115443,8 @@ class TransferFunctionManager {
         transfer_function.addColorPoint(1.00, 66, 50, 112);
 
         transfer_function.addOpacityPoint(0.00, 0);
-        //transfer_function.addOpacityPoint(0.90, 0);
-        //transfer_function.addOpacityPoint(0.90, 255);
+        transfer_function.addOpacityPoint(0.90, 0);
+        transfer_function.addOpacityPoint(0.90, 255);
         transfer_function.addOpacityPoint(1.00, 255);
 
         transfer_function.fillBins();
@@ -115427,7 +115499,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":10,"./utility":1028,"gl-matrix":52}],1027:[function(require,module,exports){
+},{"./data_types":10,"./utility":1029,"gl-matrix":52}],1027:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -115750,7 +115822,169 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":10,"./utility":1028,"gl-matrix":52,"seedrandom":992}],1028:[function(require,module,exports){
+},{"./data_types":10,"./utility":1029,"gl-matrix":52,"seedrandom":992}],1028:[function(require,module,exports){
+const glMatrix = require("gl-matrix");
+const seedrandom = require("seedrandom");
+const module_utility = require("./utility");
+const rgbToHex = module_utility.rgbToHex;
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+
+class UITransferFunctionOpacityPoint {
+    constructor(ui_transfer_functions, index) {
+        this.ui_transfer_functions = ui_transfer_functions;
+        this.index = index;
+        this.node = document.createElement("div");
+        this.node.className = "horizontal_div_tranfer_function_opacity";
+
+        this.node_label = document.createElement("label");
+        this.node_label.innerHTML = index;
+        this.node.appendChild(this.node_label);
+
+        this.node_input_t = document.createElement("input");
+        this.node_input_t.type = "text";
+        this.node_input_t.value = "0.5";
+        this.node.appendChild(this.node_input_t);
+
+        this.node_input_a = document.createElement("input");
+        this.node_input_a.type = "text";
+        this.node_input_a.value = "0.5";
+        this.node.appendChild(this.node_input_a);
+
+        this.node_button = document.createElement("button");
+        this.node_button.innerHTML = "x";
+        this.node_button.type = "button";
+        this.node_button.addEventListener("click", (event) => {
+            console.log("this.index: ", event.target.id, this.index);
+            this.ui_transfer_functions.removeOpacityPoint(this.index);
+        });
+        this.node.appendChild(this.node_button);
+    }
+
+    updateIndex(new_index) {
+        this.index = new_index;
+        this.node_label.innerHTML = new_index;
+    }
+
+    fromString(s) {
+        var split = s.split("~");
+        this.node_input_t.value = split[0];
+        this.node_input_a.value = split[1];
+    }
+
+    toString() {
+        var s = this.node_input_t.value + "~"
+            + this.node_input_a.value;
+        return s;
+    }
+
+    UpdateDefaultValues(name) {
+        this.node_input_t.defaultValue = this.node_input_t.value;
+        this.node_input_a.defaultValue = this.node_input_a.value;
+        
+    }
+
+    HasValueChanged(name) {
+        if (this.node_input_t.defaultValue != this.node_input_t.value)
+            return true;
+        if (this.node_input_a.defaultValue != this.node_input_a.value)
+            return true;
+        return false;
+    }
+}
+
+class UITransferFunctions {
+    constructor() {
+        this.changed_count = false;
+        this.element_opacities = document.getElementById("container_transfer_function_opacities");
+        this.list_opacity = [];
+        //this.rng_positions = seedrandom();
+
+        this.addOpacityPoint();
+        this.addOpacityPoint();
+        this.addOpacityPoint();
+    }
+
+    addOpacityPoint() {
+        var new_point = new UITransferFunctionOpacityPoint(this, this.list_opacity.length);
+        this.list_opacity.push(new_point);
+        this.element_opacities.appendChild(new_point.node);
+        this.changed_count = true;
+    }
+
+    removeOpacityPoint(index) {
+        console.log("removeOpacityPoint: ", index);
+        var to_remove = this.list_opacity[index];
+        this.element_opacities.removeChild(to_remove.node);
+        this.list_opacity.splice(index, 1);
+        for (var i = 0; i < this.list_opacity.length; i++) {
+            this.list_opacity[i].updateIndex(i);
+        }
+        this.changed_count = true;
+    }
+
+    toString() {
+        var s = "";
+        for (var i = 0; i < this.list_opacity.length; i++) {
+            if (i > 0)
+                s += "!"
+            s += this.list_opacity[i].toString();
+        }
+        return s;
+    }
+
+    fromString(s) {
+        console.log("fromString");
+        console.log("s:", s);
+        if (s === null)
+            return;
+        if (!s.includes("!")) {
+            return;
+        }
+        var split = s.split("!");
+
+        while (split.length > this.list_opacity.length) {
+            this.addOpacityPoint();
+        }
+        while (this.list_opacity.length > split.length) {
+            this.removeOpacityPoint(this.list_opacity.length - 1);
+        }
+
+        for (var i = 0; i < split.length; i++) {
+            console.log("i:", i, split[i]);
+            this.list_opacity[i].fromString(split[i]);
+        }
+    }
+
+    HasValueChanged(name) {
+        var changed = this.changed_count;
+        for (var i = 0; i < this.list_opacity.length; i++) {
+            changed = changed || this.list_opacity[i].HasValueChanged(name);
+        }
+        return changed;
+    }
+
+    UpdateDefaultValues(name) {
+        this.changed_count = false;
+        for (var i = 0; i < this.list_opacity.length; i++) {
+            this.list_opacity[i].UpdateDefaultValues(name);
+        }
+    }
+}
+/*
+<fieldset id="fieldset_seeds">
+<div id="div_seed_position_0" class="horizontal_div_seed">
+    <label>0</label>
+    <input id="seed_x_0" type="text" value="0.5">
+    <input id="seed_y_0" type="text" value="0.5">
+    <input id="seed_z_0" type="text" value="0.5">
+    <input id="seed_c_0" type="color" value="#ff0000">
+    <button type="button" id="button_remove_seed_0">x</button>
+</div>
+</fieldset>
+*/
+
+module.exports = UITransferFunctions;
+},{"./data_types":10,"./utility":1029,"gl-matrix":52,"seedrandom":992}],1029:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 function getMousePosition(canvas, event) {
@@ -115832,7 +116066,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":52}],1029:[function(require,module,exports){
+},{"gl-matrix":52}],1030:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;

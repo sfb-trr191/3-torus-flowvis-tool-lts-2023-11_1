@@ -19,6 +19,19 @@ class TransferFunctionOpacityPoint {
         this.t = t;
         this.a = a;
     }
+
+    toString() {
+        var s = this.t + "~"
+            + this.a;
+        return s;
+    }
+
+    fromString(s) {
+        var split = s.split("~");
+        this.t = split[0];
+        this.a = split[1];
+    }
+
 }
 
 class TransferFunction {
@@ -31,12 +44,53 @@ class TransferFunction {
         this.list_colors = [];//StreamlineColor
     }
 
+    toString() {
+        var s = "";
+        for (var i = 0; i < this.list_opacity_points.length; i++) {
+            if (i > 0)
+                s += "!"
+            s += this.list_opacity_points[i].toString();
+        }
+        return s;
+    }
+
+    fromString(s) {
+        console.log("fromString");
+        console.log("s:", s);
+        if (s === null)
+            return;
+        if (!s.includes("!")) {
+            return;
+        }
+        var split = s.split("!");
+
+        while (split.length > this.list_opacity_points.length) {
+            this.addOpacityPoint(0, 0);
+        }
+        while (this.list_opacity_points.length > split.length) {
+            //this.removeOpacityPoint(this.list_opacity_points.length - 1);
+            this.removeLastOpacityPoint();
+        }
+
+        for (var i = 0; i < split.length; i++) {
+            console.log("i:", i, split[i]);
+            this.list_opacity_points[i].fromString(split[i]);
+        }
+
+        this.fillBins();
+    }
+
     addColorPoint(t, r, g, b) {
         this.list_color_points.push(new TransferFunctionColorPoint(t, r/255, g/255, b/255));
     }
 
     addOpacityPoint(t, a) {
         this.list_opacity_points.push(new TransferFunctionOpacityPoint(t, a/255));
+    }
+
+    removeLastOpacityPoint() {
+        console.log("removeLastOpacityPoint");
+        this.list_opacity_points.pop();
     }
 
     fillBins() {
@@ -90,12 +144,23 @@ class TransferFunction {
 
 class TransferFunctionManager {
 
-    constructor() {
+    constructor(p_ui_transfer_functions) {
+        this.p_ui_transfer_functions = p_ui_transfer_functions;
         this.transfer_function_list = [];
         this.transfer_function_dict = {};
         this.concatenated_colors = [];
         this.active_transfer_function = "Green Linear";
         this.CreateDefaultTransferFunctions();
+        this.Concatenate();
+        this.UpdateToUI();
+    }
+
+    UpdateToUI(){
+        this.p_ui_transfer_functions.fromString(this.transfer_function_list[0].toString());
+    }
+
+    UpdateFromUI(){
+        this.transfer_function_list[0].fromString(this.p_ui_transfer_functions.toString());
         this.Concatenate();
     }
 
@@ -133,8 +198,8 @@ class TransferFunctionManager {
         transfer_function.addColorPoint(1.00, 66, 50, 112);
 
         transfer_function.addOpacityPoint(0.00, 0);
-        //transfer_function.addOpacityPoint(0.90, 0);
-        //transfer_function.addOpacityPoint(0.90, 255);
+        transfer_function.addOpacityPoint(0.90, 0);
+        transfer_function.addOpacityPoint(0.90, 255);
         transfer_function.addOpacityPoint(1.00, 255);
 
         transfer_function.fillBins();
