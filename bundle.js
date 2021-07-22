@@ -1206,6 +1206,7 @@ class CanvasWrapper {
 
     drawTextureRaytracing(gl, render_wrapper, width, height) {
         var projection_index = this.draw_mode == DRAW_MODE_PROJECTION ? this.projection_index : -1;
+        var max_iteration_count = this.draw_mode == DRAW_MODE_PROJECTION ? 1000 : this.max_iteration_count;
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1216,7 +1217,7 @@ class CanvasWrapper {
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
-        gl.uniform1i(this.location_raytracing.location_max_iteration_count, this.max_iteration_count);
+        gl.uniform1i(this.location_raytracing.location_max_iteration_count, max_iteration_count);
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
@@ -112259,6 +112260,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 bool CheckOutOfBounds(vec3 position);
 vec3 MoveOutOfBounds(vec3 position);
+vec3 MoveOutOfBoundsProjection(vec3 position);
 bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit);
@@ -112608,12 +112610,6 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 
 		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
 			break;
-
-		count++;		
-		if(count >= maxIterationCount)
-			break;
-		
-
 		
 		//update distance "traveled" using value from this instance
 		variableRay.rayDistance += t;
@@ -112622,11 +112618,32 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 		//1.8 is a bit greater than sqrt(3) which is the max distance inside unit cube
 		if(variableRay.rayDistance > (maxRayDistance + 1.8))
 			break;
-
-		
-		//update ray origin for next instance		
-		//MoveRayOrigin(variableRay, exit);
-		variableRay.origin = MoveOutOfBounds(exit);
+	
+        if(projection_index >= 0)
+        {
+            if(projection_index == 0){
+                if(exit.x < 0.001)
+                    break;
+            }
+            else if (projection_index == 1){
+               if(exit.y < 0.001)
+                    break;
+            }
+            else if (projection_index == 2){
+               if(exit.z < 0.001)
+                    break;
+            }
+            //update ray origin for next instance	
+		    variableRay.origin = MoveOutOfBoundsProjection(exit);
+        }	
+        else{
+		    //update ray origin for next instance		
+		    //MoveRayOrigin(variableRay, exit);
+		    variableRay.origin = MoveOutOfBounds(exit);
+        }
+        count++;
+		if(count >= maxIterationCount)
+			break;
 				
 		//break;
 	}	
@@ -112884,6 +112901,64 @@ vec3 MoveOutOfBounds(vec3 position)
 		z = z+1.0;
 	}
 
+	return vec3(x,y,z);
+}
+
+vec3 MoveOutOfBoundsProjection(vec3 position)
+{
+	//user friendly variables
+	float x = position.x;
+	float y = position.y;
+	float z = position.z;
+	//additional "constant" variables for this calculation
+	float x0 = x;
+	float y0 = y;
+	float z0 = z;
+
+    if(projection_index != 0){
+        if(x > 1.0-epsilon_move_ray)
+        {
+            x = x-1.0;
+            y = y;
+            z = z;
+        }
+        else if(x < 0.0+epsilon_move_ray)
+        {
+            x = x+1.0;
+            y = y;
+            z = z;
+        }
+    }	
+
+    if(projection_index != 1){
+        if(y > 1.0-epsilon_move_ray)
+        {
+            x = x;
+            y = y-1.0;
+            z = z;
+        }
+        else if(y < 0.0+epsilon_move_ray)
+        {
+            x = x;
+            y = y+1.0;
+            z = z;
+        }
+    }
+
+    if(projection_index != 2){
+        if(z > 1.0-epsilon_move_ray)
+        {
+            x = x;
+            y = y;
+            z = z-1.0;
+        }
+        else if(z < 0.0+epsilon_move_ray)
+        {
+            x = x;
+            y = y;
+            z = z+1.0;
+        }
+    }
 	return vec3(x,y,z);
 }
 

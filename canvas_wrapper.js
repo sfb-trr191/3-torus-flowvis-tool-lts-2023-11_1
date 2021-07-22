@@ -306,6 +306,7 @@ class CanvasWrapper {
 
     drawTextureRaytracing(gl, render_wrapper, width, height) {
         var projection_index = this.draw_mode == DRAW_MODE_PROJECTION ? this.projection_index : -1;
+        var max_iteration_count = this.draw_mode == DRAW_MODE_PROJECTION ? 1000 : this.max_iteration_count;
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -316,7 +317,7 @@ class CanvasWrapper {
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
-        gl.uniform1i(this.location_raytracing.location_max_iteration_count, this.max_iteration_count);
+        gl.uniform1i(this.location_raytracing.location_max_iteration_count, max_iteration_count);
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
