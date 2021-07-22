@@ -284,13 +284,41 @@ class CanvasWrapper {
         this.aliasing_index += 1;
     }
 
-    set_draw_mode(draw_mode) {
-        if (this.draw_mode == draw_mode)
+    set_draw_mode(draw_mode, projection_index) {
+        if (this.draw_mode == draw_mode && this.projection_index == projection_index)
             return;
-        console.log("change draw mode: ", draw_mode);
+        console.log("change draw mode: ", draw_mode, projection_index);
         this.draw_mode = draw_mode;
+        this.projection_index = projection_index;
         this.aliasing_index = 0;
         this.camera.changed = true;
+
+        switch (this.draw_mode) {
+            case DRAW_MODE_DEFAULT:
+                this.camera.loadState("state_default");
+                break;
+            case DRAW_MODE_FTLE_SLICE:
+                break;
+            case DRAW_MODE_PROJECTION:
+                switch (this.projection_index) {
+                    case 0:
+                        this.camera.loadState("state_projection_x");
+                        break;
+                    case 1:
+                        this.camera.loadState("state_projection_y");
+                        break;
+                    case 2:
+                        this.camera.loadState("state_projection_z");
+                        break;
+                    default:
+                        console.warn("PROJECTION INDEX ERROR", this.projection_index);
+                        break;
+                }
+                break;
+            default:
+                console.warn("DRAW MODE ERROR", this.draw_mode);
+                break;
+        }
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {

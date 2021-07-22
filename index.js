@@ -455,8 +455,14 @@ const Export = module_export.Export;
 
     function addChangedSideMode() {
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
-            var value = document.getElementById("select_side_mode").value;
-            canvas_wrapper_side.set_draw_mode(parseInt(value));
+            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+            var projection_index = parseInt(document.getElementById("select_projection_index").value);
+            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+        });
+        document.getElementById("select_projection_index").addEventListener("change", (event) => {
+            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+            var projection_index = parseInt(document.getElementById("select_projection_index").value);
+            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
         });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {

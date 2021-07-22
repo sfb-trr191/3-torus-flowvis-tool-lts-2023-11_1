@@ -38,6 +38,34 @@ class GL_CameraData {
     }
 }
 
+class CameraSave{
+
+    constructor(){
+        this.forward = glMatrix.vec3.create();
+        this.up = glMatrix.vec3.create();
+        this.position = glMatrix.vec3.create();
+    }
+
+    setProjectionX(){
+        this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
+        this.up = glMatrix.vec3.fromValues(0, 0, -1);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+    }
+
+    setProjectionY(){
+        this.forward = glMatrix.vec3.fromValues(0, -1, 0);
+        this.up = glMatrix.vec3.fromValues(-1, 0, 0);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+    }
+
+    setProjectionZ(){
+        this.forward = glMatrix.vec3.fromValues(0, 0, -1);
+        this.up = glMatrix.vec3.fromValues(0, -1, 0);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+    }
+
+}
+
 class Camera {
     /**
      * 
@@ -82,8 +110,17 @@ class Camera {
         this.normal_top = glMatrix.vec3.create();
         this.normal_bottom = glMatrix.vec3.create();
 
-        //console.log("Generate camera: " + name);
+        this.states = {};
+        this.states["state_default"] = new CameraSave();
+        this.states["state_projection_x"] = new CameraSave();
+        this.states["state_projection_y"] = new CameraSave();
+        this.states["state_projection_z"] = new CameraSave();
 
+        this.states["state_projection_x"].setProjectionX();
+        this.states["state_projection_y"].setProjectionY();
+        this.states["state_projection_z"].setProjectionZ();
+
+        this.current_state_name = "state_default";
     }
 
     LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z,
@@ -485,6 +522,33 @@ class Camera {
                 this.position[i] += 1.0;
             }
         }
+    }
+
+    loadState(state_name_new){
+        
+        this.saveCurrentState();
+
+        var state_new = this.states[state_name_new];
+        glMatrix.vec3.copy(this.forward, state_new.forward);
+        glMatrix.vec3.copy(this.up, state_new.up);
+        glMatrix.vec3.copy(this.position, state_new.position);
+
+        this.current_state_name = state_name_new;
+        console.log("loadState: ", this.current_state_name);
+        console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
+        console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
+        console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
+    }
+
+    saveCurrentState(){
+        var state_old = this.states[this.current_state_name];
+        glMatrix.vec3.copy(state_old.forward, this.forward);
+        glMatrix.vec3.copy(state_old.up, this.up);
+        glMatrix.vec3.copy(state_old.position, this.position);
+        console.log("saveCurrentState: ", this.current_state_name);
+        console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
+        console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
+        console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
     }
 
 }

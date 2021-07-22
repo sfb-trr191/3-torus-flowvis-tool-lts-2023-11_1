@@ -445,6 +445,34 @@ class GL_CameraData {
     }
 }
 
+class CameraSave{
+
+    constructor(){
+        this.forward = glMatrix.vec3.create();
+        this.up = glMatrix.vec3.create();
+        this.position = glMatrix.vec3.create();
+    }
+
+    setProjectionX(){
+        this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
+        this.up = glMatrix.vec3.fromValues(0, 0, -1);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+    }
+
+    setProjectionY(){
+        this.forward = glMatrix.vec3.fromValues(0, -1, 0);
+        this.up = glMatrix.vec3.fromValues(-1, 0, 0);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+    }
+
+    setProjectionZ(){
+        this.forward = glMatrix.vec3.fromValues(0, 0, -1);
+        this.up = glMatrix.vec3.fromValues(0, -1, 0);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+    }
+
+}
+
 class Camera {
     /**
      * 
@@ -489,8 +517,17 @@ class Camera {
         this.normal_top = glMatrix.vec3.create();
         this.normal_bottom = glMatrix.vec3.create();
 
-        //console.log("Generate camera: " + name);
+        this.states = {};
+        this.states["state_default"] = new CameraSave();
+        this.states["state_projection_x"] = new CameraSave();
+        this.states["state_projection_y"] = new CameraSave();
+        this.states["state_projection_z"] = new CameraSave();
 
+        this.states["state_projection_x"].setProjectionX();
+        this.states["state_projection_y"].setProjectionY();
+        this.states["state_projection_z"].setProjectionZ();
+
+        this.current_state_name = "state_default";
     }
 
     LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z,
@@ -894,6 +931,33 @@ class Camera {
         }
     }
 
+    loadState(state_name_new){
+        
+        this.saveCurrentState();
+
+        var state_new = this.states[state_name_new];
+        glMatrix.vec3.copy(this.forward, state_new.forward);
+        glMatrix.vec3.copy(this.up, state_new.up);
+        glMatrix.vec3.copy(this.position, state_new.position);
+
+        this.current_state_name = state_name_new;
+        console.log("loadState: ", this.current_state_name);
+        console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
+        console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
+        console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
+    }
+
+    saveCurrentState(){
+        var state_old = this.states[this.current_state_name];
+        glMatrix.vec3.copy(state_old.forward, this.forward);
+        glMatrix.vec3.copy(state_old.up, this.up);
+        glMatrix.vec3.copy(state_old.position, this.position);
+        console.log("saveCurrentState: ", this.current_state_name);
+        console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
+        console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
+        console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
+    }
+
 }
 
 module.exports = Camera;
@@ -1184,13 +1248,41 @@ class CanvasWrapper {
         this.aliasing_index += 1;
     }
 
-    set_draw_mode(draw_mode) {
-        if (this.draw_mode == draw_mode)
+    set_draw_mode(draw_mode, projection_index) {
+        if (this.draw_mode == draw_mode && this.projection_index == projection_index)
             return;
-        console.log("change draw mode: ", draw_mode);
+        console.log("change draw mode: ", draw_mode, projection_index);
         this.draw_mode = draw_mode;
+        this.projection_index = projection_index;
         this.aliasing_index = 0;
         this.camera.changed = true;
+
+        switch (this.draw_mode) {
+            case DRAW_MODE_DEFAULT:
+                this.camera.loadState("state_default");
+                break;
+            case DRAW_MODE_FTLE_SLICE:
+                break;
+            case DRAW_MODE_PROJECTION:
+                switch (this.projection_index) {
+                    case 0:
+                        this.camera.loadState("state_projection_x");
+                        break;
+                    case 1:
+                        this.camera.loadState("state_projection_y");
+                        break;
+                    case 2:
+                        this.camera.loadState("state_projection_z");
+                        break;
+                    default:
+                        console.warn("PROJECTION INDEX ERROR", this.projection_index);
+                        break;
+                }
+                break;
+            default:
+                console.warn("DRAW MODE ERROR", this.draw_mode);
+                break;
+        }
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
@@ -3525,8 +3617,14 @@ const Export = module_export.Export;
 
     function addChangedSideMode() {
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
-            var value = document.getElementById("select_side_mode").value;
-            canvas_wrapper_side.set_draw_mode(parseInt(value));
+            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+            var projection_index = parseInt(document.getElementById("select_projection_index").value);
+            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+        });
+        document.getElementById("select_projection_index").addEventListener("change", (event) => {
+            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+            var projection_index = parseInt(document.getElementById("select_projection_index").value);
+            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
         });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
