@@ -18,14 +18,15 @@ class InputRow{
 }
 
 class Show{
-    constructor(name, required_level){
+    constructor(name, required_level, require_exact){
         this.name = name;
         this.required_level = required_level;
+        this.require_exact = require_exact;
         this.element = document.getElementById(name)
     }
 
     UpdateVisibility(level){
-        var visible = level >= this.required_level;
+        var visible = this.require_exact ? level == this.required_level : level >= this.required_level;
         this.element.className = visible ? "show" : "hidden";
     }
 }
@@ -55,8 +56,8 @@ class HideGroup{
         this.list_input_row.push(new InputRow(input_row_name, level));
     }
 
-    AddShow(show_name, level){
-        this.list_show.push(new Show(show_name, level));
+    AddShow(show_name, level, require_exact){
+        this.list_show.push(new Show(show_name, level, require_exact));
     }
 }
 
@@ -74,8 +75,10 @@ class HideManager{
         this.groups.push(this.group_settings);
 
         this.group_side_canvas = new HideGroup("select_side_mode");
-        this.group_side_canvas.AddShow("show_side_canvas", 1);
-        this.groups.push(this.group_side_canvas);
+        this.group_side_canvas.AddShow("show_side_canvas", 1, false);
+        this.group_side_canvas.AddShow("show_projection_index", DRAW_MODE_PROJECTION, true);
+        this.group_side_canvas.AddShow("show_slice_axes_order", DRAW_MODE_FTLE_SLICE, true);
+        this.groups.push(this.group_side_canvas);        
     }
 
     UpdateVisibility(){

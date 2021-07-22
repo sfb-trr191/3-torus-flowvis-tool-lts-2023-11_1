@@ -79,16 +79,32 @@
                 <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
                     HTML5 canvas.</canvas>
             </div>
-            <select id="select_side_mode">
-                <option value="0">hide</option>
-                <!--DRAW_MODE_NONE-->
-                <option selected value="1">cube</option>
-                <!--DRAW_MODE_DEFAULT-->
-                <option value="2">FTLE slice</option>
-                <!--DRAW_MODE_FTLE_SLICE-->
-                <option value="3">projection</option>
-                <!--DRAW_MODE_PROJECTION-->
-            </select>
+            <div class="horizontal_container">
+                <select id="select_side_mode">
+                    <option value="0">hide</option>
+                    <!--DRAW_MODE_NONE-->
+                    <option selected value="1">cube</option>
+                    <!--DRAW_MODE_DEFAULT-->
+                    <option value="2">FTLE slice</option>
+                    <!--DRAW_MODE_FTLE_SLICE-->
+                    <option value="3">projection</option>
+                    <!--DRAW_MODE_PROJECTION-->
+                </select> 
+                <div class="show" id="show_projection_index">
+                    <select id="select_projection_index">
+                        <option value="0">horizontal: y vertical: z</option>
+                        <option value="1">horizontal: z vertical: x</option>
+                        <option value="2">horizontal: x vertical: y</option>
+                    </select>
+                </div>
+                <div class="show" id="show_slice_axes_order">
+                    <select id="select_slice_axes_order">
+                        <option value="0">horizontal: x vertical: y</option>
+                        <option value="1">horizontal: x vertical: z</option>
+                        <option value="2">horizontal: z vertical: y</option>
+                    </select>
+                </div>
+            </div>
             <div class="tab">
                 <button id="button_tab_data" class="tablink"></button>
                 <button id="button_tab_ftle" class="tablink"></button>
@@ -184,14 +200,6 @@
                                     <option value="4">backward normal</option>
                                 </select>
                             </div>
-                            <div class="input_row">
-                                <label>axes</label>
-                                <select id="select_slice_axes_order">
-                                    <option value="0">horizontal: x vertical: y</option>
-                                    <option value="1">horizontal: x vertical: z</option>
-                                    <option value="2">horizontal: z vertical: y</option>
-                                </select>
-                            </div>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
@@ -258,12 +266,7 @@
                         <legend>Projection</legend>
                         <div class="vertical_container">                            
                             <div class="input_row">
-                                <label>axes</label>
-                                <select id="select_projection_index">
-                                    <option value="0">horizontal: y vertical: z</option>
-                                    <option value="1">horizontal: z vertical: x</option>
-                                    <option value="2">horizontal: x vertical: y</option>
-                                </select>
+                                <label>axes</label> 
                             </div>
                         </div>
                     </fieldset>

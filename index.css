@@ -138,6 +138,11 @@ fieldset {
     gap: 4px; 
 }
 
+.horizontal_container{
+    display: grid;
+    grid-auto-flow: column;
+}
+
 .fieldset_camera{
     display: block;
     margin: 0px 4px 0px 4px;
@@ -429,3 +434,19 @@ legend {
     width: 1fr;
     margin: 4px;
 }
+
+#select_projection_index{
+    width: 1fr;
+    margin: 4px;
+}
+
+#select_slice_axes_order{
+    width: 1fr;
+    margin: 4px;
+}
+
+
+
+div.outer {display:table;table-layout: fixed}
+div.middle {display:table-row;}
+div.inner {display:table-cell;}
