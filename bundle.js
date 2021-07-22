@@ -113141,10 +113141,25 @@ void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cuto
 
 	if(distance_os > ray_local_cutoff)
 		return;
+
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance < hit.distance);
+    if(projection_index >= 0)
+    {
+        hit_condition = false;
+        if(hit.hitType==TYPE_NONE)
+            hit_condition = true;
+        else if(hit.hitType==TYPE_STREAMLINE_SEGMENT)
+        {
+            if(multiPolyID < hit.multiPolyID)
+                hit_condition = true;
+            else if(multiPolyID == hit.multiPolyID)
+                hit_condition = distance < hit.distance;
+        }
+    }
 	
 	//if (not hit) this is the first hit
 	//otherwise hit is true and we only need to check the distance
-	if((hit.hitType==TYPE_NONE) || (distance < hit.distance))
+	if(hit_condition)
 	{		
 		//calculate intersection point in world space
 		//vec3 p = (matrix_inv * vec4(p_os, 1)).xyz;
@@ -113236,9 +113251,23 @@ void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff
 	if(distance_os > ray_local_cutoff)
 		return;
 		
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_surface < hit.distance);
+    if(projection_index >= 0)
+    {
+        hit_condition = false;
+        if(hit.hitType==TYPE_NONE)
+            hit_condition = true;
+        else if(hit.hitType==TYPE_STREAMLINE_SEGMENT)
+        {
+            if(multiPolyID < hit.multiPolyID)
+                hit_condition = true;
+            else if(multiPolyID == hit.multiPolyID)
+                hit_condition = distance_surface < hit.distance;
+        }
+    }
 	//if (not hit) this is the first hit
 	//otherwise hit is true and we only need to check the distance
-	if((hit.hitType==TYPE_NONE) || (distance_surface < hit.distance))
+	if(hit_condition)
 	{		
 		hit.hitType = type;
 		hit.distance_iteration = distance_os;	
