@@ -456,19 +456,19 @@ class CameraSave{
     setProjectionX(){
         this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
         this.up = glMatrix.vec3.fromValues(0, 0, -1);
-        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        this.position = glMatrix.vec3.fromValues(1, 0.5, 0.5);
     }
 
     setProjectionY(){
         this.forward = glMatrix.vec3.fromValues(0, -1, 0);
         this.up = glMatrix.vec3.fromValues(-1, 0, 0);
-        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        this.position = glMatrix.vec3.fromValues(0.5, 1, 0.5);
     }
 
     setProjectionZ(){
         this.forward = glMatrix.vec3.fromValues(0, 0, -1);
         this.up = glMatrix.vec3.fromValues(0, -1, 0);
-        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 1);
     }
 
 }
