@@ -24,6 +24,7 @@ class UniformLocationsRayTracing {
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");
+        this.location_projection_index = gl.getUniformLocation(program, "projection_index");
         this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
@@ -134,6 +135,7 @@ class CanvasWrapper {
         this.fog_density = 0;
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
+        this.projection_index = -1;
         this.limited_max_distance = 0;
         this.max_iteration_count = 1;
         this.min_scalar = 0;
@@ -271,11 +273,13 @@ class CanvasWrapper {
             case DRAW_MODE_FTLE_SLICE:
                 this.draw_mode_ftle_slice(gl, left_render_wrapper);
                 break;
+            case DRAW_MODE_PROJECTION:
+                this.draw_mode_raytracing(gl, left_render_wrapper);
+                break;
             default:
                 console.log("DRAW MODE ERROR", this.draw_mode);
                 break;
         }
-
 
         this.aliasing_index += 1;
     }
@@ -301,6 +305,8 @@ class CanvasWrapper {
     }
 
     drawTextureRaytracing(gl, render_wrapper, width, height) {
+        var projection_index = this.draw_mode == DRAW_MODE_PROJECTION ? this.projection_index : -1;
+
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, this.camera.width, this.camera.height);
@@ -319,6 +325,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
+        gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
         gl.uniform1f(this.location_raytracing.location_min_scalar, this.min_scalar);
         gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar);

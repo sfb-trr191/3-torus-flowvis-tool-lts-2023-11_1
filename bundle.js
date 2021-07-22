@@ -924,6 +924,7 @@ class UniformLocationsRayTracing {
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");
+        this.location_projection_index = gl.getUniformLocation(program, "projection_index");
         this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
@@ -1034,6 +1035,7 @@ class CanvasWrapper {
         this.fog_density = 0;
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
+        this.projection_index = -1;
         this.limited_max_distance = 0;
         this.max_iteration_count = 1;
         this.min_scalar = 0;
@@ -1171,11 +1173,13 @@ class CanvasWrapper {
             case DRAW_MODE_FTLE_SLICE:
                 this.draw_mode_ftle_slice(gl, left_render_wrapper);
                 break;
+            case DRAW_MODE_PROJECTION:
+                this.draw_mode_raytracing(gl, left_render_wrapper);
+                break;
             default:
                 console.log("DRAW MODE ERROR", this.draw_mode);
                 break;
         }
-
 
         this.aliasing_index += 1;
     }
@@ -1201,6 +1205,8 @@ class CanvasWrapper {
     }
 
     drawTextureRaytracing(gl, render_wrapper, width, height) {
+        var projection_index = this.draw_mode == DRAW_MODE_PROJECTION ? this.projection_index : -1;
+
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, this.camera.width, this.camera.height);
@@ -1219,6 +1225,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
+        gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
         gl.uniform1f(this.location_raytracing.location_min_scalar, this.min_scalar);
         gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar);
@@ -1493,6 +1500,7 @@ global.FIXED_LENGTH_RANDOM_SEED_POSITION = 4;
 global.DRAW_MODE_NONE = 0;
 global.DRAW_MODE_DEFAULT = 1;
 global.DRAW_MODE_FTLE_SLICE = 2;
+global.DRAW_MODE_PROJECTION = 3;
 
 global.DRAW_SLICE_AXES_ORDER_HX_VY = 0;
 global.DRAW_SLICE_AXES_ORDER_HX_VZ = 1;
@@ -1587,8 +1595,8 @@ class DataContainer {
         this.setByName("total_float_count", this.arrayf.length);
         this.setByName("total_int_count", this.arrayi.length);
 
-        console.log("arrayi [" + this.arrayi.length + "][" + this.getElementIntCount() + "] : " + this.arrayi);
-        console.log("arrayf [" + this.arrayf.length + "][" + this.getElementFloatCount() + "] : " + this.arrayf);
+        //console.log("arrayi [" + this.arrayi.length + "][" + this.getElementIntCount() + "] : " + this.arrayi);
+        //console.log("arrayf [" + this.arrayf.length + "][" + this.getElementFloatCount() + "] : " + this.arrayf);
     }
 
     getElementFloatCount() {
@@ -1877,7 +1885,7 @@ The class must implement:
 
 var POSITION_DATA_FLOAT_COUNT = 4;
 var POSITION_DATA_INT_COUNT = 0;
-var LINE_SEGMENT_FLOAT_COUNT = 32;
+var LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
 var LINE_SEGMENT_INT_COUNT = 8;
 var TREE_NODE_FLOAT_COUNT = 8;
 var TREE_NODE_INT_COUNT = 4;
@@ -1937,10 +1945,17 @@ class LineSegment {
     matrix = glMatrix.mat4.create();
     matrix_inv = glMatrix.mat4.create();
 
+    list_matrix_projection = [];
+    list_matrix_projection_inv = [];
+
 
     constructor() {
         //this.matrix[0] = 2;//TODO remove: test inverse
         //glMatrix.mat4.invert(this.matrix_inv, this.matrix);//TODO remove: test inverse
+        for (var i=0; i<3; i++){
+            this.list_matrix_projection.push(glMatrix.mat4.create());
+            this.list_matrix_projection_inv.push(glMatrix.mat4.create());
+        }
     }
 
     print() {
@@ -1970,6 +1985,13 @@ class LineSegment {
         for (var i = 0; i < 16; i++) {
             arrayf[start_index_f + i] = this.matrix[i];
             arrayf[start_index_f + i + 16] = this.matrix_inv[i];
+        }
+        for (var m = 0; m < 3; m++) {
+            start_index_f += 32;
+            for (var i = 0; i < 16; i++) {
+                arrayf[start_index_f + i] = this.list_matrix_projection[m][i];
+                arrayf[start_index_f + i + 16] = this.list_matrix_projection_inv[m][i];
+            }
         }
     }
 }
@@ -2247,11 +2269,11 @@ class DataUnit {
             this.copyArray(this.list_data_containers[i].arrayi, this.arrayi, this.list_data_containers_int_start[i]);
         }
 
-        console.log("arrayi [" + this.arrayi.length + "] : " + this.arrayi);
-        console.log("arrayf [" + this.arrayf.length + "] : " + this.arrayf);
+        //console.log("arrayi [" + this.arrayi.length + "] : " + this.arrayi);
+        //console.log("arrayf [" + this.arrayf.length + "] : " + this.arrayf);
 
-        console.log("start f: " + this.list_data_containers_float_start);
-        console.log("start i: " + this.list_data_containers_int_start);
+        //console.log("start f: " + this.list_data_containers_float_start);
+        //console.log("start i: " + this.list_data_containers_int_start);
     }
 
     updateStartIndex(i, list_data_containers_start, vn_total_count, vn_element_count) {
@@ -3621,6 +3643,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_side.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_side.fog_type = document.getElementById("select_fog_type").value;
+        canvas_wrapper_side.projection_index = document.getElementById("select_projection_index").value;
         canvas_wrapper_side.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
         canvas_wrapper_side.min_scalar = document.getElementById("input_min_scalar").value;
         canvas_wrapper_side.max_scalar = document.getElementById("input_max_scalar").value;
@@ -4677,80 +4700,22 @@ class LODData {
     CalculateMatrices() {
         console.log("CalculateMatrices");
         for (var i = 0; i < this.vectorLineSegment.length; i++) {
-            var matrixTranslation = glMatrix.mat4.create();
-            var matrixRotation1 = glMatrix.mat4.create();
-            var matrixRotation2 = glMatrix.mat4.create();
-            var matrixRotation3 = glMatrix.mat4.create();
-            var matrixCombined = glMatrix.mat4.create();
+            var projection_index = -1;
+            var matrixCombined = this.CalculateMatrix(i, projection_index);
             var matrixInverted = glMatrix.mat4.create();
-
-            var posA_os = glMatrix.vec4.create();
-            var posB_os = glMatrix.vec4.create();
-
-            var translation_vector = glMatrix.vec3.create();
-            var axis_x = glMatrix.vec3.fromValues(1, 0, 0);
-            var axis_y = glMatrix.vec3.fromValues(0, 1, 0);
-
-            //std::cout << "------------------------------" << i << std::endl;
-            //std::cout << "SEGMENT: " << i << std::endl;
-            //calculate translation matrix
-            var lineSegment = this.vectorLineSegment[i];
-            var indexA = lineSegment.indexA;
-            var indexB = lineSegment.indexB;
-            var posA_ws = this.p_raw_data.data[indexA].position;//vec4
-            var posB_ws = this.p_raw_data.data[indexB].position;//vec4
-            //std::cout << "posA_ws: " << posA_ws.x() << ", " << posA_ws.y() << ", " << posA_ws.z() << std::endl;
-            //std::cout << "posB_ws: " << posB_ws.x() << ", " << posB_ws.y() << ", " << posB_ws.z() << std::endl;
-            vec3_from_vec4(translation_vector, posA_ws);
-            glMatrix.vec3.negate(translation_vector, translation_vector);
-            glMatrix.mat4.fromTranslation(matrixTranslation, translation_vector);//matrixTranslation.translate(-1 * posA_ws.toVector3D());
-
-            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixTranslation);//var posA_os = matrixTranslation * posA_ws;//vec4
-            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixTranslation);//var posB_os = matrixTranslation * posB_ws;//vec4
-            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-
-            //calculate rotation matrix (rotate around y)
-            var x = posB_os[0];
-            var z = posB_os[2];
-            var angle_y_rad = Math.atan2(-x, z);//angleY = (Math.atan2(-x, z)) * 180 / M_PI;
-            //std::cout << "angle_y_rad: " << angle_y_rad << std::endl;
-            glMatrix.mat4.fromRotation(matrixRotation1, angle_y_rad, axis_y);//matrixRotation1.rotate(angle_y_degree, QVector3D(0, 1, 0));
-
-            //combine matrices
-            glMatrix.mat4.multiply(matrixCombined, matrixRotation1, matrixTranslation);//matrixCombined = matrixRotation1 * matrixTranslation;
-            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
-            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
-            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-
-            //calculate rotation matrix (rotate around x)
-            var y = posB_os[1];
-            z = posB_os[2];
-            var angle_x_rad = Math.atan2(y, z);//angleX = (Math.atan2(y, z)) * 180 / M_PI;
-            //std::cout << "angle_x_rad: " << angle_x_rad << std::endl;
-            glMatrix.mat4.fromRotation(matrixRotation2, angle_x_rad, axis_x);//matrixRotation2.rotate(angle_x_degree, QVector3D(1, 0, 0));
-
-            //combine matrices
-            glMatrix.mat4.multiply(matrixCombined, matrixRotation2, matrixCombined);//matrixCombined = matrixRotation2 * matrixRotation1 * matrixTranslation;
-            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
-            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
-            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-
-            if (posB_os[2] < posA_os[2]) {
-                glMatrix.mat4.fromRotation(matrixRotation3, Math.PI, axis_x);//rotate.rotate(180, QVector3D(1, 0, 0));
-                glMatrix.mat4.multiply(matrixCombined, matrixRotation3, matrixCombined);//matrixCombined = rotate * matrixCombined;
-                glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
-                glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
-                //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-                //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-            }
-
             glMatrix.mat4.invert(matrixInverted, matrixCombined);//matrixInverted = matrixCombined.inverted();
-
             this.vectorLineSegment[i].matrix = matrixCombined;
             this.vectorLineSegment[i].matrix_inv = matrixInverted;
+            
+            for (var projection_index=0; projection_index<3; projection_index++){
+                var matrix = this.CalculateMatrix(i, projection_index);
+                var matrix_inv = glMatrix.mat4.create();
+                glMatrix.mat4.invert(matrix_inv, matrix);
+                this.vectorLineSegment[i].list_matrix_projection[projection_index] = matrix;
+                this.vectorLineSegment[i].list_matrix_projection_inv[projection_index] = matrix_inv;
+            }
+            
+
             //console.log("posA_os: ", posA_os);
             //console.log("posB_os: ", posB_os);
             /*
@@ -4778,6 +4743,83 @@ class LODData {
         console.log("CalculateMatrices completed");
     }
 
+    CalculateMatrix(segment_index, projection_index){
+        var matrixTranslation = glMatrix.mat4.create();
+        var matrixRotation1 = glMatrix.mat4.create();
+        var matrixRotation2 = glMatrix.mat4.create();
+        var matrixRotation3 = glMatrix.mat4.create();
+        var matrixCombined = glMatrix.mat4.create();
+
+        var posA_ws = glMatrix.vec4.create();
+        var posB_ws = glMatrix.vec4.create();
+        var posA_os = glMatrix.vec4.create();
+        var posB_os = glMatrix.vec4.create();
+
+        var translation_vector = glMatrix.vec3.create();
+        var axis_x = glMatrix.vec3.fromValues(1, 0, 0);
+        var axis_y = glMatrix.vec3.fromValues(0, 1, 0);
+
+        //std::cout << "------------------------------" << i << std::endl;
+        //std::cout << "SEGMENT: " << i << std::endl;
+        //calculate translation matrix
+        var lineSegment = this.vectorLineSegment[segment_index];
+        var indexA = lineSegment.indexA;
+        var indexB = lineSegment.indexB;
+        glMatrix.vec4.copy(posA_ws, this.p_raw_data.data[indexA].position);//vec4
+        glMatrix.vec4.copy(posB_ws, this.p_raw_data.data[indexB].position);//vec4
+        posA_ws[projection_index] = 0;
+        posB_ws[projection_index] = 0;
+        //std::cout << "posA_ws: " << posA_ws.x() << ", " << posA_ws.y() << ", " << posA_ws.z() << std::endl;
+        //std::cout << "posB_ws: " << posB_ws.x() << ", " << posB_ws.y() << ", " << posB_ws.z() << std::endl;
+        vec3_from_vec4(translation_vector, posA_ws);
+        glMatrix.vec3.negate(translation_vector, translation_vector);
+        glMatrix.mat4.fromTranslation(matrixTranslation, translation_vector);//matrixTranslation.translate(-1 * posA_ws.toVector3D());
+
+        glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixTranslation);//var posA_os = matrixTranslation * posA_ws;//vec4
+        glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixTranslation);//var posB_os = matrixTranslation * posB_ws;//vec4
+        //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+        //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+
+        //calculate rotation matrix (rotate around y)
+        var x = posB_os[0];
+        var z = posB_os[2];
+        var angle_y_rad = Math.atan2(-x, z);//angleY = (Math.atan2(-x, z)) * 180 / M_PI;
+        //std::cout << "angle_y_rad: " << angle_y_rad << std::endl;
+        glMatrix.mat4.fromRotation(matrixRotation1, angle_y_rad, axis_y);//matrixRotation1.rotate(angle_y_degree, QVector3D(0, 1, 0));
+
+        //combine matrices
+        glMatrix.mat4.multiply(matrixCombined, matrixRotation1, matrixTranslation);//matrixCombined = matrixRotation1 * matrixTranslation;
+        glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
+        glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
+        //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+        //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+
+        //calculate rotation matrix (rotate around x)
+        var y = posB_os[1];
+        z = posB_os[2];
+        var angle_x_rad = Math.atan2(y, z);//angleX = (Math.atan2(y, z)) * 180 / M_PI;
+        //std::cout << "angle_x_rad: " << angle_x_rad << std::endl;
+        glMatrix.mat4.fromRotation(matrixRotation2, angle_x_rad, axis_x);//matrixRotation2.rotate(angle_x_degree, QVector3D(1, 0, 0));
+
+        //combine matrices
+        glMatrix.mat4.multiply(matrixCombined, matrixRotation2, matrixCombined);//matrixCombined = matrixRotation2 * matrixRotation1 * matrixTranslation;
+        glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
+        glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
+        //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+        //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+
+        if (posB_os[2] < posA_os[2]) {
+            glMatrix.mat4.fromRotation(matrixRotation3, Math.PI, axis_x);//rotate.rotate(180, QVector3D(1, 0, 0));
+            glMatrix.mat4.multiply(matrixCombined, matrixRotation3, matrixCombined);//matrixCombined = rotate * matrixCombined;
+            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
+            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
+            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+        }
+
+        return matrixCombined;
+    }
+
     CalculateBVH() {
         console.log("CalculateBVH");
         var bvh = new BVH_AA();
@@ -4787,7 +4829,7 @@ class LODData {
         var volume_threshold = 0.0001;
         bvh.GenerateTree(this.p_raw_data.data, this.vectorLineSegment, tubeRadius, maxCost, growthID, volume_threshold);
         this.tree_nodes = bvh.ConvertNodes();
-        console.log("tree_nodes: " + this.tree_nodes);
+        //console.log("tree_nodes: " + this.tree_nodes);
         console.log("CalculateBVH completed");
     }
 
@@ -112145,6 +112187,7 @@ uniform int fog_type;
 uniform int shading_mode_streamlines;
 uniform float min_scalar;
 uniform float max_scalar;
+uniform int projection_index;
 
 uniform bool cut_at_cube_faces;
 uniform bool handle_inside;
@@ -114190,7 +114233,7 @@ float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
 //DATA SIZES
 const int POSITION_DATA_FLOAT_COUNT = 4;
 const int POSITION_DATA_INT_COUNT = 0;
-const int LINE_SEGMENT_FLOAT_COUNT = 32;
+const int LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
 const int LINE_SEGMENT_INT_COUNT = 8;
 const int TREE_NODE_FLOAT_COUNT = 8;
 const int TREE_NODE_INT_COUNT = 4;
@@ -114239,12 +114282,16 @@ ivec3 GetIndex3D(int global_index)
 
 vec3 GetPosition(int index, bool interactiveStreamline)
 {
-	//return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
-  ivec3 pointer = GetIndex3D(start_index_float_position_data + index * POSITION_DATA_FLOAT_COUNT);
-  float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
-  float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
-  float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
-  return vec3(x, y, z);
+    //return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
+    ivec3 pointer = GetIndex3D(start_index_float_position_data + index * POSITION_DATA_FLOAT_COUNT);
+    float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
+    float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
+    float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
+    vec3 position = vec3(x, y, z);
+    if(projection_index >=0)
+        position[projection_index] = 0.0;
+
+    return position;
 }
 
 float GetCost(int index, bool interactiveStreamline)
@@ -114274,7 +114321,8 @@ GL_LineSegment GetLineSegment(int index, bool interactiveStreamline)
 	segment.copy = texelFetch(texture_int, pointer+ivec3(3,0,0), 0).r;
 	segment.isBeginning = texelFetch(texture_int, pointer+ivec3(4,0,0), 0).r;
 
-	pointer = GetIndex3D(start_index_float_line_segments + index * LINE_SEGMENT_FLOAT_COUNT);
+	pointer = GetIndex3D(start_index_float_line_segments + index * LINE_SEGMENT_FLOAT_COUNT
+        + 32 * (projection_index+1));//projection_index = -1 is no projection (default)
   	segment.matrix = mat4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
@@ -114345,6 +114393,12 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
 		texelFetch(texture_float, pointer+ivec3(6,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(7,0,0), 0).r//unnecessary
 	);
+
+    if(projection_index >=0)
+    {
+        aabb.min[projection_index] = -tubeRadius;
+        aabb.max[projection_index] = tubeRadius;
+    }
 
 	/*
 	aabb.min = vec4(0.4,0.4,0,0);
@@ -115431,7 +115485,7 @@ class TransferFunction {
             c.color = color;
             c.opacity = opacity;
             this.list_colors.push(c);
-            console.log(i, " t:", t, "color:", color, "opacity:", opacity);
+            //console.log(i, " t:", t, "color:", color, "opacity:", opacity);
         }
     }
 
@@ -115493,7 +115547,7 @@ class TransferFunctionManager {
         for(var i=0; i<this.transfer_function_list.length; i++){
             this.concatenated_colors = this.concatenated_colors.concat(this.transfer_function_list[i].list_colors);
         }
-        console.log("Concatenate ", this.concatenated_colors)
+        //console.log("Concatenate ", this.concatenated_colors)
     }
 
     GetConcatenatedTransferfunctionColorList(){

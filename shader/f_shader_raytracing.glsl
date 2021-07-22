@@ -173,6 +173,7 @@ uniform int fog_type;
 uniform int shading_mode_streamlines;
 uniform float min_scalar;
 uniform float max_scalar;
+uniform int projection_index;
 
 uniform bool cut_at_cube_faces;
 uniform bool handle_inside;
@@ -2218,7 +2219,7 @@ float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
 //DATA SIZES
 const int POSITION_DATA_FLOAT_COUNT = 4;
 const int POSITION_DATA_INT_COUNT = 0;
-const int LINE_SEGMENT_FLOAT_COUNT = 32;
+const int LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
 const int LINE_SEGMENT_INT_COUNT = 8;
 const int TREE_NODE_FLOAT_COUNT = 8;
 const int TREE_NODE_INT_COUNT = 4;
@@ -2267,12 +2268,16 @@ ivec3 GetIndex3D(int global_index)
 
 vec3 GetPosition(int index, bool interactiveStreamline)
 {
-	//return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
-  ivec3 pointer = GetIndex3D(start_index_float_position_data + index * POSITION_DATA_FLOAT_COUNT);
-  float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
-  float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
-  float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
-  return vec3(x, y, z);
+    //return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
+    ivec3 pointer = GetIndex3D(start_index_float_position_data + index * POSITION_DATA_FLOAT_COUNT);
+    float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
+    float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
+    float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
+    vec3 position = vec3(x, y, z);
+    if(projection_index >=0)
+        position[projection_index] = 0.0;
+
+    return position;
 }
 
 float GetCost(int index, bool interactiveStreamline)
@@ -2302,7 +2307,8 @@ GL_LineSegment GetLineSegment(int index, bool interactiveStreamline)
 	segment.copy = texelFetch(texture_int, pointer+ivec3(3,0,0), 0).r;
 	segment.isBeginning = texelFetch(texture_int, pointer+ivec3(4,0,0), 0).r;
 
-	pointer = GetIndex3D(start_index_float_line_segments + index * LINE_SEGMENT_FLOAT_COUNT);
+	pointer = GetIndex3D(start_index_float_line_segments + index * LINE_SEGMENT_FLOAT_COUNT
+        + 32 * (projection_index+1));//projection_index = -1 is no projection (default)
   	segment.matrix = mat4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
@@ -2373,6 +2379,12 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
 		texelFetch(texture_float, pointer+ivec3(6,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(7,0,0), 0).r//unnecessary
 	);
+
+    if(projection_index >=0)
+    {
+        aabb.min[projection_index] = -tubeRadius;
+        aabb.max[projection_index] = tubeRadius;
+    }
 
 	/*
 	aabb.min = vec4(0.4,0.4,0,0);

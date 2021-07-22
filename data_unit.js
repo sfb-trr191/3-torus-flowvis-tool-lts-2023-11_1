@@ -101,11 +101,11 @@ class DataUnit {
             this.copyArray(this.list_data_containers[i].arrayi, this.arrayi, this.list_data_containers_int_start[i]);
         }
 
-        console.log("arrayi [" + this.arrayi.length + "] : " + this.arrayi);
-        console.log("arrayf [" + this.arrayf.length + "] : " + this.arrayf);
+        //console.log("arrayi [" + this.arrayi.length + "] : " + this.arrayi);
+        //console.log("arrayf [" + this.arrayf.length + "] : " + this.arrayf);
 
-        console.log("start f: " + this.list_data_containers_float_start);
-        console.log("start i: " + this.list_data_containers_int_start);
+        //console.log("start f: " + this.list_data_containers_float_start);
+        //console.log("start i: " + this.list_data_containers_int_start);
     }
 
     updateStartIndex(i, list_data_containers_start, vn_total_count, vn_element_count) {

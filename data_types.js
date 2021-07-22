@@ -10,7 +10,7 @@ The class must implement:
 
 var POSITION_DATA_FLOAT_COUNT = 4;
 var POSITION_DATA_INT_COUNT = 0;
-var LINE_SEGMENT_FLOAT_COUNT = 32;
+var LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
 var LINE_SEGMENT_INT_COUNT = 8;
 var TREE_NODE_FLOAT_COUNT = 8;
 var TREE_NODE_INT_COUNT = 4;
@@ -70,10 +70,17 @@ class LineSegment {
     matrix = glMatrix.mat4.create();
     matrix_inv = glMatrix.mat4.create();
 
+    list_matrix_projection = [];
+    list_matrix_projection_inv = [];
+
 
     constructor() {
         //this.matrix[0] = 2;//TODO remove: test inverse
         //glMatrix.mat4.invert(this.matrix_inv, this.matrix);//TODO remove: test inverse
+        for (var i=0; i<3; i++){
+            this.list_matrix_projection.push(glMatrix.mat4.create());
+            this.list_matrix_projection_inv.push(glMatrix.mat4.create());
+        }
     }
 
     print() {
@@ -103,6 +110,13 @@ class LineSegment {
         for (var i = 0; i < 16; i++) {
             arrayf[start_index_f + i] = this.matrix[i];
             arrayf[start_index_f + i + 16] = this.matrix_inv[i];
+        }
+        for (var m = 0; m < 3; m++) {
+            start_index_f += 32;
+            for (var i = 0; i < 16; i++) {
+                arrayf[start_index_f + i] = this.list_matrix_projection[m][i];
+                arrayf[start_index_f + i + 16] = this.list_matrix_projection_inv[m][i];
+            }
         }
     }
 }

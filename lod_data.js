@@ -288,80 +288,22 @@ class LODData {
     CalculateMatrices() {
         console.log("CalculateMatrices");
         for (var i = 0; i < this.vectorLineSegment.length; i++) {
-            var matrixTranslation = glMatrix.mat4.create();
-            var matrixRotation1 = glMatrix.mat4.create();
-            var matrixRotation2 = glMatrix.mat4.create();
-            var matrixRotation3 = glMatrix.mat4.create();
-            var matrixCombined = glMatrix.mat4.create();
+            var projection_index = -1;
+            var matrixCombined = this.CalculateMatrix(i, projection_index);
             var matrixInverted = glMatrix.mat4.create();
-
-            var posA_os = glMatrix.vec4.create();
-            var posB_os = glMatrix.vec4.create();
-
-            var translation_vector = glMatrix.vec3.create();
-            var axis_x = glMatrix.vec3.fromValues(1, 0, 0);
-            var axis_y = glMatrix.vec3.fromValues(0, 1, 0);
-
-            //std::cout << "------------------------------" << i << std::endl;
-            //std::cout << "SEGMENT: " << i << std::endl;
-            //calculate translation matrix
-            var lineSegment = this.vectorLineSegment[i];
-            var indexA = lineSegment.indexA;
-            var indexB = lineSegment.indexB;
-            var posA_ws = this.p_raw_data.data[indexA].position;//vec4
-            var posB_ws = this.p_raw_data.data[indexB].position;//vec4
-            //std::cout << "posA_ws: " << posA_ws.x() << ", " << posA_ws.y() << ", " << posA_ws.z() << std::endl;
-            //std::cout << "posB_ws: " << posB_ws.x() << ", " << posB_ws.y() << ", " << posB_ws.z() << std::endl;
-            vec3_from_vec4(translation_vector, posA_ws);
-            glMatrix.vec3.negate(translation_vector, translation_vector);
-            glMatrix.mat4.fromTranslation(matrixTranslation, translation_vector);//matrixTranslation.translate(-1 * posA_ws.toVector3D());
-
-            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixTranslation);//var posA_os = matrixTranslation * posA_ws;//vec4
-            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixTranslation);//var posB_os = matrixTranslation * posB_ws;//vec4
-            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-
-            //calculate rotation matrix (rotate around y)
-            var x = posB_os[0];
-            var z = posB_os[2];
-            var angle_y_rad = Math.atan2(-x, z);//angleY = (Math.atan2(-x, z)) * 180 / M_PI;
-            //std::cout << "angle_y_rad: " << angle_y_rad << std::endl;
-            glMatrix.mat4.fromRotation(matrixRotation1, angle_y_rad, axis_y);//matrixRotation1.rotate(angle_y_degree, QVector3D(0, 1, 0));
-
-            //combine matrices
-            glMatrix.mat4.multiply(matrixCombined, matrixRotation1, matrixTranslation);//matrixCombined = matrixRotation1 * matrixTranslation;
-            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
-            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
-            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-
-            //calculate rotation matrix (rotate around x)
-            var y = posB_os[1];
-            z = posB_os[2];
-            var angle_x_rad = Math.atan2(y, z);//angleX = (Math.atan2(y, z)) * 180 / M_PI;
-            //std::cout << "angle_x_rad: " << angle_x_rad << std::endl;
-            glMatrix.mat4.fromRotation(matrixRotation2, angle_x_rad, axis_x);//matrixRotation2.rotate(angle_x_degree, QVector3D(1, 0, 0));
-
-            //combine matrices
-            glMatrix.mat4.multiply(matrixCombined, matrixRotation2, matrixCombined);//matrixCombined = matrixRotation2 * matrixRotation1 * matrixTranslation;
-            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
-            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
-            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-
-            if (posB_os[2] < posA_os[2]) {
-                glMatrix.mat4.fromRotation(matrixRotation3, Math.PI, axis_x);//rotate.rotate(180, QVector3D(1, 0, 0));
-                glMatrix.mat4.multiply(matrixCombined, matrixRotation3, matrixCombined);//matrixCombined = rotate * matrixCombined;
-                glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
-                glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
-                //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
-                //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
-            }
-
             glMatrix.mat4.invert(matrixInverted, matrixCombined);//matrixInverted = matrixCombined.inverted();
-
             this.vectorLineSegment[i].matrix = matrixCombined;
             this.vectorLineSegment[i].matrix_inv = matrixInverted;
+            
+            for (var projection_index=0; projection_index<3; projection_index++){
+                var matrix = this.CalculateMatrix(i, projection_index);
+                var matrix_inv = glMatrix.mat4.create();
+                glMatrix.mat4.invert(matrix_inv, matrix);
+                this.vectorLineSegment[i].list_matrix_projection[projection_index] = matrix;
+                this.vectorLineSegment[i].list_matrix_projection_inv[projection_index] = matrix_inv;
+            }
+            
+
             //console.log("posA_os: ", posA_os);
             //console.log("posB_os: ", posB_os);
             /*
@@ -389,6 +331,83 @@ class LODData {
         console.log("CalculateMatrices completed");
     }
 
+    CalculateMatrix(segment_index, projection_index){
+        var matrixTranslation = glMatrix.mat4.create();
+        var matrixRotation1 = glMatrix.mat4.create();
+        var matrixRotation2 = glMatrix.mat4.create();
+        var matrixRotation3 = glMatrix.mat4.create();
+        var matrixCombined = glMatrix.mat4.create();
+
+        var posA_ws = glMatrix.vec4.create();
+        var posB_ws = glMatrix.vec4.create();
+        var posA_os = glMatrix.vec4.create();
+        var posB_os = glMatrix.vec4.create();
+
+        var translation_vector = glMatrix.vec3.create();
+        var axis_x = glMatrix.vec3.fromValues(1, 0, 0);
+        var axis_y = glMatrix.vec3.fromValues(0, 1, 0);
+
+        //std::cout << "------------------------------" << i << std::endl;
+        //std::cout << "SEGMENT: " << i << std::endl;
+        //calculate translation matrix
+        var lineSegment = this.vectorLineSegment[segment_index];
+        var indexA = lineSegment.indexA;
+        var indexB = lineSegment.indexB;
+        glMatrix.vec4.copy(posA_ws, this.p_raw_data.data[indexA].position);//vec4
+        glMatrix.vec4.copy(posB_ws, this.p_raw_data.data[indexB].position);//vec4
+        posA_ws[projection_index] = 0;
+        posB_ws[projection_index] = 0;
+        //std::cout << "posA_ws: " << posA_ws.x() << ", " << posA_ws.y() << ", " << posA_ws.z() << std::endl;
+        //std::cout << "posB_ws: " << posB_ws.x() << ", " << posB_ws.y() << ", " << posB_ws.z() << std::endl;
+        vec3_from_vec4(translation_vector, posA_ws);
+        glMatrix.vec3.negate(translation_vector, translation_vector);
+        glMatrix.mat4.fromTranslation(matrixTranslation, translation_vector);//matrixTranslation.translate(-1 * posA_ws.toVector3D());
+
+        glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixTranslation);//var posA_os = matrixTranslation * posA_ws;//vec4
+        glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixTranslation);//var posB_os = matrixTranslation * posB_ws;//vec4
+        //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+        //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+
+        //calculate rotation matrix (rotate around y)
+        var x = posB_os[0];
+        var z = posB_os[2];
+        var angle_y_rad = Math.atan2(-x, z);//angleY = (Math.atan2(-x, z)) * 180 / M_PI;
+        //std::cout << "angle_y_rad: " << angle_y_rad << std::endl;
+        glMatrix.mat4.fromRotation(matrixRotation1, angle_y_rad, axis_y);//matrixRotation1.rotate(angle_y_degree, QVector3D(0, 1, 0));
+
+        //combine matrices
+        glMatrix.mat4.multiply(matrixCombined, matrixRotation1, matrixTranslation);//matrixCombined = matrixRotation1 * matrixTranslation;
+        glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
+        glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
+        //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+        //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+
+        //calculate rotation matrix (rotate around x)
+        var y = posB_os[1];
+        z = posB_os[2];
+        var angle_x_rad = Math.atan2(y, z);//angleX = (Math.atan2(y, z)) * 180 / M_PI;
+        //std::cout << "angle_x_rad: " << angle_x_rad << std::endl;
+        glMatrix.mat4.fromRotation(matrixRotation2, angle_x_rad, axis_x);//matrixRotation2.rotate(angle_x_degree, QVector3D(1, 0, 0));
+
+        //combine matrices
+        glMatrix.mat4.multiply(matrixCombined, matrixRotation2, matrixCombined);//matrixCombined = matrixRotation2 * matrixRotation1 * matrixTranslation;
+        glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
+        glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
+        //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+        //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+
+        if (posB_os[2] < posA_os[2]) {
+            glMatrix.mat4.fromRotation(matrixRotation3, Math.PI, axis_x);//rotate.rotate(180, QVector3D(1, 0, 0));
+            glMatrix.mat4.multiply(matrixCombined, matrixRotation3, matrixCombined);//matrixCombined = rotate * matrixCombined;
+            glMatrix.vec4.transformMat4(posA_os, posA_ws, matrixCombined);//posA_os = matrixCombined * posA_ws;
+            glMatrix.vec4.transformMat4(posB_os, posB_ws, matrixCombined);//posB_os = matrixCombined * posB_ws;
+            //std::cout << "posA_os: " << posA_os.x() << ", " << posA_os.y() << ", " << posA_os.z() << std::endl;
+            //std::cout << "posB_os: " << posB_os.x() << ", " << posB_os.y() << ", " << posB_os.z() << std::endl;
+        }
+
+        return matrixCombined;
+    }
+
     CalculateBVH() {
         console.log("CalculateBVH");
         var bvh = new BVH_AA();
@@ -398,7 +417,7 @@ class LODData {
         var volume_threshold = 0.0001;
         bvh.GenerateTree(this.p_raw_data.data, this.vectorLineSegment, tubeRadius, maxCost, growthID, volume_threshold);
         this.tree_nodes = bvh.ConvertNodes();
-        console.log("tree_nodes: " + this.tree_nodes);
+        //console.log("tree_nodes: " + this.tree_nodes);
         console.log("CalculateBVH completed");
     }
 

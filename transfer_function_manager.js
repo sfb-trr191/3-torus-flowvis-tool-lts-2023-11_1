@@ -107,7 +107,7 @@ class TransferFunction {
             c.color = color;
             c.opacity = opacity;
             this.list_colors.push(c);
-            console.log(i, " t:", t, "color:", color, "opacity:", opacity);
+            //console.log(i, " t:", t, "color:", color, "opacity:", opacity);
         }
     }
 
@@ -169,7 +169,7 @@ class TransferFunctionManager {
         for(var i=0; i<this.transfer_function_list.length; i++){
             this.concatenated_colors = this.concatenated_colors.concat(this.transfer_function_list[i].list_colors);
         }
-        console.log("Concatenate ", this.concatenated_colors)
+        //console.log("Concatenate ", this.concatenated_colors)
     }
 
     GetConcatenatedTransferfunctionColorList(){
