@@ -38,7 +38,7 @@ class GL_CameraData {
     }
 }
 
-class CameraSave{
+class CameraState{
 
     constructor(){
         this.forward = glMatrix.vec3.create();
@@ -111,10 +111,10 @@ class Camera {
         this.normal_bottom = glMatrix.vec3.create();
 
         this.states = {};
-        this.states["state_default"] = new CameraSave();
-        this.states["state_projection_x"] = new CameraSave();
-        this.states["state_projection_y"] = new CameraSave();
-        this.states["state_projection_z"] = new CameraSave();
+        this.states["state_default"] = new CameraState();
+        this.states["state_projection_x"] = new CameraState();
+        this.states["state_projection_y"] = new CameraState();
+        this.states["state_projection_z"] = new CameraState();
 
         this.states["state_projection_x"].setProjectionX();
         this.states["state_projection_y"].setProjectionY();
