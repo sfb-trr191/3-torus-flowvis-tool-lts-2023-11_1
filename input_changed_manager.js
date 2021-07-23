@@ -123,6 +123,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_min_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
+        this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_main"));   

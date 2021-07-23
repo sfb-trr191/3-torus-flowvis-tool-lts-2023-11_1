@@ -1093,7 +1093,8 @@ class CanvasWrapper {
         this.p_ftle_manager = ftle_manager;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
-        this.tube_radius = 0;
+        this.tube_radius = 1.0;
+        this.tube_radius_projection = 1.0;
         this.lod_index_panning = 0;
         this.lod_index_still = 0;
         this.fog_density = 0;
@@ -1297,8 +1298,15 @@ class CanvasWrapper {
     }
 
     drawTextureRaytracing(gl, render_wrapper, width, height) {
-        var projection_index = this.draw_mode == DRAW_MODE_PROJECTION ? this.projection_index : -1;
-        var max_iteration_count = this.draw_mode == DRAW_MODE_PROJECTION ? 1000 : this.max_iteration_count;
+        var projection_index = -1;
+        var max_iteration_count = this.max_iteration_count;
+        var tube_radius_projection = this.tube_radius;
+
+        if(this.draw_mode == DRAW_MODE_PROJECTION){
+            projection_index = this.projection_index;
+            max_iteration_count = 1000;
+            tube_radius_projection = this.tube_radius_projection;
+        }
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1315,7 +1323,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
-        gl.uniform1f(this.location_raytracing.location_tube_radius, this.tube_radius);
+        gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_projection);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
         gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
@@ -3703,6 +3711,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.tube_radius_projection = 0.005 * document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_main.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_main.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
@@ -3743,6 +3752,7 @@ const Export = module_export.Export;
         //SIDE
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_side.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.tube_radius_projection = 0.005 * document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_side.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_side.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_side.projection_index = document.getElementById("select_projection_index").value;
@@ -4136,6 +4146,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_min_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
+        this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_main"));   

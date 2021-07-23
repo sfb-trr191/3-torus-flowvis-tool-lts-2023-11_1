@@ -538,6 +538,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
         canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.tube_radius_projection = 0.005 * document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_main.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_main.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
@@ -578,6 +579,7 @@ const Export = module_export.Export;
         //SIDE
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_side.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.tube_radius_projection = 0.005 * document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_side.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_side.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_side.projection_index = document.getElementById("select_projection_index").value;
