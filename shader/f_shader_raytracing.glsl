@@ -149,6 +149,8 @@ const float PI = 3.1415926535897932384626433832795;
 const int TRANSFER_FUNCTION_BINS = 512;
 const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
+const int INDEX_CYLINDER_FIRST_PROJECTION_FRAME = 66;
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START UNIFORMS
@@ -271,6 +273,7 @@ void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegme
 void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
 void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
 
+void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectAxesCornerAABB(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube, int corner_index);
 void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float ray_local_cutoff, inout HitInformation hit, bool ignore_override);
@@ -718,7 +721,13 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	
 	if(show_bounding_box)
 	{
-		IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
+        if(projection_index < 0){
+		    IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
+        }
+        else{
+            bool check_bounds = true;
+            IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
+        }
 	}
 
 /*
@@ -1841,6 +1850,35 @@ void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInf
 		//hit.hitType = TYPE_GL_CYLINDER;//change
 		//hit.objectColor = vec3(1, 1, 0);
 	}	
+}
+
+void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
+{
+    for(int i=0; i<4; i++){
+        float tmin;
+        float tmax;
+        bool ignore_override = true;
+        GL_Cylinder cylinder = GetCylinder(INDEX_CYLINDER_FIRST_PROJECTION_FRAME+i+4*projection_index);
+
+        Sphere sphere;
+        sphere.radius = cylinder.radius;
+
+        vec3 pos_a = cylinder.position_a.xyz;
+        vec3 pos_b = cylinder.position_b.xyz;
+        vec3 col = cylinder.color.xyz;
+
+        bool hitAABB = IntersectGLAABB(cylinder, ray, ray_local_cutoff, tmin, tmax);
+        if(hitAABB)
+        {
+            IntersectCylinder(check_bounds, cylinder, ray, ray_local_cutoff, hit, ignore_override);
+            
+            sphere.center = pos_a;
+            IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b, col, pos_b, col, pos_b, col);
+        
+            //sphere.center = pos_b;
+            //IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b, col, pos_b, col, pos_b, col);
+        }
+    }
 }
 
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube){

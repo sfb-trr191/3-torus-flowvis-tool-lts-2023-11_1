@@ -22,6 +22,7 @@ class ObjectManager {
 
         this.AddAxes(true);
         this.AddAxes(false);
+        this.AddProjectionFrames();
         this.CalculateMatrices();
         console.log("this.cylinders: ", this.cylinders);
     }
@@ -57,10 +58,68 @@ class ObjectManager {
         this.AddAxesCorner(position, directions, false, radius);
     }
 
-    SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main, 
+    AddProjectionFrames() {
+        this.INDEX_CYLINDER_FIRST_PROJECTION_FRAME = this.cylinders.length;
+        console.log("INDEX_CYLINDER_FIRST_PROJECTION_FRAME: ", this.INDEX_CYLINDER_FIRST_PROJECTION_FRAME);
+        this.AddProjectionFrame(
+            glMatrix.vec4.fromValues(0, 0, 0, 1),
+            glMatrix.vec4.fromValues(0, 1, 0, 1),
+            glMatrix.vec4.fromValues(0, 1, 1, 1),
+            glMatrix.vec4.fromValues(0, 0, 1, 1)
+        );
+        this.AddProjectionFrame(
+            glMatrix.vec4.fromValues(0, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 0, 1, 1),
+            glMatrix.vec4.fromValues(0, 0, 1, 1)
+        );
+        this.AddProjectionFrame(
+            glMatrix.vec4.fromValues(0, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 1, 0, 1),
+            glMatrix.vec4.fromValues(0, 1, 0, 1)
+        );
+        console.log("this.cylinders: ", this.cylinders);
+
+    }
+
+    AddProjectionFrame(point_1, point_2, point_3, point_4) {
+        var radius = 0.01;
+        var color = glMatrix.vec4.fromValues(0.75, 0.75, 0.75, 1);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_1;
+        cylinder.position_b = point_2;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_2;
+        cylinder.position_b = point_3;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_3;
+        cylinder.position_b = point_4;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_4;
+        cylinder.position_b = point_1;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+    }
+
+    SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main,
         cube_axes_length_main, cube_axes_length_origin_main,
         camera_axes_invert_color_main, cube_use_axes_colors_main,
-        cube_axes_radius_side, cube_axes_radius_origin_side, 
+        cube_axes_radius_side, cube_axes_radius_origin_side,
         cube_axes_length_side, cube_axes_length_origin_side,
         camera_axes_invert_color_side, cube_use_axes_colors_side) {
         if (this.cube_axes_radius_main == cube_axes_radius_main
@@ -76,7 +135,7 @@ class ObjectManager {
             && this.camera_axes_invert_color_side == camera_axes_invert_color_side
             && this.cube_use_axes_colors_side == cube_use_axes_colors_side)
             return;
-            
+
         this.cube_axes_radius_main = cube_axes_radius_main;
         this.cube_axes_radius_origin_main = cube_axes_radius_origin_main;
         this.cube_axes_length_main = cube_axes_length_main;

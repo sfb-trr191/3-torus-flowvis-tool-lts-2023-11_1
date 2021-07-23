@@ -110681,6 +110681,7 @@ class ObjectManager {
 
         this.AddAxes(true);
         this.AddAxes(false);
+        this.AddProjectionFrames();
         this.CalculateMatrices();
         console.log("this.cylinders: ", this.cylinders);
     }
@@ -110716,10 +110717,68 @@ class ObjectManager {
         this.AddAxesCorner(position, directions, false, radius);
     }
 
-    SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main, 
+    AddProjectionFrames() {
+        this.INDEX_CYLINDER_FIRST_PROJECTION_FRAME = this.cylinders.length;
+        console.log("INDEX_CYLINDER_FIRST_PROJECTION_FRAME: ", this.INDEX_CYLINDER_FIRST_PROJECTION_FRAME);
+        this.AddProjectionFrame(
+            glMatrix.vec4.fromValues(0, 0, 0, 1),
+            glMatrix.vec4.fromValues(0, 1, 0, 1),
+            glMatrix.vec4.fromValues(0, 1, 1, 1),
+            glMatrix.vec4.fromValues(0, 0, 1, 1)
+        );
+        this.AddProjectionFrame(
+            glMatrix.vec4.fromValues(0, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 0, 1, 1),
+            glMatrix.vec4.fromValues(0, 0, 1, 1)
+        );
+        this.AddProjectionFrame(
+            glMatrix.vec4.fromValues(0, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 0, 0, 1),
+            glMatrix.vec4.fromValues(1, 1, 0, 1),
+            glMatrix.vec4.fromValues(0, 1, 0, 1)
+        );
+        console.log("this.cylinders: ", this.cylinders);
+
+    }
+
+    AddProjectionFrame(point_1, point_2, point_3, point_4) {
+        var radius = 0.01;
+        var color = glMatrix.vec4.fromValues(0.75, 0.75, 0.75, 1);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_1;
+        cylinder.position_b = point_2;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_2;
+        cylinder.position_b = point_3;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_3;
+        cylinder.position_b = point_4;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        cylinder.radius = radius;
+        cylinder.position_a = point_4;
+        cylinder.position_b = point_1;
+        cylinder.color = color;
+        this.cylinders.push(cylinder);
+    }
+
+    SetAxesParameters(cube_axes_radius_main, cube_axes_radius_origin_main,
         cube_axes_length_main, cube_axes_length_origin_main,
         camera_axes_invert_color_main, cube_use_axes_colors_main,
-        cube_axes_radius_side, cube_axes_radius_origin_side, 
+        cube_axes_radius_side, cube_axes_radius_origin_side,
         cube_axes_length_side, cube_axes_length_origin_side,
         camera_axes_invert_color_side, cube_use_axes_colors_side) {
         if (this.cube_axes_radius_main == cube_axes_radius_main
@@ -110735,7 +110794,7 @@ class ObjectManager {
             && this.camera_axes_invert_color_side == camera_axes_invert_color_side
             && this.cube_use_axes_colors_side == cube_use_axes_colors_side)
             return;
-            
+
         this.cube_axes_radius_main = cube_axes_radius_main;
         this.cube_axes_radius_origin_main = cube_axes_radius_origin_main;
         this.cube_axes_length_main = cube_axes_length_main;
@@ -112265,6 +112324,8 @@ const float PI = 3.1415926535897932384626433832795;
 const int TRANSFER_FUNCTION_BINS = 512;
 const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
+const int INDEX_CYLINDER_FIRST_PROJECTION_FRAME = 66;
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START UNIFORMS
@@ -112387,6 +112448,7 @@ void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegme
 void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
 void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
 
+void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectAxesCornerAABB(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube, int corner_index);
 void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float ray_local_cutoff, inout HitInformation hit, bool ignore_override);
@@ -112834,7 +112896,13 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	
 	if(show_bounding_box)
 	{
-		IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
+        if(projection_index < 0){
+		    IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
+        }
+        else{
+            bool check_bounds = true;
+            IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
+        }
 	}
 
 /*
@@ -113957,6 +114025,35 @@ void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInf
 		//hit.hitType = TYPE_GL_CYLINDER;//change
 		//hit.objectColor = vec3(1, 1, 0);
 	}	
+}
+
+void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
+{
+    for(int i=0; i<4; i++){
+        float tmin;
+        float tmax;
+        bool ignore_override = true;
+        GL_Cylinder cylinder = GetCylinder(INDEX_CYLINDER_FIRST_PROJECTION_FRAME+i+4*projection_index);
+
+        Sphere sphere;
+        sphere.radius = cylinder.radius;
+
+        vec3 pos_a = cylinder.position_a.xyz;
+        vec3 pos_b = cylinder.position_b.xyz;
+        vec3 col = cylinder.color.xyz;
+
+        bool hitAABB = IntersectGLAABB(cylinder, ray, ray_local_cutoff, tmin, tmax);
+        if(hitAABB)
+        {
+            IntersectCylinder(check_bounds, cylinder, ray, ray_local_cutoff, hit, ignore_override);
+            
+            sphere.center = pos_a;
+            IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b, col, pos_b, col, pos_b, col);
+        
+            //sphere.center = pos_b;
+            //IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b, col, pos_b, col, pos_b, col);
+        }
+    }
 }
 
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube){
