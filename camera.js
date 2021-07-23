@@ -513,13 +513,38 @@ class Camera {
         this.changed = true;
     }
 
-    repositionCamera() {
+    repositionCamera(is_projection, projection_index, allow_default) {
+        if(is_projection){
+            this.repositionCameraProjection(projection_index);
+        }
+        else if(allow_default){
+            this.repositionCameraDefault();
+        }
+    }
+
+    repositionCameraDefault() {
         for (var i = 0; i < 3; i++) {
             if (this.position[i] > 1.0) {
                 this.position[i] -= 1.0;
             }
             else if (this.position[i] < 0.0) {
                 this.position[i] += 1.0;
+            }
+        }
+    }
+
+    repositionCameraProjection(projection_index) {
+        for (var i = 0; i < 3; i++) {
+            if(i == projection_index){
+                this.position[i] = Math.max(this.position[i], 0.01)
+            }
+            else{
+                if (this.position[i] > 1.0) {
+                    this.position[i] -= 1.0;
+                }
+                else if (this.position[i] < 0.0) {
+                    this.position[i] += 1.0;
+                }
             }
         }
     }

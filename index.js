@@ -260,7 +260,7 @@ const Export = module_export.Export;
 
         input_manager.on_update(deltaTime, mouse_manager.active_camera);
 
-        main_camera.repositionCamera();
+        main_camera.repositionCamera(canvas_wrapper_main.draw_mode == DRAW_MODE_PROJECTION, canvas_wrapper_main.projection_index, true);
         main_camera.UpdateShaderValues();
         main_camera.WriteToInputFields();
         object_manager.movable_axes_state_main.SetCameraData(
@@ -271,7 +271,7 @@ const Export = module_export.Export;
             main_camera.q_x,
             main_camera.q_y);
 
-        //side_camera.repositionCamera();
+        side_camera.repositionCamera(canvas_wrapper_side.draw_mode == DRAW_MODE_PROJECTION, canvas_wrapper_side.projection_index, false);
         side_camera.UpdateShaderValues();
         side_camera.WriteToInputFields();
         object_manager.movable_axes_state_side.SetCameraData(

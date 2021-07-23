@@ -920,13 +920,38 @@ class Camera {
         this.changed = true;
     }
 
-    repositionCamera() {
+    repositionCamera(is_projection, projection_index, allow_default) {
+        if(is_projection){
+            this.repositionCameraProjection(projection_index);
+        }
+        else if(allow_default){
+            this.repositionCameraDefault();
+        }
+    }
+
+    repositionCameraDefault() {
         for (var i = 0; i < 3; i++) {
             if (this.position[i] > 1.0) {
                 this.position[i] -= 1.0;
             }
             else if (this.position[i] < 0.0) {
                 this.position[i] += 1.0;
+            }
+        }
+    }
+
+    repositionCameraProjection(projection_index) {
+        for (var i = 0; i < 3; i++) {
+            if(i == projection_index){
+                this.position[i] = Math.max(this.position[i], 0.01)
+            }
+            else{
+                if (this.position[i] > 1.0) {
+                    this.position[i] -= 1.0;
+                }
+                else if (this.position[i] < 0.0) {
+                    this.position[i] += 1.0;
+                }
             }
         }
     }
@@ -3433,7 +3458,7 @@ const Export = module_export.Export;
 
         input_manager.on_update(deltaTime, mouse_manager.active_camera);
 
-        main_camera.repositionCamera();
+        main_camera.repositionCamera(canvas_wrapper_main.draw_mode == DRAW_MODE_PROJECTION, canvas_wrapper_main.projection_index, true);
         main_camera.UpdateShaderValues();
         main_camera.WriteToInputFields();
         object_manager.movable_axes_state_main.SetCameraData(
@@ -3444,7 +3469,7 @@ const Export = module_export.Export;
             main_camera.q_x,
             main_camera.q_y);
 
-        //side_camera.repositionCamera();
+        side_camera.repositionCamera(canvas_wrapper_side.draw_mode == DRAW_MODE_PROJECTION, canvas_wrapper_side.projection_index, false);
         side_camera.UpdateShaderValues();
         side_camera.WriteToInputFields();
         object_manager.movable_axes_state_side.SetCameraData(
