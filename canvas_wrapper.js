@@ -398,8 +398,8 @@ class CanvasWrapper {
 
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_raytracing,
-            this.location_raytracing.location_texture_float_global,
-            this.location_raytracing.location_texture_int_global);
+            this.location_raytracing.location_texture_float_global, gl.TEXTURE2, 2,
+            this.location_raytracing.location_texture_int_global, gl.TEXTURE3, 3);
 
         //this.p_ftle_manager.bind(this.name, gl,
         //    this.location_raytracing.location_texture_ftle,
@@ -476,8 +476,8 @@ class CanvasWrapper {
         */
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_resampling,
-            this.location_resampling.location_texture_float_global,
-            this.location_resampling.location_texture_int_global);
+            this.location_resampling.location_texture_float_global, gl.TEXTURE2, 2,
+            this.location_resampling.location_texture_int_global, gl.TEXTURE3, 3);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_resampling);
     }
@@ -512,8 +512,8 @@ class CanvasWrapper {
         */
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_ftle_slice,
-            this.location_ftle_slice.location_texture_float_global,
-            this.location_ftle_slice.location_texture_int_global);
+            this.location_ftle_slice.location_texture_float_global, gl.TEXTURE2, 2,
+            this.location_ftle_slice.location_texture_int_global, gl.TEXTURE3, 3);
         
         this.p_ftle_manager.bind(this.name, gl,
             this.location_ftle_slice.location_texture_ftle, gl.TEXTURE0, 0,

@@ -10,6 +10,7 @@ const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
 const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
 const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
 const f_shader_sum = require("./shader/f_shader_sum.glsl");
+const f_shader_transfer_function = require("./shader/f_shader_transfer_function.glsl");
 const v_shader_raytracing = require("./shader/v_shader_raytracing.glsl");
 const v_shader_resampling = require("./shader/v_shader_resampling.glsl");
 
@@ -46,6 +47,7 @@ const StreamlineContext = require("./streamline_context");
 const FTLEManager = require("./ftle_manager");
 const Aliasing = require("./aliasing");
 const CanvasWrapper = require("./canvas_wrapper");
+const CanvasWrapperTransferFunction = require("./canvas_wrapper_transfer_function");
 const InputParameterWrapper = require("./input_parameter_wrapper");
 const module_utility = require("./utility");
 const setCSS = module_utility.setCSS;
@@ -59,6 +61,7 @@ const Export = module_export.Export;
 
     var gl;
     var gl_side;
+    var gl_transfer_function;
     var timer;
     var tick_counter;
     var frame_counter;
@@ -72,6 +75,7 @@ const Export = module_export.Export;
     var side_camera;
     var main_canvas;
     var side_canvas;
+    var transfer_function_canvas;
     var input_manager;
     var mouse_manager;
     var input_changed_manager;
@@ -87,6 +91,7 @@ const Export = module_export.Export;
     var shader_manager;
     var canvas_wrapper_main;
     var canvas_wrapper_side;
+    var canvas_wrapper_transfer_function;
     var input_parameter_wrapper;
 
     var data_changed = false;
@@ -121,6 +126,7 @@ const Export = module_export.Export;
 
         main_canvas = document.getElementById("main_canvas");
         side_canvas = document.getElementById("side_canvas");
+        transfer_function_canvas = document.getElementById("transfer_function_canvas");
         fps_display = document.getElementById("fps_display");
         message_display = document.getElementById("message_display");
 
@@ -141,13 +147,17 @@ const Export = module_export.Export;
             return;
         if (!(gl_side = getRenderingContext(side_canvas)))
             return;
+        if (!(gl_transfer_function = getRenderingContext(transfer_function_canvas)))
+            return;
         console.log(gl);
         console.log(gl_side);
+        console.log(gl_transfer_function);
 
         var ext = gl.getExtension('EXT_color_buffer_float');
         var ext_side = gl_side.getExtension('EXT_color_buffer_float');
+        var ext_transfer_function = gl_transfer_function.getExtension('EXT_color_buffer_float');
 
-        if ((!ext) || (!ext_side)) {
+        if ((!ext) || (!ext_side) || (!ext_transfer_function)) {
             alert("FTLE not supported: could not load EXT_color_buffer_float");
             return;
         }
@@ -164,7 +174,7 @@ const Export = module_export.Export;
         transfer_function_manager = new TransferFunctionManager(ui_transfer_functions);
         object_manager = new ObjectManager();
 
-        global_data = new GlobalData(gl, gl_side, lights, ui_seeds, transfer_function_manager, object_manager);
+        global_data = new GlobalData(gl, gl_side, gl_transfer_function, lights, ui_seeds, transfer_function_manager, object_manager);
 
         shader_manager = new ShaderManager();
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
@@ -214,6 +224,8 @@ const Export = module_export.Export;
             main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data);
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
             side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data);
+        canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
+            transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -285,8 +297,11 @@ const Export = module_export.Export;
         object_manager.Update();
         UpdateGlobalDataIfDirty();
 
+        var transfer_function_changed = true;        
+
         canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
         canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
+        canvas_wrapper_transfer_function.draw(gl_transfer_function, transfer_function_changed);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
         main_camera.changed = false;
@@ -623,7 +638,7 @@ const Export = module_export.Export;
 
     function UpdateGlobalData() {
         global_data.UpdateDataUnit();
-        global_data.UpdateDataTextures(gl, gl_side);
+        global_data.UpdateDataTextures(gl, gl_side, gl_transfer_function);
     }
 
     function UpdateGlobalDataIfDirty() {
@@ -631,8 +646,7 @@ const Export = module_export.Export;
             return;
         console.log("UpdateGlobalDataIfDirty");
         object_manager.dirty = false;
-        global_data.UpdateDataUnit();
-        global_data.UpdateDataTextures(gl, gl_side);
+        UpdateGlobalData();
     }
 
     function UpdateCamera() {

@@ -49,12 +49,15 @@ global.PARAM_RNG_SEED_POSITION = "rngp";
 
 global.CANVAS_WRAPPER_MAIN = "main";
 global.CANVAS_WRAPPER_SIDE = "side";
+global.CANVAS_WRAPPER_TRANSFER_FUNCTION = "transfer_function";
 
 
 global.CANVAS_MAIN_WIDTH = 1280;
 global.CANVAS_MAIN_HEIGHT = 720;
 global.CANVAS_SIDE_WIDTH = 512;
 global.CANVAS_SIDE_HEIGHT = 384;
+global.CANVAS_TRANSFER_FUNCTION_WIDTH = 512;
+global.CANVAS_TRANSFER_FUNCTION_HEIGHT = 256;
 
 global.GROUP_NAME_CALCULATE = "group_calculate";
 global.GROUP_NAME_MAIN_CAMERA = "group_main_camera";

@@ -5,7 +5,7 @@ const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder
 
 class GlobalData {
 
-    constructor(gl, gl_side, p_lights, p_ui_seeds, p_transfer_function_manager, p_object_manager) {
+    constructor(gl, gl_side, gl_transfer_function, p_lights, p_ui_seeds, p_transfer_function_manager, p_object_manager) {
 
         //---start region: references
         this.p_lights = p_lights;
@@ -28,6 +28,7 @@ class GlobalData {
 
         this.data_textures = new DataTextures(gl, this.data_unit);
         this.data_textures_side = new DataTextures(gl_side, this.data_unit);
+        this.data_textures_transfer_function = new DataTextures(gl_transfer_function, this.data_unit);
     }
 
     UpdateDataUnit() {
@@ -40,22 +41,39 @@ class GlobalData {
         console.log("UpdateDataUnit completed");
     }
 
-    UpdateDataTextures(gl, gl_side) {
+    UpdateDataTextures(gl, gl_side, gl_transfer_function) {
         console.log("UpdateDataTextures");
         this.data_textures.update(gl);
         this.data_textures_side.update(gl_side);
+        this.data_textures_transfer_function.update(gl_transfer_function);
         console.log("UpdateDataTextures completed");
     }
 
-    bind(canvas_wrapper_name, gl, shader_uniforms, location_texture_float_global, location_texture_int_global) {
-        var data_textures = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_textures : this.data_textures_side;
+    bind(canvas_wrapper_name, gl, shader_uniforms, 
+        location_texture_float_global, texture_float_active, texture_float_index, 
+        location_texture_int_global, texture_int_active, texture_int_index) {
+        var data_textures;
+        switch (canvas_wrapper_name) {
+            case CANVAS_WRAPPER_MAIN:
+                data_textures = this.data_textures;
+                break;
+            case CANVAS_WRAPPER_SIDE:
+                data_textures = this.data_textures_side;
+                break;
+            case CANVAS_WRAPPER_TRANSFER_FUNCTION:
+                data_textures = this.data_textures_transfer_function;
+                break;
+            default:
+                console.warn("unknown canvas_wrapper_name: ", canvas_wrapper_name);
+                break;
+        }
 
-        gl.activeTexture(gl.TEXTURE2);                  // added this and following line to be extra sure which texture is being used...
+        gl.activeTexture(texture_float_active);                  // added this and following line to be extra sure which texture is being used...
         gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_float.texture);
-        gl.uniform1i(location_texture_float_global, 2);
-        gl.activeTexture(gl.TEXTURE3);
+        gl.uniform1i(location_texture_float_global, texture_float_index);
+        gl.activeTexture(texture_int_active);
         gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_int.texture);
-        gl.uniform1i(location_texture_int_global, 3);
+        gl.uniform1i(location_texture_int_global, texture_int_index);
 
         shader_uniforms.setUniform("start_index_int_dir_lights", this.data_unit.getIntStart("dir_lights"));
         shader_uniforms.setUniform("start_index_int_streamline_color", this.data_unit.getIntStart("streamline_color"));
