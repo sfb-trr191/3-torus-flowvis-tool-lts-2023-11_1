@@ -63,3 +63,8 @@ global.GROUP_NAME_CALCULATE = "group_calculate";
 global.GROUP_NAME_MAIN_CAMERA = "group_main_camera";
 global.GROUP_NAME_SIDE_CAMERA = "group_side_camera";
 global.GROUP_NAME_RENDER_SETTINGS = "group_render_settings";
+
+global.TRANSFER_FUNCTION_AREA_NONE = 0;
+global.TRANSFER_FUNCTION_AREA_TOP = 1;
+global.TRANSFER_FUNCTION_AREA_CENTER = 2;
+global.TRANSFER_FUNCTION_AREA_BOTTOM = 3;

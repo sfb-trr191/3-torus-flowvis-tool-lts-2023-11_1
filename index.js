@@ -11,8 +11,10 @@ const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
 const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
 const f_shader_sum = require("./shader/f_shader_sum.glsl");
 const f_shader_transfer_function = require("./shader/f_shader_transfer_function.glsl");
+const f_shader_transfer_function_points = require("./shader/f_shader_transfer_function_points.glsl");
 const v_shader_raytracing = require("./shader/v_shader_raytracing.glsl");
 const v_shader_resampling = require("./shader/v_shader_resampling.glsl");
+const v_shader_transfer_function_points = require("./shader/v_shader_transfer_function_points.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");

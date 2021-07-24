@@ -1,9 +1,19 @@
 const glMatrix = require("gl-matrix");
 
-function getMousePosition(canvas, event) {
+exports.getMousePosition = function(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
+    return {
+        x: x,
+        y: y
+    };
+}
+
+exports.getMousePositionFromBottomLeft = function(canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let x = event.clientX - rect.left;
+    let y = rect.height - (event.clientY - rect.top);
     return {
         x: x,
         y: y
