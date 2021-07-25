@@ -96,6 +96,7 @@ class CanvasWrapperTransferFunction {
         console.log("FillBuffers");
         var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
         var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
+        
         this.vertices_opacities = new Float32Array(3*transfer_function.list_opacity_points.length);
         this.vertices_opacities.fill(0);
         for(var i=0; i<transfer_function.list_opacity_points.length; i++){
@@ -120,6 +121,24 @@ class CanvasWrapperTransferFunction {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices_colors), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         */
+        this.vertices_colors_count = new Float32Array(3*transfer_function.list_color_points.length);
+        this.vertices_colors_count.fill(0);
+        for(var i=0; i<transfer_function.list_color_points.length; i++){
+            var color_point = transfer_function.list_color_points[i];
+            var tx = color_point.t;
+            var ty = 0.5;
+            var dx = this.txToDeviceX(TRANSFER_FUNCTION_AREA_BOTTOM, tx);
+            var dy = this.tyToDeviceY(TRANSFER_FUNCTION_AREA_BOTTOM, ty);
+            this.vertices_colors_count[3*i] = dx;
+            this.vertices_colors_count[3*i+1] = dy;
+            console.log("txy", tx, ty);
+            console.log("dxy", dx, dy);
+        }
+        console.log(this.vertices_colors_count);
+        this.vertices_colors_count_count = transfer_function.list_color_points.length;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_colors);
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices_colors_count, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
 
     FillBufferOpacities(){
@@ -178,10 +197,10 @@ class CanvasWrapperTransferFunction {
 
         gl.uniform1i(this.location_transfer_function_points.location_type, 0);
         gl.uniform1f(this.location_transfer_function_points.location_size, 12);
-        gl.drawArrays(gl.POINTS, 0, 3);
+        gl.drawArrays(gl.POINTS, 0, this.vertices_colors_count_count);
         gl.uniform1i(this.location_transfer_function_points.location_type, 1);
         gl.uniform1f(this.location_transfer_function_points.location_size, 8);
-        gl.drawArrays(gl.POINTS, 0, 3);
+        gl.drawArrays(gl.POINTS, 0, this.vertices_colors_count_count);
     }
 
     loadShaderUniformsFTLESlice(gl, program) {
@@ -313,8 +332,8 @@ class CanvasWrapperTransferFunction {
 
         var min_x_d = lerp(-1, 1, min_x/width);
         var max_x_d = lerp(-1, 1, max_x/width);
-        var min_y_d = lerp(1, -1, min_y/height);
-        var max_y_d = lerp(1, -1, max_y/height);
+        var min_y_d = lerp(-1, 1, min_y/height);
+        var max_y_d = lerp(-1, 1, max_y/height);
         var max_y_bottom_d = lerp(-1, 1, max_y_bottom/height);
         var min_y_center_d = lerp(-1, 1, min_y_center/height);
         var min_y_top_d = lerp(-1, 1, min_y_top/height);
@@ -351,8 +370,8 @@ class CanvasWrapperTransferFunction {
 
         var min_x_d = lerp(-1, 1, min_x/width);
         var max_x_d = lerp(-1, 1, max_x/width);
-        var min_y_d = lerp(1, -1, min_y/height);
-        var max_y_d = lerp(1, -1, max_y/height);
+        var min_y_d = lerp(-1, 1, min_y/height);
+        var max_y_d = lerp(-1, 1, max_y/height);
         var max_y_bottom_d = lerp(-1, 1, max_y_bottom/height);
         var min_y_center_d = lerp(-1, 1, min_y_center/height);
         var min_y_top_d = lerp(-1, 1, min_y_top/height);
