@@ -72,11 +72,7 @@ class UITransferFunctions {
         this.changed_count = false;
         this.element_opacities = document.getElementById("container_transfer_function_opacities");
         this.list_opacity = [];
-        //this.rng_positions = seedrandom();
-
-        this.addOpacityPoint();
-        this.addOpacityPoint();
-        this.addOpacityPoint();
+        this.active_transfer_function_name = "Green Linear";
     }
 
     addOpacityPoint() {

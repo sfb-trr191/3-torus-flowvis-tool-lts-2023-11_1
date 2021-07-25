@@ -149,7 +149,6 @@ class TransferFunctionManager {
         this.transfer_function_list = [];
         this.transfer_function_dict = {};
         this.concatenated_colors = [];
-        this.active_transfer_function = "Green Linear";
         this.CreateDefaultTransferFunctions();
         this.Concatenate();
         this.UpdateToUI();
@@ -248,9 +247,11 @@ class TransferFunctionManager {
         transfer_function.fillBins();
     }
 
+    /*
     GetActiveTransferfunctionColorList(){
         return this.transfer_function_dict[this.active_transfer_function].list_colors;
     }
+    */
 }
 
 module.exports = TransferFunctionManager;

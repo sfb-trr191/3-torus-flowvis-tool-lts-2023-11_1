@@ -1605,18 +1605,30 @@ class UniformLocationsFTLESlice {
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
+        this.location_type = gl.getUniformLocation(program, "type");
+    }
+}
+
+class UniformLocationsTransferFunctionPoints {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsFTLESlice: ", name)
+        this.location_type = gl.getUniformLocation(program, "type");
+        this.location_size = gl.getUniformLocation(program, "size");
     }
 }
 
 class CanvasWrapperTransferFunction {
 
-    constructor(gl, name, canvas, canvas_width, canvas_height, global_data) {
+    constructor(gl, name, canvas, canvas_width, canvas_height, global_data, transfer_function_manager) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
         this.canvas_width = canvas_width;
         this.canvas_height = canvas_height;
         this.global_data = global_data;
+        this.transfer_function_manager = transfer_function_manager;
+        this.p_ui_transfer_functions = transfer_function_manager.p_ui_transfer_functions;
+        this.transfer_function_changed = true;
 
         //this.render_wrapper = new RenderWrapper(gl, name + "_render_wrapper", canvas_width, canvas_height);
 
@@ -1630,24 +1642,94 @@ class CanvasWrapperTransferFunction {
         this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
 
         this.program_transfer_function_points = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_transfer_function_points, V_SHADER_TRANSFER_FUNCTION_POINTS, F_SHADER_TRANSFER_FUNCTION_POINTS);
+        loadShaderProgramFromCode(gl, this.program_transfer_function_points, V_SHADER_TRANSFER_FUNCTION_POINTS, F_SHADER_TRANSFER_FUNCTION_POINTS); 
+        this.location_transfer_function_points = new UniformLocationsTransferFunctionPoints(gl, this.program_transfer_function_points);
         this.attribute_location_dummy_program_transfer_function_points = gl.getAttribLocation(this.program_transfer_function_points, "a_position");
 
         //this.GenerateDummyBuffer(gl);
         this.dummy_quad = new DummyQuad(gl);
 
+        this.GenerateBuffers(gl);
+
         canvas.addEventListener("click", (event) => {
             var pos = getMousePositionFromBottomLeft(canvas, event)
             this.onClick(pos.x, pos.y);
-        });
+        });  
+        
     }
 
-    draw(gl, transfer_function_changed) {
-        if (!transfer_function_changed)
+    GenerateBuffers(gl){
+        this.vertices_opacities = [
+            -0.5, 0.5, 0.0,
+            -0.5, -0.5, 0.0,
+            0.5, 0.5, 0.0,
+            0.5, -0.5, 0.0,
+        ];
+        this.vertices_opacities_count = 0;
+        this.vertex_buffer_opacities = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_opacities);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices_opacities), gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        this.vertices_colors = [
+            -0.5, -0.75, 0.0,
+            0.0, -0.75, 0.0,
+            -0.25, -0.75, 0.0,
+        ];
+        this.vertices_colors_count = 0;
+        this.vertex_buffer_colors = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_colors);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices_colors), gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+
+    FillBuffers(gl){
+        console.log("FillBuffers");
+        var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
+        var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
+        this.vertices_opacities = new Float32Array(3*transfer_function.list_opacity_points.length);
+        this.vertices_opacities.fill(0);
+        for(var i=0; i<transfer_function.list_opacity_points.length; i++){
+            var opacity_point = transfer_function.list_opacity_points[i];
+            var tx = opacity_point.t;
+            var ty = opacity_point.a;
+            var dx = this.txToDeviceX(TRANSFER_FUNCTION_AREA_CENTER, tx);
+            var dy = this.tyToDeviceY(TRANSFER_FUNCTION_AREA_CENTER, ty);
+            this.vertices_opacities[3*i] = dx;
+            this.vertices_opacities[3*i+1] = dy;
+            console.log("txy", tx, ty);
+            console.log("dxy", dx, dy);
+        }
+        console.log(this.vertices_opacities);
+        this.vertices_opacities_count = transfer_function.list_opacity_points.length;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_opacities);
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertices_opacities, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        /*
+        this.vertices_colors_count = this.transfer_function_manager.FillBufferColors(this.vertices_colors);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_colors);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices_colors), gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        */
+    }
+
+    FillBufferOpacities(){
+
+
+        this.list_color_points = [];//TransferFunctionColorPoint
+        this.list_opacity_points = [];//TransferFunctionOpacityPoint
+    }
+
+    draw(gl) {
+        if (!this.transfer_function_changed)
             return;
 
+        console.log("Draw transfer function");
+        this.FillBuffers(gl);
         this.drawBackground(gl);
         this.drawPoints(gl);
+
+        this.transfer_function_changed = false;
     }
 
     drawBackground(gl) {
@@ -1667,38 +1749,29 @@ class CanvasWrapperTransferFunction {
     }
 
     drawPoints(gl) {
-        var vertices_opacities = [
-            -0.5, 0.5, 0.0,
-            -0.5, -0.5, 0.0,
-            0.5, 0.5, 0.0,
-            0.5, -0.5, 0.0,
-        ];
-        var vertex_buffer_opacities = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_opacities);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_opacities), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        var vertices_colors = [
-            -0.5, -0.75, 0.0,
-            0.0, -0.75, 0.0,
-            -0.25, -0.75, 0.0,
-        ];
-        var vertex_buffer_colors = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_colors);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_colors), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
         //opacities
         gl.useProgram(this.program_transfer_function_points);
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_opacities);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_opacities);
         gl.vertexAttribPointer(this.attribute_location_dummy_program_transfer_function_points, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(this.attribute_location_dummy_program_transfer_function_points);
-        gl.drawArrays(gl.POINTS, 0, 4);
+
+        gl.uniform1i(this.location_transfer_function_points.location_type, 0);
+        gl.uniform1f(this.location_transfer_function_points.location_size, 12);
+        gl.drawArrays(gl.POINTS, 0, this.vertices_opacities_count);        
+        gl.uniform1i(this.location_transfer_function_points.location_type, 1);
+        gl.uniform1f(this.location_transfer_function_points.location_size, 8);
+        gl.drawArrays(gl.POINTS, 0, this.vertices_opacities_count);
         //colors
         gl.useProgram(this.program_transfer_function_points);
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_colors);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_colors);
         gl.vertexAttribPointer(this.attribute_location_dummy_program_transfer_function_points, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(this.attribute_location_dummy_program_transfer_function_points);
+
+        gl.uniform1i(this.location_transfer_function_points.location_type, 0);
+        gl.uniform1f(this.location_transfer_function_points.location_size, 12);
+        gl.drawArrays(gl.POINTS, 0, 3);
+        gl.uniform1i(this.location_transfer_function_points.location_type, 1);
+        gl.uniform1f(this.location_transfer_function_points.location_size, 8);
         gl.drawArrays(gl.POINTS, 0, 3);
     }
 
@@ -1833,10 +1906,10 @@ class CanvasWrapperTransferFunction {
         var max_x_d = lerp(-1, 1, max_x/width);
         var min_y_d = lerp(1, -1, min_y/height);
         var max_y_d = lerp(1, -1, max_y/height);
-        var max_y_bottom_d = lerp(1, -1, max_y_bottom/height);
-        var min_y_center_d = lerp(1, -1, min_y_center/height);
-        var min_y_top_d = lerp(1, -1, min_y_top/height);
-        var max_y_center_d = lerp(1, -1, max_y_center/height);
+        var max_y_bottom_d = lerp(-1, 1, max_y_bottom/height);
+        var min_y_center_d = lerp(-1, 1, min_y_center/height);
+        var min_y_top_d = lerp(-1, 1, min_y_top/height);
+        var max_y_center_d = lerp(-1, 1, max_y_center/height);
         /*
         console.log("min_x_d", min_x_d);
         console.log("max_x_d", max_x_d);
@@ -1871,10 +1944,10 @@ class CanvasWrapperTransferFunction {
         var max_x_d = lerp(-1, 1, max_x/width);
         var min_y_d = lerp(1, -1, min_y/height);
         var max_y_d = lerp(1, -1, max_y/height);
-        var max_y_bottom_d = lerp(1, -1, max_y_bottom/height);
-        var min_y_center_d = lerp(1, -1, min_y_center/height);
-        var min_y_top_d = lerp(1, -1, min_y_top/height);
-        var max_y_center_d = lerp(1, -1, max_y_center/height);
+        var max_y_bottom_d = lerp(-1, 1, max_y_bottom/height);
+        var min_y_center_d = lerp(-1, 1, min_y_center/height);
+        var min_y_top_d = lerp(-1, 1, min_y_top/height);
+        var max_y_center_d = lerp(-1, 1, max_y_center/height);
 
         switch (area) {
             case TRANSFER_FUNCTION_AREA_TOP:               
@@ -3754,7 +3827,7 @@ const Export = module_export.Export;
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
             side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data);
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
-            transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data);
+            transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -3826,11 +3899,9 @@ const Export = module_export.Export;
         object_manager.Update();
         UpdateGlobalDataIfDirty();
 
-        var transfer_function_changed = true;        
-
         canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
         canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
-        canvas_wrapper_transfer_function.draw(gl_transfer_function, transfer_function_changed);
+        canvas_wrapper_transfer_function.draw(gl_transfer_function);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
         main_camera.changed = false;
@@ -4055,6 +4126,7 @@ const Export = module_export.Export;
         settings_changed = true;
 
         transfer_function_manager.UpdateFromUI();
+        canvas_wrapper_transfer_function.transfer_function_changed = true;
 
         var cube_axes_radius_main = parseFloat(document.getElementById("input_cube_axes_radius_main").value);
         var cube_axes_radius_origin_main = 0;
@@ -115555,11 +115627,21 @@ global.F_SHADER_TRANSFER_FUNCTION_POINTS = `#version 300 es
 precision highp int;
 precision highp float;
 
+uniform int type;
+
 in vec4 a_position;
 out vec4 outputColor;
 
 void main() {
-    outputColor = vec4(0.0, 0.0, 0.0, 0.75);
+    if(type == 0){
+        outputColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    else if(type == 1){
+        outputColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+    else{
+        outputColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
 }
 
 `;
@@ -115608,11 +115690,13 @@ global.V_SHADER_TRANSFER_FUNCTION_POINTS = `#version 300 es
 precision highp int;
 precision highp float;
 
+uniform float size;
+
 in vec3 a_position;
 
 void main() {
     gl_Position = vec4(a_position, 1);
-    gl_PointSize = 8.0;
+    gl_PointSize = size;
 }
 
 `;
@@ -116378,7 +116462,6 @@ class TransferFunctionManager {
         this.transfer_function_list = [];
         this.transfer_function_dict = {};
         this.concatenated_colors = [];
-        this.active_transfer_function = "Green Linear";
         this.CreateDefaultTransferFunctions();
         this.Concatenate();
         this.UpdateToUI();
@@ -116477,9 +116560,11 @@ class TransferFunctionManager {
         transfer_function.fillBins();
     }
 
+    /*
     GetActiveTransferfunctionColorList(){
         return this.transfer_function_dict[this.active_transfer_function].list_colors;
     }
+    */
 }
 
 module.exports = TransferFunctionManager;
@@ -116881,11 +116966,7 @@ class UITransferFunctions {
         this.changed_count = false;
         this.element_opacities = document.getElementById("container_transfer_function_opacities");
         this.list_opacity = [];
-        //this.rng_positions = seedrandom();
-
-        this.addOpacityPoint();
-        this.addOpacityPoint();
-        this.addOpacityPoint();
+        this.active_transfer_function_name = "Green Linear";
     }
 
     addOpacityPoint() {

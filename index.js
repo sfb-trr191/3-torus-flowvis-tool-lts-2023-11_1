@@ -227,7 +227,7 @@ const Export = module_export.Export;
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
             side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data);
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
-            transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data);
+            transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
         tick_counter = 0;
         frame_counter = 0;
@@ -299,11 +299,9 @@ const Export = module_export.Export;
         object_manager.Update();
         UpdateGlobalDataIfDirty();
 
-        var transfer_function_changed = true;        
-
         canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
         canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
-        canvas_wrapper_transfer_function.draw(gl_transfer_function, transfer_function_changed);
+        canvas_wrapper_transfer_function.draw(gl_transfer_function);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
         main_camera.changed = false;
@@ -528,6 +526,7 @@ const Export = module_export.Export;
         settings_changed = true;
 
         transfer_function_manager.UpdateFromUI();
+        canvas_wrapper_transfer_function.transfer_function_changed = true;
 
         var cube_axes_radius_main = parseFloat(document.getElementById("input_cube_axes_radius_main").value);
         var cube_axes_radius_origin_main = 0;
