@@ -2116,37 +2116,48 @@ class CanvasWrapperTransferFunction {
 
     updateDragPoint(x, y) {
         console.log("updateDragPoint", "x: " + x, "y: " + y);
-        //var area = this.identifyArea(x, y, true);
         var area = this.drag_area;
-        //if (area != this.drag_area) {
-        //    return;
-        //}
         var tx = clamp(this.pixelToTX(area, x), 0, 1);
         var ty = clamp(this.pixelToTY(area, y), 0, 1);
-        var x_d = this.txToDeviceX(area, tx);
-        var y_d = this.tyToDeviceY(area, ty);
-        console.log("area", area);
-        console.log("tx", tx);
-        console.log("ty", ty);
-        console.log("x_d", x_d);
-        console.log("y_d", y_d);
-
-        var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
-        var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
 
         var decimals = 3;
         if (area == TRANSFER_FUNCTION_AREA_CENTER) {
-            //var point = transfer_function.list_opacity_points[this.drag_point_index];
-            //point.t = tx;
-            //point.a = ty;
+            var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;
+            if(this.drag_point_index == 0){
+                tx = 0;
+            }
+            else if(this.drag_point_index == last_index){
+                tx = 1;
+            }
+            else{
+                var point_l = this.p_ui_transfer_functions.list_opacity[this.drag_point_index-1];
+                var point_r = this.p_ui_transfer_functions.list_opacity[this.drag_point_index+1];
+                var tl = point_l.node_input_t.value;
+                var tr = point_r.node_input_t.value;
+                tx = clamp(tx, tl, tr);
+            }
+    
             var point = this.p_ui_transfer_functions.list_opacity[this.drag_point_index];
             point.node_input_t.value = tx.toFixed(decimals);
             point.node_input_a.value = ty.toFixed(decimals);
         }
 
         if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
-            //var point = transfer_function.list_color_points[this.drag_point_index];
-            //point.t = tx;
+            var last_index = this.p_ui_transfer_functions.list_color.length - 1;
+            if(this.drag_point_index == 0){
+                tx = 0;
+            }
+            else if(this.drag_point_index == last_index){
+                tx = 1;
+            }
+            else{
+                var point_l = this.p_ui_transfer_functions.list_color[this.drag_point_index-1];
+                var point_r = this.p_ui_transfer_functions.list_color[this.drag_point_index+1];
+                var tl = point_l.node_input_t.value;
+                var tr = point_r.node_input_t.value;
+                tx = clamp(tx, tl, tr);
+            }
+    
             var point = this.p_ui_transfer_functions.list_color[this.drag_point_index];
             point.node_input_t.value = tx.toFixed(decimals);
         }
@@ -2156,17 +2167,6 @@ class CanvasWrapperTransferFunction {
         this.FillBuffers(this.gl);
         this.FillBufferSelected();
         this.transfer_function_changed = true;
-
-        /*
-        var vertex_list = area == TRANSFER_FUNCTION_AREA_CENTER ? this.vertices_opacities
-        : area == TRANSFER_FUNCTION_AREA_BOTTOM ? this.vertices_colors
-            : [];
-
-        vertex_list[3*this.drag_point_index] = x_d;
-        vertex_list[3*this.drag_point_index+1] = y_d;
-        this.
-        */
-
     }
 }
 
