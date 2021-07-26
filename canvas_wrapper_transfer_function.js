@@ -6,6 +6,7 @@ const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 const module_utility = require("./utility");
 const getMousePositionFromBottomLeft = module_utility.getMousePositionFromBottomLeft;
 const lerp = module_utility.lerp;
+const clamp = module_utility.clamp;
 
 class UniformLocationsFTLESlice {
     constructor(gl, program, name) {
@@ -73,6 +74,18 @@ class CanvasWrapperTransferFunction {
             var pos = getMousePositionFromBottomLeft(canvas, event)
             this.onMouseUp(pos.x, pos.y);
         });
+
+        canvas.addEventListener("mousemove", (event) => {
+            var pos = getMousePositionFromBottomLeft(canvas, event)
+            //var pos = getMousePositionPercentage(canvas, event)
+            this.onMouseMove(pos.x, pos.y);
+        });
+
+        canvas.addEventListener("mouseout", (event) => {
+            this.onMouseOut();
+        });
+
+        
 
     }
 
@@ -277,6 +290,16 @@ class CanvasWrapperTransferFunction {
 
     onMouseUp(x, y) {
         console.log("up", "x: " + x, "y: " + y);
+        this.stopDragPoint();
+    }
+
+    onMouseMove(x, y) {
+        if (this.drag_active) {
+            this.updateDragPoint(x, y);
+        }
+    }
+
+    onMouseOut(){
         this.stopDragPoint();
     }
 
@@ -498,6 +521,61 @@ class CanvasWrapperTransferFunction {
     stopDragPoint() {
         this.drag_active = false;
         this.transfer_function_changed = true;
+    }
+
+    updateDragPoint(x, y) {
+        console.log("updateDragPoint", "x: " + x, "y: " + y);
+        //var area = this.identifyArea(x, y, true);
+        var area = this.drag_area;
+        //if (area != this.drag_area) {
+        //    return;
+        //}
+        var tx = clamp(this.pixelToTX(area, x), 0, 1);
+        var ty = clamp(this.pixelToTY(area, y), 0, 1);
+        var x_d = this.txToDeviceX(area, tx);
+        var y_d = this.tyToDeviceY(area, ty);
+        console.log("area", area);
+        console.log("tx", tx);
+        console.log("ty", ty);
+        console.log("x_d", x_d);
+        console.log("y_d", y_d);
+
+        var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
+        var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
+
+        var decimals = 3;
+        if (area == TRANSFER_FUNCTION_AREA_CENTER) {
+            //var point = transfer_function.list_opacity_points[this.drag_point_index];
+            //point.t = tx;
+            //point.a = ty;
+            var point = this.p_ui_transfer_functions.list_opacity[this.drag_point_index];
+            point.node_input_t.value = tx.toFixed(decimals);
+            point.node_input_a.value = ty.toFixed(decimals);
+        }
+
+        if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
+            //var point = transfer_function.list_color_points[this.drag_point_index];
+            //point.t = tx;
+            var point = this.p_ui_transfer_functions.list_color[this.drag_point_index];
+            point.node_input_t.value = tx.toFixed(decimals);
+        }
+
+        this.transfer_function_manager.UpdateFromUI();
+        this.transfer_function_manager.dirty = true;
+        this.FillBuffers(this.gl);
+        this.FillBufferSelected();
+        this.transfer_function_changed = true;
+
+        /*
+        var vertex_list = area == TRANSFER_FUNCTION_AREA_CENTER ? this.vertices_opacities
+        : area == TRANSFER_FUNCTION_AREA_BOTTOM ? this.vertices_colors
+            : [];
+
+        vertex_list[3*this.drag_point_index] = x_d;
+        vertex_list[3*this.drag_point_index+1] = y_d;
+        this.
+        */
+
     }
 }
 

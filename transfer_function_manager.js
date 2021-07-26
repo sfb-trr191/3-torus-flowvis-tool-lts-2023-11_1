@@ -238,6 +238,7 @@ class TransferFunctionManager {
         this.CreateDefaultTransferFunctions();
         this.Concatenate();
         this.UpdateToUI();
+        this.dirty = false;
     }
 
     UpdateToUI(){

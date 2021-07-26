@@ -82,6 +82,10 @@ exports.lerp = function (a, b, t) {
     return (1 - t) * a + t * b;
 }
 
+exports.clamp = function (x, min_x, max_x) {
+    return Math.min(Math.max(x, min_x), max_x);
+}
+
 exports.regexIntToFloat = function(input_string) {
     return input_string.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
         return ($2 == ".") ? $0 : $0 + ".0";

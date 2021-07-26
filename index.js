@@ -643,10 +643,12 @@ const Export = module_export.Export;
     }
 
     function UpdateGlobalDataIfDirty() {
-        if (!object_manager.dirty)
+        var dirty = object_manager.dirty || transfer_function_manager.dirty;
+        if (!dirty)
             return;
         console.log("UpdateGlobalDataIfDirty");
         object_manager.dirty = false;
+        transfer_function_manager.dirty = false;
         UpdateGlobalData();
     }
 
