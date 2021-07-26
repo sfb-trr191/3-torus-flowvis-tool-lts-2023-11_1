@@ -2095,7 +2095,7 @@ class CanvasWrapperTransferFunction {
             }
         }
         //check if min squared distance smaller than threshold
-        if (min_squared_dist < 100) {
+        if (min_squared_dist <= DRAG_SQUARED_DISTANCE_THRESHOLD) {
             point_index = index_min_squared_dist;
         }
         return point_index;
@@ -2274,6 +2274,8 @@ global.TRANSFER_FUNCTION_AREA_NONE = 0;
 global.TRANSFER_FUNCTION_AREA_TOP = 1;
 global.TRANSFER_FUNCTION_AREA_CENTER = 2;
 global.TRANSFER_FUNCTION_AREA_BOTTOM = 3;
+
+global.DRAG_SQUARED_DISTANCE_THRESHOLD = 256;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],9:[function(require,module,exports){

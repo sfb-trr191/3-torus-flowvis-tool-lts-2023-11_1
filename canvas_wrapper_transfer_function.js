@@ -504,7 +504,7 @@ class CanvasWrapperTransferFunction {
             }
         }
         //check if min squared distance smaller than threshold
-        if (min_squared_dist < 100) {
+        if (min_squared_dist <= DRAG_SQUARED_DISTANCE_THRESHOLD) {
             point_index = index_min_squared_dist;
         }
         return point_index;
