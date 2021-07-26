@@ -286,6 +286,9 @@ class CanvasWrapperTransferFunction {
         if (point_index != -1) {
             this.startDragPoint(area, point_index);
         }
+        else{
+            this.addPoint(area, x, y);
+        }
     }
 
     onMouseUp(x, y) {
@@ -576,6 +579,47 @@ class CanvasWrapperTransferFunction {
         this.FillBuffers(this.gl);
         this.FillBufferSelected();
         this.transfer_function_changed = true;
+    }
+
+    addPoint(area, x, y){
+        var tx = clamp(this.pixelToTX(area, x), 0, 1);
+        var ty = clamp(this.pixelToTY(area, y), 0, 1);
+
+        var decimals = 3;
+        if (area == TRANSFER_FUNCTION_AREA_CENTER) {
+            var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;
+            var index = 1;
+            for(var i=0; i < last_index; i++){
+                var point_l = this.p_ui_transfer_functions.list_opacity[i];
+                var point_r = this.p_ui_transfer_functions.list_opacity[i+1];
+                if(tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value){
+                    index = i+1;
+                }
+            }    
+            //new point
+            var point = this.p_ui_transfer_functions.addOpacityPointAtIndex(index, tx.toFixed(decimals), ty.toFixed(decimals));
+        }
+
+        if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
+            var last_index = this.p_ui_transfer_functions.list_color.length - 1;
+            var index = 1;
+            for(var i=0; i < last_index; i++){
+                var point_l = this.p_ui_transfer_functions.list_color[i];
+                var point_r = this.p_ui_transfer_functions.list_color[i+1];
+                if(tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value){
+                    index = i+1;
+                }
+            }    
+            //new point
+            var point = this.p_ui_transfer_functions.addColorPointAtIndex(index, tx.toFixed(decimals));
+        }
+
+        this.transfer_function_manager.UpdateFromUI();
+        this.transfer_function_manager.dirty = true;
+        this.FillBuffers(this.gl);
+        this.FillBufferSelected();
+        this.transfer_function_changed = true;
+
     }
 }
 

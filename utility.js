@@ -82,6 +82,27 @@ exports.lerp = function (a, b, t) {
     return (1 - t) * a + t * b;
 }
 
+exports.lerpHex = function (col_a, col_b, t){
+    var a_r = parseInt(col_a.substr(1, 2), 16) / 255
+    var a_g = parseInt(col_a.substr(3, 2), 16) / 255
+    var a_b = parseInt(col_a.substr(5, 2), 16) / 255
+
+    var b_r = parseInt(col_b.substr(1, 2), 16) / 255
+    var b_g = parseInt(col_b.substr(3, 2), 16) / 255
+    var b_b = parseInt(col_b.substr(5, 2), 16) / 255
+
+    var r = exports.lerp(a_r, b_r, t);
+    var g = exports.lerp(a_g, b_g, t);
+    var b = exports.lerp(a_b, b_b, t);
+
+    var r_int = Math.round(r * 255);
+    var g_int = Math.round(g * 255);
+    var b_int = Math.round(b * 255);
+
+    var hex = exports.rgbToHex(r_int, g_int, b_int);
+    return hex;
+}
+
 exports.clamp = function (x, min_x, max_x) {
     return Math.min(Math.max(x, min_x), max_x);
 }

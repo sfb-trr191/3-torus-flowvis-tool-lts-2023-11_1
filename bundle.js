@@ -1877,6 +1877,9 @@ class CanvasWrapperTransferFunction {
         if (point_index != -1) {
             this.startDragPoint(area, point_index);
         }
+        else{
+            this.addPoint(area, x, y);
+        }
     }
 
     onMouseUp(x, y) {
@@ -2167,6 +2170,47 @@ class CanvasWrapperTransferFunction {
         this.FillBuffers(this.gl);
         this.FillBufferSelected();
         this.transfer_function_changed = true;
+    }
+
+    addPoint(area, x, y){
+        var tx = clamp(this.pixelToTX(area, x), 0, 1);
+        var ty = clamp(this.pixelToTY(area, y), 0, 1);
+
+        var decimals = 3;
+        if (area == TRANSFER_FUNCTION_AREA_CENTER) {
+            var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;
+            var index = 1;
+            for(var i=0; i < last_index; i++){
+                var point_l = this.p_ui_transfer_functions.list_opacity[i];
+                var point_r = this.p_ui_transfer_functions.list_opacity[i+1];
+                if(tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value){
+                    index = i+1;
+                }
+            }    
+            //new point
+            var point = this.p_ui_transfer_functions.addOpacityPointAtIndex(index, tx.toFixed(decimals), ty.toFixed(decimals));
+        }
+
+        if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
+            var last_index = this.p_ui_transfer_functions.list_color.length - 1;
+            var index = 1;
+            for(var i=0; i < last_index; i++){
+                var point_l = this.p_ui_transfer_functions.list_color[i];
+                var point_r = this.p_ui_transfer_functions.list_color[i+1];
+                if(tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value){
+                    index = i+1;
+                }
+            }    
+            //new point
+            var point = this.p_ui_transfer_functions.addColorPointAtIndex(index, tx.toFixed(decimals));
+        }
+
+        this.transfer_function_manager.UpdateFromUI();
+        this.transfer_function_manager.dirty = true;
+        this.FillBuffers(this.gl);
+        this.FillBufferSelected();
+        this.transfer_function_changed = true;
+
     }
 }
 
@@ -117196,6 +117240,7 @@ const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
+const lerpHex = module_utility.lerpHex;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
 class UITransferFunctionOpacityPoint {
@@ -117341,6 +117386,19 @@ class UITransferFunctions {
         this.changed_count = true;
     }
 
+    addOpacityPointAtIndex(index, t_x, t_y) {
+        var new_point = new UITransferFunctionOpacityPoint(this, this.list_opacity.length);
+        this.element_opacities.insertBefore(new_point.node, this.list_opacity[index].node);
+        this.list_opacity.splice(index, 0, new_point);
+        this.changed_count = true;
+        for (var i = 0; i < this.list_opacity.length; i++) {
+            this.list_opacity[i].updateIndex(i);
+        }
+        new_point.node_input_t.value = t_x;
+        new_point.node_input_a.value = t_y;
+        return new_point;
+    }
+
     removeOpacityPoint(index) {
         console.log("removeOpacityPoint: ", index);
         var to_remove = this.list_opacity[index];
@@ -117358,6 +117416,34 @@ class UITransferFunctions {
         this.element_colors.appendChild(new_point.node);
         this.changed_count = true;
     }
+
+    addColorPointAtIndex(index, t_x) {
+        var new_point = new UITransferFunctionColorPoint(this, this.list_color.length);
+        this.element_colors.insertBefore(new_point.node, this.list_color[index].node);
+        this.list_color.splice(index, 0, new_point);
+        this.changed_count = true;
+        for (var i = 0; i < this.list_color.length; i++) {
+            this.list_color[i].updateIndex(i);
+        }
+
+        var point_l = this.list_color[index-1];
+        var point_r = this.list_color[index+1];
+        var t_l = point_l.node_input_t.value;
+        var t_r = point_r.node_input_t.value;
+
+        var t = (t_x - t_l) / (t_r - t_l);
+        var c_l = point_l.node_input_c.value;
+        var c_r = point_r.node_input_c.value;
+
+        console.log("insert debug tl", t_l);
+        console.log("insert debug tr", t_r);
+        console.log("insert debug t", t);
+        //var r = lerp(point_low.r, point_high.r, t);
+        new_point.node_input_t.value = t_x;
+        new_point.node_input_c.value = lerpHex(c_l, c_r, t);
+        return new_point;
+    }
+
 
     removeColorPoint(index) {
         console.log("removeColorPoint: ", index);
@@ -117579,6 +117665,27 @@ exports.rgbToHex = function (r, g, b) {
 
 exports.lerp = function (a, b, t) {
     return (1 - t) * a + t * b;
+}
+
+exports.lerpHex = function (col_a, col_b, t){
+    var a_r = parseInt(col_a.substr(1, 2), 16) / 255
+    var a_g = parseInt(col_a.substr(3, 2), 16) / 255
+    var a_b = parseInt(col_a.substr(5, 2), 16) / 255
+
+    var b_r = parseInt(col_b.substr(1, 2), 16) / 255
+    var b_g = parseInt(col_b.substr(3, 2), 16) / 255
+    var b_b = parseInt(col_b.substr(5, 2), 16) / 255
+
+    var r = exports.lerp(a_r, b_r, t);
+    var g = exports.lerp(a_g, b_g, t);
+    var b = exports.lerp(a_b, b_b, t);
+
+    var r_int = Math.round(r * 255);
+    var g_int = Math.round(g * 255);
+    var b_int = Math.round(b * 255);
+
+    var hex = exports.rgbToHex(r_int, g_int, b_int);
+    return hex;
 }
 
 exports.clamp = function (x, min_x, max_x) {

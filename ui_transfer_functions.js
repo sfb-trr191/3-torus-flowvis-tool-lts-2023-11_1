@@ -2,6 +2,7 @@ const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
+const lerpHex = module_utility.lerpHex;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
 class UITransferFunctionOpacityPoint {
@@ -147,6 +148,19 @@ class UITransferFunctions {
         this.changed_count = true;
     }
 
+    addOpacityPointAtIndex(index, t_x, t_y) {
+        var new_point = new UITransferFunctionOpacityPoint(this, this.list_opacity.length);
+        this.element_opacities.insertBefore(new_point.node, this.list_opacity[index].node);
+        this.list_opacity.splice(index, 0, new_point);
+        this.changed_count = true;
+        for (var i = 0; i < this.list_opacity.length; i++) {
+            this.list_opacity[i].updateIndex(i);
+        }
+        new_point.node_input_t.value = t_x;
+        new_point.node_input_a.value = t_y;
+        return new_point;
+    }
+
     removeOpacityPoint(index) {
         console.log("removeOpacityPoint: ", index);
         var to_remove = this.list_opacity[index];
@@ -164,6 +178,34 @@ class UITransferFunctions {
         this.element_colors.appendChild(new_point.node);
         this.changed_count = true;
     }
+
+    addColorPointAtIndex(index, t_x) {
+        var new_point = new UITransferFunctionColorPoint(this, this.list_color.length);
+        this.element_colors.insertBefore(new_point.node, this.list_color[index].node);
+        this.list_color.splice(index, 0, new_point);
+        this.changed_count = true;
+        for (var i = 0; i < this.list_color.length; i++) {
+            this.list_color[i].updateIndex(i);
+        }
+
+        var point_l = this.list_color[index-1];
+        var point_r = this.list_color[index+1];
+        var t_l = point_l.node_input_t.value;
+        var t_r = point_r.node_input_t.value;
+
+        var t = (t_x - t_l) / (t_r - t_l);
+        var c_l = point_l.node_input_c.value;
+        var c_r = point_r.node_input_c.value;
+
+        console.log("insert debug tl", t_l);
+        console.log("insert debug tr", t_r);
+        console.log("insert debug t", t);
+        //var r = lerp(point_low.r, point_high.r, t);
+        new_point.node_input_t.value = t_x;
+        new_point.node_input_c.value = lerpHex(c_l, c_r, t);
+        return new_point;
+    }
+
 
     removeColorPoint(index) {
         console.log("removeColorPoint: ", index);
