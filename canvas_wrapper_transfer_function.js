@@ -544,8 +544,8 @@ class CanvasWrapperTransferFunction {
 
     updateDragPoint(x, y) {
         console.log("updateDragPoint", "x: " + x, "y: " + y);
-        var jump_distance = 0.2;
-        var allow_jump = false;
+        var jump_distance = 0.1;
+        var allow_jump = true;
         var jump_left = false;
         var jump_right = false;
         var jump_right_0 = false;
@@ -600,6 +600,8 @@ class CanvasWrapperTransferFunction {
         if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
             var last_index = this.p_ui_transfer_functions.list_color.length - 1;
             if (this.drag_point_index == 0) {
+                var point_r = this.p_ui_transfer_functions.list_color[this.drag_point_index + 1];
+                var tr = parseFloat(point_r.node_input_t.value);
                 if(tx > tr + jump_distance){
                     jump_right = true;
                 }
@@ -607,6 +609,8 @@ class CanvasWrapperTransferFunction {
                 tx = 0;
             }
             else if (this.drag_point_index == last_index) {
+                var point_l = this.p_ui_transfer_functions.list_color[this.drag_point_index - 1];
+                var tl = parseFloat(point_l.node_input_t.value);
                 if(tx < tl - jump_distance){
                     jump_left = true;
                 }
