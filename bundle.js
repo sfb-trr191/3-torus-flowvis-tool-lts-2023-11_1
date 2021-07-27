@@ -1676,7 +1676,9 @@ class CanvasWrapperTransferFunction {
             this.onMouseOut();
         });
 
-        
+        canvas.addEventListener("keydown", (event) => {
+            this.onKeyDown(event);
+        });
 
     }
 
@@ -1842,6 +1844,14 @@ class CanvasWrapperTransferFunction {
             gl.uniform1f(this.location_transfer_function_points.location_size, 6);
             gl.drawArrays(gl.POINTS, 0, 1);
         }
+        else if (this.drag_point_index != -1) {//selected
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_selected);
+            gl.vertexAttribPointer(this.attribute_location_dummy_program_transfer_function_points, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(this.attribute_location_dummy_program_transfer_function_points);
+            gl.uniform1i(this.location_transfer_function_points.location_type, 3);
+            gl.uniform1f(this.location_transfer_function_points.location_size, 6);
+            gl.drawArrays(gl.POINTS, 0, 1);
+        }
     }
 
     loadShaderUniformsFTLESlice(gl, program) {
@@ -1877,8 +1887,8 @@ class CanvasWrapperTransferFunction {
         if (point_index != -1) {
             this.startDragPoint(area, point_index);
         }
-        else{
-            this.addPoint(area, x, y);
+        else {
+            this.addPoint(area, x, y, true);
         }
     }
 
@@ -1893,8 +1903,14 @@ class CanvasWrapperTransferFunction {
         }
     }
 
-    onMouseOut(){
+    onMouseOut() {
         this.stopDragPoint();
+    }
+
+    onKeyDown(event) {
+        if (event.key == 'Delete' || event.key == 'x') {
+            this.removeSelectedPoint();
+        }
     }
 
     identifyArea(x, y, allow_extended_click) {
@@ -1902,7 +1918,7 @@ class CanvasWrapperTransferFunction {
         var height = CANVAS_TRANSFER_FUNCTION_HEIGHT;
 
         var padding = 8;
-        var padding_bottom = 24;
+        var padding_bottom = 8;
         var gap = 8;
         var bar_height = 16;
         var min_x = padding - 1;
@@ -1938,7 +1954,7 @@ class CanvasWrapperTransferFunction {
         var height = CANVAS_TRANSFER_FUNCTION_HEIGHT;
 
         var padding = 8;
-        var padding_bottom = 24;
+        var padding_bottom = 8;
         var gap = 8;
         var bar_height = 16;
         var min_x = padding - 1;
@@ -1958,7 +1974,7 @@ class CanvasWrapperTransferFunction {
         var height = CANVAS_TRANSFER_FUNCTION_HEIGHT;
 
         var padding = 8;
-        var padding_bottom = 24;
+        var padding_bottom = 8;
         var gap = 8;
         var bar_height = 16;
         var min_x = padding - 1;
@@ -1987,7 +2003,7 @@ class CanvasWrapperTransferFunction {
         var height = CANVAS_TRANSFER_FUNCTION_HEIGHT;
 
         var padding = 8;
-        var padding_bottom = 24;
+        var padding_bottom = 8;
         var gap = 8;
         var bar_height = 16;
         var min_x = padding - 1;
@@ -2025,7 +2041,7 @@ class CanvasWrapperTransferFunction {
         var height = CANVAS_TRANSFER_FUNCTION_HEIGHT;
 
         var padding = 8;
-        var padding_bottom = 24;
+        var padding_bottom = 8;
         var gap = 8;
         var bar_height = 16;
         var min_x = padding - 1;
@@ -2126,20 +2142,20 @@ class CanvasWrapperTransferFunction {
         var decimals = 3;
         if (area == TRANSFER_FUNCTION_AREA_CENTER) {
             var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;
-            if(this.drag_point_index == 0){
+            if (this.drag_point_index == 0) {
                 tx = 0;
             }
-            else if(this.drag_point_index == last_index){
+            else if (this.drag_point_index == last_index) {
                 tx = 1;
             }
-            else{
-                var point_l = this.p_ui_transfer_functions.list_opacity[this.drag_point_index-1];
-                var point_r = this.p_ui_transfer_functions.list_opacity[this.drag_point_index+1];
+            else {
+                var point_l = this.p_ui_transfer_functions.list_opacity[this.drag_point_index - 1];
+                var point_r = this.p_ui_transfer_functions.list_opacity[this.drag_point_index + 1];
                 var tl = point_l.node_input_t.value;
                 var tr = point_r.node_input_t.value;
                 tx = clamp(tx, tl, tr);
             }
-    
+
             var point = this.p_ui_transfer_functions.list_opacity[this.drag_point_index];
             point.node_input_t.value = tx.toFixed(decimals);
             point.node_input_a.value = ty.toFixed(decimals);
@@ -2147,20 +2163,20 @@ class CanvasWrapperTransferFunction {
 
         if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
             var last_index = this.p_ui_transfer_functions.list_color.length - 1;
-            if(this.drag_point_index == 0){
+            if (this.drag_point_index == 0) {
                 tx = 0;
             }
-            else if(this.drag_point_index == last_index){
+            else if (this.drag_point_index == last_index) {
                 tx = 1;
             }
-            else{
-                var point_l = this.p_ui_transfer_functions.list_color[this.drag_point_index-1];
-                var point_r = this.p_ui_transfer_functions.list_color[this.drag_point_index+1];
+            else {
+                var point_l = this.p_ui_transfer_functions.list_color[this.drag_point_index - 1];
+                var point_r = this.p_ui_transfer_functions.list_color[this.drag_point_index + 1];
                 var tl = point_l.node_input_t.value;
                 var tr = point_r.node_input_t.value;
                 tx = clamp(tx, tl, tr);
             }
-    
+
             var point = this.p_ui_transfer_functions.list_color[this.drag_point_index];
             point.node_input_t.value = tx.toFixed(decimals);
         }
@@ -2172,38 +2188,46 @@ class CanvasWrapperTransferFunction {
         this.transfer_function_changed = true;
     }
 
-    addPoint(area, x, y){
+    addPoint(area, x, y, select) {
         var tx = clamp(this.pixelToTX(area, x), 0, 1);
         var ty = clamp(this.pixelToTY(area, y), 0, 1);
 
         var decimals = 3;
+        var index = 1;
         if (area == TRANSFER_FUNCTION_AREA_CENTER) {
-            var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;
-            var index = 1;
-            for(var i=0; i < last_index; i++){
+            var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;            
+            for (var i = 0; i < last_index; i++) {
                 var point_l = this.p_ui_transfer_functions.list_opacity[i];
-                var point_r = this.p_ui_transfer_functions.list_opacity[i+1];
-                if(tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value){
-                    index = i+1;
+                var point_r = this.p_ui_transfer_functions.list_opacity[i + 1];
+                if (tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value) {
+                    index = i + 1;
                 }
-            }    
+            }
             //new point
             var point = this.p_ui_transfer_functions.addOpacityPointAtIndex(index, tx.toFixed(decimals), ty.toFixed(decimals));
         }
 
         if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
             var last_index = this.p_ui_transfer_functions.list_color.length - 1;
-            var index = 1;
-            for(var i=0; i < last_index; i++){
+            for (var i = 0; i < last_index; i++) {
                 var point_l = this.p_ui_transfer_functions.list_color[i];
-                var point_r = this.p_ui_transfer_functions.list_color[i+1];
-                if(tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value){
-                    index = i+1;
+                var point_r = this.p_ui_transfer_functions.list_color[i + 1];
+                if (tx >= point_l.node_input_t.value && tx <= point_r.node_input_t.value) {
+                    index = i + 1;
                 }
-            }    
+            }
             //new point
             var point = this.p_ui_transfer_functions.addColorPointAtIndex(index, tx.toFixed(decimals));
         }
+
+        if(select){
+            this.drag_active = true;
+            this.drag_area = area;
+            this.drag_point_index = index;
+            //this.FillBufferSelected();
+            //this.transfer_function_changed = true;
+        }
+
 
         this.transfer_function_manager.UpdateFromUI();
         this.transfer_function_manager.dirty = true;
@@ -2211,6 +2235,34 @@ class CanvasWrapperTransferFunction {
         this.FillBufferSelected();
         this.transfer_function_changed = true;
 
+    }
+
+    removeSelectedPoint() {
+        console.log("debug remove: i", this.drag_point_index);
+        console.log("debug remove: o", this.p_ui_transfer_functions.list_opacity.length);
+        console.log("debug remove: c", this.p_ui_transfer_functions.list_color.length);
+        if (this.drag_point_index <= 0)
+            return;
+
+        if (this.drag_area == TRANSFER_FUNCTION_AREA_CENTER) {
+            if (this.drag_point_index >= this.p_ui_transfer_functions.list_opacity.length - 1)
+                return;
+            this.p_ui_transfer_functions.removeOpacityPoint(this.drag_point_index);
+        }
+        else if (this.drag_area == TRANSFER_FUNCTION_AREA_BOTTOM) {
+            if (this.drag_point_index >= this.p_ui_transfer_functions.list_color.length - 1)
+                return;
+            this.p_ui_transfer_functions.removeColorPoint(this.drag_point_index);
+        }
+        else {
+            return;
+        }
+
+        this.transfer_function_manager.UpdateFromUI();
+        this.transfer_function_manager.dirty = true;
+        this.FillBuffers(this.gl);
+        this.FillBufferSelected();
+        this.transfer_function_changed = true;
     }
 }
 
@@ -115787,7 +115839,7 @@ void main()
     float t_y = float(y) / float(height);
 
     int padding = 8;
-    int padding_bottom = 24;
+    int padding_bottom = 8;
     int gap = 8;
     int bar_height = 16;
     int min_x = padding-1;
@@ -115888,14 +115940,17 @@ in vec4 a_position;
 out vec4 outputColor;
 
 void main() {
-    if(type == 0){
+    if(type == 0){//black border
         outputColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    else if(type == 1){
+    else if(type == 1){//white interior
         outputColor = vec4(1.0, 1.0, 1.0, 1.0);
     }
-    else{
+    else if(type == 2){//active drag
         outputColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+    else{//selected
+        outputColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
 }
 

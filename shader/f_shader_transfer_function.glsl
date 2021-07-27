@@ -43,7 +43,7 @@ void main()
     float t_y = float(y) / float(height);
 
     int padding = 8;
-    int padding_bottom = 24;
+    int padding_bottom = 8;
     int gap = 8;
     int bar_height = 16;
     int min_x = padding-1;
