@@ -544,6 +544,11 @@ class CanvasWrapperTransferFunction {
 
     updateDragPoint(x, y) {
         console.log("updateDragPoint", "x: " + x, "y: " + y);
+        var jump_distance = 0.2;
+        var allow_jump = false;
+        var jump_left = false;
+        var jump_right = false;
+        var jump_right_0 = false;
         var area = this.drag_area;
         var tx = clamp(this.pixelToTX(area, x), 0, 1);
         var ty = clamp(this.pixelToTY(area, y), 0, 1);
@@ -552,17 +557,39 @@ class CanvasWrapperTransferFunction {
         if (area == TRANSFER_FUNCTION_AREA_CENTER) {
             var last_index = this.p_ui_transfer_functions.list_opacity.length - 1;
             if (this.drag_point_index == 0) {
+                var point_r = this.p_ui_transfer_functions.list_opacity[this.drag_point_index + 1];
+                var tr = parseFloat(point_r.node_input_t.value);
+                if(tx > tr + jump_distance){
+                    jump_right = true;
+                    jump_right_0 = true;
+                }
+
                 tx = 0;
             }
             else if (this.drag_point_index == last_index) {
+                var point_l = this.p_ui_transfer_functions.list_opacity[this.drag_point_index - 1];
+                var tl = parseFloat(point_l.node_input_t.value);
+                if(tx < tl - jump_distance){
+                    jump_left = true;
+                }
+
                 tx = 1;
             }
             else {
                 var point_l = this.p_ui_transfer_functions.list_opacity[this.drag_point_index - 1];
                 var point_r = this.p_ui_transfer_functions.list_opacity[this.drag_point_index + 1];
-                var tl = point_l.node_input_t.value;
-                var tr = point_r.node_input_t.value;
+                var tl = parseFloat(point_l.node_input_t.value);
+                var tr = parseFloat(point_r.node_input_t.value);
+
+                if(tx < tl - jump_distance){
+                    jump_left = true;
+                }
+                if(tx > tr + jump_distance){
+                    jump_right = true;
+                }
+
                 tx = clamp(tx, tl, tr);
+
             }
 
             var point = this.p_ui_transfer_functions.list_opacity[this.drag_point_index];
@@ -573,22 +600,51 @@ class CanvasWrapperTransferFunction {
         if (area == TRANSFER_FUNCTION_AREA_BOTTOM) {
             var last_index = this.p_ui_transfer_functions.list_color.length - 1;
             if (this.drag_point_index == 0) {
+                if(tx > tr + jump_distance){
+                    jump_right = true;
+                }
+
                 tx = 0;
             }
             else if (this.drag_point_index == last_index) {
+                if(tx < tl - jump_distance){
+                    jump_left = true;
+                }
+
                 tx = 1;
             }
             else {
                 var point_l = this.p_ui_transfer_functions.list_color[this.drag_point_index - 1];
                 var point_r = this.p_ui_transfer_functions.list_color[this.drag_point_index + 1];
-                var tl = point_l.node_input_t.value;
-                var tr = point_r.node_input_t.value;
+                var tl = parseFloat(point_l.node_input_t.value);
+                var tr = parseFloat(point_r.node_input_t.value);
+
+                if(tx < tl - jump_distance){
+                    jump_left = true;
+                }
+                if(tx > tr + jump_distance){
+                    jump_right = true;
+                }
+
                 tx = clamp(tx, tl, tr);
             }
 
             var point = this.p_ui_transfer_functions.list_color[this.drag_point_index];
             point.node_input_t.value = tx.toFixed(decimals);
         }
+
+        if(jump_right_0){
+            this.drag_point_index += 1;
+        }
+        else if(allow_jump){
+            if(jump_left){
+                this.drag_point_index -= 1;
+            }
+            else if(jump_right){
+                this.drag_point_index += 1;
+            }
+        }
+
 
         this.transfer_function_manager.UpdateFromUI();
         this.transfer_function_manager.dirty = true;
