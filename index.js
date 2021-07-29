@@ -121,6 +121,7 @@ const Export = module_export.Export;
         addOnClickExport();
         addOnClickTabs();
         addChangedSideMode();
+        addChangedTransferFunction();
         //testWebGPU();
         //testEigenvalueDecomposition();
 
@@ -485,6 +486,16 @@ const Export = module_export.Export;
             canvas_wrapper_side.draw_slice_index = value;
             console.log("slice_index", value);
             UpdateSliceSettings();
+        });
+    }
+
+    function addChangedTransferFunction(){
+        document.getElementById("select_transfer_function_id").addEventListener("change", (event) => {
+            var value = parseInt(document.getElementById("select_transfer_function_id").value);
+            console.log("SELECT: ", value);
+            canvas_wrapper_transfer_function.deselectPoint();
+            transfer_function_manager.UpdateToUI(value);
+            canvas_wrapper_transfer_function.updateBuffers();
         });
     }
 

@@ -237,18 +237,22 @@ class TransferFunctionManager {
         this.concatenated_colors = [];
         this.CreateDefaultTransferFunctions();
         this.Concatenate();
-        this.UpdateToUI();
+        this.UpdateToUI(0);
         this.dirty = false;
     }
 
-    UpdateToUI(){
-        var s = this.transfer_function_list[0].toString();
+    UpdateToUI(index){
+        console.log(index);
+        var s = this.transfer_function_list[index].toString();
         console.log("UpdateToUI: ", s);
+        this.p_ui_transfer_functions.active_transfer_function_index = index;
+        //this.p_ui_transfer_functions.active_transfer_function_name;        
         this.p_ui_transfer_functions.fromString(s);
     }
 
     UpdateFromUI(){
-        this.transfer_function_list[0].fromString(this.p_ui_transfer_functions.toString());
+        var index = this.p_ui_transfer_functions.active_transfer_function_index;
+        this.transfer_function_list[index].fromString(this.p_ui_transfer_functions.toString());
         this.Concatenate();
     }
 
@@ -265,10 +269,10 @@ class TransferFunctionManager {
     }
 
     CreateDefaultTransferFunctions() {
-        this.CreateGreenLinear();
-        this.CreateCoolToWarm();
-        this.CreateWhiteToBlue();
-        this.CreateWhiteToRed();
+        this.CreateGreenLinear();   //0
+        this.CreateCoolToWarm();    //1
+        this.CreateWhiteToBlue();   //2
+        this.CreateWhiteToRed();    //3
     }
 
     CreateGreenLinear() {

@@ -139,6 +139,7 @@ class UITransferFunctions {
         this.list_opacity = [];
         this.list_color = [];
         this.active_transfer_function_name = "Green Linear";
+        this.active_transfer_function_index = 0;
     }
 
     addOpacityPoint() {

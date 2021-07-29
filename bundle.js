@@ -1607,6 +1607,7 @@ class UniformLocationsFTLESlice {
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
         this.location_type = gl.getUniformLocation(program, "type");
+        this.location_transfer_function_index = gl.getUniformLocation(program, "transfer_function_index");        
     }
 }
 
@@ -1717,8 +1718,10 @@ class CanvasWrapperTransferFunction {
 
     FillBuffers(gl) {
         console.log("FillBuffers");
-        var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
-        var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
+        //var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
+        //var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
+        var transfer_function_index = this.p_ui_transfer_functions.active_transfer_function_index;
+        var transfer_function = this.transfer_function_manager.transfer_function_list[transfer_function_index];
 
         this.vertices_opacities = new Float32Array(3 * transfer_function.list_opacity_points.length);
         this.vertices_opacities.fill(0);
@@ -1793,12 +1796,17 @@ class CanvasWrapperTransferFunction {
     }
 
     drawBackground(gl) {
+        var transfer_function_index = this.p_ui_transfer_functions.active_transfer_function_index;
+
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, this.canvas_width, this.canvas_height);
         //gl.viewport(0, 0, 1024, 200);
         gl.useProgram(this.program_ftle_slice);
         gl.uniform1i(this.location_ftle_slice.location_width, this.canvas_width);
         gl.uniform1i(this.location_ftle_slice.location_height, this.canvas_height);
+        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index, transfer_function_index);
+
+        
 
         this.global_data.bind(this.name, gl,
             this.shader_uniforms_ftle_slice,
@@ -2133,6 +2141,11 @@ class CanvasWrapperTransferFunction {
         this.transfer_function_changed = true;
     }
 
+    deselectPoint(){
+        this.drag_active = false;
+        this.drag_point_index = -1;
+    }
+
     updateDragPoint(x, y) {
         console.log("updateDragPoint", "x: " + x, "y: " + y);
         var jump_distance = 0.1;
@@ -2320,6 +2333,12 @@ class CanvasWrapperTransferFunction {
 
         this.transfer_function_manager.UpdateFromUI();
         this.transfer_function_manager.dirty = true;
+        this.FillBuffers(this.gl);
+        this.FillBufferSelected();
+        this.transfer_function_changed = true;
+    }
+
+    updateBuffers(){
         this.FillBuffers(this.gl);
         this.FillBufferSelected();
         this.transfer_function_changed = true;
@@ -4086,6 +4105,7 @@ const Export = module_export.Export;
         addOnClickExport();
         addOnClickTabs();
         addChangedSideMode();
+        addChangedTransferFunction();
         //testWebGPU();
         //testEigenvalueDecomposition();
 
@@ -4450,6 +4470,16 @@ const Export = module_export.Export;
             canvas_wrapper_side.draw_slice_index = value;
             console.log("slice_index", value);
             UpdateSliceSettings();
+        });
+    }
+
+    function addChangedTransferFunction(){
+        document.getElementById("select_transfer_function_id").addEventListener("change", (event) => {
+            var value = parseInt(document.getElementById("select_transfer_function_id").value);
+            console.log("SELECT: ", value);
+            canvas_wrapper_transfer_function.deselectPoint();
+            transfer_function_manager.UpdateToUI(value);
+            canvas_wrapper_transfer_function.updateBuffers();
         });
     }
 
@@ -115861,6 +115891,7 @@ precision highp sampler3D;
 uniform int use3D;
 uniform int width;
 uniform int height;
+uniform int transfer_function_index;
 
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
@@ -115924,7 +115955,7 @@ void main()
         float scalar = t_x;
         int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
         bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec4 rgba = vec4(GetScalarColor(bin, 0));
+        vec4 rgba = vec4(GetScalarColor(bin, transfer_function_index));
         //vec3 color = mix(vec3(1,1,1), rgba.rgb * rgba.a, rgba.a);
         vec3 color = (vec3(1,1,1) - rgba.rgb) * (1.0-rgba.a) + rgba.rgb;
         //CInt((255 - R) * (A / 255.0) + R)
@@ -115937,7 +115968,7 @@ void main()
         float scalar = t_x;
         int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
         bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec4 rgba = vec4(GetScalarColor(bin, 0));
+        vec4 rgba = vec4(GetScalarColor(bin, transfer_function_index));
         if(t_y <= rgba.a)
             outputColor = vec4(rgba.rgb, 1);
         else
@@ -115949,7 +115980,7 @@ void main()
         float scalar = t_x;
         int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
         bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec4 rgba = vec4(GetScalarColor(bin, 0));
+        vec4 rgba = vec4(GetScalarColor(bin, transfer_function_index));
         outputColor = vec4(rgba.rgb, 1); 
     }
     else{
@@ -116919,18 +116950,22 @@ class TransferFunctionManager {
         this.concatenated_colors = [];
         this.CreateDefaultTransferFunctions();
         this.Concatenate();
-        this.UpdateToUI();
+        this.UpdateToUI(0);
         this.dirty = false;
     }
 
-    UpdateToUI(){
-        var s = this.transfer_function_list[0].toString();
+    UpdateToUI(index){
+        console.log(index);
+        var s = this.transfer_function_list[index].toString();
         console.log("UpdateToUI: ", s);
+        this.p_ui_transfer_functions.active_transfer_function_index = index;
+        //this.p_ui_transfer_functions.active_transfer_function_name;        
         this.p_ui_transfer_functions.fromString(s);
     }
 
     UpdateFromUI(){
-        this.transfer_function_list[0].fromString(this.p_ui_transfer_functions.toString());
+        var index = this.p_ui_transfer_functions.active_transfer_function_index;
+        this.transfer_function_list[index].fromString(this.p_ui_transfer_functions.toString());
         this.Concatenate();
     }
 
@@ -116947,10 +116982,10 @@ class TransferFunctionManager {
     }
 
     CreateDefaultTransferFunctions() {
-        this.CreateGreenLinear();
-        this.CreateCoolToWarm();
-        this.CreateWhiteToBlue();
-        this.CreateWhiteToRed();
+        this.CreateGreenLinear();   //0
+        this.CreateCoolToWarm();    //1
+        this.CreateWhiteToBlue();   //2
+        this.CreateWhiteToRed();    //3
     }
 
     CreateGreenLinear() {
@@ -117491,6 +117526,7 @@ class UITransferFunctions {
         this.list_opacity = [];
         this.list_color = [];
         this.active_transfer_function_name = "Green Linear";
+        this.active_transfer_function_index = 0;
     }
 
     addOpacityPoint() {

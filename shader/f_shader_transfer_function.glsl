@@ -6,6 +6,7 @@ precision highp sampler3D;
 uniform int use3D;
 uniform int width;
 uniform int height;
+uniform int transfer_function_index;
 
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
@@ -69,7 +70,7 @@ void main()
         float scalar = t_x;
         int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
         bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec4 rgba = vec4(GetScalarColor(bin, 0));
+        vec4 rgba = vec4(GetScalarColor(bin, transfer_function_index));
         //vec3 color = mix(vec3(1,1,1), rgba.rgb * rgba.a, rgba.a);
         vec3 color = (vec3(1,1,1) - rgba.rgb) * (1.0-rgba.a) + rgba.rgb;
         //CInt((255 - R) * (A / 255.0) + R)
@@ -82,7 +83,7 @@ void main()
         float scalar = t_x;
         int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
         bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec4 rgba = vec4(GetScalarColor(bin, 0));
+        vec4 rgba = vec4(GetScalarColor(bin, transfer_function_index));
         if(t_y <= rgba.a)
             outputColor = vec4(rgba.rgb, 1);
         else
@@ -94,7 +95,7 @@ void main()
         float scalar = t_x;
         int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
         bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-        vec4 rgba = vec4(GetScalarColor(bin, 0));
+        vec4 rgba = vec4(GetScalarColor(bin, transfer_function_index));
         outputColor = vec4(rgba.rgb, 1); 
     }
     else{
