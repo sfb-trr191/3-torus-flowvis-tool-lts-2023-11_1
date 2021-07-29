@@ -115201,13 +115201,12 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
             continue;
         }
 
-        //calculate forward position/scalar/normal
+        //calculate forward color
         int z_offset = 0;
-        vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);
-            
-    //uniform int transfer_function_index_streamline_scalar;
-    //uniform int transfer_function_index_ftle_forward;
-    //uniform int transfer_function_index_ftle_backward;
+        vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);         
+        //transfer_function_index_streamline_scalar;
+        //transfer_function_index_ftle_forward;
+        //transfer_function_index_ftle_backward;
         vec3 combined_color = rgba_forward.rgb;
         float combined_alpha = rgba_forward.a;
 
