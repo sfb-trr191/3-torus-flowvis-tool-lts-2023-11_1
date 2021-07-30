@@ -5,7 +5,6 @@ class StreamlineGenerator {
 
     constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
-        this.p_raw_data = p_streamline_context.raw_data;
         this.p_ui_seeds = p_streamline_context.ui_seeds;
         this.seeds = [];
         this.num_points_per_streamline = 10;
@@ -67,30 +66,30 @@ class StreamlineGenerator {
         this.shader_rule_z_neg_z = "z+1";	//if z>1 : z=___
     }
 
-    CalculateRawStreamlines() {
+    CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
         this.check_bounds = true;
         this.continue_at_bounds = true;
 
-        this.p_raw_data.initialize(this.seeds, this.num_points_per_streamline);
+        raw_data.initialize(this.seeds, this.num_points_per_streamline);
 
         for (var i = 0; i < this.seeds.length; i++) {
-            this.CalculateRawStreamline(i);
+            this.CalculateRawStreamline(i, raw_data);
         }
         console.log("CalculateRawStreamlines completed");
     }
 
-    CalculateRawStreamline(seed_index) {
+    CalculateRawStreamline(seed_index, raw_data) {
         console.log("CalculateRawStreamline: ", seed_index);
 
         var startIndex = seed_index * this.num_points_per_streamline;
-        var total_points = this.p_raw_data.num_points;
-        var positionData = this.p_raw_data.data[startIndex];
+        var total_points = raw_data.num_points;
+        var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
         var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
 
         var f_start = this.f(startPosition, signum);
-        this.p_raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], signum);
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], signum);
         var previousPosition = startPosition;
         console.log("startIndex: ", startIndex);
         console.log("positionData: ", positionData);
@@ -115,7 +114,7 @@ class StreamlineGenerator {
 
             var currentIndex = startIndex + i;
             var previousIndex = currentIndex - 1;
-            var previousVec4 = this.p_raw_data.data[previousIndex].position;
+            var previousVec4 = raw_data.data[previousIndex].position;
             previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
             //console.log("i: ", i);
             //console.log("previousPosition: ", previousPosition);
@@ -159,7 +158,7 @@ class StreamlineGenerator {
             var v_previous = glMatrix.vec3.length(f_previous);
             var v_current = glMatrix.vec3.length(f_current);
             var v_average = (v_previous + v_current) * 0.5;
-            var time_previous = this.p_raw_data.data[previousIndex].time;
+            var time_previous = raw_data.data[previousIndex].time;
             var time_current = time_previous + (this.step_size / v_average);
 
 
@@ -177,10 +176,10 @@ class StreamlineGenerator {
                         var movedPosition = this.MoveOutOfBounds(currentPosition);
                         var f_movedPosition = this.f(movedPosition, signum);
                         var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
-                        this.p_raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
-                        this.p_raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
-                        this.p_raw_data.data[currentIndex + 1].time = time_current;
-                        this.p_raw_data.data[currentIndex + 1].velocity = v_movedPosition;
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
+                        raw_data.data[currentIndex + 1].time = time_current;
+                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
                         i++;
                     }
                     else {
@@ -190,9 +189,9 @@ class StreamlineGenerator {
             }
 
 
-            this.p_raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], flag);
-            this.p_raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
-            this.p_raw_data.data[currentIndex].time = time_current;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], flag);
+            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
+            raw_data.data[currentIndex].time = time_current;
 
             //previousPosition = currentPosition;
             if (terminate)

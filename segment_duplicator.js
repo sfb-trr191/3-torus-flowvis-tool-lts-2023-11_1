@@ -8,7 +8,6 @@ class SegmentDuplicator {
 
     constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
-        this.p_raw_data = p_streamline_context.raw_data;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.iterations = 1;
         this.InitUnitCubeVectors();
@@ -44,24 +43,26 @@ class SegmentDuplicator {
 
     }
 
-    GenerateLineSegmentCopies(lod) {
+    GenerateLineSegmentCopies(part_index, lod) {
         console.log("GenerateLineSegmentCopies");
+        var vectorLineSegment = lod.GetVectorLineSegment(part_index);
         var startSegmentIndex = 0;
         for (var i = 0; i < this.iterations; i++) {
-            var startSegmentIndexNext = lod.vectorLineSegment.length;
+            var startSegmentIndexNext = vectorLineSegment.length;
             //PrepareProgramApplyRules(pointDataVector);
-            this.GenerateLineSegmentCopiesIteration(lod, i, startSegmentIndex);
+            this.GenerateLineSegmentCopiesIteration(part_index, lod, i, startSegmentIndex);
             startSegmentIndex = startSegmentIndexNext;
         }
         console.log("GenerateLineSegmentCopies completed");
     }
 
-    GenerateLineSegmentCopiesIteration(lod, iteration, startSegmentIndex) {
+    GenerateLineSegmentCopiesIteration(part_index, lod, iteration, startSegmentIndex) {
         console.log("GenerateLineSegmentCopiesIteration: ", iteration, startSegmentIndex);
-        console.log("lod.vectorLineSegment.length: ", lod.vectorLineSegment.length);
-        var vectorLineSegment = lod.vectorLineSegment;
-        var pointDataVector = this.p_raw_data.data;
+        var vectorLineSegment = lod.GetVectorLineSegment(part_index);
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var pointDataVector = raw_data.data;
         var tubeRadius = this.p_streamline_generator.tubeRadius;
+        console.log("vectorLineSegment.length: ", vectorLineSegment.length);
 
         var r = glMatrix.vec4.fromValues(tubeRadius, tubeRadius, tubeRadius, 0);
         var segmentCount = vectorLineSegment.length;
@@ -127,7 +128,7 @@ class SegmentDuplicator {
                 }
             }
         }
-        console.log("lod.vectorLineSegment.length: ", lod.vectorLineSegment.length);
+        console.log("vectorLineSegment.length: ", vectorLineSegment.length);
         console.log("GenerateLineSegmentCopiesIteration completed");
     }
 

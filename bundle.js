@@ -1523,12 +1523,14 @@ class CanvasWrapper {
 
     loadShaderUniformsRayTracing(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.registerUniform("start_index_int_position_data", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_float_position_data", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_int_line_segments", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_float_line_segments", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_int_tree_nodes", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_float_tree_nodes", "INT", -1);
+        for(var part_index=0; part_index<NUMBER_OF_LOD_PARTS; part_index++){
+            program_shader_uniforms.registerUniform("start_index_int_position_data"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_float_position_data"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_int_line_segments"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_float_line_segments"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_int_tree_nodes"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_float_tree_nodes"+part_index, "INT", -1);
+        }
 
         program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);
@@ -2451,6 +2453,11 @@ global.TRANSFER_FUNCTION_AREA_CENTER = 2;
 global.TRANSFER_FUNCTION_AREA_BOTTOM = 3;
 
 global.DRAG_SQUARED_DISTANCE_THRESHOLD = 256;
+
+global.NUMBER_OF_LOD_PARTS = 2;
+global.PART_INDEX_DEFAULT = 0;//streamlines only in fundamental domain
+global.PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
+
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],9:[function(require,module,exports){
@@ -5369,6 +5376,7 @@ const {DataTextures, DataTexture3D_RGBA, DataTexture3D_R} = require("./data_text
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 const BVH_AA = require("./bvh_aa");
 const module_utility = require("./utility");
+const { rightArithShift } = require("mathjs");
 const distancePointToLine = module_utility.distancePointToLine;
 
 class PolyLineSegment {
@@ -5434,6 +5442,41 @@ class MultiPolyLine {
     }
 }
 
+class LODDataPart{
+
+    constructor(name, part_index, p_data_unit, p_streamline_context){
+        this.name = name + "_" + part_index;
+        this.p_data_unit = p_data_unit;
+        this.p_streamline_context = p_streamline_context;
+        this.p_raw_data = p_streamline_context.GetRawData(part_index);
+        console.log("Generate part: " + this.name);
+        this.vectorMultiPolyLines = [];
+        this.vectorLineSegment = [];
+        this.tree_nodes = [];
+
+        this.data_container_positions = new DataContainer("positions"+part_index, new PositionData());
+        this.data_container_line_segments = new DataContainer("line_segments"+part_index, new LineSegment());
+        this.data_container_tree_nodes = new DataContainer("tree_nodes"+part_index, new TreeNode());
+
+        this.p_data_unit.registerDataCollection(this.data_container_positions);
+        this.p_data_unit.registerDataCollection(this.data_container_line_segments);
+        this.p_data_unit.registerDataCollection(this.data_container_tree_nodes);
+    }
+
+    UpdateDataContainers(){
+        this.data_container_positions.data = this.p_raw_data.position_data;
+        this.data_container_line_segments.data = this.vectorLineSegment;
+        this.data_container_tree_nodes.data = this.tree_nodes;
+    }
+
+    LogState() {
+        console.log("LogState LOD: " + this.name);
+        console.log("LogState segments: " + this.vectorLineSegment.length);
+        console.log("LogState nodes: " + this.tree_nodes.length);
+    }
+
+}
+
 /**
  * The LODData class manages one level of detail.
  * - Streamlines are extracted from the streamline generator and are stored as MultiPolyLines.
@@ -5449,31 +5492,25 @@ class LODData {
     constructor(name, p_streamline_context, gl, gl_side) {
         console.log("Generate lod: " + name);
         this.name = name;
-        this.vectorMultiPolyLines = [];
-        this.vectorLineSegment = [];
-        this.tree_nodes = [];
         this.douglasPeukerParameter = 0;
+        this.data_unit = new DataUnit(name);
+        this.list_part = [];
+        this.list_part.push(new LODDataPart(name, 0, this.data_unit, p_streamline_context));
+        //this.list_part.push(new LODDataPart(name, 1));
 
         //---start region: references
         this.p_streamline_context = p_streamline_context;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.p_segment_duplicator = p_streamline_context.segment_duplicator;
-        this.p_raw_data = p_streamline_context.raw_data;
+        //this.p_raw_data = p_streamline_context.raw_data;
         this.p_lights = p_streamline_context.p_lights;
         this.p_ui_seeds = p_streamline_context.ui_seeds;
         //---end region: references
 
         //---start region: data unit 
-        this.data_unit = new DataUnit(name);
         //this.data_container_dir_lights = new DataContainer("dir_lights", new DirLight());
-        this.data_container_positions = new DataContainer("positions", new PositionData());
-        this.data_container_line_segments = new DataContainer("line_segments", new LineSegment());
-        this.data_container_tree_nodes = new DataContainer("tree_nodes", new TreeNode());
         //this.data_container_streamline_color = new DataContainer("streamline_color", new StreamlineColor());
         //this.data_unit.registerDataCollection(this.data_container_dir_lights);
-        this.data_unit.registerDataCollection(this.data_container_positions);
-        this.data_unit.registerDataCollection(this.data_container_line_segments);
-        this.data_unit.registerDataCollection(this.data_container_tree_nodes);
         //this.data_unit.registerDataCollection(this.data_container_streamline_color);
         //---end region: data unit 
 
@@ -5482,24 +5519,51 @@ class LODData {
     }
 
     Reset() {
-        this.vectorMultiPolyLines = [];
-        this.vectorLineSegment = [];
+        for(var i=0; i<this.list_part.length; i++){
+            this.list_part[i].vectorMultiPolyLines = [];
+            this.list_part[i].vectorLineSegment = [];
+        }
     }
 
-    ExtractMultiPolyLines() {
-        console.log("ExtractMultiPolyLines");
-        this.Reset();
+    ResetPart(part_index) {
+        this.list_part[part_index].vectorMultiPolyLines = [];
+        this.list_part[part_index].vectorLineSegment = [];
+    }
 
-        var direction = this.p_streamline_generator.direction;
+    GetVectorMultiPolyLines(part_index){
+        return this.list_part[part_index].vectorMultiPolyLines;
+    }
+
+    GetVectorLineSegment(part_index){
+        return this.list_part[part_index].vectorLineSegment;
+    }
+
+    GetTreeNodes(part_index){
+        return this.list_part[part_index].tree_nodes;
+    }
+
+    SetTreeNodes(part_index, tree_nodes){
+        this.list_part[part_index].tree_nodes = tree_nodes;
+    }
+
+    ExtractMultiPolyLines(part_index) {
+        console.log("ExtractMultiPolyLines", part_index);
+        this.ResetPart(part_index);
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var streamline_generator = this.p_streamline_generator;
+
+        var vectorMultiPolyLines = this.GetVectorMultiPolyLines(part_index);
+
+        var direction = streamline_generator.direction;
         var multi = new MultiPolyLine();
         var poly = new PolyLine();
         var currentDirection;
-        for (var seedIndex = 0; seedIndex < this.p_raw_data.num_seeds; seedIndex++) {
-            var startIndex = seedIndex * this.p_raw_data.num_points_per_streamline;
+        for (var seedIndex = 0; seedIndex < raw_data.num_seeds; seedIndex++) {
+            var startIndex = seedIndex * raw_data.num_points_per_streamline;
             var oldFlag = 1337;
-            for (var offset = 0; offset < this.p_raw_data.num_points_per_streamline; offset++) {
+            for (var offset = 0; offset < raw_data.num_points_per_streamline; offset++) {
                 var index = startIndex + offset;
-                var flag = this.p_raw_data.data[index].position[3];
+                var flag = raw_data.data[index].position[3];
                 switch (flag) {
                     case -1://new polyline other direction
                         //console.log("case -1: new polyline other direction");
@@ -5542,40 +5606,41 @@ class LODData {
                 //the multi poly line ends for every seed in "direction=forward" or "direction=backward" mode
                 //in "direction=both" mode, the multi poly ends if the current direction is backward
                 //because seeds alternate forward and backward
-                this.vectorMultiPolyLines.push(multi);
+                vectorMultiPolyLines.push(multi);
                 multi = new MultiPolyLine();
             }
         }
 
-        for (var i = 0; i < this.vectorMultiPolyLines.length; i++)
-            this.vectorMultiPolyLines[i].multiPolyID = i;
+        for (var i = 0; i < vectorMultiPolyLines.length; i++)
+            vectorMultiPolyLines[i].multiPolyID = i;
 
-        console.log("this.vectorMultiPolyLines: ", this.vectorMultiPolyLines);
+        console.log("vectorMultiPolyLines: ", vectorMultiPolyLines);
         console.log("ExtractMultiPolyLines completed");
     }
-
-    DouglasPeuker(lod_data_original) {
-        console.log("DouglasPeuker: ", this.name);
-        this.Reset();
-        for (var i = 0; i < lod_data_original.vectorMultiPolyLines.length; i++) {
-            this.DouglasPeukerMulti(lod_data_original.vectorMultiPolyLines[i]);
+    
+    DouglasPeuker(part_index, lod_data_original) {
+        console.log("DouglasPeuker: ", this.name, part_index);
+        var originalVectorMultiPolyLines = lod_data_original.GetVectorMultiPolyLines(part_index);
+        this.ResetPart(part_index);
+        for (var i = 0; i < originalVectorMultiPolyLines.length; i++) {
+            this.DouglasPeukerMulti(part_index, originalVectorMultiPolyLines[i]);
         }
-        //lod_data_original.LogState();
-        //this.LogState();
         console.log("DouglasPeuker completed");
     }
 
-    DouglasPeukerMulti(originalMulti) {
+    DouglasPeukerMulti(part_index, originalMulti) {
+        var vectorMultiPolyLines = this.GetVectorMultiPolyLines(part_index);
         var newMulti = new MultiPolyLine();
         newMulti.multiPolyID = originalMulti.multiPolyID;
         for (var i = 0; i < originalMulti.polyLines.length; i++) {
-            this.DouglasPeukerAddPoly(newMulti, originalMulti.polyLines[i]);
+            this.DouglasPeukerAddPoly(part_index, newMulti, originalMulti.polyLines[i]);
         }
-        this.vectorMultiPolyLines.push(newMulti);
+        vectorMultiPolyLines.push(newMulti);
 
     }
 
-    DouglasPeukerAddPoly(newMulti, originalPoly) {
+    DouglasPeukerAddPoly(part_index, newMulti, originalPoly) {
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
         var numberOfPoints = originalPoly.pointIndices.length;
         var vectorKeep = new Array(numberOfPoints);//address via local index
         for (var i = 1; i < numberOfPoints - 1; i++) {
@@ -5594,7 +5659,7 @@ class LODData {
             var segment = stack.pop();
             //std::cout << "pop: " << segment.indexA << ", " << segment.indexB << std::endl;
 
-            segment.CalculateDistances(originalPoly.pointIndices, this.p_raw_data.data);
+            segment.CalculateDistances(originalPoly.pointIndices, raw_data.data);
             if (segment.hasInBetweenVertex && segment.highestDistance > this.douglasPeukerParameter) {
                 //std::cout << "segment split: " << segment.indexA << ", " << segment.indexB << std::endl;
                 //std::cout << "segment.highestDistance: " << segment.highestDistance << std::endl;
@@ -5628,10 +5693,12 @@ class LODData {
         newMulti.polyLines.push(newPoly);
     }
 
-    GenerateLineSegments() {
-        console.log("GenerateLineSegments");
-        for (var i = 0; i < this.vectorMultiPolyLines.length; i++) {
-            var m = this.vectorMultiPolyLines[i];
+    GenerateLineSegments(part_index) {
+        console.log("GenerateLineSegments", part_index);
+        var vectorMultiPolyLines = this.GetVectorMultiPolyLines(part_index);
+        var vectorLineSegment = this.GetVectorLineSegment(part_index);
+        for (var i = 0; i < vectorMultiPolyLines.length; i++) {
+            var m = vectorMultiPolyLines[i];
             for (var j = 0; j < m.polyLines.length; j++) {
                 var p = m.polyLines[j];
                 for (var k = 1; k < p.pointIndices.length; k++) {
@@ -5641,61 +5708,41 @@ class LODData {
                     segment.multiPolyID = m.multiPolyID;
                     segment.copy = 0;
                     segment.beginning = (k == 1) ? 1 : 0;
-                    this.vectorLineSegment.push(segment);
+                    vectorLineSegment.push(segment);
                 }
             }
         }
         console.log("GenerateLineSegments completed");
-        console.log("this.vectorLineSegment [", this.vectorLineSegment.length, "]: ", this.vectorLineSegment);
+        console.log("this.vectorLineSegment [", vectorLineSegment.length, "]: ", vectorLineSegment);
     }
 
-    CalculateMatrices() {
-        console.log("CalculateMatrices");
-        for (var i = 0; i < this.vectorLineSegment.length; i++) {
+    CalculateMatrices(part_index) {
+        console.log("CalculateMatrices", part_index);
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var vectorLineSegment = this.GetVectorLineSegment(part_index);
+        for (var i = 0; i < vectorLineSegment.length; i++) {
             var projection_index = -1;
-            var matrixCombined = this.CalculateMatrix(i, projection_index);
+            var matrixCombined = this.CalculateMatrix(part_index, i, projection_index);
             var matrixInverted = glMatrix.mat4.create();
             glMatrix.mat4.invert(matrixInverted, matrixCombined);//matrixInverted = matrixCombined.inverted();
-            this.vectorLineSegment[i].matrix = matrixCombined;
-            this.vectorLineSegment[i].matrix_inv = matrixInverted;
+            vectorLineSegment[i].matrix = matrixCombined;
+            vectorLineSegment[i].matrix_inv = matrixInverted;
             
             for (var projection_index=0; projection_index<3; projection_index++){
-                var matrix = this.CalculateMatrix(i, projection_index);
+                var matrix = this.CalculateMatrix(part_index, i, projection_index);
                 var matrix_inv = glMatrix.mat4.create();
                 glMatrix.mat4.invert(matrix_inv, matrix);
-                this.vectorLineSegment[i].list_matrix_projection[projection_index] = matrix;
-                this.vectorLineSegment[i].list_matrix_projection_inv[projection_index] = matrix_inv;
+                vectorLineSegment[i].list_matrix_projection[projection_index] = matrix;
+                vectorLineSegment[i].list_matrix_projection_inv[projection_index] = matrix_inv;
             }
-            
-
-            //console.log("posA_os: ", posA_os);
-            //console.log("posB_os: ", posB_os);
-            /*
-            console.log("-----------------: ");
-            console.log("matrixCombined: ", matrixCombined);
-            console.log("matrixInverted: ", matrixInverted);
-            var a = glMatrix.vec4.create();
-            var b = glMatrix.vec4.create();
-            var a2 = glMatrix.vec4.create();
-            var b2 = glMatrix.vec4.create();
-            var diff = glMatrix.vec4.create();
-            glMatrix.vec4.transformMat4(a, posA_ws, matrixCombined);
-            glMatrix.vec4.transformMat4(b, posB_ws, matrixCombined);
-            glMatrix.vec4.transformMat4(a2, a, matrixInverted);
-            glMatrix.vec4.transformMat4(b2, b, matrixInverted);
-            //glMatrix.vec4.subtract(diff, c, a);
-            console.log("posA_ws: ", posA_ws);
-            console.log("posB_ws: ", posB_ws);
-            console.log("posA_os: ", a);
-            console.log("posB_os: ", b);
-            console.log("posA_2: ", a2);
-            console.log("posB_2: ", b2);
-            */
         }
         console.log("CalculateMatrices completed");
     }
 
-    CalculateMatrix(segment_index, projection_index){
+    CalculateMatrix(part_index, segment_index, projection_index){
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var vectorLineSegment = this.GetVectorLineSegment(part_index);
+
         var matrixTranslation = glMatrix.mat4.create();
         var matrixRotation1 = glMatrix.mat4.create();
         var matrixRotation2 = glMatrix.mat4.create();
@@ -5714,11 +5761,11 @@ class LODData {
         //std::cout << "------------------------------" << i << std::endl;
         //std::cout << "SEGMENT: " << i << std::endl;
         //calculate translation matrix
-        var lineSegment = this.vectorLineSegment[segment_index];
+        var lineSegment = vectorLineSegment[segment_index];
         var indexA = lineSegment.indexA;
         var indexB = lineSegment.indexB;
-        glMatrix.vec4.copy(posA_ws, this.p_raw_data.data[indexA].position);//vec4
-        glMatrix.vec4.copy(posB_ws, this.p_raw_data.data[indexB].position);//vec4
+        glMatrix.vec4.copy(posA_ws, raw_data.data[indexA].position);//vec4
+        glMatrix.vec4.copy(posB_ws, raw_data.data[indexB].position);//vec4
         posA_ws[projection_index] = 0;
         posB_ws[projection_index] = 0;
         //std::cout << "posA_ws: " << posA_ws.x() << ", " << posA_ws.y() << ", " << posA_ws.z() << std::endl;
@@ -5772,26 +5819,32 @@ class LODData {
         return matrixCombined;
     }
 
-    CalculateBVH() {
+    CalculateBVH(part_index) {
         console.log("CalculateBVH");
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var vectorLineSegment = this.GetVectorLineSegment(part_index);
+        //var tree_nodes = this.GetTreeNodes(part_index);
+
         var bvh = new BVH_AA();
         var tubeRadius = this.p_streamline_generator.tubeRadius;
         var maxCost = -1;
         var growthID = -1;
         var volume_threshold = 0.0001;
-        bvh.GenerateTree(this.p_raw_data.data, this.vectorLineSegment, tubeRadius, maxCost, growthID, volume_threshold);
-        this.tree_nodes = bvh.ConvertNodes();
+        bvh.GenerateTree(raw_data.data, vectorLineSegment, tubeRadius, maxCost, growthID, volume_threshold);
+        var tree_nodes = bvh.ConvertNodes();
+        this.SetTreeNodes(part_index, tree_nodes);
         //console.log("tree_nodes: " + this.tree_nodes);
         console.log("CalculateBVH completed");
     }
 
     UpdateDataUnit() {
         console.log("UpdateDataUnit");
-        //this.data_container_dir_lights.data = this.p_lights.dir_lights;
-        this.data_container_positions.data = this.p_raw_data.position_data;
-        this.data_container_line_segments.data = this.vectorLineSegment;
-        this.data_container_tree_nodes.data = this.tree_nodes;
-        //this.data_container_streamline_color.data = this.p_ui_seeds.getStreamlineColors();
+        //this.data_container_positions.data = this.p_raw_data.position_data;
+        //this.data_container_line_segments.data = this.vectorLineSegment;
+        //this.data_container_tree_nodes.data = this.tree_nodes;
+        for(var i=0; i<this.list_part.length; i++){
+            this.list_part[i].UpdateDataContainers();
+        }
         this.data_unit.generateArrays();
         console.log("UpdateDataUnit completed");
     }
@@ -5813,34 +5866,34 @@ class LODData {
         gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_int.texture);
         gl.uniform1i(location_texture_int, 1);
 
-        shader_uniforms.setUniform("start_index_int_position_data", this.data_unit.getIntStart("positions"));
-        shader_uniforms.setUniform("start_index_int_line_segments", this.data_unit.getIntStart("line_segments"));
-        shader_uniforms.setUniform("start_index_int_tree_nodes", this.data_unit.getIntStart("tree_nodes"));
-        //shader_uniforms.setUniform("start_index_int_dir_lights", this.data_unit.getIntStart("dir_lights"));
-        //shader_uniforms.setUniform("start_index_int_streamline_color", this.data_unit.getIntStart("streamline_color"));
-        shader_uniforms.setUniform("start_index_float_position_data", this.data_unit.getFloatStart("positions"));
-        shader_uniforms.setUniform("start_index_float_line_segments", this.data_unit.getFloatStart("line_segments"));
-        shader_uniforms.setUniform("start_index_float_tree_nodes", this.data_unit.getFloatStart("tree_nodes"));
-        //shader_uniforms.setUniform("start_index_float_dir_lights", this.data_unit.getFloatStart("dir_lights"));
-        //shader_uniforms.setUniform("start_index_float_streamline_color", this.data_unit.getFloatStart("streamline_color"));
+        for(var part_index=0; part_index<this.list_part.length; part_index++){
+            shader_uniforms.setUniform("start_index_int_position_data"+part_index, this.data_unit.getIntStart("positions"+part_index));
+            shader_uniforms.setUniform("start_index_int_line_segments"+part_index, this.data_unit.getIntStart("line_segments"+part_index));
+            shader_uniforms.setUniform("start_index_int_tree_nodes"+part_index, this.data_unit.getIntStart("tree_nodes"+part_index));
+            
+            shader_uniforms.setUniform("start_index_float_position_data"+part_index, this.data_unit.getFloatStart("positions"+part_index));
+            shader_uniforms.setUniform("start_index_float_line_segments"+part_index, this.data_unit.getFloatStart("line_segments"+part_index));
+            shader_uniforms.setUniform("start_index_float_tree_nodes"+part_index, this.data_unit.getFloatStart("tree_nodes"+part_index));
+        }
+
         shader_uniforms.updateUniforms();
     }
 
-    GenerateLineSegmentCopies() {
+    GenerateLineSegmentCopies(part_index) {
         console.log("GenerateLineSegmentCopies");
-        this.p_segment_duplicator.GenerateLineSegmentCopies(this);
+        this.p_segment_duplicator.GenerateLineSegmentCopies(part_index, this);
         console.log("GenerateLineSegmentCopies completed");
     }
 
     LogState() {
-        console.log("LOD: " + this.name);
-        console.log("segments: " + this.vectorLineSegment.length);
-        console.log("nodes: " + this.tree_nodes.length);
+        for(var i=0; i<this.list_part.length; i++){
+            this.list_part[i].LogState();
+        }
     }
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1033,"gl-matrix":53}],25:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1033,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 
@@ -112091,7 +112144,6 @@ class SegmentDuplicator {
 
     constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
-        this.p_raw_data = p_streamline_context.raw_data;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.iterations = 1;
         this.InitUnitCubeVectors();
@@ -112127,24 +112179,26 @@ class SegmentDuplicator {
 
     }
 
-    GenerateLineSegmentCopies(lod) {
+    GenerateLineSegmentCopies(part_index, lod) {
         console.log("GenerateLineSegmentCopies");
+        var vectorLineSegment = lod.GetVectorLineSegment(part_index);
         var startSegmentIndex = 0;
         for (var i = 0; i < this.iterations; i++) {
-            var startSegmentIndexNext = lod.vectorLineSegment.length;
+            var startSegmentIndexNext = vectorLineSegment.length;
             //PrepareProgramApplyRules(pointDataVector);
-            this.GenerateLineSegmentCopiesIteration(lod, i, startSegmentIndex);
+            this.GenerateLineSegmentCopiesIteration(part_index, lod, i, startSegmentIndex);
             startSegmentIndex = startSegmentIndexNext;
         }
         console.log("GenerateLineSegmentCopies completed");
     }
 
-    GenerateLineSegmentCopiesIteration(lod, iteration, startSegmentIndex) {
+    GenerateLineSegmentCopiesIteration(part_index, lod, iteration, startSegmentIndex) {
         console.log("GenerateLineSegmentCopiesIteration: ", iteration, startSegmentIndex);
-        console.log("lod.vectorLineSegment.length: ", lod.vectorLineSegment.length);
-        var vectorLineSegment = lod.vectorLineSegment;
-        var pointDataVector = this.p_raw_data.data;
+        var vectorLineSegment = lod.GetVectorLineSegment(part_index);
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var pointDataVector = raw_data.data;
         var tubeRadius = this.p_streamline_generator.tubeRadius;
+        console.log("vectorLineSegment.length: ", vectorLineSegment.length);
 
         var r = glMatrix.vec4.fromValues(tubeRadius, tubeRadius, tubeRadius, 0);
         var segmentCount = vectorLineSegment.length;
@@ -112210,7 +112264,7 @@ class SegmentDuplicator {
                 }
             }
         }
-        console.log("lod.vectorLineSegment.length: ", lod.vectorLineSegment.length);
+        console.log("vectorLineSegment.length: ", vectorLineSegment.length);
         console.log("GenerateLineSegmentCopiesIteration completed");
     }
 
@@ -115396,12 +115450,12 @@ const int CYLINDER_FLOAT_COUNT = 64;
 const int CYLINDER_INT_COUNT = 0;
 
 //LOD DATA
-uniform int start_index_int_position_data;
-uniform int start_index_float_position_data;
-uniform int start_index_int_line_segments;
-uniform int start_index_float_line_segments;
-uniform int start_index_int_tree_nodes;
-uniform int start_index_float_tree_nodes;
+uniform int start_index_int_position_data0;
+uniform int start_index_float_position_data0;
+uniform int start_index_int_line_segments0;
+uniform int start_index_float_line_segments0;
+uniform int start_index_int_tree_nodes0;
+uniform int start_index_float_tree_nodes0;
 
 //GLOBAL DATA
 uniform int start_index_int_dir_lights;
@@ -115431,10 +115485,34 @@ ivec3 GetIndex3D(int global_index)
 //
 ////////////////////////////////////////////////////////////////////
 
+int GetStartIndexIntPositionData(){
+    return start_index_int_position_data0;
+}
+
+int GetStartIndexFloatPositionData(){
+    return start_index_float_position_data0;
+}
+
+int GetStartIndexIntLineSegments(){
+    return start_index_int_line_segments0;
+}
+
+int GetStartIndexFloatLineSegments(){
+    return start_index_float_line_segments0;
+}
+
+int GetStartIndexIntTreeNodes(){
+    return start_index_int_tree_nodes0;
+}
+
+int GetStartIndexFloatTreeNodes(){
+    return start_index_float_tree_nodes0;
+}
+
 vec3 GetPosition(int index, bool interactiveStreamline)
 {
     //return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
-    ivec3 pointer = GetIndex3D(start_index_float_position_data + index * POSITION_DATA_FLOAT_COUNT);
+    ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData() + index * POSITION_DATA_FLOAT_COUNT);
     float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
     float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
     float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
@@ -115465,14 +115543,14 @@ GL_LineSegment GetLineSegment(int index, bool interactiveStreamline)
 {
 	//return interactiveStreamline ? bufferLineSegmentsInteractiveStreamline[index] : bufferLineSegments[index];
 	GL_LineSegment segment;
-	ivec3 pointer = GetIndex3D(start_index_int_line_segments + index * LINE_SEGMENT_INT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexIntLineSegments() + index * LINE_SEGMENT_INT_COUNT);
 	segment.indexA = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
 	segment.indexB = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
 	segment.multiPolyID = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;
 	segment.copy = texelFetch(texture_int, pointer+ivec3(3,0,0), 0).r;
 	segment.isBeginning = texelFetch(texture_int, pointer+ivec3(4,0,0), 0).r;
 
-	pointer = GetIndex3D(start_index_float_line_segments + index * LINE_SEGMENT_FLOAT_COUNT
+	pointer = GetIndex3D(GetStartIndexFloatLineSegments() + index * LINE_SEGMENT_FLOAT_COUNT
         + 32 * (projection_index+1));//projection_index = -1 is no projection (default)
   	segment.matrix = mat4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
@@ -115519,7 +115597,7 @@ GL_TreeNode GetNode(int index, bool interactiveStreamline)
 {
 	//return interactiveStreamline ? bufferNodesInteractiveStreamline[index].node : bufferNodes[index].node;
 	GL_TreeNode node;
-	ivec3 pointer = GetIndex3D(start_index_int_tree_nodes + index * TREE_NODE_INT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexIntTreeNodes() + index * TREE_NODE_INT_COUNT);
 	node.hitLink = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
 	node.missLink = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
 	node.objectIndex = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;//segmentIndex TODO rename?
@@ -115531,7 +115609,7 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
 {
 	//return interactiveStreamline ? bufferNodesInteractiveStreamline[index].aabb : bufferNodes[index].aabb;
 	GL_AABB aabb;
-	ivec3 pointer = GetIndex3D(start_index_float_tree_nodes + index * TREE_NODE_FLOAT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes() + index * TREE_NODE_FLOAT_COUNT);
 	aabb.min = vec4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
@@ -115550,20 +115628,6 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
         aabb.min[projection_index] = -tubeRadius;
         aabb.max[projection_index] = tubeRadius;
     }
-
-	/*
-	aabb.min = vec4(0.4,0.4,0,0);
-	aabb.max = vec4(0.7,0.6,1,0);
-
-	aabb.min = vec4(0.6, 0.4, 0.0, 0);
-	aabb.max = vec4(0.7, 0.99, 0.99, 0);
-
-	aabb.min = vec4(0.5, 0.0, 0.0, 0);
-	aabb.max = vec4(0.6, 0.6, 0.1, 0);
-
-	aabb.min = vec4(0.0, 0.0, 0.0, 0);
-	aabb.max = vec4(1.0, 1.0, 1.0, 0);
-	*/
 	return aabb;
 }
 
@@ -116196,7 +116260,11 @@ class StreamlineContext {
         this.name = name;
         this.p_lights = p_lights;
         this.ui_seeds = ui_seeds;
-        this.raw_data = new RawData();
+        this.list_raw_data = [];
+        for(var i=0; i<NUMBER_OF_LOD_PARTS; i++){
+            this.list_raw_data.push(new RawData());
+        }
+
         this.streamline_generator = new StreamlineGenerator(this);
         this.segment_duplicator = new SegmentDuplicator(this);
         //this.lod_0 = new LODData(name+"_lod_0", this, gl);
@@ -116216,6 +116284,10 @@ class StreamlineContext {
         this.lod_0 = this.lod_list[0];
     }
 
+    GetRawData(part_index){
+        return this.list_raw_data[part_index];
+    }
+
     CalculateExampleStreamlines(gl, gl_side) {
         console.log("CalculateExampleStreamlines");
 
@@ -116230,24 +116302,7 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateExampleSeeds();
 
-        this.CalculateStreamlinesInternal(gl, gl_side);
-        /*
-        this.streamline_generator.CalculateRawStreamlines();
-        this.lod_0.ExtractMultiPolyLines();
-        this.raw_data.MakeDataHomogenous();
-        
-        //TODO: DouglasPeuker: simplify (for all lods except lod0)
-
-        this.lod_0.GenerateLineSegments();//TODO:(for all lods)        
-        this.lod_0.GenerateLineSegmentCopies();//TODO: GeometryDuplicator: generate copies (for all lods)   
-        this.lod_0.CalculateMatrices();//TODO:(for all lods)
-        this.lod_0.CalculateBVH();//TODO:(for all lods)
-
-        this.raw_data.GeneratePositionData();
-
-        this.lod_0.UpdateDataUnit();//TODO:(for all lods)
-        this.lod_0.UpdateDataTextures(gl);//TODO:(for all lods)
-        */
+        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
     CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
@@ -116264,27 +116319,29 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        this.CalculateStreamlinesInternal(gl, gl_side);
+        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlinesInternal(gl, gl_side) {
-        this.streamline_generator.CalculateRawStreamlines();
-        this.lod_0.ExtractMultiPolyLines();
-        this.raw_data.MakeDataHomogenous();
+    CalculateStreamlinesPart(part_index, gl, gl_side) {
+        var raw_data = this.GetRawData(part_index);
+
+        this.streamline_generator.CalculateRawStreamlines(raw_data);
+        this.lod_0.ExtractMultiPolyLines(part_index);
+        raw_data.MakeDataHomogenous();
 
         //simplify for all lods except lod_0
         for (var i = 1; i < this.lod_list.length; i++) {
-            this.lod_list[i].DouglasPeuker(this.lod_list[i - 1]);
+            this.lod_list[i].DouglasPeuker(part_index, this.lod_list[i - 1]);
         }
 
         for (var i = 0; i < this.lod_list.length; i++) {
-            this.lod_list[i].GenerateLineSegments();
-            this.lod_list[i].GenerateLineSegmentCopies();
-            this.lod_list[i].CalculateMatrices();
-            this.lod_list[i].CalculateBVH();
+            this.lod_list[i].GenerateLineSegments(part_index);
+            this.lod_list[i].GenerateLineSegmentCopies(part_index);
+            this.lod_list[i].CalculateMatrices(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
         }
 
-        this.raw_data.GeneratePositionData();
+        raw_data.GeneratePositionData();
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].UpdateDataUnit();
@@ -116314,7 +116371,6 @@ class StreamlineGenerator {
 
     constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
-        this.p_raw_data = p_streamline_context.raw_data;
         this.p_ui_seeds = p_streamline_context.ui_seeds;
         this.seeds = [];
         this.num_points_per_streamline = 10;
@@ -116376,30 +116432,30 @@ class StreamlineGenerator {
         this.shader_rule_z_neg_z = "z+1";	//if z>1 : z=___
     }
 
-    CalculateRawStreamlines() {
+    CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
         this.check_bounds = true;
         this.continue_at_bounds = true;
 
-        this.p_raw_data.initialize(this.seeds, this.num_points_per_streamline);
+        raw_data.initialize(this.seeds, this.num_points_per_streamline);
 
         for (var i = 0; i < this.seeds.length; i++) {
-            this.CalculateRawStreamline(i);
+            this.CalculateRawStreamline(i, raw_data);
         }
         console.log("CalculateRawStreamlines completed");
     }
 
-    CalculateRawStreamline(seed_index) {
+    CalculateRawStreamline(seed_index, raw_data) {
         console.log("CalculateRawStreamline: ", seed_index);
 
         var startIndex = seed_index * this.num_points_per_streamline;
-        var total_points = this.p_raw_data.num_points;
-        var positionData = this.p_raw_data.data[startIndex];
+        var total_points = raw_data.num_points;
+        var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
         var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
 
         var f_start = this.f(startPosition, signum);
-        this.p_raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], signum);
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], signum);
         var previousPosition = startPosition;
         console.log("startIndex: ", startIndex);
         console.log("positionData: ", positionData);
@@ -116424,7 +116480,7 @@ class StreamlineGenerator {
 
             var currentIndex = startIndex + i;
             var previousIndex = currentIndex - 1;
-            var previousVec4 = this.p_raw_data.data[previousIndex].position;
+            var previousVec4 = raw_data.data[previousIndex].position;
             previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
             //console.log("i: ", i);
             //console.log("previousPosition: ", previousPosition);
@@ -116468,7 +116524,7 @@ class StreamlineGenerator {
             var v_previous = glMatrix.vec3.length(f_previous);
             var v_current = glMatrix.vec3.length(f_current);
             var v_average = (v_previous + v_current) * 0.5;
-            var time_previous = this.p_raw_data.data[previousIndex].time;
+            var time_previous = raw_data.data[previousIndex].time;
             var time_current = time_previous + (this.step_size / v_average);
 
 
@@ -116486,10 +116542,10 @@ class StreamlineGenerator {
                         var movedPosition = this.MoveOutOfBounds(currentPosition);
                         var f_movedPosition = this.f(movedPosition, signum);
                         var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
-                        this.p_raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
-                        this.p_raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
-                        this.p_raw_data.data[currentIndex + 1].time = time_current;
-                        this.p_raw_data.data[currentIndex + 1].velocity = v_movedPosition;
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
+                        raw_data.data[currentIndex + 1].time = time_current;
+                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
                         i++;
                     }
                     else {
@@ -116499,9 +116555,9 @@ class StreamlineGenerator {
             }
 
 
-            this.p_raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], flag);
-            this.p_raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
-            this.p_raw_data.data[currentIndex].time = time_current;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], flag);
+            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
+            raw_data.data[currentIndex].time = time_current;
 
             //previousPosition = currentPosition;
             if (terminate)

@@ -10,7 +10,11 @@ class StreamlineContext {
         this.name = name;
         this.p_lights = p_lights;
         this.ui_seeds = ui_seeds;
-        this.raw_data = new RawData();
+        this.list_raw_data = [];
+        for(var i=0; i<NUMBER_OF_LOD_PARTS; i++){
+            this.list_raw_data.push(new RawData());
+        }
+
         this.streamline_generator = new StreamlineGenerator(this);
         this.segment_duplicator = new SegmentDuplicator(this);
         //this.lod_0 = new LODData(name+"_lod_0", this, gl);
@@ -30,6 +34,10 @@ class StreamlineContext {
         this.lod_0 = this.lod_list[0];
     }
 
+    GetRawData(part_index){
+        return this.list_raw_data[part_index];
+    }
+
     CalculateExampleStreamlines(gl, gl_side) {
         console.log("CalculateExampleStreamlines");
 
@@ -44,24 +52,7 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateExampleSeeds();
 
-        this.CalculateStreamlinesInternal(gl, gl_side);
-        /*
-        this.streamline_generator.CalculateRawStreamlines();
-        this.lod_0.ExtractMultiPolyLines();
-        this.raw_data.MakeDataHomogenous();
-        
-        //TODO: DouglasPeuker: simplify (for all lods except lod0)
-
-        this.lod_0.GenerateLineSegments();//TODO:(for all lods)        
-        this.lod_0.GenerateLineSegmentCopies();//TODO: GeometryDuplicator: generate copies (for all lods)   
-        this.lod_0.CalculateMatrices();//TODO:(for all lods)
-        this.lod_0.CalculateBVH();//TODO:(for all lods)
-
-        this.raw_data.GeneratePositionData();
-
-        this.lod_0.UpdateDataUnit();//TODO:(for all lods)
-        this.lod_0.UpdateDataTextures(gl);//TODO:(for all lods)
-        */
+        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
     CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
@@ -78,27 +69,29 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        this.CalculateStreamlinesInternal(gl, gl_side);
+        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlinesInternal(gl, gl_side) {
-        this.streamline_generator.CalculateRawStreamlines();
-        this.lod_0.ExtractMultiPolyLines();
-        this.raw_data.MakeDataHomogenous();
+    CalculateStreamlinesPart(part_index, gl, gl_side) {
+        var raw_data = this.GetRawData(part_index);
+
+        this.streamline_generator.CalculateRawStreamlines(raw_data);
+        this.lod_0.ExtractMultiPolyLines(part_index);
+        raw_data.MakeDataHomogenous();
 
         //simplify for all lods except lod_0
         for (var i = 1; i < this.lod_list.length; i++) {
-            this.lod_list[i].DouglasPeuker(this.lod_list[i - 1]);
+            this.lod_list[i].DouglasPeuker(part_index, this.lod_list[i - 1]);
         }
 
         for (var i = 0; i < this.lod_list.length; i++) {
-            this.lod_list[i].GenerateLineSegments();
-            this.lod_list[i].GenerateLineSegmentCopies();
-            this.lod_list[i].CalculateMatrices();
-            this.lod_list[i].CalculateBVH();
+            this.lod_list[i].GenerateLineSegments(part_index);
+            this.lod_list[i].GenerateLineSegmentCopies(part_index);
+            this.lod_list[i].CalculateMatrices(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
         }
 
-        this.raw_data.GeneratePositionData();
+        raw_data.GeneratePositionData();
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].UpdateDataUnit();

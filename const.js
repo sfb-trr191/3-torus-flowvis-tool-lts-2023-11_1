@@ -70,3 +70,8 @@ global.TRANSFER_FUNCTION_AREA_CENTER = 2;
 global.TRANSFER_FUNCTION_AREA_BOTTOM = 3;
 
 global.DRAG_SQUARED_DISTANCE_THRESHOLD = 256;
+
+global.NUMBER_OF_LOD_PARTS = 2;
+global.PART_INDEX_DEFAULT = 0;//streamlines only in fundamental domain
+global.PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
+

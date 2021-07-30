@@ -534,12 +534,14 @@ class CanvasWrapper {
 
     loadShaderUniformsRayTracing(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.registerUniform("start_index_int_position_data", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_float_position_data", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_int_line_segments", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_float_line_segments", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_int_tree_nodes", "INT", -1);
-        program_shader_uniforms.registerUniform("start_index_float_tree_nodes", "INT", -1);
+        for(var part_index=0; part_index<NUMBER_OF_LOD_PARTS; part_index++){
+            program_shader_uniforms.registerUniform("start_index_int_position_data"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_float_position_data"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_int_line_segments"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_float_line_segments"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_int_tree_nodes"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_float_tree_nodes"+part_index, "INT", -1);
+        }
 
         program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_dir_lights", "INT", -1);

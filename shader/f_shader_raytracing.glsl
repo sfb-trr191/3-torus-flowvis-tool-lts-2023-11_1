@@ -2371,12 +2371,12 @@ const int CYLINDER_FLOAT_COUNT = 64;
 const int CYLINDER_INT_COUNT = 0;
 
 //LOD DATA
-uniform int start_index_int_position_data;
-uniform int start_index_float_position_data;
-uniform int start_index_int_line_segments;
-uniform int start_index_float_line_segments;
-uniform int start_index_int_tree_nodes;
-uniform int start_index_float_tree_nodes;
+uniform int start_index_int_position_data0;
+uniform int start_index_float_position_data0;
+uniform int start_index_int_line_segments0;
+uniform int start_index_float_line_segments0;
+uniform int start_index_int_tree_nodes0;
+uniform int start_index_float_tree_nodes0;
 
 //GLOBAL DATA
 uniform int start_index_int_dir_lights;
@@ -2406,10 +2406,34 @@ ivec3 GetIndex3D(int global_index)
 //
 ////////////////////////////////////////////////////////////////////
 
+int GetStartIndexIntPositionData(){
+    return start_index_int_position_data0;
+}
+
+int GetStartIndexFloatPositionData(){
+    return start_index_float_position_data0;
+}
+
+int GetStartIndexIntLineSegments(){
+    return start_index_int_line_segments0;
+}
+
+int GetStartIndexFloatLineSegments(){
+    return start_index_float_line_segments0;
+}
+
+int GetStartIndexIntTreeNodes(){
+    return start_index_int_tree_nodes0;
+}
+
+int GetStartIndexFloatTreeNodes(){
+    return start_index_float_tree_nodes0;
+}
+
 vec3 GetPosition(int index, bool interactiveStreamline)
 {
     //return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
-    ivec3 pointer = GetIndex3D(start_index_float_position_data + index * POSITION_DATA_FLOAT_COUNT);
+    ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData() + index * POSITION_DATA_FLOAT_COUNT);
     float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
     float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
     float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
@@ -2440,14 +2464,14 @@ GL_LineSegment GetLineSegment(int index, bool interactiveStreamline)
 {
 	//return interactiveStreamline ? bufferLineSegmentsInteractiveStreamline[index] : bufferLineSegments[index];
 	GL_LineSegment segment;
-	ivec3 pointer = GetIndex3D(start_index_int_line_segments + index * LINE_SEGMENT_INT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexIntLineSegments() + index * LINE_SEGMENT_INT_COUNT);
 	segment.indexA = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
 	segment.indexB = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
 	segment.multiPolyID = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;
 	segment.copy = texelFetch(texture_int, pointer+ivec3(3,0,0), 0).r;
 	segment.isBeginning = texelFetch(texture_int, pointer+ivec3(4,0,0), 0).r;
 
-	pointer = GetIndex3D(start_index_float_line_segments + index * LINE_SEGMENT_FLOAT_COUNT
+	pointer = GetIndex3D(GetStartIndexFloatLineSegments() + index * LINE_SEGMENT_FLOAT_COUNT
         + 32 * (projection_index+1));//projection_index = -1 is no projection (default)
   	segment.matrix = mat4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
@@ -2494,7 +2518,7 @@ GL_TreeNode GetNode(int index, bool interactiveStreamline)
 {
 	//return interactiveStreamline ? bufferNodesInteractiveStreamline[index].node : bufferNodes[index].node;
 	GL_TreeNode node;
-	ivec3 pointer = GetIndex3D(start_index_int_tree_nodes + index * TREE_NODE_INT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexIntTreeNodes() + index * TREE_NODE_INT_COUNT);
 	node.hitLink = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
 	node.missLink = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
 	node.objectIndex = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;//segmentIndex TODO rename?
@@ -2506,7 +2530,7 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
 {
 	//return interactiveStreamline ? bufferNodesInteractiveStreamline[index].aabb : bufferNodes[index].aabb;
 	GL_AABB aabb;
-	ivec3 pointer = GetIndex3D(start_index_float_tree_nodes + index * TREE_NODE_FLOAT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes() + index * TREE_NODE_FLOAT_COUNT);
 	aabb.min = vec4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
@@ -2525,20 +2549,6 @@ GL_AABB GetAABB(int index, bool interactiveStreamline)
         aabb.min[projection_index] = -tubeRadius;
         aabb.max[projection_index] = tubeRadius;
     }
-
-	/*
-	aabb.min = vec4(0.4,0.4,0,0);
-	aabb.max = vec4(0.7,0.6,1,0);
-
-	aabb.min = vec4(0.6, 0.4, 0.0, 0);
-	aabb.max = vec4(0.7, 0.99, 0.99, 0);
-
-	aabb.min = vec4(0.5, 0.0, 0.0, 0);
-	aabb.max = vec4(0.6, 0.6, 0.1, 0);
-
-	aabb.min = vec4(0.0, 0.0, 0.0, 0);
-	aabb.max = vec4(1.0, 1.0, 1.0, 0);
-	*/
 	return aabb;
 }
 
