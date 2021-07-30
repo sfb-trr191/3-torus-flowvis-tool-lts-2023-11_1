@@ -1024,6 +1024,7 @@ class UniformLocationsRayTracing {
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
         this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
+        this.location_show_streamlines_outside = gl.getUniformLocation(program, "show_streamlines_outside");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
@@ -1144,6 +1145,7 @@ class CanvasWrapper {
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
         this.show_streamlines = true;
+        this.show_streamlines_outside = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
@@ -1363,6 +1365,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
         gl.uniform1i(this.location_raytracing.location_show_streamlines, this.show_streamlines);
+        gl.uniform1i(this.location_raytracing.location_show_streamlines_outside, this.show_streamlines_outside);
+
+        
 
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
@@ -3123,6 +3128,7 @@ class DataUnit {
 
         //generate arrays of the containers
         for (var i = 0; i < this.list_data_containers.length; i++) {
+            console.log("container: ", i, this.list_data_containers[i]);
             this.list_data_containers[i].generateArrays();
         }
 
@@ -4612,6 +4618,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
         canvas_wrapper_side.show_streamlines = document.getElementById("checkbox_show_streamlines_side").checked;
+        canvas_wrapper_side.show_streamlines_outside = document.getElementById("checkbox_show_streamlines_outside_side").checked;       
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -5496,7 +5503,7 @@ class LODData {
         this.data_unit = new DataUnit(name);
         this.list_part = [];
         this.list_part.push(new LODDataPart(name, 0, this.data_unit, p_streamline_context));
-        //this.list_part.push(new LODDataPart(name, 1));
+        this.list_part.push(new LODDataPart(name, 1, this.data_unit, p_streamline_context));
 
         //---start region: references
         this.p_streamline_context = p_streamline_context;
@@ -111966,6 +111973,9 @@ class RawData {
 
     constructor() {
         console.log("Generate raw data");
+        this.num_points = 0;
+        this.data = new Array();
+        this.position_data = new Array();
     }
 
     /**
@@ -113230,6 +113240,9 @@ const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
 const int INDEX_CYLINDER_FIRST_PROJECTION_FRAME = 66;
 
+const int PART_INDEX_DEFAULT = 0;//streamlines only in fundamental domain
+const int PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START UNIFORMS
@@ -113263,6 +113276,7 @@ uniform bool show_origin_axes;
 uniform bool show_bounding_box;
 uniform bool show_movable_axes;
 uniform bool show_streamlines;
+uniform bool show_streamlines_outside;
 uniform bool show_volume_rendering;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
@@ -113323,15 +113337,15 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset);
 GL_CameraData GetActiveCamera();
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
-void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
+void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 bool CheckOutOfBounds(vec3 position);
 vec3 MoveOutOfBounds(vec3 position);
 vec3 MoveOutOfBoundsProjection(vec3 position);
 bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
-void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit);
-void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
-void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
+void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit);
+void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
+void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
 float ExtractLinearPercentage(float a, float b, float value);
 
 //**********************************************************
@@ -113345,12 +113359,12 @@ vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
 
 void IntersectUnitCube(Ray ray, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
 void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
-void HandleOutOfBound_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hitCube);
-void HandleOutOfBound_Cylinder(bool interactiveStreamline, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b);
-void HandleOutOfBound_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID);
-void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hit);
-void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
-void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
+void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube);
+void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b);
+void HandleOutOfBound_Sphere(int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID);
+void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit);
+void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
+void HandleInside_Sphere(int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
 
 void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
@@ -113371,12 +113385,12 @@ float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
 
 //**********************************************************
 
-float GetCost(int index, bool interactiveStreamline);
-vec3 GetPosition(int index, bool interactiveStreamline);
-float GetVelocity(int index, bool interactiveStreamline);
-GL_LineSegment GetLineSegment(int index, bool interactiveStreamline);
-GL_TreeNode GetNode(int index, bool interactiveStreamline);
-GL_AABB GetAABB(int index, bool interactiveStreamline);
+float GetCost(int index, int part_index);
+vec3 GetPosition(int index, int part_index);
+float GetVelocity(int index, int part_index);
+GL_LineSegment GetLineSegment(int index, int part_index);
+GL_TreeNode GetNode(int index, int part_index);
+GL_AABB GetAABB(int index, int part_index);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
 vec4 GetScalarColor(int index, int transfer_function_index);
@@ -113406,7 +113420,7 @@ void main() {
 			outputColor = getTestColor(0,0,0);	
 		else if (int(j) < 200)
 		{
-			outputColor = vec4(GetPosition(0, false), 1);	
+			outputColor = vec4(GetPosition(0, 0), 1);	
 		}
 		else if (int(j) < 300)
 		{
@@ -113437,19 +113451,19 @@ void main() {
 		}
 		else if (int(j) < 500)
 		{
-			GL_TreeNode node = GetNode(0, false);
+			GL_TreeNode node = GetNode(0, 0);
 			bool flag1 = validateInteger(node.hitLink, 1);
 			bool flag2 = validateInteger(node.missLink, 0);
 			bool flag3 = validateInteger(node.objectIndex, -1);
 			bool flag4 = validateInteger(node.type, 0);
 
-			node = GetNode(1, false);
+			node = GetNode(1, 0);
 			bool flag5 = validateInteger(node.hitLink, 2);
 			bool flag6 = validateInteger(node.missLink, 2);
 			bool flag7 = validateInteger(node.objectIndex, 0);
 			bool flag8 = validateInteger(node.type, 1);
 
-			node = GetNode(2, false);
+			node = GetNode(2, 0);
 			bool flag9 = validateInteger(node.hitLink, 0);
 			bool flag10 = validateInteger(node.missLink, 0);
 			bool flag11 = validateInteger(node.objectIndex, 1);
@@ -113649,7 +113663,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 	//IntersectAxesCorner(ray, hit, hitCube, 0);
 
 	while(true)
-	{		
+	{		        
 		IntersectInstance(variableRay, hit, hitCube);
 		//calculate exit (the point where ray leaves the current instance)
 		//formula: target = origin + t * direction
@@ -113714,6 +113728,11 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 				
 		//break;
 	}	
+
+    if(show_streamlines_outside){
+        bool check_bounds = false;
+	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit, hitCube);
+    }
 }
 
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
@@ -113769,8 +113788,10 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		}
 	}
 
-	if(show_streamlines)
-	    IntersectInstance_Tree(false, ray, maxRayDistance, hit, hitCube);
+	if(show_streamlines){
+        bool check_bounds = true;
+	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, maxRayDistance, hit, hitCube);
+    }
   /*
 	if(show_interactive_streamline)
 		IntersectInstance_Tree(true, ray, maxRayDistance, hit, hitCube);
@@ -113820,7 +113841,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
   */
 }
 
-void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
+void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
 {		
 	bool copy = false;
 	int multiPolyID = 0;
@@ -113831,27 +113852,6 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 	Sphere sphere;
 	sphere.radius = 0.1;
 
-	/*
-	sphere.center =	vec3(0.1, 0.1, 0.1);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.1, 0.1, 0.9);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.1, 0.9, 0.1);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.1, 0.9, 0.9);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.9, 0.1, 0.1);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.9, 0.1, 0.9);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.9, 0.9, 0.1);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	sphere.center =	vec3(0.9, 0.9, 0.9);
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-	*/
-	//return;
-
-
 	int nodeIndex = 0;
 	int iteration_counter = -1;
 	while(true)
@@ -113860,8 +113860,8 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 		//if (iteration_counter > 1000)			
 		//	break;//TODO
 
-		GL_TreeNode glNode = GetNode(nodeIndex, interactiveStreamline);
-		GL_AABB glAABB = GetAABB(nodeIndex, interactiveStreamline);
+		GL_TreeNode glNode = GetNode(nodeIndex, part_index);
+		GL_AABB glAABB = GetAABB(nodeIndex, part_index);
 		float tmin;
 		float tmax;
 		bool hitAABB = IntersectGLAABB(glAABB, ray, ray_local_cutoff, tmin, tmax);
@@ -113869,19 +113869,12 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 		if(hitAABB)
 		{
 			nodeIndex = glNode.hitLink;
-            /*
-			if (glNode.type != 0)
-			{
-				//hit.hitType = 1;
-				IntersectLineSegment(interactiveStreamline, ray, ray_local_cutoff, glNode, hit);
-			}
-            */
 			if(hitCube.hitType != TYPE_IGNORE_CUBE)
 			{
 				//ray intersects cube --> check if cube hit is inside this object
 				if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
 				{
-					HandleOutOfBound_LineSegment(interactiveStreamline, ray, glNode.objectIndex, hitCube);					
+					HandleOutOfBound_LineSegment(part_index, ray, glNode.objectIndex, hitCube);					
 				}
 			}
 			if(hitCube.hitType == TYPE_NONE || hitCube.hitType ==TYPE_IGNORE_CUBE)
@@ -113891,9 +113884,9 @@ void IntersectInstance_Tree(bool interactiveStreamline, Ray ray, float ray_local
 				{
 					if(handle_inside)
 					{
-						HandleInside_LineSegment(interactiveStreamline, ray, glNode.objectIndex, hit);
+						HandleInside_LineSegment(part_index, ray, glNode.objectIndex, hit);
 					}
-					IntersectLineSegment(interactiveStreamline, ray, ray_local_cutoff, glNode, hit);	
+					IntersectLineSegment(part_index, check_bounds, ray, ray_local_cutoff, glNode, hit);	
           						
 				}
 			}
@@ -114060,7 +114053,7 @@ bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout 
     return IntersectGLAABB(aabb, r, ray_local_cutoff, tmin, tmax);
 }
 
-void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
+void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
 { 
 	/*
 	int lineSegmentID = glNode.objectIndex;
@@ -114081,15 +114074,15 @@ void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_c
 
 
 	int lineSegmentID = glNode.objectIndex;
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	int multiPolyID = lineSegment.multiPolyID;
 	bool copy = (lineSegment.copy==1);
 	if(ignore_copy && copy)
 		return;
-	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
-	vec3 b = GetPosition(lineSegment.indexB, interactiveStreamline);
-	float cost_a = GetCost(lineSegment.indexA, interactiveStreamline);
-	float cost_b = GetCost(lineSegment.indexB, interactiveStreamline);
+	vec3 a = GetPosition(lineSegment.indexA, part_index);
+	vec3 b = GetPosition(lineSegment.indexB, part_index);
+	float cost_a = GetCost(lineSegment.indexA, part_index);
+	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float cost_cutoff = growth_max_cost * scalar_cost_max;
 	if(growth == 1)
 	{
@@ -114118,19 +114111,19 @@ void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_c
 	{
 		//return;
 	}
-	float v_a = GetVelocity(lineSegment.indexA, interactiveStreamline);
-	float v_b = GetVelocity(lineSegment.indexB, interactiveStreamline);
+	float v_a = GetVelocity(lineSegment.indexA, part_index);
+	float v_b = GetVelocity(lineSegment.indexB, part_index);
 	
 	//CYLINDER AND SPHERE TEST
 	bool ignore_override = false;
-	IntersectCylinder(interactiveStreamline, ray, ray_local_cutoff, glNode.objectIndex, hit, ignore_override);	
+	IntersectCylinder(part_index, check_bounds, ray, ray_local_cutoff, glNode.objectIndex, hit, ignore_override);	
 	Sphere sphere;
 	sphere.radius = tubeRadius;
 	//SPHERE A
 	if(lineSegment.isBeginning == 1 || copy)
 	{
 		sphere.center = a;
-		IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_a, cost_a);
+		IntersectSphere(part_index, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_a, cost_a);
 	}
 	//SPHERE B
 	sphere.center = b;
@@ -114148,17 +114141,17 @@ void IntersectLineSegment(bool interactiveStreamline, Ray ray, float ray_local_c
 			}
 		}
 	}
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
+	IntersectSphere(part_index, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
 	
 	/**/
 }
 
-void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
+void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
 {
 	float r = tubeRadius;// / 2.0;
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
-	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
-	vec3 b = GetPosition(lineSegment.indexB, interactiveStreamline);
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
+	vec3 a = GetPosition(lineSegment.indexA, part_index);
+	vec3 b = GetPosition(lineSegment.indexB, part_index);
 
 	
 	mat4 matrix = lineSegment.matrix;
@@ -114264,16 +114257,18 @@ void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cuto
 			
 	bool copy = (lineSegment.copy == 1);
 	
-	vec3 position_os = ray.origin + distance_os * ray.direction;
-	bool outOfBounds = CheckOutOfBounds(position_os);	
-	
-	if(outOfBounds)	
-		return;		
+	vec3 position_os = ray.origin + distance_os * ray.direction;	
+	if(check_bounds)
+	{
+		bool outOfBounds = CheckOutOfBounds(position_os);	
+		if(outOfBounds)	
+			return;	
+	}	
 	
 	int multiPolyID = lineSegment.multiPolyID;
 
-	float cost_a = GetCost(lineSegment.indexA, interactiveStreamline);
-	float cost_b = GetCost(lineSegment.indexB, interactiveStreamline);
+	float cost_a = GetCost(lineSegment.indexA, part_index);
+	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float local_percentage = z_os / h;
 	float cost = mix(cost_a, cost_b, local_percentage);
 	/*
@@ -114309,13 +114304,14 @@ void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cuto
 	//otherwise hit is true and we only need to check the distance
 	if(hit_condition)
 	{		
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
 		//calculate intersection point in world space
 		//vec3 p = (matrix_inv * vec4(p_os, 1)).xyz;
 		//calculate tube center in world space (for normal calculation)
 		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;
 		//vec3 tube_center = mix(a, b, local_percentage);//alternative
-		float v_a = GetVelocity(lineSegment.indexA, interactiveStreamline);
-		float v_b = GetVelocity(lineSegment.indexB, interactiveStreamline);		
+		float v_a = GetVelocity(lineSegment.indexA, part_index);
+		float v_b = GetVelocity(lineSegment.indexB, part_index);		
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
@@ -114330,7 +114326,7 @@ void IntersectCylinder(bool interactiveStreamline, Ray ray, float ray_local_cuto
 	}
 }
 
-void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
+void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
 {
 	vec3 z = ray.origin - sphere.center;//e-c
 	float a = dot(ray.direction, ray.direction);//unnecessary
@@ -114367,7 +114363,7 @@ void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff
 		
 	vec3 position_os = ray.origin + distance_os * ray.direction;//intersection point in world space
 
-	
+	/*
 	bool doOutOfBoundsCheck = false;
 	if(allowOutOfBoundSphere == 0)	
 		doOutOfBoundsCheck = true;	
@@ -114386,6 +114382,15 @@ void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff
 		if(outOfBounds)	
 			return;
 	}
+    */
+	if(check_bounds)
+	{
+		bool outOfBounds = CheckOutOfBounds(position_os);	
+		if(outOfBounds)	
+			return;	
+	}	
+
+
 	if(growth == 1)
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
@@ -114417,6 +114422,8 @@ void IntersectSphere(bool interactiveStreamline, Ray ray, float ray_local_cutoff
 	//otherwise hit is true and we only need to check the distance
 	if(hit_condition)
 	{		
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
+
 		hit.hitType = type;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
@@ -114701,16 +114708,16 @@ void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout
 	doesIntersect = true;
 }
 
-void HandleOutOfBound_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hitCube)
+void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube)
 {	
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
 	if(ignore_copy && copy)
 		return;
 
-	float cost_a = GetCost(lineSegment.indexA, interactiveStreamline);
-	float cost_b = GetCost(lineSegment.indexB, interactiveStreamline);
+	float cost_a = GetCost(lineSegment.indexA, part_index);
+	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float cost_cutoff = growth_max_cost * scalar_cost_max;
 	if(growth == 1)
 	{
@@ -114722,15 +114729,15 @@ void HandleOutOfBound_LineSegment(bool interactiveStreamline, Ray ray, int lineS
 	}
 		
 	mat4 matrix = lineSegment.matrix;
-	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
-	vec3 b = GetPosition(lineSegment.indexB, interactiveStreamline);
+	vec3 a = GetPosition(lineSegment.indexA, part_index);
+	vec3 b = GetPosition(lineSegment.indexB, part_index);
 	float h = distance(a,b);
-	HandleOutOfBound_Cylinder(interactiveStreamline, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
+	HandleOutOfBound_Cylinder(part_index, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
 		
 	Sphere sphere;
 	sphere.radius = tubeRadius;	
 	sphere.center = a;
-	HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);
+	HandleOutOfBound_Sphere(part_index, sphere, hitCube, copy, multiPolyID);
 
 	//sphere.center = b;
 	//HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);	
@@ -114750,11 +114757,11 @@ void HandleOutOfBound_LineSegment(bool interactiveStreamline, Ray ray, int lineS
 			}
 		}
 	}
-	HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);	
+	HandleOutOfBound_Sphere(part_index, sphere, hitCube, copy, multiPolyID);	
 	//IntersectSphere(interactiveStreamline, ray, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
 }
 
-void HandleOutOfBound_Cylinder(bool interactiveStreamline, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
+void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
 {	
 	
 	vec3 position_face_os = (matrix * vec4(hitCube.position, 1)).xyz;
@@ -114783,6 +114790,8 @@ void HandleOutOfBound_Cylinder(bool interactiveStreamline, mat4 matrix, float h,
 	//otherwise hit is true and we only need to check the distance
 	if((hitCube.hitType==TYPE_NONE) || (distanceToCenter < hitCube.distanceToCenter))
 	{
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
+
 		hitCube.hitType = TYPE_STREAMLINE_SEGMENT;
 		hitCube.copy = copy;
 		hitCube.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
@@ -114791,7 +114800,7 @@ void HandleOutOfBound_Cylinder(bool interactiveStreamline, mat4 matrix, float h,
 	}		
 }
 
-void HandleOutOfBound_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID)
+void HandleOutOfBound_Sphere(int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID)
 {	
 
 	float distanceToCenter = distance(hitCube.position, sphere.center);
@@ -114802,6 +114811,8 @@ void HandleOutOfBound_Sphere(bool interactiveStreamline, Sphere sphere, inout Hi
 	//otherwise hit is true and we only need to check the distance
 	if((hitCube.hitType==TYPE_NONE) || (distanceToCenter < hitCube.distanceToCenter))
 	{
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
+
 		hitCube.hitType = TYPE_STREAMLINE_SEGMENT;
 		hitCube.copy = copy;
 		hitCube.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
@@ -114810,16 +114821,16 @@ void HandleOutOfBound_Sphere(bool interactiveStreamline, Sphere sphere, inout Hi
 	}	
 }
 
-void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegmentID, inout HitInformation hit)
+void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit)
 {	
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
 	if(ignore_copy && copy)
 		return;
 
-	float cost_a = GetCost(lineSegment.indexA, interactiveStreamline);
-	float cost_b = GetCost(lineSegment.indexB, interactiveStreamline);
+	float cost_a = GetCost(lineSegment.indexA, part_index);
+	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float cost_cutoff = growth_max_cost * scalar_cost_max;
 	if(growth == 1)
 	{
@@ -114832,15 +114843,15 @@ void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegme
 		
 	mat4 matrix = lineSegment.matrix;
 	mat4 matrix_inv = lineSegment.matrix_inv;
-	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
-	vec3 b = GetPosition(lineSegment.indexB, interactiveStreamline);
+	vec3 a = GetPosition(lineSegment.indexA, part_index);
+	vec3 b = GetPosition(lineSegment.indexB, part_index);
 	float h = distance(a,b);
-	HandleInside_Cylinder(interactiveStreamline, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
+	HandleInside_Cylinder(part_index, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
 		
 	Sphere sphere;
 	sphere.radius = tubeRadius;	
 	sphere.center = a;
-	HandleInside_Sphere(interactiveStreamline, sphere, hit, copy, multiPolyID, ray.origin, ray);
+	HandleInside_Sphere(part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);
 
 	sphere.center = b;
 	float cost_b_value = cost_b;
@@ -114857,10 +114868,10 @@ void HandleInside_LineSegment(bool interactiveStreamline, Ray ray, int lineSegme
 			}
 		}
 	}
-	HandleInside_Sphere(interactiveStreamline, sphere, hit, copy, multiPolyID, ray.origin, ray);	
+	HandleInside_Sphere(part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);	
 }
 
-void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
+void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
 {	
 	
 	vec3 position_face_os = (matrix * vec4(position, 1)).xyz;
@@ -114889,6 +114900,8 @@ void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_
 	//otherwise hit is true and we only need to check the distance
 	if((hit.hitType==TYPE_NONE) || (distanceToCenter < hit.distanceToCenter)|| (ray.rayDistance < hit.distance))
 	{
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
+
 		vec3 tube_center = (matrix_inv * vec4(0,0, f_z, 1)).xyz;
 
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
@@ -114906,7 +114919,7 @@ void HandleInside_Cylinder(bool interactiveStreamline, mat4 matrix, mat4 matrix_
 	}		
 }
 
-void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray)
+void HandleInside_Sphere(int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray)
 {	
 
 	float distanceToCenter = distance(position, sphere.center);
@@ -114917,6 +114930,8 @@ void HandleInside_Sphere(bool interactiveStreamline, Sphere sphere, inout HitInf
 	//otherwise hit is true and we only need to check the distance
 	if((hit.hitType==TYPE_NONE) || (distanceToCenter < hit.distanceToCenter) || (ray.rayDistance < hit.distance))
 	{
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
+
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
 		hit.copy = copy;
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
@@ -115457,6 +115472,15 @@ uniform int start_index_float_line_segments0;
 uniform int start_index_int_tree_nodes0;
 uniform int start_index_float_tree_nodes0;
 
+uniform int start_index_int_position_data1;
+uniform int start_index_float_position_data1;
+uniform int start_index_int_line_segments1;
+uniform int start_index_float_line_segments1;
+uniform int start_index_int_tree_nodes1;
+uniform int start_index_float_tree_nodes1;
+
+const int test_value = 1;
+
 //GLOBAL DATA
 uniform int start_index_int_dir_lights;
 uniform int start_index_float_dir_lights;
@@ -115485,34 +115509,33 @@ ivec3 GetIndex3D(int global_index)
 //
 ////////////////////////////////////////////////////////////////////
 
-int GetStartIndexIntPositionData(){
-    return start_index_int_position_data0;
+int GetStartIndexIntPositionData(int part_index){
+    return part_index == 0 ? start_index_int_position_data0 : start_index_int_position_data1;
 }
 
-int GetStartIndexFloatPositionData(){
-    return start_index_float_position_data0;
+int GetStartIndexFloatPositionData(int part_index){
+    return part_index == 0 ? start_index_float_position_data0 : start_index_float_position_data1;
 }
 
-int GetStartIndexIntLineSegments(){
-    return start_index_int_line_segments0;
+int GetStartIndexIntLineSegments(int part_index){
+    return part_index == 0 ? start_index_int_line_segments0 : start_index_int_line_segments1;
 }
 
-int GetStartIndexFloatLineSegments(){
-    return start_index_float_line_segments0;
+int GetStartIndexFloatLineSegments(int part_index){
+    return part_index == 0 ? start_index_float_line_segments0 : start_index_float_line_segments1;
 }
 
-int GetStartIndexIntTreeNodes(){
-    return start_index_int_tree_nodes0;
+int GetStartIndexIntTreeNodes(int part_index){
+    return part_index == 0 ? start_index_int_tree_nodes0 : start_index_int_tree_nodes1;
 }
 
-int GetStartIndexFloatTreeNodes(){
-    return start_index_float_tree_nodes0;
+int GetStartIndexFloatTreeNodes(int part_index){
+    return part_index == 0 ? start_index_float_tree_nodes0 : start_index_float_tree_nodes1;
 }
 
-vec3 GetPosition(int index, bool interactiveStreamline)
+vec3 GetPosition(int index, int part_index)
 {
-    //return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].position.xyz : bufferPositionData[index].position.xyz;
-    ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData() + index * POSITION_DATA_FLOAT_COUNT);
+    ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData(part_index) + index * POSITION_DATA_FLOAT_COUNT);
     float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
     float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
     float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
@@ -115523,34 +115546,31 @@ vec3 GetPosition(int index, bool interactiveStreamline)
     return position;
 }
 
-float GetCost(int index, bool interactiveStreamline)
+float GetCost(int index, int part_index)
 {
-	//return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].cost : bufferPositionData[index].cost;
-  float cost = 0.0;
-  return cost;
+    float cost = 0.0;
+    return cost;
 }
 
-float GetVelocity(int index, bool interactiveStreamline)
+float GetVelocity(int index, int part_index)
 {
-	//return interactiveStreamline ? bufferPositionDataInteractiveStreamline[index].velocity : bufferPositionData[index].velocity;
-  float velocity = 1.0;//DUMMY
-  return velocity;
+    float velocity = 1.0;//DUMMY
+    return velocity;
 }
 
 //********************************************************** 
 
-GL_LineSegment GetLineSegment(int index, bool interactiveStreamline)
+GL_LineSegment GetLineSegment(int index, int part_index)
 {
-	//return interactiveStreamline ? bufferLineSegmentsInteractiveStreamline[index] : bufferLineSegments[index];
 	GL_LineSegment segment;
-	ivec3 pointer = GetIndex3D(GetStartIndexIntLineSegments() + index * LINE_SEGMENT_INT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexIntLineSegments(part_index) + index * LINE_SEGMENT_INT_COUNT);
 	segment.indexA = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
 	segment.indexB = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
 	segment.multiPolyID = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;
 	segment.copy = texelFetch(texture_int, pointer+ivec3(3,0,0), 0).r;
 	segment.isBeginning = texelFetch(texture_int, pointer+ivec3(4,0,0), 0).r;
 
-	pointer = GetIndex3D(GetStartIndexFloatLineSegments() + index * LINE_SEGMENT_FLOAT_COUNT
+	pointer = GetIndex3D(GetStartIndexFloatLineSegments(part_index) + index * LINE_SEGMENT_FLOAT_COUNT
         + 32 * (projection_index+1));//projection_index = -1 is no projection (default)
   	segment.matrix = mat4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
@@ -115593,11 +115613,10 @@ GL_LineSegment GetLineSegment(int index, bool interactiveStreamline)
 
 //********************************************************** 
 
-GL_TreeNode GetNode(int index, bool interactiveStreamline)
+GL_TreeNode GetNode(int index, int part_index)
 {
-	//return interactiveStreamline ? bufferNodesInteractiveStreamline[index].node : bufferNodes[index].node;
 	GL_TreeNode node;
-	ivec3 pointer = GetIndex3D(GetStartIndexIntTreeNodes() + index * TREE_NODE_INT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexIntTreeNodes(part_index) + index * TREE_NODE_INT_COUNT);
 	node.hitLink = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
 	node.missLink = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
 	node.objectIndex = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;//segmentIndex TODO rename?
@@ -115605,11 +115624,10 @@ GL_TreeNode GetNode(int index, bool interactiveStreamline)
 	return node;
 }
 
-GL_AABB GetAABB(int index, bool interactiveStreamline)
+GL_AABB GetAABB(int index, int part_index)
 {
-	//return interactiveStreamline ? bufferNodesInteractiveStreamline[index].aabb : bufferNodes[index].aabb;
 	GL_AABB aabb;
-	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes() + index * TREE_NODE_FLOAT_COUNT);
+	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes(part_index) + index * TREE_NODE_FLOAT_COUNT);
 	aabb.min = vec4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
@@ -116319,10 +116337,15 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
+        var generate_copies = true;
+        this.streamline_generator.check_bounds = true;
+        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
+        var generate_copies = false;
+        this.streamline_generator.check_bounds = false;
+        this.CalculateStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side, generate_copies);
     }
 
-    CalculateStreamlinesPart(part_index, gl, gl_side) {
+    CalculateStreamlinesPart(part_index, gl, gl_side, generate_copies) {
         var raw_data = this.GetRawData(part_index);
 
         this.streamline_generator.CalculateRawStreamlines(raw_data);
@@ -116336,7 +116359,8 @@ class StreamlineContext {
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].GenerateLineSegments(part_index);
-            this.lod_list[i].GenerateLineSegmentCopies(part_index);
+            if(generate_copies)
+                this.lod_list[i].GenerateLineSegmentCopies(part_index);
             this.lod_list[i].CalculateMatrices(part_index);
             this.lod_list[i].CalculateBVH(part_index);
         }
@@ -116377,6 +116401,8 @@ class StreamlineGenerator {
         this.step_size = 0.0125;
         this.epsilon_move_just_outside_cube = 0.00001;
         this.confine_to_cube = false;
+        this.check_bounds = true;
+        this.continue_at_bounds = true;
         this.tubeRadius = 0.005;
     }
 
@@ -116434,8 +116460,6 @@ class StreamlineGenerator {
 
     CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
-        this.check_bounds = true;
-        this.continue_at_bounds = true;
 
         raw_data.initialize(this.seeds, this.num_points_per_streamline);
 

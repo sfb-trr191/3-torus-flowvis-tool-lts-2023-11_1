@@ -8,6 +8,9 @@ class RawData {
 
     constructor() {
         console.log("Generate raw data");
+        this.num_points = 0;
+        this.data = new Array();
+        this.position_data = new Array();
     }
 
     /**

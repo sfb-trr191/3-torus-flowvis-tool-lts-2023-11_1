@@ -621,6 +621,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
         canvas_wrapper_side.show_streamlines = document.getElementById("checkbox_show_streamlines_side").checked;
+        canvas_wrapper_side.show_streamlines_outside = document.getElementById("checkbox_show_streamlines_outside_side").checked;       
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        

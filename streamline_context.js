@@ -69,10 +69,15 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
+        var generate_copies = true;
+        this.streamline_generator.check_bounds = true;
+        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
+        var generate_copies = false;
+        this.streamline_generator.check_bounds = false;
+        this.CalculateStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side, generate_copies);
     }
 
-    CalculateStreamlinesPart(part_index, gl, gl_side) {
+    CalculateStreamlinesPart(part_index, gl, gl_side, generate_copies) {
         var raw_data = this.GetRawData(part_index);
 
         this.streamline_generator.CalculateRawStreamlines(raw_data);
@@ -86,7 +91,8 @@ class StreamlineContext {
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].GenerateLineSegments(part_index);
-            this.lod_list[i].GenerateLineSegmentCopies(part_index);
+            if(generate_copies)
+                this.lod_list[i].GenerateLineSegmentCopies(part_index);
             this.lod_list[i].CalculateMatrices(part_index);
             this.lod_list[i].CalculateBVH(part_index);
         }

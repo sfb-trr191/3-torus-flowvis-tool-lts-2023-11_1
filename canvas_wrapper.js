@@ -35,6 +35,7 @@ class UniformLocationsRayTracing {
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
         this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
+        this.location_show_streamlines_outside = gl.getUniformLocation(program, "show_streamlines_outside");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
@@ -155,6 +156,7 @@ class CanvasWrapper {
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
         this.show_streamlines = true;
+        this.show_streamlines_outside = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
@@ -374,6 +376,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
         gl.uniform1i(this.location_raytracing.location_show_streamlines, this.show_streamlines);
+        gl.uniform1i(this.location_raytracing.location_show_streamlines_outside, this.show_streamlines_outside);
+
+        
 
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);

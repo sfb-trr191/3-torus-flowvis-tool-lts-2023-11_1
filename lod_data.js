@@ -125,7 +125,7 @@ class LODData {
         this.data_unit = new DataUnit(name);
         this.list_part = [];
         this.list_part.push(new LODDataPart(name, 0, this.data_unit, p_streamline_context));
-        //this.list_part.push(new LODDataPart(name, 1));
+        this.list_part.push(new LODDataPart(name, 1, this.data_unit, p_streamline_context));
 
         //---start region: references
         this.p_streamline_context = p_streamline_context;

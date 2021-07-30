@@ -11,6 +11,8 @@ class StreamlineGenerator {
         this.step_size = 0.0125;
         this.epsilon_move_just_outside_cube = 0.00001;
         this.confine_to_cube = false;
+        this.check_bounds = true;
+        this.continue_at_bounds = true;
         this.tubeRadius = 0.005;
     }
 
@@ -68,8 +70,6 @@ class StreamlineGenerator {
 
     CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
-        this.check_bounds = true;
-        this.continue_at_bounds = true;
 
         raw_data.initialize(this.seeds, this.num_points_per_streamline);
 
