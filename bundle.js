@@ -445,30 +445,63 @@ class GL_CameraData {
     }
 }
 
-class CameraState{
+class CameraState {
 
-    constructor(){
+    constructor() {
         this.forward = glMatrix.vec3.create();
         this.up = glMatrix.vec3.create();
         this.position = glMatrix.vec3.create();
     }
 
-    setProjectionX(){
+    setProjectionX() {
         this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
         this.up = glMatrix.vec3.fromValues(0, 0, -1);
         this.position = glMatrix.vec3.fromValues(1, 0.5, 0.5);
     }
 
-    setProjectionY(){
+    setProjectionY() {
         this.forward = glMatrix.vec3.fromValues(0, -1, 0);
         this.up = glMatrix.vec3.fromValues(-1, 0, 0);
         this.position = glMatrix.vec3.fromValues(0.5, 1, 0.5);
     }
 
-    setProjectionZ(){
+    setProjectionZ() {
         this.forward = glMatrix.vec3.fromValues(0, 0, -1);
         this.up = glMatrix.vec3.fromValues(0, -1, 0);
         this.position = glMatrix.vec3.fromValues(0.5, 0.5, 1);
+    }
+
+    fromString(s) {
+        console.log("CAMERA_STATE ", s);
+        if (s === null)
+            return;
+        console.log("CAMERA_STATE not null");
+        if (!s.includes("~"))
+            return;
+
+        var split = s.split("~");
+        this.position[0] = split[0];
+        this.position[1] = split[1];
+        this.position[2] = split[2];
+        this.forward[0] = split[3];
+        this.forward[1] = split[4];
+        this.forward[2] = split[5];
+        this.up[0] = split[6];
+        this.up[1] = split[7];
+        this.up[2] = split[8];
+    }
+
+    toString() {
+        var s = this.position[0] + "~"
+            + this.position[1] + "~"
+            + this.position[2] + "~"
+            + this.forward[0] + "~"
+            + this.forward[1] + "~"
+            + this.forward[2] + "~"
+            + this.up[0] + "~"
+            + this.up[1] + "~"
+            + this.up[2]
+        return s;
     }
 
 }
@@ -580,9 +613,25 @@ class Camera {
         if (s === null)
             return;
         console.log("CAMERA not null");
+        if (!s.includes("!"))
+            return;
+        console.log("CAMERA contains !");
+
+        var split = s.split("!");
+        //this.fromStringUI(split[0]);
+        this.current_state_name = split[0];
+        this.states["state_default"].fromString(split[1]);
+        this.states["state_projection_x"].fromString(split[2]);
+        this.states["state_projection_y"].fromString(split[3]);
+        this.states["state_projection_z"].fromString(split[4]);
+
+        this.loadState(this.current_state_name, false);
+    }
+
+    fromStringUI(s) {
+        console.log("fromStringUI: ", s);
         if (!s.includes("~"))
             return;
-        console.log("CAMERA ~");
 
         var split = s.split("~");
         this.input_camera_position_x.value = split[0];
@@ -599,6 +648,20 @@ class Camera {
     }
 
     toString() {
+        //var s = this.toStringUI();
+        var s = this.current_state_name;
+        s += "!"
+        s += this.states["state_default"].toString();
+        s += "!"
+        s += this.states["state_projection_x"].toString();
+        s += "!"
+        s += this.states["state_projection_y"].toString();
+        s += "!"
+        s += this.states["state_projection_z"].toString();
+        return s;
+    }
+
+    toStringUI() {
         var s = this.input_camera_position_x.value + "~"
             + this.input_camera_position_y.value + "~"
             + this.input_camera_position_z.value + "~"
@@ -921,10 +984,10 @@ class Camera {
     }
 
     repositionCamera(is_projection, projection_index, allow_default) {
-        if(is_projection){
+        if (is_projection) {
             this.repositionCameraProjection(projection_index);
         }
-        else if(allow_default){
+        else if (allow_default) {
             this.repositionCameraDefault();
         }
     }
@@ -942,10 +1005,10 @@ class Camera {
 
     repositionCameraProjection(projection_index) {
         for (var i = 0; i < 3; i++) {
-            if(i == projection_index){
+            if (i == projection_index) {
                 this.position[i] = Math.max(this.position[i], 0.01)
             }
-            else{
+            else {
                 if (this.position[i] > 1.0) {
                     this.position[i] -= 1.0;
                 }
@@ -956,9 +1019,9 @@ class Camera {
         }
     }
 
-    loadState(state_name_new){
-        
-        this.saveCurrentState();
+    loadState(state_name_new, save_old_state) {
+        if (save_old_state)
+            this.saveCurrentState();
 
         var state_new = this.states[state_name_new];
         glMatrix.vec3.copy(this.forward, state_new.forward);
@@ -972,7 +1035,7 @@ class Camera {
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
     }
 
-    saveCurrentState(){
+    saveCurrentState() {
         var state_old = this.states[this.current_state_name];
         glMatrix.vec3.copy(state_old.forward, this.forward);
         glMatrix.vec3.copy(state_old.up, this.up);
@@ -1285,22 +1348,23 @@ class CanvasWrapper {
         this.aliasing_index = 0;
         this.camera.changed = true;
 
+        var save_old_state = true;
         switch (this.draw_mode) {
             case DRAW_MODE_DEFAULT:
-                this.camera.loadState("state_default");
+                this.camera.loadState("state_default", save_old_state);
                 break;
             case DRAW_MODE_FTLE_SLICE:
                 break;
             case DRAW_MODE_PROJECTION:
                 switch (this.projection_index) {
                     case 0:
-                        this.camera.loadState("state_projection_x");
+                        this.camera.loadState("state_projection_x", save_old_state);
                         break;
                     case 1:
-                        this.camera.loadState("state_projection_y");
+                        this.camera.loadState("state_projection_y", save_old_state);
                         break;
                     case 2:
-                        this.camera.loadState("state_projection_z");
+                        this.camera.loadState("state_projection_z", save_old_state);
                         break;
                     default:
                         console.warn("PROJECTION INDEX ERROR", this.projection_index);
@@ -2421,6 +2485,7 @@ global.SHADING_MODE_STREAMLINES_FTLE = 2;
 
 global.PARAM_SEEDS = "s";
 global.PARAM_CAMERA = "mc";
+global.PARAM_SIDE_CAMERA = "sc";
 global.PARAM_input_field_equation_u = "u";
 global.PARAM_input_field_equation_v = "v";
 global.PARAM_input_field_equation_w = "w";
@@ -2430,6 +2495,8 @@ global.PARAM_segment_duplicator_iterations = "di";
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
 global.PARAM_TAB_MAIN = "tab";
+global.PARAM_SIDE_MODE = "sm";
+global.PARAM_PROJECTION_INDEX = "pi"
 global.PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 global.PARAM_EXPORT_THUMBNAIL_NAME = "etn";
 global.PARAM_RNG_SEED_POSITION = "rngp";
@@ -4238,8 +4305,9 @@ const Export = module_export.Export;
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, tab_manager);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, tab_manager);
         input_parameter_wrapper.fromURL();
+        onChangedDrawMode();
 
 
 
@@ -4468,14 +4536,10 @@ const Export = module_export.Export;
 
     function addChangedSideMode() {
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
-            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
-            var projection_index = parseInt(document.getElementById("select_projection_index").value);
-            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+            onChangedDrawMode();
         });
         document.getElementById("select_projection_index").addEventListener("change", (event) => {
-            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
-            var projection_index = parseInt(document.getElementById("select_projection_index").value);
-            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+            onChangedDrawMode();
         });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
@@ -4484,6 +4548,12 @@ const Export = module_export.Export;
             console.log("slice_index", value);
             UpdateSliceSettings();
         });
+    }
+
+    function onChangedDrawMode(){
+        var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+        var projection_index = parseInt(document.getElementById("select_projection_index").value);
+        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
     }
 
     function addChangedTransferFunction(){
@@ -4705,6 +4775,8 @@ const Export = module_export.Export;
     */
     function UpdateURL() {
         console.log("UpdateURL");
+        main_camera.saveCurrentState();
+        side_camera.saveCurrentState();
         var query_string = input_parameter_wrapper.toQueryString();
         window.history.pushState(null, null, 'index.html' + query_string);
     }
@@ -5230,9 +5302,10 @@ class InputSelectWrapper {
 
 class InputParameterWrapper {
 
-    constructor(ui_seeds, main_camera, tab_manager) {
+    constructor(ui_seeds, main_camera, side_camera, tab_manager) {
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
+        this.side_camera = side_camera;
         this.tab_manager = tab_manager;
         this.dict_url_parameter_name_to_input_field = {};
         this.css_loaded = "index.css";
@@ -5246,6 +5319,10 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
         new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
+        new InputFieldWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
+        new InputFieldWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
+
+        
         //new InputFieldWrapper(this, "input_random_position_seed", PARAM_RNG_SEED_POSITION);
     }
 
@@ -5268,6 +5345,9 @@ class InputParameterWrapper {
 
         const camera = urlParams.get(PARAM_CAMERA);
         this.main_camera.fromString(camera);
+
+        const side_camera = urlParams.get(PARAM_SIDE_CAMERA);
+        this.side_camera.fromString(side_camera);
 
         const style = urlParams.get(PARAM_STYLE);
         console.log("STYLE:", style)
@@ -5314,6 +5394,7 @@ class InputParameterWrapper {
         }
         params[PARAM_SEEDS] = this.ui_seeds.toString();
         params[PARAM_CAMERA] = this.main_camera.toString();
+        params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
         /*
         params["text"] = `
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu neque efficitur augue malesuada tristique. Mauris aliquam bibendum risus quis vestibulum. Sed dictum dignissim libero, commodo faucibus ex. Aenean lobortis in justo eget rutrum. Suspendisse maximus felis massa, non ornare risus rhoncus non. Quisque congue ex nulla, mollis tincidunt arcu auctor vitae. Mauris orci diam, suscipit sed commodo ac, eleifend et urna. Nullam dapibus urna eros, in euismod nibh iaculis accumsan. Proin ut ipsum at dolor tempus maximus a non diam. Vivamus leo nisi, rhoncus vitae dignissim a, scelerisque at ex. Quisque ipsum nulla, posuere at tempor quis, molestie vitae risus. Morbi ut metus non ex malesuada porta. Donec varius eros purus. Aliquam vehicula libero ac arcu venenatis vestibulum. Integer justo arcu, imperdiet id turpis ut, tincidunt ultrices mi.

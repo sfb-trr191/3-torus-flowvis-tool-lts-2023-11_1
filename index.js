@@ -241,8 +241,9 @@ const Export = module_export.Export;
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, tab_manager);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, tab_manager);
         input_parameter_wrapper.fromURL();
+        onChangedDrawMode();
 
 
 
@@ -471,14 +472,10 @@ const Export = module_export.Export;
 
     function addChangedSideMode() {
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
-            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
-            var projection_index = parseInt(document.getElementById("select_projection_index").value);
-            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+            onChangedDrawMode();
         });
         document.getElementById("select_projection_index").addEventListener("change", (event) => {
-            var draw_mode = parseInt(document.getElementById("select_side_mode").value);
-            var projection_index = parseInt(document.getElementById("select_projection_index").value);
-            canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+            onChangedDrawMode();
         });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
@@ -487,6 +484,12 @@ const Export = module_export.Export;
             console.log("slice_index", value);
             UpdateSliceSettings();
         });
+    }
+
+    function onChangedDrawMode(){
+        var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+        var projection_index = parseInt(document.getElementById("select_projection_index").value);
+        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
     }
 
     function addChangedTransferFunction(){
@@ -708,6 +711,8 @@ const Export = module_export.Export;
     */
     function UpdateURL() {
         console.log("UpdateURL");
+        main_camera.saveCurrentState();
+        side_camera.saveCurrentState();
         var query_string = input_parameter_wrapper.toQueryString();
         window.history.pushState(null, null, 'index.html' + query_string);
     }

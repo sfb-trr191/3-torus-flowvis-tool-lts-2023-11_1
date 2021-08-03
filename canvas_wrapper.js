@@ -296,22 +296,23 @@ class CanvasWrapper {
         this.aliasing_index = 0;
         this.camera.changed = true;
 
+        var save_old_state = true;
         switch (this.draw_mode) {
             case DRAW_MODE_DEFAULT:
-                this.camera.loadState("state_default");
+                this.camera.loadState("state_default", save_old_state);
                 break;
             case DRAW_MODE_FTLE_SLICE:
                 break;
             case DRAW_MODE_PROJECTION:
                 switch (this.projection_index) {
                     case 0:
-                        this.camera.loadState("state_projection_x");
+                        this.camera.loadState("state_projection_x", save_old_state);
                         break;
                     case 1:
-                        this.camera.loadState("state_projection_y");
+                        this.camera.loadState("state_projection_y", save_old_state);
                         break;
                     case 2:
-                        this.camera.loadState("state_projection_z");
+                        this.camera.loadState("state_projection_z", save_old_state);
                         break;
                     default:
                         console.warn("PROJECTION INDEX ERROR", this.projection_index);

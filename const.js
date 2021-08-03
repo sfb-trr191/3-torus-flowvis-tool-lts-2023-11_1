@@ -33,6 +33,7 @@ global.SHADING_MODE_STREAMLINES_FTLE = 2;
 
 global.PARAM_SEEDS = "s";
 global.PARAM_CAMERA = "mc";
+global.PARAM_SIDE_CAMERA = "sc";
 global.PARAM_input_field_equation_u = "u";
 global.PARAM_input_field_equation_v = "v";
 global.PARAM_input_field_equation_w = "w";
@@ -42,6 +43,8 @@ global.PARAM_segment_duplicator_iterations = "di";
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
 global.PARAM_TAB_MAIN = "tab";
+global.PARAM_SIDE_MODE = "sm";
+global.PARAM_PROJECTION_INDEX = "pi"
 global.PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 global.PARAM_EXPORT_THUMBNAIL_NAME = "etn";
 global.PARAM_RNG_SEED_POSITION = "rngp";

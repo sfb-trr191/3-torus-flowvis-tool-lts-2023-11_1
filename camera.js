@@ -38,30 +38,63 @@ class GL_CameraData {
     }
 }
 
-class CameraState{
+class CameraState {
 
-    constructor(){
+    constructor() {
         this.forward = glMatrix.vec3.create();
         this.up = glMatrix.vec3.create();
         this.position = glMatrix.vec3.create();
     }
 
-    setProjectionX(){
+    setProjectionX() {
         this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
         this.up = glMatrix.vec3.fromValues(0, 0, -1);
         this.position = glMatrix.vec3.fromValues(1, 0.5, 0.5);
     }
 
-    setProjectionY(){
+    setProjectionY() {
         this.forward = glMatrix.vec3.fromValues(0, -1, 0);
         this.up = glMatrix.vec3.fromValues(-1, 0, 0);
         this.position = glMatrix.vec3.fromValues(0.5, 1, 0.5);
     }
 
-    setProjectionZ(){
+    setProjectionZ() {
         this.forward = glMatrix.vec3.fromValues(0, 0, -1);
         this.up = glMatrix.vec3.fromValues(0, -1, 0);
         this.position = glMatrix.vec3.fromValues(0.5, 0.5, 1);
+    }
+
+    fromString(s) {
+        console.log("CAMERA_STATE ", s);
+        if (s === null)
+            return;
+        console.log("CAMERA_STATE not null");
+        if (!s.includes("~"))
+            return;
+
+        var split = s.split("~");
+        this.position[0] = split[0];
+        this.position[1] = split[1];
+        this.position[2] = split[2];
+        this.forward[0] = split[3];
+        this.forward[1] = split[4];
+        this.forward[2] = split[5];
+        this.up[0] = split[6];
+        this.up[1] = split[7];
+        this.up[2] = split[8];
+    }
+
+    toString() {
+        var s = this.position[0] + "~"
+            + this.position[1] + "~"
+            + this.position[2] + "~"
+            + this.forward[0] + "~"
+            + this.forward[1] + "~"
+            + this.forward[2] + "~"
+            + this.up[0] + "~"
+            + this.up[1] + "~"
+            + this.up[2]
+        return s;
     }
 
 }
@@ -173,9 +206,25 @@ class Camera {
         if (s === null)
             return;
         console.log("CAMERA not null");
+        if (!s.includes("!"))
+            return;
+        console.log("CAMERA contains !");
+
+        var split = s.split("!");
+        //this.fromStringUI(split[0]);
+        this.current_state_name = split[0];
+        this.states["state_default"].fromString(split[1]);
+        this.states["state_projection_x"].fromString(split[2]);
+        this.states["state_projection_y"].fromString(split[3]);
+        this.states["state_projection_z"].fromString(split[4]);
+
+        this.loadState(this.current_state_name, false);
+    }
+
+    fromStringUI(s) {
+        console.log("fromStringUI: ", s);
         if (!s.includes("~"))
             return;
-        console.log("CAMERA ~");
 
         var split = s.split("~");
         this.input_camera_position_x.value = split[0];
@@ -192,6 +241,20 @@ class Camera {
     }
 
     toString() {
+        //var s = this.toStringUI();
+        var s = this.current_state_name;
+        s += "!"
+        s += this.states["state_default"].toString();
+        s += "!"
+        s += this.states["state_projection_x"].toString();
+        s += "!"
+        s += this.states["state_projection_y"].toString();
+        s += "!"
+        s += this.states["state_projection_z"].toString();
+        return s;
+    }
+
+    toStringUI() {
         var s = this.input_camera_position_x.value + "~"
             + this.input_camera_position_y.value + "~"
             + this.input_camera_position_z.value + "~"
@@ -514,10 +577,10 @@ class Camera {
     }
 
     repositionCamera(is_projection, projection_index, allow_default) {
-        if(is_projection){
+        if (is_projection) {
             this.repositionCameraProjection(projection_index);
         }
-        else if(allow_default){
+        else if (allow_default) {
             this.repositionCameraDefault();
         }
     }
@@ -535,10 +598,10 @@ class Camera {
 
     repositionCameraProjection(projection_index) {
         for (var i = 0; i < 3; i++) {
-            if(i == projection_index){
+            if (i == projection_index) {
                 this.position[i] = Math.max(this.position[i], 0.01)
             }
-            else{
+            else {
                 if (this.position[i] > 1.0) {
                     this.position[i] -= 1.0;
                 }
@@ -549,9 +612,9 @@ class Camera {
         }
     }
 
-    loadState(state_name_new){
-        
-        this.saveCurrentState();
+    loadState(state_name_new, save_old_state) {
+        if (save_old_state)
+            this.saveCurrentState();
 
         var state_new = this.states[state_name_new];
         glMatrix.vec3.copy(this.forward, state_new.forward);
@@ -565,7 +628,7 @@ class Camera {
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
     }
 
-    saveCurrentState(){
+    saveCurrentState() {
         var state_old = this.states[this.current_state_name];
         glMatrix.vec3.copy(state_old.forward, this.forward);
         glMatrix.vec3.copy(state_old.up, this.up);
