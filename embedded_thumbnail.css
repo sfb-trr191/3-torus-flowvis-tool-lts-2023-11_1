@@ -112,3 +112,8 @@ fieldset {
     border: none;
     background-color: black; 
 }
+
+#container_bottom_left
+{
+    display: none;
+}

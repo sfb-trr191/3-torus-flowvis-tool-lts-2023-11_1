@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify index.js -o bundle.js",
+    "build_lazy": "browserify lazy.js -o bundle_lazy.js",
     "watch": "watchify index.js -o bundle.js",
+    "watch_lazy": "watchify lazy.js -o bundle_lazy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

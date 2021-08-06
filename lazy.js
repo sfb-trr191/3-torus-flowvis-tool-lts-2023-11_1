@@ -1,3 +1,4 @@
+const module_const = require("./const");
 ; (function () {
     "use strict"
     window.addEventListener("load", onStart, false);
