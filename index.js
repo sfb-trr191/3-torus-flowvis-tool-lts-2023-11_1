@@ -112,6 +112,12 @@ const Export = module_export.Export;
     function onStart(evt) {
         console.log("onStart");
         window.removeEventListener(evt.type, onStart, false);
+        message_display = document.getElementById("message_display");
+        message_display.innerHTML = "step 1: initializing...";
+        setTimeout(on_start_step_1, 200);
+    }
+
+    function on_start_step_1(){
         addOnClickRequestData();
         addOnClickUpdateRenderSettings();
         addOnClickUpdateCamera();
@@ -131,7 +137,6 @@ const Export = module_export.Export;
         side_canvas = document.getElementById("side_canvas");
         transfer_function_canvas = document.getElementById("transfer_function_canvas");
         fps_display = document.getElementById("fps_display");
-        message_display = document.getElementById("message_display");
 
 
         input_changed_manager = new InputChangedManager();
@@ -220,9 +225,6 @@ const Export = module_export.Export;
 
         aliasing = new Aliasing();
 
-
-
-
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, ftle_manager, CANVAS_WRAPPER_MAIN,
             main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data);
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
@@ -245,15 +247,20 @@ const Export = module_export.Export;
         input_parameter_wrapper.fromURL();
         onChangedDrawMode();
 
-
-
         hide_manager.UpdateVisibility();
 
-        message_display.innerHTML = "calculating...";
-        setTimeout(on_start_delayed, 1000);
+        message_display.innerHTML = "step 2: initializing shaders...";
+        setTimeout(on_start_step_2, 1000);
     }
 
-    function on_start_delayed() {
+    function on_start_step_2(){
+        canvas_wrapper_main.InitializeShaders(gl);
+        canvas_wrapper_side.InitializeShaders(gl_side);
+        message_display.innerHTML = "step 3: calculating...";
+        setTimeout(on_start_step_3, 1000);
+    }
+
+    function on_start_step_3(){
         CalculateStreamlines();
         UpdateRenderSettings();
         UpdateGlobalData();

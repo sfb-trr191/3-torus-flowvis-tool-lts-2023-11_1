@@ -172,6 +172,13 @@ class CanvasWrapper {
         console.log("CanvasWrapper: ", name, "create program")
         console.log("CanvasWrapper gl: ", gl)
 
+        //this.InitializeShaders(gl);
+
+        //this.GenerateDummyBuffer(gl);
+        this.dummy_quad = new DummyQuad(gl);
+    }
+
+    InitializeShaders(gl){
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
@@ -201,9 +208,6 @@ class CanvasWrapper {
         this.location_ftle_slice = new UniformLocationsFTLESlice(gl, this.program_ftle_slice);
         this.shader_uniforms_ftle_slice = this.loadShaderUniformsFTLESlice(gl, this.program_ftle_slice);
         this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
-
-        //this.GenerateDummyBuffer(gl);
-        this.dummy_quad = new DummyQuad(gl);
     }
 
     ReplaceRaytracingShader(gl, shader_formula_scalar) {
