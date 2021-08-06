@@ -89,7 +89,7 @@
                     <!--DRAW_MODE_PROJECTION-->
                     <option value="2">FTLE slice</option>
                     <!--DRAW_MODE_FTLE_SLICE-->
-                </select> 
+                </select>
                 <div class="show" id="show_projection_index">
                     <select id="select_projection_index">
                         <option value="0">horizontal: y vertical: z</option>
@@ -106,7 +106,7 @@
                 </div>
             </div>
             <div class="tab">
-                <button id="button_tab_data" class="tablink"></button>
+                <button id="button_tab_data" class="tablink" title="data"></button>
                 <button id="button_tab_ftle" class="tablink"></button>
                 <button id="button_tab_settings" class="tablink"></button>
                 <button id="button_tab_transfer_function" class="tablink"></button>
@@ -151,7 +151,7 @@
                         <div class="vertical_container">
                             <div class="input_row">
                                 <label>points per streamline</label>
-                                <input id="input_num_points_per_streamline" type="text" value="2000">
+                                <input id="input_num_points_per_streamline" type="text" value="200">
                             </div>
                             <div class="input_row">
                                 <label>step size</label>
@@ -184,7 +184,10 @@
                             </div>
                             <div class="input_row">
                                 <label>animate</label>
-                                <input id="checkbox_animate_slice_index" type="checkbox" value="true" checked="true">
+                                <input id="checkbox_animate_slice_index" type="checkbox" value="true" checked="true"
+                                    title="Animation of the slice index:
+    - checked: the slices are shown consecutively.
+    - unchecked: only one slice is shown.">
                             </div>
                             <div class="input_row">
                                 <label>interpolate</label>
@@ -264,7 +267,7 @@
                     </fieldset>
                     <fieldset class="fieldset_camera">
                         <legend>Projection</legend>
-                        <div class="vertical_container">                            
+                        <div class="vertical_container">
                             <div class="input_row">
                                 <label>tube radius factor</label>
                                 <input id="input_tube_radius_factor_projection" type="text" value="1.0">
@@ -277,15 +280,18 @@
                             <div class="input_row">
                                 <label>show fundamental</label>
                                 <div class="horizontal_div_2">
-                                    <input id="checkbox_show_streamlines_main" type="checkbox" value="true" checked="true">
-                                    <input id="checkbox_show_streamlines_side" type="checkbox" value="true" checked="true">
+                                    <input id="checkbox_show_streamlines_main" type="checkbox" value="true"
+                                        checked="true">
+                                    <input id="checkbox_show_streamlines_side" type="checkbox" value="true"
+                                        checked="true">
                                 </div>
                             </div>
                             <div class="input_row">
                                 <label>show outside</label>
                                 <div class="horizontal_div_2">
                                     <label></label>
-                                    <input id="checkbox_show_streamlines_outside_side" type="checkbox" value="true" checked="true">
+                                    <input id="checkbox_show_streamlines_outside_side" type="checkbox" value="true"
+                                        checked="true">
                                 </div>
                             </div>
                             <div class="input_row">
@@ -474,7 +480,7 @@
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
-                        <legend>Colors</legend>                        
+                        <legend>Colors</legend>
                         <div class="vertical_container" id="container_transfer_function_colors">
                             <!--
                             <div class="horizontal_div_tranfer_function_color">
@@ -487,7 +493,7 @@
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
-                        <legend>Opacities</legend>                        
+                        <legend>Opacities</legend>
                         <div class="vertical_container" id="container_transfer_function_opacities">
                             <!--
                             <div class="vertical_container" id="fieldset_transfer_function_opacities">
