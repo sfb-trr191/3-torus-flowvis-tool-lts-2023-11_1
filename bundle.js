@@ -2475,6 +2475,10 @@ global.DIRECTION_FORWARD = 1;
 global.DIRECTION_BACKWARD = 2;
 global.DIRECTION_BOTH = 3;
 
+global.STREAMLINE_CALCULATION_METHOD_BOTH = 0;
+global.STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL = 1;
+global.STREAMLINE_CALCULATION_METHOD_R3 = 2;
+
 global.STYLE_DEFAULT = "d";
 global.STYLE_EMBEDDED = "e";
 
@@ -2496,6 +2500,7 @@ global.PARAM_input_field_equation_w = "w";
 global.PARAM_input_num_points_per_streamline = "pps";
 global.PARAM_input_step_size = "ss";
 global.PARAM_segment_duplicator_iterations = "di";
+global.PARAM_STREAMLINE_CALCULATION_METHOD = "scm"
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
 global.PARAM_TAB_MAIN = "tab";
@@ -4586,7 +4591,11 @@ const Export = module_export.Export;
         var step_size = document.getElementById("input_step_size").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
         var direction = DIRECTION_FORWARD;
-        streamline_context_static.CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
+
+        var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
+        
+
+        streamline_context_static.CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
     }
@@ -5048,6 +5057,7 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_num_points_per_streamline"));
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
+        this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
     }
 
     GenerateGroupCamera(){
@@ -5326,6 +5336,7 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputFieldWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputFieldWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
+        new InputFieldWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
         new InputFieldWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
         new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
@@ -116415,9 +116426,10 @@ class StreamlineContext {
         this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
+    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
         console.log("CalculateStreamlines");
 
+        //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.streamline_generator.direction = direction;
         this.streamline_generator.shader_formula_u = shader_formula_u;
         this.streamline_generator.shader_formula_v = shader_formula_v;
@@ -116429,12 +116441,50 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        var generate_copies = true;
-        this.streamline_generator.check_bounds = true;
-        this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
-        var generate_copies = false;
-        this.streamline_generator.check_bounds = false;
-        this.CalculateStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side, generate_copies);
+        var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH 
+            || streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL;
+        var flag_r3 = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH 
+            || streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_R3;
+
+        if(flag_fundamental){
+            var generate_copies = true;
+            this.streamline_generator.check_bounds = true;
+            this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
+        }
+        else{
+            this.ClearStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
+        }
+
+        if(flag_r3){
+            var generate_copies = false;
+            this.streamline_generator.check_bounds = false;
+            this.CalculateStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side, generate_copies);
+        }
+        else{
+            this.ClearStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side);
+        }
+
+    }
+
+    ClearStreamlinesPart(part_index, gl, gl_side) {
+        var raw_data = this.GetRawData(part_index);
+        raw_data.initialize([], 0);
+        //for all lods
+        for (var i = 0; i < this.lod_list.length; i++) {
+            this.lod_list[i].ResetPart(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
+        }
+
+        raw_data.GeneratePositionData();
+
+        for (var i = 0; i < this.lod_list.length; i++) {
+            this.lod_list[i].UpdateDataUnit();
+            this.lod_list[i].UpdateDataTextures(gl, gl_side);
+        }
+
+        for (var i = 0; i < this.lod_list.length; i++) {
+            this.lod_list[i].LogState();
+        }
     }
 
     CalculateStreamlinesPart(part_index, gl, gl_side, generate_copies) {

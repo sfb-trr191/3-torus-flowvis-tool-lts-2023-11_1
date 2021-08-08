@@ -89,6 +89,7 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_num_points_per_streamline"));
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
+        this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
     }
 
     GenerateGroupCamera(){

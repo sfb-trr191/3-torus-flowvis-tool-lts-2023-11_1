@@ -19,6 +19,10 @@ global.DIRECTION_FORWARD = 1;
 global.DIRECTION_BACKWARD = 2;
 global.DIRECTION_BOTH = 3;
 
+global.STREAMLINE_CALCULATION_METHOD_BOTH = 0;
+global.STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL = 1;
+global.STREAMLINE_CALCULATION_METHOD_R3 = 2;
+
 global.STYLE_DEFAULT = "d";
 global.STYLE_EMBEDDED = "e";
 
@@ -40,6 +44,7 @@ global.PARAM_input_field_equation_w = "w";
 global.PARAM_input_num_points_per_streamline = "pps";
 global.PARAM_input_step_size = "ss";
 global.PARAM_segment_duplicator_iterations = "di";
+global.PARAM_STREAMLINE_CALCULATION_METHOD = "scm"
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
 global.PARAM_TAB_MAIN = "tab";

@@ -161,6 +161,18 @@
                                 <label>duplicator iterations</label>
                                 <input id="segment_duplicator_iterations" type="text" value="1">
                             </div>
+                            <div class="input_row">
+                                <label>calculation method</label>
+                                <select id="select_streamline_calculation_method" 
+                                title="Streamline calculation method:
+    - fundamental domain: required for the left canvas
+    - R³: required for showing streamlines outside of the fundamental domain in the right canvas
+        (especially helpful in the projection view)">
+                                    <option value="0">fundamental domain + R³</option>
+                                    <option value="1">fundamental domain</option>
+                                    <option value="2">R³</option>
+                                </select>
+                            </div>    
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">

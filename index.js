@@ -518,7 +518,11 @@ const Export = module_export.Export;
         var step_size = document.getElementById("input_step_size").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
         var direction = DIRECTION_FORWARD;
-        streamline_context_static.CalculateStreamlines(gl, gl_side, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
+
+        var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
+        
+
+        streamline_context_static.CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
     }

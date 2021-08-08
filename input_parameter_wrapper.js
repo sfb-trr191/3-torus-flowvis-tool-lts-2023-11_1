@@ -38,6 +38,7 @@ class InputParameterWrapper {
         new InputFieldWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputFieldWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputFieldWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
+        new InputFieldWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
         new InputFieldWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
         new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
