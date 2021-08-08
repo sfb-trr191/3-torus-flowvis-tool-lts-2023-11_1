@@ -150,16 +150,12 @@
                         <legend>Parameters</legend>
                         <div class="vertical_container">
                             <div class="input_row">
-                                <label>points per streamline</label>
-                                <input id="input_num_points_per_streamline" type="text" value="200">
-                            </div>
-                            <div class="input_row">
-                                <label>step size</label>
-                                <input id="input_step_size" type="text" value="0.0125">
-                            </div>
-                            <div class="input_row">
-                                <label>duplicator iterations</label>
-                                <input id="segment_duplicator_iterations" type="text" value="1">
+                                <label>parameters</label>
+                                <select id="select_data_paramaters_mode">
+                                    <option value="0">basic</option>
+                                    <option value="1">advanced</option>
+                                    <option value="2">debug</option>
+                                </select>
                             </div>
                             <div class="input_row">
                                 <label>calculation method</label>
@@ -172,7 +168,19 @@
                                     <option value="1">fundamental domain</option>
                                     <option value="2">R³</option>
                                 </select>
-                            </div>    
+                            </div>   
+                            <div class="input_row">
+                                <label>points per streamline</label>
+                                <input id="input_num_points_per_streamline" type="text" value="200">
+                            </div>
+                            <div class="input_row" id="input_row_data_step_size">
+                                <label>step size</label>
+                                <input id="input_step_size" type="text" value="0.0125">
+                            </div>
+                            <div class="input_row" id="input_row_duplicator_iterations">
+                                <label>duplicator iterations</label>
+                                <input id="segment_duplicator_iterations" type="text" value="1">
+                            </div> 
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
@@ -256,7 +264,7 @@
                         <div class="vertical_container">
                             <button type="button" id="button_render_settings">update render settings</button>
                             <div class="input_row">
-                                <label>show settings</label>
+                                <label>settings</label>
                                 <select id="select_settings_mode">
                                     <option value="0">basic</option>
                                     <option value="1">advanced</option>

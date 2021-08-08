@@ -65,6 +65,12 @@ class HideManager{
     constructor(){        
         this.groups = [];
 
+        
+        this.group_data = new HideGroup("select_data_paramaters_mode");
+        this.group_data.AddInputRow("input_row_duplicator_iterations", LEVEL_DEBUG);
+        this.group_data.AddInputRow("input_row_data_step_size", LEVEL_ADVANCED);
+        this.groups.push(this.group_data);
+
         this.group_settings = new HideGroup("select_settings_mode");
         this.group_settings.AddInputRow("input_row_scalar_field_debug", LEVEL_DEBUG);
         this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED);
