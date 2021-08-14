@@ -12,24 +12,73 @@ class InputWrapper {
         this.addToDicts();
     }
 
-    addToDicts(){
+    addToDicts() {
         console.log("add InputWrapper: ", this.input_element_name, this.url_parameter_name)
         var exists = this.url_parameter_name in this.input_parameter_wrapper.dict_url_parameter_name_to_input_wrapper
-        if(exists){
+        if (exists) {
             var wrapper = this.input_parameter_wrapper.dict_url_parameter_name_to_input_wrapper[this.url_parameter_name]
-            throw new Error("Error while trying to add '"+this.input_element_name+"' with url_parameter_name '"
-            +this.url_parameter_name+"'. The url_parameter_name "
-            +"already exists for wrapper: '"+wrapper.input_element_name+"'");
+            throw new Error("Error while trying to add '" + this.input_element_name + "' with url_parameter_name '"
+                + this.url_parameter_name + "'. The url_parameter_name "
+                + "already exists for wrapper: '" + wrapper.input_element_name + "'");
         }
         var exists = this.input_element_name in this.input_parameter_wrapper.dict_input_element_name_to_input_wrapper
-        if(exists){
+        if (exists) {
             var wrapper = this.input_parameter_wrapper.dict_input_element_name_to_input_wrapper[this.input_element_name]
-            throw new Error("Error while trying to add '"+this.input_element_name+"' with url_parameter_name '"
-            +this.url_parameter_name+"'. The input_element_name "
-            +"already exists with url_parameter_name: '"+wrapper.url_parameter_name+"'");
+            throw new Error("Error while trying to add '" + this.input_element_name + "' with url_parameter_name '"
+                + this.url_parameter_name + "'. The input_element_name "
+                + "already exists with url_parameter_name: '" + wrapper.url_parameter_name + "'");
         }
         this.input_parameter_wrapper.dict_url_parameter_name_to_input_wrapper[this.url_parameter_name] = this;
         this.input_parameter_wrapper.dict_input_element_name_to_input_wrapper[this.input_element_name] = this;
+    }
+
+    /**
+     * 
+     * @param {*} value the value to be set. In the case of type "checkbox" use 1 or 0 instead of true and false
+     */
+    setValue(value) {
+        console.log("set value of '", this.input_element_name, "' to '", value, "'")
+        var node_name = this.input_element.nodeName
+        switch (node_name) {
+            case "INPUT":
+                var type = this.input_element.type
+                switch (type) {
+                    case "text":
+                        this.input_element.value = value
+                        break;
+                    case "checkbox":
+                        this.input_element.checked = (value == 1)
+                        break;
+                    default:
+                        throw new Error("unknown type: " + type)
+                }
+            case "SELECT":
+                this.input_element.value = value
+                break;
+            default:
+                throw new Error("unknown node_name: " + node_name)
+        }
+    }
+
+    getValue() {
+        console.log("get value of '", this.input_element_name, "'")
+        var node_name = this.input_element.nodeName
+        switch (node_name) {
+            case "INPUT":
+                var type = this.input_element.type
+                switch (type) {
+                    case "text":
+                        return this.input_element.value;
+                    case "checkbox":
+                        return this.input_element.checked ? 1 : 0;
+                    default:
+                        throw new Error("unknown type: " + type)
+                }
+            case "SELECT":
+                return this.input_element.value;
+            default:
+                throw new Error("unknown node_name: " + node_name)
+        }
     }
 }
 
@@ -42,7 +91,7 @@ class InputParameterWrapper {
         this.tab_manager = tab_manager;
         this.dict_url_parameter_name_to_input_wrapper = {};
         this.dict_input_element_name_to_input_wrapper = {};
-        
+
         this.css_loaded = "index.css";
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
@@ -61,7 +110,12 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
         new InputWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
 
-        
+        new InputWrapper(this, "checkbox_show_streamlines_main", "test");
+
+
+
+        //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
+
     }
 
     fromURL() {
@@ -73,7 +127,7 @@ class InputParameterWrapper {
             console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
             if (value === null)
                 continue;
-            input_wrapper.input_field.value = value;
+            input_wrapper.setValue(value);
         }
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
@@ -124,7 +178,7 @@ class InputParameterWrapper {
         for (var key in this.dict_url_parameter_name_to_input_wrapper) {
             var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
             console.log("key:", key);
-            const value = input_wrapper.input_element.value;
+            const value = input_wrapper.getValue();
             console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
             if (value === null)
                 continue;
