@@ -40,6 +40,7 @@ global.SHADING_MODE_STREAMLINES_FTLE = 2;
 global.PARAM_SEEDS = "s";
 global.PARAM_CAMERA = "mc";
 global.PARAM_SIDE_CAMERA = "sc";
+global.PARAM_select_data_paramaters_mode = "dpm"
 global.PARAM_input_field_equation_u = "u";
 global.PARAM_input_field_equation_v = "v";
 global.PARAM_input_field_equation_w = "w";

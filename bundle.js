@@ -2494,6 +2494,7 @@ global.SHADING_MODE_STREAMLINES_FTLE = 2;
 global.PARAM_SEEDS = "s";
 global.PARAM_CAMERA = "mc";
 global.PARAM_SIDE_CAMERA = "sc";
+global.PARAM_select_data_paramaters_mode = "dpm"
 global.PARAM_input_field_equation_u = "u";
 global.PARAM_input_field_equation_v = "v";
 global.PARAM_input_field_equation_w = "w";
@@ -5305,25 +5306,35 @@ module.exports = InputManager;
 const module_utility = require("./utility");
 const setCSS = module_utility.setCSS;
 
-class InputFieldWrapper {
+class InputWrapper {
 
-    constructor(input_parameter_wrapper, input_field_name, url_parameter_name) {
-        this.input_field_name = input_field_name;
-        this.input_field = document.getElementById(input_field_name);
+    constructor(input_parameter_wrapper, input_element_name, url_parameter_name) {
+        this.input_parameter_wrapper = input_parameter_wrapper;
+        this.input_element_name = input_element_name;
+        this.input_element = document.getElementById(input_element_name);
         this.url_parameter_name = url_parameter_name;
 
-        input_parameter_wrapper.dict_url_parameter_name_to_input_field[url_parameter_name] = this;
+        this.addToDicts();
     }
-}
 
-class InputSelectWrapper {
-
-    constructor(input_parameter_wrapper, input_select_name, url_parameter_name) {
-        this.input_select_name = input_select_name;
-        this.input_select = document.getElementById(input_select_name);
-        this.url_parameter_name = url_parameter_name;
-
-        input_parameter_wrapper.dict_url_parameter_name_to_input_field[url_parameter_name] = this;
+    addToDicts(){
+        console.log("add InputWrapper: ", this.input_element_name, this.url_parameter_name)
+        var exists = this.url_parameter_name in this.input_parameter_wrapper.dict_url_parameter_name_to_input_wrapper
+        if(exists){
+            var wrapper = this.input_parameter_wrapper.dict_url_parameter_name_to_input_wrapper[this.url_parameter_name]
+            throw new Error("Error while trying to add '"+this.input_element_name+"' with url_parameter_name '"
+            +this.url_parameter_name+"'. The url_parameter_name "
+            +"already exists for wrapper: '"+wrapper.input_element_name+"'");
+        }
+        var exists = this.input_element_name in this.input_parameter_wrapper.dict_input_element_name_to_input_wrapper
+        if(exists){
+            var wrapper = this.input_parameter_wrapper.dict_input_element_name_to_input_wrapper[this.input_element_name]
+            throw new Error("Error while trying to add '"+this.input_element_name+"' with url_parameter_name '"
+            +this.url_parameter_name+"'. The input_element_name "
+            +"already exists with url_parameter_name: '"+wrapper.url_parameter_name+"'");
+        }
+        this.input_parameter_wrapper.dict_url_parameter_name_to_input_wrapper[this.url_parameter_name] = this;
+        this.input_parameter_wrapper.dict_input_element_name_to_input_wrapper[this.input_element_name] = this;
     }
 }
 
@@ -5334,36 +5345,40 @@ class InputParameterWrapper {
         this.main_camera = main_camera;
         this.side_camera = side_camera;
         this.tab_manager = tab_manager;
-        this.dict_url_parameter_name_to_input_field = {};
+        this.dict_url_parameter_name_to_input_wrapper = {};
+        this.dict_input_element_name_to_input_wrapper = {};
+        
         this.css_loaded = "index.css";
-        new InputFieldWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
-        new InputFieldWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
-        new InputFieldWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
-        new InputFieldWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
-        new InputFieldWrapper(this, "input_step_size", PARAM_input_step_size);
-        new InputFieldWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
-        new InputFieldWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
-        new InputFieldWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
-        new InputFieldWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
-        new InputFieldWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
-        new InputFieldWrapper(this, "select_tab", PARAM_TAB_MAIN);
-        new InputFieldWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
-        new InputFieldWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
+        //data - equations
+        new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
+        new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
+        new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
+        //data - parameters        
+        new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
+        new InputWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
+        new InputWrapper(this, "input_step_size", PARAM_input_step_size);
+        new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
+        new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
+        new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
+        new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
+        new InputWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
+        new InputWrapper(this, "select_tab", PARAM_TAB_MAIN);
+        new InputWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
+        new InputWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
 
         
-        //new InputFieldWrapper(this, "input_random_position_seed", PARAM_RNG_SEED_POSITION);
     }
 
     fromURL() {
         console.log("fromURL:", window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
-        for (var key in this.dict_url_parameter_name_to_input_field) {
-            var input_field_wrapper = this.dict_url_parameter_name_to_input_field[key];
-            const value = urlParams.get(input_field_wrapper.url_parameter_name);
-            console.log("url_parameter_name:", input_field_wrapper.url_parameter_name, "value:", value);
+        for (var key in this.dict_url_parameter_name_to_input_wrapper) {
+            var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
+            const value = urlParams.get(input_wrapper.url_parameter_name);
+            console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
             if (value === null)
                 continue;
-            input_field_wrapper.input_field.value = value;
+            input_wrapper.input_field.value = value;
         }
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
@@ -5411,14 +5426,14 @@ class InputParameterWrapper {
     toQueryString() {
         console.log("toURL");
         var params = {};
-        for (var key in this.dict_url_parameter_name_to_input_field) {
-            var input_field_wrapper = this.dict_url_parameter_name_to_input_field[key];
+        for (var key in this.dict_url_parameter_name_to_input_wrapper) {
+            var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
             console.log("key:", key);
-            const value = input_field_wrapper.input_field.value;
-            console.log("url_parameter_name:", input_field_wrapper.url_parameter_name, "value:", value);
+            const value = input_wrapper.input_element.value;
+            console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
             if (value === null)
                 continue;
-            params[input_field_wrapper.url_parameter_name] = value;
+            params[input_wrapper.url_parameter_name] = value;
         }
         params[PARAM_SEEDS] = this.ui_seeds.toString();
         params[PARAM_CAMERA] = this.main_camera.toString();
