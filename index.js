@@ -265,6 +265,7 @@ const Export = module_export.Export;
         UpdateRenderSettings();
         UpdateGlobalData();
         on_fully_loaded();
+        OnSelectedTransferFunction();
         requestAnimationFrame(on_update);
     }
 
@@ -501,12 +502,16 @@ const Export = module_export.Export;
 
     function addChangedTransferFunction(){
         document.getElementById("select_transfer_function_id").addEventListener("change", (event) => {
-            var value = parseInt(document.getElementById("select_transfer_function_id").value);
-            console.log("SELECT: ", value);
-            canvas_wrapper_transfer_function.deselectPoint();
-            transfer_function_manager.UpdateToUI(value);
-            canvas_wrapper_transfer_function.updateBuffers();
+            OnSelectedTransferFunction();
         });
+    }
+
+    function OnSelectedTransferFunction(){
+        var value = parseInt(document.getElementById("select_transfer_function_id").value);
+        console.log("SELECT: ", value);
+        canvas_wrapper_transfer_function.deselectPoint();
+        transfer_function_manager.UpdateToUI(value);
+        canvas_wrapper_transfer_function.updateBuffers();
     }
 
     function CalculateStreamlines() {

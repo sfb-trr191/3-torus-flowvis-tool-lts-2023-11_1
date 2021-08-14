@@ -93,27 +93,82 @@ class InputParameterWrapper {
         this.dict_input_element_name_to_input_wrapper = {};
 
         this.css_loaded = "index.css";
+
+        //top right select
+        new InputWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
+        new InputWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
+        new InputWrapper(this, "select_slice_axes_order", "sao");
+        //data
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
         new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
+        new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
         new InputWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
-        new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
+        //FTLE data
+        //FTLE data - slice
+        //TODO SLICE INDEX
+        new InputWrapper(this, "checkbox_animate_slice_index", "asi");
+        new InputWrapper(this, "checkbox_ftle_slice_interpolate", "fsi");
+        new InputWrapper(this, "select_slice_mode", "slm");
+        //FTLE data - resolution
+        new InputWrapper(this, "input_ftle_dim_x", "srx");
+        new InputWrapper(this, "input_ftle_dim_y", "sry");
+        new InputWrapper(this, "input_ftle_dim_z", "srz");
+        //FTLE data - parameters
+        new InputWrapper(this, "input_ftle_advection_time", "fat");
+        new InputWrapper(this, "input_ftle_step_size", "fss");        
+        //settings
+        //settings - general
+        new InputWrapper(this, "select_settings_mode", "ssm");
+        new InputWrapper(this, "input_max_ray_distance", "mrd");
+        new InputWrapper(this, "input_tube_radius_factor", "trf");
+        //settings - projection
+        new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");        
+        //settings - streamline shading
+        new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
+        new InputWrapper(this, "checkbox_show_streamlines_side", "ssr");
+        new InputWrapper(this, "checkbox_show_streamlines_outside_side", "sor");
+        new InputWrapper(this, "select_shading_mode_streamlines", "sms");
+        new InputWrapper(this, "input_formula_scalar", "fs");
+        new InputWrapper(this, "input_min_scalar", "smin");
+        new InputWrapper(this, "input_max_scalar", "smax");        
+        //settings - fog
+        new InputWrapper(this, "select_fog_type", "sft");      
+        new InputWrapper(this, "input_fog_density", "fd");          
+        //settings - axes   
+        new InputWrapper(this, "checkbox_show_movable_axes_main", "mal");    
+        new InputWrapper(this, "checkbox_show_movable_axes_side", "mar");  
+        new InputWrapper(this, "checkbox_show_bounding_axes_main", "bal");  
+        new InputWrapper(this, "checkbox_show_bounding_axes_side", "bar");  
+        new InputWrapper(this, "input_cube_axes_length_main", "all"); 
+        new InputWrapper(this, "input_cube_axes_length_side", "alr"); 
+        new InputWrapper(this, "input_cube_axes_radius_main", "arl"); 
+        new InputWrapper(this, "input_cube_axes_radius_side", "arr"); 
+        new InputWrapper(this, "checkbox_show_origin_axes_side", "oas"); 
+        new InputWrapper(this, "input_cube_axes_origin_length_side", "oll"); 
+        new InputWrapper(this, "input_cube_axes_origin_radius_side", "olr"); 
+        //settings - volume rendering
+        new InputWrapper(this, "checkbox_show_volume_main", "vl"); 
+        new InputWrapper(this, "checkbox_show_volume_side", "vr"); 
+        new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
+        new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
+        new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto");         
+        //settings - quality
+        new InputWrapper(this, "input_panning_resolution_factor", "rfp");   
+        new InputWrapper(this, "select_lod_still", "lods");   
+        new InputWrapper(this, "select_lod_panning", "lodp");   
+        //transfer function
+        new InputWrapper(this, "select_transfer_function_id", "tfid");           
+        //export
         new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
         new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
         new InputWrapper(this, "select_tab", PARAM_TAB_MAIN);
-        new InputWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
-        new InputWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
-
-        new InputWrapper(this, "checkbox_show_streamlines_main", "test");
-
-
-
         //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
 
     }
