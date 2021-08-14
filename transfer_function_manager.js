@@ -162,11 +162,11 @@ class TransferFunction {
     }
 
     addOpacityPoint(t, a) {
-        this.list_opacity_points.push(new TransferFunctionOpacityPoint(t, a/255));
+        this.list_opacity_points.push(new TransferFunctionOpacityPoint(t, a / 255));
     }
 
     addColorPoint(t, r, g, b) {
-        this.list_color_points.push(new TransferFunctionColorPoint(t, r/255, g/255, b/255));
+        this.list_color_points.push(new TransferFunctionColorPoint(t, r / 255, g / 255, b / 255));
     }
 
     removeLastOpacityPoint() {
@@ -197,29 +197,29 @@ class TransferFunction {
         }
     }
 
-    findIndexLow(t, list){
+    findIndexLow(t, list) {
         for (var i = 0; i < list.length - 1; i++) {
             var low = list[i].t;
-            var high = list[i+1].t;
-            if(low == high)
+            var high = list[i + 1].t;
+            if (low == high)
                 continue;
-            if(t >= low && t <= high)
+            if (t >= low && t <= high)
                 return i;
         }
         return list.length - 2;
     }
 
-    interpolateColor(index_low, index_high, t){
+    interpolateColor(index_low, index_high, t) {
         var point_low = this.list_color_points[index_low];
         var point_high = this.list_color_points[index_high];
         var t = (t - point_low.t) / (point_high.t - point_low.t);
         var r = lerp(point_low.r, point_high.r, t);
         var g = lerp(point_low.g, point_high.g, t);
         var b = lerp(point_low.b, point_high.b, t);
-        return glMatrix.vec3.fromValues(r,g,b);
+        return glMatrix.vec3.fromValues(r, g, b);
     }
 
-    interpolateOpacity(index_low, index_high, t){
+    interpolateOpacity(index_low, index_high, t) {
         var point_low = this.list_opacity_points[index_low];
         var point_high = this.list_opacity_points[index_high];
         var t = (t - point_low.t) / (point_high.t - point_low.t);
@@ -241,7 +241,37 @@ class TransferFunctionManager {
         this.dirty = false;
     }
 
-    UpdateToUI(index){
+    fromString(s) {
+        console.log("from string TransferFunctionManager ", s);
+        if (s === null)
+            return;
+        console.log("TransferFunctionManager not null");
+        if (!s.includes("|"))
+            return;
+        console.log("TransferFunctionManager contains |");
+        var split = s.split("|");
+        for (var i = 0; i < split.length; i++) {
+            var s_i = split[i];
+            console.log("s_i", s_i);
+            this.transfer_function_list[i].fromString(s_i);
+        }
+    }
+
+    toString() {
+        console.log("to string TransferFunctionManager");
+        var s = "";
+        for (var i = 0; i < this.transfer_function_list.length; i++) {
+            if(i>0)
+                s += "|"
+            var s_i = this.transfer_function_list[i].toString();
+            console.log("s_i", s_i);
+            s += s_i
+        }
+        console.log("s", s);
+        return s;
+    }
+
+    UpdateToUI(index) {
         console.log(index);
         var s = this.transfer_function_list[index].toString();
         console.log("UpdateToUI: ", s);
@@ -250,21 +280,21 @@ class TransferFunctionManager {
         this.p_ui_transfer_functions.fromString(s);
     }
 
-    UpdateFromUI(){
+    UpdateFromUI() {
         var index = this.p_ui_transfer_functions.active_transfer_function_index;
         this.transfer_function_list[index].fromString(this.p_ui_transfer_functions.toString());
         this.Concatenate();
     }
 
-    Concatenate(){
+    Concatenate() {
         this.concatenated_colors = [];
-        for(var i=0; i<this.transfer_function_list.length; i++){
+        for (var i = 0; i < this.transfer_function_list.length; i++) {
             this.concatenated_colors = this.concatenated_colors.concat(this.transfer_function_list[i].list_colors);
         }
         //console.log("Concatenate ", this.concatenated_colors)
     }
 
-    GetConcatenatedTransferfunctionColorList(){
+    GetConcatenatedTransferfunctionColorList() {
         return this.concatenated_colors;
     }
 

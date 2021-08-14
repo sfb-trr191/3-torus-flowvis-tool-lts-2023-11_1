@@ -243,9 +243,10 @@ const Export = module_export.Export;
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, tab_manager);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager);
         input_parameter_wrapper.fromURL();
         onChangedDrawMode();
+        OnSelectedTransferFunction();
 
         hide_manager.UpdateVisibility();
 
@@ -265,7 +266,6 @@ const Export = module_export.Export;
         UpdateRenderSettings();
         UpdateGlobalData();
         on_fully_loaded();
-        OnSelectedTransferFunction();
         requestAnimationFrame(on_update);
     }
 
