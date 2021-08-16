@@ -106,6 +106,8 @@ struct HitInformation
 
     float vol_accumulated_opacity;
     vec3 vol_accumulated_color;
+
+    bool was_copied_from_outside;
 };
 
 struct Ray
@@ -242,11 +244,12 @@ vec4 getValidationColor(bool valid);
 
 //**********************************************************
 
-vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit);
+vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, inout HitInformation hit_outside);
 Ray GenerateRay(float x_offset, float y_offset);
 Ray GenerateRayWithPixelOffset(float x_offset, float y_offset);
 GL_CameraData GetActiveCamera();
-void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
+void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
+void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 bool CheckOutOfBounds(vec3 position);
@@ -314,7 +317,8 @@ void main() {
 	float j = gl_FragCoord[1];//y
     
 	HitInformation hit;
-	vec3 color = CalculateOneRay(offset_x, offset_y, hit);
+    HitInformation hit_outside;
+	vec3 color = CalculateOneRay(offset_x, offset_y, hit, hit_outside);
 	//if(hit.hitType > TYPE_NONE)
 	//{
   //  
@@ -448,8 +452,9 @@ vec4 getValidationColor(bool valid)
     return valid ? vec4(0,1,0, 1) : vec4(1,0,0, 1);  
 }
 
-vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
+vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, inout HitInformation hit_outside)
 {
+    hit.was_copied_from_outside = false;
 	hit.hitType = TYPE_NONE;
 	hit.distance = 0.0;	
     hit.distance_iteration = 0.0;
@@ -459,6 +464,16 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
 	hit.ignore_override = false;
     hit.vol_accumulated_opacity = 0.0;
     hit.vol_accumulated_color = vec3(0,0,0);
+
+    hit_outside.hitType = TYPE_NONE;
+	hit_outside.distance = 0.0;	
+    hit_outside.distance_iteration = 0.0;
+	hit_outside.transparentHit = false;
+	hit_outside.transparentNearest = 0.0;
+	hit_outside.clickTarget = false;
+	hit_outside.ignore_override = false;
+    hit_outside.vol_accumulated_opacity = 0.0;
+    hit_outside.vol_accumulated_color = vec3(0,0,0);
   /*
 	if(clicked == 1)
 	{
@@ -486,7 +501,9 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit)
 
 	Ray ray = GenerateRay(x_offset, y_offset);	
   
-	Intersect(ray, hit, hitCube);//found in decision: intersection_control_definitions
+	Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
+
+    CombineHitInformation(ray, hit, hit_outside, hitCube);
 
 	vec3 resultColor = Shade(ray, hit, hitCube, false);
 	/*
@@ -560,7 +577,7 @@ GL_CameraData GetActiveCamera()
 	return active_camera;
 }
 
-void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
+void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {			
 	Ray variableRay;
 	variableRay.origin = ray.origin;
@@ -642,7 +659,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 
     if(show_streamlines_outside){
         bool check_bounds = false;
-	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit, hitCube);
+	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
     }
 }
 
@@ -1355,6 +1372,65 @@ float ExtractLinearPercentage(float a, float b, float value)
 	return (value - a) / (b - a);
 }
 
+void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
+{
+    //deciding which hit to use
+
+    if(show_streamlines_outside)
+    {
+        //if we hit a streamline inside the fundamental domain
+        if(hit.hitType == TYPE_STREAMLINE_SEGMENT){
+
+        }
+
+
+        else{
+
+        }
+    }
+
+    if(projection_index == -1){
+        if(hit_outside.hitType>TYPE_NONE){
+            if(hit.hitType == TYPE_NONE){
+                hit.was_copied_from_outside = true;
+                hit.hitType = hit_outside.hitType;
+                hit.position = hit_outside.position;
+                hit.positionCenter = hit_outside.positionCenter;
+                hit.normal = hit_outside.normal;
+                hit.distance = hit_outside.distance;
+                hit.multiPolyID = hit_outside.multiPolyID;
+                hit.velocity = hit_outside.velocity;
+                hit.cost = hit_outside.cost;
+            }
+            else if(hit_outside.distance < hit.distance){
+                hit.was_copied_from_outside = true;
+                hit.hitType = hit_outside.hitType;
+                hit.position = hit_outside.position;
+                hit.positionCenter = hit_outside.positionCenter;
+                hit.normal = hit_outside.normal;
+                hit.distance = hit_outside.distance;
+                hit.multiPolyID = hit_outside.multiPolyID;
+                hit.velocity = hit_outside.velocity;
+                hit.cost = hit_outside.cost;
+            }
+        }
+    }
+    else{
+        //if we hit something outside, prioretize the outside hit
+        if(hit_outside.hitType>TYPE_NONE){
+            hit.was_copied_from_outside = true;
+            hit.hitType = hit_outside.hitType;
+            hit.position = hit_outside.position;
+            hit.positionCenter = hit_outside.positionCenter;
+            hit.normal = hit_outside.normal;
+            hit.distance = hit_outside.distance;
+            hit.multiPolyID = hit_outside.multiPolyID;
+            hit.velocity = hit_outside.velocity;
+            hit.cost = hit_outside.cost;
+        }
+    }
+}
+
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override)
 {			
 	ignore_override = ignore_override || hit.ignore_override;
@@ -1459,6 +1535,14 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 	{
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_ID)
         {
+            //check if we are in projection mode and show both inside and outside
+            bool projection_both = projection_index>=0 && show_streamlines && show_streamlines_outside;
+            if( projection_both ){
+                //check if we want to remove color from the inside mode
+                if(!hit.was_copied_from_outside){
+                    return vec3(1,1,1);
+                }
+            }
 		    int index = hit.multiPolyID % 8;
             return GetStreamlineColor(index);
         }
