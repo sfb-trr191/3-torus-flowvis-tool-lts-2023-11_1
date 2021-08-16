@@ -6,14 +6,15 @@ const LEVEL_DEBUG = 3;
 const CLASS_INPUT_ROW = "input_row";
 
 class InputRow{
-    constructor(name, required_level){
+    constructor(name, required_level, require_exact){
         this.name = name;
         this.required_level = required_level;
+        this.require_exact = require_exact;
         this.element = document.getElementById(name)
     }
 
     UpdateVisibility(level){
-        var visible = level >= this.required_level;
+        var visible = this.require_exact ? level == this.required_level : level >= this.required_level;
         this.element.className = visible ? "input_row" : "hidden";
     }
 }
@@ -53,8 +54,8 @@ class HideGroup{
         }
     }
 
-    AddInputRow(input_row_name, level){
-        this.list_input_row.push(new InputRow(input_row_name, level));
+    AddInputRow(input_row_name, level, require_exact){
+        this.list_input_row.push(new InputRow(input_row_name, level, require_exact));
     }
 
     AddShow(show_name, level, require_exact){
@@ -68,25 +69,31 @@ class HideManager{
 
         
         this.group_data = new HideGroup("select_data_paramaters_mode");
-        this.group_data.AddInputRow("input_row_duplicator_iterations", LEVEL_DEBUG);
-        this.group_data.AddInputRow("input_row_data_step_size", LEVEL_ADVANCED);
+        this.group_data.AddInputRow("input_row_duplicator_iterations", LEVEL_DEBUG, false);
+        this.group_data.AddInputRow("input_row_data_step_size", LEVEL_ADVANCED, false);
         this.groups.push(this.group_data);
 
         this.group_settings = new HideGroup("select_settings_mode");
-        this.group_settings.AddInputRow("input_row_scalar_field_debug", LEVEL_DEBUG);
-        this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_bounding_axes_origin_length", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_bounding_axes_origin_radius", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE);
-        this.group_settings.AddInputRow("input_row_volume_rendering_distance_between_points", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_volume_rendering_termination_opacity", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_still_resolution_factor", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED);
-        this.group_settings.AddInputRow("input_row_lod_panning", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_scalar_field_debug", LEVEL_DEBUG, false);
+        this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_bounding_axes_origin_length", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_bounding_axes_origin_radius", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE, false);
+        this.group_settings.AddInputRow("input_row_volume_rendering_distance_between_points", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_volume_rendering_termination_opacity", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_still_resolution_factor", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_lod_panning", LEVEL_ADVANCED, false);
         this.groups.push(this.group_settings);
+
+        this.group_shading_mode = new HideGroup("select_shading_mode_streamlines");
+        this.group_shading_mode.AddInputRow("input_row_formula_scalar", SHADING_MODE_STREAMLINES_SCALAR, true);
+        this.group_shading_mode.AddInputRow("input_row_scalar_field_debug", SHADING_MODE_STREAMLINES_SCALAR, true);
+        this.group_shading_mode.AddInputRow("input_row_scalar_range", SHADING_MODE_STREAMLINES_SCALAR, true);
+        this.groups.push(this.group_shading_mode);
 
         this.group_side_canvas = new HideGroup("select_side_mode");
         this.group_side_canvas.AddShow("show_side_canvas", 1, false);
