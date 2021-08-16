@@ -1,6 +1,7 @@
 const LEVEL_BASIC = 0;
-const LEVEL_ADVANCED = 1;
-const LEVEL_DEBUG = 2;
+const LEVEL_INTERMEDIATE = 1;
+const LEVEL_ADVANCED = 2;
+const LEVEL_DEBUG = 3;
 
 const CLASS_INPUT_ROW = "input_row";
 
@@ -78,6 +79,13 @@ class HideManager{
         this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED);
         this.group_settings.AddInputRow("input_row_bounding_axes_origin_length", LEVEL_ADVANCED);
         this.group_settings.AddInputRow("input_row_bounding_axes_origin_radius", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE);
+        this.group_settings.AddInputRow("input_row_volume_rendering_distance_between_points", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_volume_rendering_termination_opacity", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_still_resolution_factor", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED);
+        this.group_settings.AddInputRow("input_row_lod_panning", LEVEL_ADVANCED);
         this.groups.push(this.group_settings);
 
         this.group_side_canvas = new HideGroup("select_side_mode");

@@ -187,8 +187,9 @@
                                 <label>parameters</label>
                                 <select id="select_data_paramaters_mode">
                                     <option value="0">basic</option>
-                                    <option value="1">advanced</option>
-                                    <option value="2">debug</option>
+                                    <option value="1">intermediate</option>
+                                    <option value="2">advanced</option>
+                                    <option value="3">debug</option>
                                 </select>
                             </div>
                             <div class="input_row">
@@ -300,8 +301,9 @@
                                 <label>settings</label>
                                 <select id="select_settings_mode">
                                     <option value="0">basic</option>
-                                    <option value="1">advanced</option>
-                                    <option value="2">debug</option>
+                                    <option value="1">intermediate</option>
+                                    <option value="2">advanced</option>
+                                    <option value="3">debug</option>
                                 </select>
                             </div>
                             <div class="input_row">
@@ -449,15 +451,15 @@
                                     <input id="checkbox_show_volume_side" type="checkbox">
                                 </div>
                             </div>
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_volume_rendering_max_distance">
                                 <label>max distance</label>
                                 <input id="input_volume_rendering_max_distance" type="text" value="0">
                             </div>
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_volume_rendering_distance_between_points">
                                 <label>sample distance</label>
                                 <input id="input_volume_rendering_distance_between_points" type="text" value="0.001">
                             </div>
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_volume_rendering_termination_opacity">
                                 <label>termination opacity</label>
                                 <input id="input_volume_rendering_termination_opacity" type="text" value="0.99">
                             </div>
@@ -466,15 +468,15 @@
                     <fieldset class="fieldset_camera">
                         <legend>Quality</legend>
                         <div class="vertical_container">
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_still_resolution_factor">
                                 <label>still resolution factor</label>
                                 <input id="input_still_resolution_factor" type="text" value="1.0">
                             </div>
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_panning_resolution_factor">
                                 <label>panning resolution factor</label>
                                 <input id="input_panning_resolution_factor" type="text" value="0.5">
                             </div>
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_lod_still">
                                 <label>LOD still</label>
                                 <select id="select_lod_still">
                                     <option value="0">raw</option>
@@ -483,7 +485,7 @@
                                     <option value="3">low</option>
                                 </select>
                             </div>
-                            <div class="input_row">
+                            <div class="input_row" id="input_row_lod_panning">
                                 <label>LOD panning</label>
                                 <select id="select_lod_panning">
                                     <option value="0">raw</option>
