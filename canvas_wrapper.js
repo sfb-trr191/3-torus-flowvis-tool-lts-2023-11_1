@@ -151,8 +151,6 @@ class CanvasWrapper {
         this.draw_slice_index = 0;
         this.draw_slice_axes_order = DRAW_SLICE_AXES_ORDER_HX_VY;
         this.draw_slice_mode = DRAW_SLICE_MODE_COMBINED;
-        this.ftle_transfer_function_index = 2;
-        this.ftle_transfer_function_index_backward = 3;
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
@@ -160,8 +158,8 @@ class CanvasWrapper {
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
-        this.transfer_function_index_ftle_forward = 2;
-        this.transfer_function_index_ftle_backward = 3;
+        this.transfer_function_index_ftle_forward = 3;
+        this.transfer_function_index_ftle_backward = 4;
         this.max_volume_distance = 0;// 0=same as limited_max_distance
         
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
@@ -541,8 +539,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_ftle_slice.location_min_scalar, this.p_ftle_manager.ftle_min_value);
         gl.uniform1f(this.location_ftle_slice.location_max_scalar, this.p_ftle_manager.ftle_max_value);
         gl.uniform1i(this.location_ftle_slice.location_render_color_bar, true);
-        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index, this.ftle_transfer_function_index);
-        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.ftle_transfer_function_index_backward);
+        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index, this.transfer_function_index_ftle_forward);
+        gl.uniform1i(this.location_ftle_slice.location_transfer_function_index_backward, this.transfer_function_index_ftle_backward);
         gl.uniform1i(this.location_ftle_slice.location_interpolate, this.ftle_slice_interpolate);
            
         /*

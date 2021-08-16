@@ -169,6 +169,10 @@ class TransferFunction {
         this.list_color_points.push(new TransferFunctionColorPoint(t, r / 255, g / 255, b / 255));
     }
 
+    addColorPointF(t, r, g, b) {
+        this.list_color_points.push(new TransferFunctionColorPoint(t, r, g, b));
+    }
+
     removeLastOpacityPoint() {
         console.log("removeLastOpacityPoint");
         this.list_opacity_points.pop();
@@ -299,10 +303,27 @@ class TransferFunctionManager {
     }
 
     CreateDefaultTransferFunctions() {
-        this.CreateGreenLinear();   //0
-        this.CreateCoolToWarm();    //1
-        this.CreateWhiteToBlue();   //2
-        this.CreateWhiteToRed();    //3
+        this.CreateBlackBodyRadiation();    //0
+        this.CreateGreenLinear();           //1
+        this.CreateCoolToWarm();            //2
+        this.CreateWhiteToBlue();           //3
+        this.CreateWhiteToRed();            //4
+    }
+
+    CreateBlackBodyRadiation() {
+        var transfer_function = new TransferFunction("Black Body Radiation", TRANSFER_FUNCTION_BINS);
+        this.transfer_function_dict[transfer_function.name] = transfer_function;
+        this.transfer_function_list.push(transfer_function);
+
+        transfer_function.addColorPoint(0.00, 0, 0, 0);
+        transfer_function.addColorPoint(0.40, 230, 0, 0);
+        transfer_function.addColorPoint(0.80, 230, 230, 0);
+        transfer_function.addColorPoint(1.00, 255, 255, 255);
+
+        transfer_function.addOpacityPoint(0.00, 0);
+        transfer_function.addOpacityPoint(1.00, 255);
+
+        transfer_function.fillBins();
     }
 
     CreateGreenLinear() {
@@ -320,8 +341,8 @@ class TransferFunctionManager {
         transfer_function.addColorPoint(1.00, 66, 50, 112);
 
         transfer_function.addOpacityPoint(0.00, 0);
-        transfer_function.addOpacityPoint(0.90, 0);
-        transfer_function.addOpacityPoint(0.90, 255);
+        //transfer_function.addOpacityPoint(0.90, 0);
+        //transfer_function.addOpacityPoint(0.90, 255);
         transfer_function.addOpacityPoint(1.00, 255);
 
         transfer_function.fillBins();
@@ -332,6 +353,9 @@ class TransferFunctionManager {
         this.transfer_function_dict[transfer_function.name] = transfer_function;
         this.transfer_function_list.push(transfer_function);
 
+        //transfer_function.addColorPointF(0.00, 0.231373, 0.298039, 0.752941);
+        //transfer_function.addColorPointF(0.50, 0.865003, 0.865003, 0.865003);
+        //transfer_function.addColorPointF(1.00, 0.705882, 0.0156863, 0.14902);
         transfer_function.addColorPoint(0.00, 0, 0, 255);
         transfer_function.addColorPoint(0.5, 255, 255, 255);
         transfer_function.addColorPoint(1.00, 255, 0, 0);
