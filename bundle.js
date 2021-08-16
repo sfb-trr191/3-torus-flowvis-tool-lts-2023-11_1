@@ -4288,9 +4288,11 @@ const Export = module_export.Export;
         ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
-        main_camera.position = glMatrix.vec3.fromValues(0.5399, 0.7699, 0.001);
-        main_camera.forward = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);
-        main_camera.up = glMatrix.vec3.fromValues(0.0, 0.0, 1.0);
+        main_camera.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        main_camera.forward = glMatrix.vec3.fromValues(0.000001, 1.0, 0.000001);
+        main_camera.up = glMatrix.vec3.fromValues(0.000001, 0.000001, -1.0);
+        glMatrix.vec3.normalize(main_camera.forward, main_camera.forward);
+        glMatrix.vec3.normalize(main_camera.up, main_camera.up);
 
         main_camera.LinkInput(
             document.getElementById("input_camera_position_x"),
