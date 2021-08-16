@@ -1195,6 +1195,7 @@ class CanvasWrapper {
         this.shading_mode_streamlines = 0;
         this.projection_index = -1;
         this.streamline_method = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;
+        this.streamline_method_projection = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;        
         this.limited_max_distance = 0;
         this.max_iteration_count = 1;
         this.min_scalar = 0;
@@ -1360,13 +1361,14 @@ class CanvasWrapper {
         this.aliasing_index += 1;
     }
 
-    set_draw_mode(draw_mode, projection_index, streamline_method) {
-        if (this.draw_mode == draw_mode && this.projection_index == projection_index && this.streamline_method == streamline_method)
+    set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection) {
+        if (this.draw_mode == draw_mode && this.projection_index == projection_index && this.streamline_method == streamline_method && this.streamline_method_projection == streamline_method_projection)
             return;
         console.log("change draw mode: ", draw_mode, projection_index, streamline_method);
         this.draw_mode = draw_mode;
         this.projection_index = projection_index;
         this.streamline_method = streamline_method;
+        this.streamline_method_projection = streamline_method_projection;
         this.aliasing_index = 0;
         this.camera.changed = true;
 
@@ -1415,9 +1417,10 @@ class CanvasWrapper {
         var max_iteration_count = this.max_iteration_count;
         var tube_radius_projection = this.tube_radius;
 
+        var streamline_method = this.draw_mode == DRAW_MODE_PROJECTION ? this.streamline_method_projection : this.streamline_method;
         var show_streamlines = false;
         var show_streamlines_outside = false;
-        switch (this.streamline_method) {
+        switch (streamline_method) {
             case STREAMLINE_DRAW_METHOD_FUNDAMENTAL:
                 show_streamlines = true;
                 break;
@@ -4106,6 +4109,8 @@ class HideManager{
         this.group_side_canvas.AddShow("show_side_canvas", 1, false);
         this.group_side_canvas.AddShow("show_projection_index", DRAW_MODE_PROJECTION, true);
         this.group_side_canvas.AddShow("show_slice_axes_order", DRAW_MODE_FTLE_SLICE, true);
+        this.group_side_canvas.AddShow("show_side_canvas_streamline_method", DRAW_MODE_DEFAULT, true);
+        this.group_side_canvas.AddShow("show_side_canvas_streamline_method_projection", DRAW_MODE_PROJECTION, true);
         this.groups.push(this.group_side_canvas);        
     }
 
@@ -4611,6 +4616,9 @@ const Export = module_export.Export;
         document.getElementById("select_side_canvas_streamline_method").addEventListener("change", (event) => {
             onChangedDrawMode();
         });
+        document.getElementById("select_side_canvas_streamline_method_projection").addEventListener("change", (event) => {
+            onChangedDrawMode();
+        });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
             var value = document.getElementById("slide_slice_index").value;
@@ -4624,7 +4632,8 @@ const Export = module_export.Export;
         var draw_mode = parseInt(document.getElementById("select_side_mode").value);
         var projection_index = parseInt(document.getElementById("select_projection_index").value);
         var streamline_method = parseInt(document.getElementById("select_side_canvas_streamline_method").value);
-        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method);
+        var streamline_method_projection = parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value);
+        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
     }
 
     function addChangedTransferFunction(){
@@ -5458,6 +5467,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
         new InputWrapper(this, "select_slice_axes_order", "sao");
         new InputWrapper(this, "select_side_canvas_streamline_method", "sml");
+        new InputWrapper(this, "select_side_canvas_streamline_method_projection", "smpl");
         //data
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);

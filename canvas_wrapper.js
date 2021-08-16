@@ -139,6 +139,7 @@ class CanvasWrapper {
         this.shading_mode_streamlines = 0;
         this.projection_index = -1;
         this.streamline_method = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;
+        this.streamline_method_projection = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;        
         this.limited_max_distance = 0;
         this.max_iteration_count = 1;
         this.min_scalar = 0;
@@ -304,13 +305,14 @@ class CanvasWrapper {
         this.aliasing_index += 1;
     }
 
-    set_draw_mode(draw_mode, projection_index, streamline_method) {
-        if (this.draw_mode == draw_mode && this.projection_index == projection_index && this.streamline_method == streamline_method)
+    set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection) {
+        if (this.draw_mode == draw_mode && this.projection_index == projection_index && this.streamline_method == streamline_method && this.streamline_method_projection == streamline_method_projection)
             return;
         console.log("change draw mode: ", draw_mode, projection_index, streamline_method);
         this.draw_mode = draw_mode;
         this.projection_index = projection_index;
         this.streamline_method = streamline_method;
+        this.streamline_method_projection = streamline_method_projection;
         this.aliasing_index = 0;
         this.camera.changed = true;
 
@@ -359,9 +361,10 @@ class CanvasWrapper {
         var max_iteration_count = this.max_iteration_count;
         var tube_radius_projection = this.tube_radius;
 
+        var streamline_method = this.draw_mode == DRAW_MODE_PROJECTION ? this.streamline_method_projection : this.streamline_method;
         var show_streamlines = false;
         var show_streamlines_outside = false;
-        switch (this.streamline_method) {
+        switch (streamline_method) {
             case STREAMLINE_DRAW_METHOD_FUNDAMENTAL:
                 show_streamlines = true;
                 break;

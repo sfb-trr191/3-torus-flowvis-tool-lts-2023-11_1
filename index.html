@@ -105,11 +105,10 @@
                     </select>
                 </div>
                 <div class="show" id="show_side_canvas_streamline_method">
-                    <select id="select_side_canvas_streamline_method" 
-                    title="Streamlines are shown in:
+                    <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
     - fundamental domain + R³: combines the two methods below
     - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
-    - R³: streamlines leave the fundamental domain and are shown in R³ (or R² in the case of projection)
+    - R³: streamlines leave the fundamental domain and are shown in R³
     - none: streamlines are not shown">
                         <option value="3">fundamental domain + R³</option>
                         <!--STREAMLINE_DRAW_METHOD_BOTH-->
@@ -121,8 +120,22 @@
                         <!--STREAMLINE_DRAW_METHOD_NONE-->
                     </select>
                 </div>
-
-
+                <div class="show" id="show_side_canvas_streamline_method_projection">
+                    <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
+    - fundamental domain + R²: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R²: streamlines leave the fundamental domain and are shown in R²
+    - none: streamlines are not shown">
+                        <option value="3">fundamental domain + R²</option>
+                        <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                        <option value="1">fundamental domain</option>
+                        <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                        <option value="2">R²</option>
+                        <!--STREAMLINE_DRAW_METHOD_R3-->
+                        <option value="0">none</option>
+                        <!--STREAMLINE_DRAW_METHOD_NONE-->
+                    </select>
+                </div>
             </div>
             <div class="tab">
                 <button id="button_tab_data" class="tablink" title="data"></button>
@@ -137,11 +150,13 @@
             <fieldset class="toolbar">
                 <div class="container">
                     <button type="button" id="button_request_data" title="calculate streamlines"></button>
-                    <button type="button" id="button_calculate_ftle"  title="calculate FTLE"></button>
-                    <button type="button" id="button_data_update_render_settings" title="update render settings"></button>
+                    <button type="button" id="button_calculate_ftle" title="calculate FTLE"></button>
+                    <button type="button" id="button_data_update_render_settings"
+                        title="update render settings"></button>
                     <button type="button" id="button_update_url" title="update URL"></button>
                     <button type="button" id="button_add_seed" title="add seed"></button>
-                    <button type="button" id="button_randomize_seed_positions" title="randomize all seed positions"></button>
+                    <button type="button" id="button_randomize_seed_positions"
+                        title="randomize all seed positions"></button>
                     <button type="button" id="button_randomize_seed_colors" title="randomize all seed colors"></button>
                 </div>
             </fieldset class="fieldset_camera">
@@ -178,8 +193,7 @@
                             </div>
                             <div class="input_row">
                                 <label>calculation method</label>
-                                <select id="select_streamline_calculation_method" 
-                                title="Streamline calculation method:
+                                <select id="select_streamline_calculation_method" title="Streamline calculation method:
     - fundamental domain: required for the left canvas
     - R³: required for showing streamlines outside of the fundamental domain in the right canvas
         (especially helpful in the projection view)">
@@ -187,7 +201,7 @@
                                     <option value="1">fundamental domain</option>
                                     <option value="2">R³</option>
                                 </select>
-                            </div>   
+                            </div>
                             <div class="input_row">
                                 <label>points per streamline</label>
                                 <input id="input_num_points_per_streamline" type="text" value="200">
@@ -199,7 +213,7 @@
                             <div class="input_row" id="input_row_duplicator_iterations">
                                 <label>duplicator iterations</label>
                                 <input id="segment_duplicator_iterations" type="text" value="1">
-                            </div> 
+                            </div>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset_camera">
@@ -605,8 +619,8 @@
                         <h3 class="warning_title">Warning</h3>
                         <p class="warning_text">
                             For high quality thumbnails it is recommended to wait until the
-                            progress bar at the bottom of the image disappears. This requires that the mouse is inside
-                            the canvas.
+                            progress bar at the bottom of the image disappears. This requires that the mouse is
+                            inside the canvas.
                         </p>
                     </div>
                     <div id="warning_thumbnail_url" class="warning">

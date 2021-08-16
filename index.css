@@ -450,7 +450,10 @@ legend {
     margin: 4px;
 }
 
-
+#select_side_canvas_streamline_method_projection{
+    width: 1fr;
+    margin: 4px;
+}
 
 div.outer {display:table;table-layout: fixed}
 div.middle {display:table-row;}

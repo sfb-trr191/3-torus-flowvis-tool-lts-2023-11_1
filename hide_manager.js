@@ -84,6 +84,8 @@ class HideManager{
         this.group_side_canvas.AddShow("show_side_canvas", 1, false);
         this.group_side_canvas.AddShow("show_projection_index", DRAW_MODE_PROJECTION, true);
         this.group_side_canvas.AddShow("show_slice_axes_order", DRAW_MODE_FTLE_SLICE, true);
+        this.group_side_canvas.AddShow("show_side_canvas_streamline_method", DRAW_MODE_DEFAULT, true);
+        this.group_side_canvas.AddShow("show_side_canvas_streamline_method_projection", DRAW_MODE_PROJECTION, true);
         this.groups.push(this.group_side_canvas);        
     }
 
