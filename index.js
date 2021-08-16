@@ -461,7 +461,8 @@ const Export = module_export.Export;
         document.getElementById("button_tab_transfer_function").addEventListener("click", function () {
             console.log("onClick: button_tab_transfer_function");
             tab_manager.selectTab("tab_group_main", "tab_transfer_function");
-        });        
+        });   
+        /**     
         document.getElementById("button_tab_information").addEventListener("click", function () {
             console.log("onClick: button_tab_information");
             tab_manager.selectTab("tab_group_main", "tab_information");
@@ -470,6 +471,7 @@ const Export = module_export.Export;
             console.log("onClick: button_tab_edit");
             tab_manager.selectTab("tab_group_main", "tab_edit");
         });
+        */ 
         document.getElementById("button_tab_export").addEventListener("click", function () {
             console.log("onClick: button_tab_export");
             tab_manager.selectTab("tab_group_main", "tab_export");
