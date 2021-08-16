@@ -99,6 +99,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_side_mode", PARAM_SIDE_MODE);
         new InputWrapper(this, "select_projection_index", PARAM_PROJECTION_INDEX);
         new InputWrapper(this, "select_slice_axes_order", "sao");
+        new InputWrapper(this, "select_side_canvas_streamline_method", "sml");
         //data
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);

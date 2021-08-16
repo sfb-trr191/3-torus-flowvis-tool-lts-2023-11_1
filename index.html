@@ -104,6 +104,25 @@
                         <option value="2">horizontal: z vertical: y</option>
                     </select>
                 </div>
+                <div class="show" id="show_side_canvas_streamline_method">
+                    <select id="select_side_canvas_streamline_method" 
+                    title="Streamlines are shown in:
+    - fundamental domain + R³: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R³: streamlines leave the fundamental domain and are shown in R³ (or R² in the case of projection)
+    - none: streamlines are not shown">
+                        <option value="3">fundamental domain + R³</option>
+                        <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                        <option value="1">fundamental domain</option>
+                        <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                        <option value="2">R³</option>
+                        <!--STREAMLINE_DRAW_METHOD_R3-->
+                        <option value="0">none</option>
+                        <!--STREAMLINE_DRAW_METHOD_NONE-->
+                    </select>
+                </div>
+
+
             </div>
             <div class="tab">
                 <button id="button_tab_data" class="tablink" title="data"></button>
@@ -309,7 +328,7 @@
                             <div class="input_row">
                                 <label>show outside</label>
                                 <div class="horizontal_div_2">
-                                    <label></label>
+                                    <label></label>                                    
                                     <input id="checkbox_show_streamlines_outside_side" type="checkbox" value="true"
                                         checked="true">
                                 </div>

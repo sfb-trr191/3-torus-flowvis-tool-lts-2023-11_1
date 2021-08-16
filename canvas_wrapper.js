@@ -138,6 +138,7 @@ class CanvasWrapper {
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
         this.projection_index = -1;
+        this.streamline_method = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;
         this.limited_max_distance = 0;
         this.max_iteration_count = 1;
         this.min_scalar = 0;
@@ -305,12 +306,13 @@ class CanvasWrapper {
         this.aliasing_index += 1;
     }
 
-    set_draw_mode(draw_mode, projection_index) {
-        if (this.draw_mode == draw_mode && this.projection_index == projection_index)
+    set_draw_mode(draw_mode, projection_index, streamline_method) {
+        if (this.draw_mode == draw_mode && this.projection_index == projection_index && this.streamline_method == streamline_method)
             return;
-        console.log("change draw mode: ", draw_mode, projection_index);
+        console.log("change draw mode: ", draw_mode, projection_index, streamline_method);
         this.draw_mode = draw_mode;
         this.projection_index = projection_index;
+        this.streamline_method = streamline_method;
         this.aliasing_index = 0;
         this.camera.changed = true;
 
@@ -359,6 +361,23 @@ class CanvasWrapper {
         var max_iteration_count = this.max_iteration_count;
         var tube_radius_projection = this.tube_radius;
 
+        var show_streamlines = false;
+        var show_streamlines_outside = false;
+        switch (this.streamline_method) {
+            case STREAMLINE_DRAW_METHOD_FUNDAMENTAL:
+                show_streamlines = true;
+                break;
+            case STREAMLINE_DRAW_METHOD_R3:
+                show_streamlines_outside = true;
+                break;
+            case STREAMLINE_DRAW_METHOD_BOTH:
+                show_streamlines = true;
+                show_streamlines_outside = true;
+                break;
+            default:
+                break;
+        }
+
         if(this.draw_mode == DRAW_MODE_PROJECTION){
             projection_index = this.projection_index;
             max_iteration_count = 1000;
@@ -394,8 +413,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box);
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
-        gl.uniform1i(this.location_raytracing.location_show_streamlines, this.show_streamlines);
-        gl.uniform1i(this.location_raytracing.location_show_streamlines_outside, this.show_streamlines_outside);
+        gl.uniform1i(this.location_raytracing.location_show_streamlines, show_streamlines);
+        gl.uniform1i(this.location_raytracing.location_show_streamlines_outside, show_streamlines_outside);
 
         
 

@@ -487,6 +487,9 @@ const Export = module_export.Export;
         document.getElementById("select_projection_index").addEventListener("change", (event) => {
             onChangedDrawMode();
         });
+        document.getElementById("select_side_canvas_streamline_method").addEventListener("change", (event) => {
+            onChangedDrawMode();
+        });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
             var value = document.getElementById("slide_slice_index").value;
@@ -499,7 +502,8 @@ const Export = module_export.Export;
     function onChangedDrawMode(){
         var draw_mode = parseInt(document.getElementById("select_side_mode").value);
         var projection_index = parseInt(document.getElementById("select_projection_index").value);
-        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index);
+        var streamline_method = parseInt(document.getElementById("select_side_canvas_streamline_method").value);
+        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method);
     }
 
     function addChangedTransferFunction(){

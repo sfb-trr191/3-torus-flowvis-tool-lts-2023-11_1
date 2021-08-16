@@ -445,6 +445,11 @@ legend {
     margin: 4px;
 }
 
+#select_side_canvas_streamline_method{
+    width: 1fr;
+    margin: 4px;
+}
+
 
 
 div.outer {display:table;table-layout: fixed}
