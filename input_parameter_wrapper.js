@@ -159,7 +159,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto");         
-        //settings - quality
+        //settings - quality        
+        new InputWrapper(this, "input_still_resolution_factor", "rfs");   
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   
         new InputWrapper(this, "select_lod_still", "lods");   
         new InputWrapper(this, "select_lod_panning", "lodp");   

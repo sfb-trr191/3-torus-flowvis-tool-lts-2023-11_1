@@ -115,6 +115,7 @@ class InputChangedManager{
     }
 
     GenerateGroupRenderSettings(){
+        this.group_render_settings.AddInput(document.getElementById("input_still_resolution_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_panning_resolution_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_max_ray_distance"));
         this.group_render_settings.AddInput(document.getElementById("select_fog_type"));

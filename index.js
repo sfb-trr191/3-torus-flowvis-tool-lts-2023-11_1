@@ -610,8 +610,9 @@ const Export = module_export.Export;
         canvas_wrapper_main.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_main.lod_index_still = document.getElementById("select_lod_still").value;
 
+        var still_resolution_factor = document.getElementById("input_still_resolution_factor").value;
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
-        canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
+        canvas_wrapper_main.UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor);
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
@@ -653,8 +654,9 @@ const Export = module_export.Export;
         canvas_wrapper_side.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_side.lod_index_still = document.getElementById("select_lod_still").value;
 
+        var still_resolution_factor = document.getElementById("input_still_resolution_factor").value;
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
-        canvas_wrapper_side.UpdatePanningResolutionFactor(gl_side, panning_resolution_factor);
+        canvas_wrapper_side.UpdateResolutionFactor(gl_side, still_resolution_factor, panning_resolution_factor);
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {

@@ -243,16 +243,30 @@ class CanvasWrapper {
         return this.shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR;
     }
 
-    UpdatePanningResolutionFactor(gl, panning_resolution_factor) {
-        var width_panning = Math.round(this.camera.width_still * panning_resolution_factor);
-        var height_panning = Math.round(this.camera.height_still * panning_resolution_factor);
+    UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor) {
+        var width_still = Math.round(this.camera.width_original * still_resolution_factor);
+        var height_still = Math.round(this.camera.height_original * still_resolution_factor);
+        var width_panning = Math.round(this.camera.width_original * panning_resolution_factor);
+        var height_panning = Math.round(this.camera.height_original * panning_resolution_factor);
+
+        var changed = (width_still != this.camera.width_still) || (height_still != this.camera.height_still);
+        if (changed) {
+            this.camera.width_still = width_still;
+            this.camera.height_still = height_still;
+            this.render_wrapper_raytracing_still_left.resize(gl, width_still, height_still);
+            this.render_wrapper_raytracing_still_right.resize(gl, width_still, height_still);
+            this.camera.SetCorrectResolution();
+        }
+
         var changed = (width_panning != this.camera.width_panning) || (height_panning != this.camera.height_panning);
         if (changed) {
             this.camera.width_panning = width_panning;
             this.camera.height_panning = height_panning;
             this.render_wrapper_raytracing_panning_left.resize(gl, width_panning, height_panning);
             this.render_wrapper_raytracing_panning_right.resize(gl, width_panning, height_panning);
+            this.camera.SetCorrectResolution();
         }
+
     }
 
     draw(gl, data_changed, settings_changed, mouse_in_canvas) {

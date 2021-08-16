@@ -109,6 +109,8 @@ class Camera {
         this.input_changed_manager = input_changed_manager;
         this.width = 0;
         this.height = 0;
+        this.width_original = 0;
+        this.height_original = 0;
         this.width_still = 0;
         this.height_still = 0;
         this.width_panning = 0;
@@ -270,6 +272,8 @@ class Camera {
     SetRenderSizes(width, height, width_panning, height_panning) {
         this.width = width;
         this.height = height;
+        this.width_original = width;
+        this.height_original = height;
         this.width_still = width;
         this.height_still = height;
         this.width_panning = width_panning;

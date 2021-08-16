@@ -516,6 +516,8 @@ class Camera {
         this.input_changed_manager = input_changed_manager;
         this.width = 0;
         this.height = 0;
+        this.width_original = 0;
+        this.height_original = 0;
         this.width_still = 0;
         this.height_still = 0;
         this.width_panning = 0;
@@ -677,6 +679,8 @@ class Camera {
     SetRenderSizes(width, height, width_panning, height_panning) {
         this.width = width;
         this.height = height;
+        this.width_original = width;
+        this.height_original = height;
         this.width_still = width;
         this.height_still = height;
         this.width_panning = width_panning;
@@ -1295,16 +1299,30 @@ class CanvasWrapper {
         return this.shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR;
     }
 
-    UpdatePanningResolutionFactor(gl, panning_resolution_factor) {
-        var width_panning = Math.round(this.camera.width_still * panning_resolution_factor);
-        var height_panning = Math.round(this.camera.height_still * panning_resolution_factor);
+    UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor) {
+        var width_still = Math.round(this.camera.width_original * still_resolution_factor);
+        var height_still = Math.round(this.camera.height_original * still_resolution_factor);
+        var width_panning = Math.round(this.camera.width_original * panning_resolution_factor);
+        var height_panning = Math.round(this.camera.height_original * panning_resolution_factor);
+
+        var changed = (width_still != this.camera.width_still) || (height_still != this.camera.height_still);
+        if (changed) {
+            this.camera.width_still = width_still;
+            this.camera.height_still = height_still;
+            this.render_wrapper_raytracing_still_left.resize(gl, width_still, height_still);
+            this.render_wrapper_raytracing_still_right.resize(gl, width_still, height_still);
+            this.camera.SetCorrectResolution();
+        }
+
         var changed = (width_panning != this.camera.width_panning) || (height_panning != this.camera.height_panning);
         if (changed) {
             this.camera.width_panning = width_panning;
             this.camera.height_panning = height_panning;
             this.render_wrapper_raytracing_panning_left.resize(gl, width_panning, height_panning);
             this.render_wrapper_raytracing_panning_right.resize(gl, width_panning, height_panning);
+            this.camera.SetCorrectResolution();
         }
+
     }
 
     draw(gl, data_changed, settings_changed, mouse_in_canvas) {
@@ -4691,8 +4709,9 @@ const Export = module_export.Export;
         canvas_wrapper_main.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_main.lod_index_still = document.getElementById("select_lod_still").value;
 
+        var still_resolution_factor = document.getElementById("input_still_resolution_factor").value;
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
-        canvas_wrapper_main.UpdatePanningResolutionFactor(gl, panning_resolution_factor);
+        canvas_wrapper_main.UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor);
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
@@ -4734,8 +4753,9 @@ const Export = module_export.Export;
         canvas_wrapper_side.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_side.lod_index_still = document.getElementById("select_lod_still").value;
 
+        var still_resolution_factor = document.getElementById("input_still_resolution_factor").value;
         var panning_resolution_factor = document.getElementById("input_panning_resolution_factor").value;
-        canvas_wrapper_side.UpdatePanningResolutionFactor(gl_side, panning_resolution_factor);
+        canvas_wrapper_side.UpdateResolutionFactor(gl_side, still_resolution_factor, panning_resolution_factor);
 
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
@@ -5096,6 +5116,7 @@ class InputChangedManager{
     }
 
     GenerateGroupRenderSettings(){
+        this.group_render_settings.AddInput(document.getElementById("input_still_resolution_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_panning_resolution_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_max_ray_distance"));
         this.group_render_settings.AddInput(document.getElementById("select_fog_type"));
@@ -5470,7 +5491,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto");         
-        //settings - quality
+        //settings - quality        
+        new InputWrapper(this, "input_still_resolution_factor", "rfs");   
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   
         new InputWrapper(this, "select_lod_still", "lods");   
         new InputWrapper(this, "select_lod_panning", "lodp");   
