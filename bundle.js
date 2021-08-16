@@ -1212,8 +1212,6 @@ class CanvasWrapper {
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
-        this.show_streamlines = true;
-        this.show_streamlines_outside = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
@@ -4726,10 +4724,11 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
         canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
-        canvas_wrapper_main.show_streamlines = document.getElementById("checkbox_show_streamlines_main").checked;
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
+        canvas_wrapper_main.streamline_method = document.getElementById("checkbox_show_streamlines_main").checked ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
+
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
         console.log("fog_type", canvas_wrapper_main.fog_type);
@@ -4769,8 +4768,6 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
-        canvas_wrapper_side.show_streamlines = document.getElementById("checkbox_show_streamlines_side").checked;
-        canvas_wrapper_side.show_streamlines_outside = document.getElementById("checkbox_show_streamlines_outside_side").checked;       
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -5173,8 +5170,7 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_main"));     
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_side"));        
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
     }
@@ -5495,8 +5491,6 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");        
         //settings - streamline shading
         new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
-        new InputWrapper(this, "checkbox_show_streamlines_side", "ssr");
-        new InputWrapper(this, "checkbox_show_streamlines_outside_side", "sor");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");
         new InputWrapper(this, "input_formula_scalar", "fs");
         new InputWrapper(this, "input_min_scalar", "smin");

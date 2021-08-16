@@ -156,8 +156,6 @@ class CanvasWrapper {
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
         this.show_volume_rendering = false;
-        this.show_streamlines = true;
-        this.show_streamlines_outside = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;

@@ -133,8 +133,6 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");        
         //settings - streamline shading
         new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
-        new InputWrapper(this, "checkbox_show_streamlines_side", "ssr");
-        new InputWrapper(this, "checkbox_show_streamlines_outside_side", "sor");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");
         new InputWrapper(this, "input_formula_scalar", "fs");
         new InputWrapper(this, "input_min_scalar", "smin");
