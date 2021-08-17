@@ -22,6 +22,7 @@ class UniformLocationsRayTracing {
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
+        this.location_tube_radius_outside = gl.getUniformLocation(program, "tubeRadiusOutside");        
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");
         this.location_projection_index = gl.getUniformLocation(program, "projection_index");
@@ -130,8 +131,11 @@ class CanvasWrapper {
         this.p_ftle_manager = ftle_manager;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
-        this.tube_radius = 1.0;
-        this.tube_radius_projection = 1.0;
+        this.tube_radius_fundamental = 0.005;
+        this.max_radius_factor_highlight = 2.0;
+        this.tube_radius_factor = 1.0;
+        this.tube_radius_factor_projection = 1.0;
+        this.tube_radius_factor_projection_highlight = 2.0;
         this.lod_index_panning = 0;
         this.lod_index_still = 0;
         this.fog_density = 0;
@@ -357,7 +361,8 @@ class CanvasWrapper {
     drawTextureRaytracing(gl, render_wrapper, width, height) {
         var projection_index = -1;
         var max_iteration_count = this.max_iteration_count;
-        var tube_radius_projection = this.tube_radius;
+        var tube_radius_factor_active = this.tube_radius_factor;
+        var tube_radius_factor_active_outside = this.tube_radius_factor;
 
         var streamline_method = this.draw_mode == DRAW_MODE_PROJECTION ? this.streamline_method_projection : this.streamline_method;
         var show_streamlines = false;
@@ -380,8 +385,12 @@ class CanvasWrapper {
         if(this.draw_mode == DRAW_MODE_PROJECTION){
             projection_index = this.projection_index;
             max_iteration_count = 1000;
-            tube_radius_projection = this.tube_radius_projection;
+            tube_radius_factor_active = this.tube_radius_factor_projection;
+            tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
         }
+
+        var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
+        var tube_radius_active_outside = this.tube_radius_fundamental * tube_radius_factor_active_outside;        
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -398,7 +407,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
-        gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_projection);
+        gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
+        gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
         gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);

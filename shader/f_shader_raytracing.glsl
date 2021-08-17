@@ -175,6 +175,7 @@ uniform float maxRayDistance;
 uniform float max_volume_distance;
 uniform int maxIterationCount;
 uniform float tubeRadius;
+uniform float tubeRadiusOutside;
 uniform float fog_density;
 uniform int fog_type;
 uniform int shading_mode_streamlines;
@@ -296,6 +297,7 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
 
 vec3 InterpolateVec3(sampler3D texture, vec3 texture_coordinate, int z_offset);
 float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset);
+float GetTubeRadius(int part_index);
 
 //**********************************************************
 
@@ -983,6 +985,7 @@ bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout 
 
 void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
 { 
+    float tube_radius = GetTubeRadius(part_index);
 	/*
 	int lineSegmentID = glNode.objectIndex;
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
@@ -994,7 +997,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
 
 	Sphere sphere;
-	sphere.radius = tubeRadius;
+	sphere.radius = tube_radius;
 	sphere.center = a;
 	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);
 
@@ -1030,8 +1033,8 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	ray_os.direction = (matrix * vec4(ray.origin+ray.direction, 1)).xyz - ray_os.origin;
 	ray_os.dir_inv = 1.0/ray_os.direction;
 	GL_AABB glAABB_os;
-	glAABB_os.min = vec4(-tubeRadius, -tubeRadius, -tubeRadius, 0);
-	glAABB_os.max = vec4(tubeRadius, tubeRadius, h+tubeRadius, 0);
+	glAABB_os.min = vec4(-tube_radius, -tube_radius, -tube_radius, 0);
+	glAABB_os.max = vec4(tube_radius, tube_radius, h+tube_radius, 0);
 	float tmin;
 	float tmax;
 	bool hitAABB = IntersectGLAABB(glAABB_os, ray_os, ray_local_cutoff, tmin, tmax);
@@ -1046,7 +1049,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	bool ignore_override = false;
 	IntersectCylinder(part_index, check_bounds, ray, ray_local_cutoff, glNode.objectIndex, hit, ignore_override);	
 	Sphere sphere;
-	sphere.radius = tubeRadius;
+	sphere.radius = tube_radius;
 	//SPHERE A
 	if(lineSegment.isBeginning == 1 || copy)
 	{
@@ -1065,7 +1068,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
 				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
-				//sphere.radius = tubeRadius * 1.1;		
+				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
 	}
@@ -1076,7 +1079,9 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 
 void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
 {
-	float r = tubeRadius;// / 2.0;
+    float tube_radius = GetTubeRadius(part_index);
+
+	float r = tube_radius;// / 2.0;
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	vec3 a = GetPosition(lineSegment.indexA, part_index);
 	vec3 b = GetPosition(lineSegment.indexB, part_index);
@@ -1705,6 +1710,8 @@ void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout
 
 void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube)
 {	
+    float tube_radius = GetTubeRadius(part_index);
+
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
@@ -1730,7 +1737,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 	HandleOutOfBound_Cylinder(part_index, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
 		
 	Sphere sphere;
-	sphere.radius = tubeRadius;	
+	sphere.radius = tube_radius;	
 	sphere.center = a;
 	HandleOutOfBound_Sphere(part_index, sphere, hitCube, copy, multiPolyID);
 
@@ -1748,7 +1755,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
 				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
-				//sphere.radius = tubeRadius * 1.1;		
+				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
 	}
@@ -1758,6 +1765,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 
 void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
 {	
+    float tube_radius = GetTubeRadius(part_index);
 	
 	vec3 position_face_os = (matrix * vec4(hitCube.position, 1)).xyz;
 	float f_z = position_face_os.z;
@@ -1767,7 +1775,7 @@ void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitIn
 		return;
 		
 	float distanceToCenter = sqrt(f_x_2 + f_y_2);
-	if(distanceToCenter > tubeRadius)
+	if(distanceToCenter > tube_radius)
 		return;	
 
 	float local_percentage = f_z / h;
@@ -1818,6 +1826,8 @@ void HandleOutOfBound_Sphere(int part_index, Sphere sphere, inout HitInformation
 
 void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit)
 {	
+    float tube_radius = GetTubeRadius(part_index);
+
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
@@ -1844,7 +1854,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 	HandleInside_Cylinder(part_index, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
 		
 	Sphere sphere;
-	sphere.radius = tubeRadius;	
+	sphere.radius = tube_radius;	
 	sphere.center = a;
 	HandleInside_Sphere(part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);
 
@@ -1859,7 +1869,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
 				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
-				//sphere.radius = tubeRadius * 1.1;		
+				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
 	}
@@ -1868,6 +1878,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 
 void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
 {	
+    float tube_radius = GetTubeRadius(part_index);
 	
 	vec3 position_face_os = (matrix * vec4(position, 1)).xyz;
 	float f_z = position_face_os.z;
@@ -1877,7 +1888,7 @@ void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h
 		return;
 		
 	float distanceToCenter = sqrt(f_x_2 + f_y_2);
-	if(distanceToCenter > tubeRadius)
+	if(distanceToCenter > tube_radius)
 		return;	
 
 	float local_percentage = f_z / h;
@@ -2439,6 +2450,10 @@ float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
     return v;
 }
 
+float GetTubeRadius(int part_index){
+    return part_index == 0 ? tubeRadius : tubeRadiusOutside;
+}
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START REGION MEMORY ACCESS
@@ -2621,6 +2636,8 @@ GL_TreeNode GetNode(int index, int part_index)
 
 GL_AABB GetAABB(int index, int part_index)
 {
+    float tube_radius = GetTubeRadius(part_index);
+
 	GL_AABB aabb;
 	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes(part_index) + index * TREE_NODE_FLOAT_COUNT);
 	aabb.min = vec4(
@@ -2638,8 +2655,8 @@ GL_AABB GetAABB(int index, int part_index)
 
     if(projection_index >=0)
     {
-        aabb.min[projection_index] = -tubeRadius;
-        aabb.max[projection_index] = tubeRadius;
+        aabb.min[projection_index] = -tube_radius;
+        aabb.max[projection_index] = tube_radius;
     }
 	return aabb;
 }

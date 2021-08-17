@@ -11,7 +11,7 @@ class StreamlineContext {
         this.p_lights = p_lights;
         this.ui_seeds = ui_seeds;
         this.list_raw_data = [];
-        for(var i=0; i<NUMBER_OF_LOD_PARTS; i++){
+        for (var i = 0; i < NUMBER_OF_LOD_PARTS; i++) {
             this.list_raw_data.push(new RawData());
         }
 
@@ -34,7 +34,7 @@ class StreamlineContext {
         this.lod_0 = this.lod_list[0];
     }
 
-    GetRawData(part_index){
+    GetRawData(part_index) {
         return this.list_raw_data[part_index];
     }
 
@@ -55,8 +55,12 @@ class StreamlineContext {
         this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
+    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
+        input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction,
+        tube_radius_fundamental, max_radius_factor_highlight) {
         console.log("CalculateStreamlines");
+        console.log("tube_radius_fundamental", tube_radius_fundamental)
+        console.log("max_radius_factor_highlight", max_radius_factor_highlight)
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.streamline_generator.direction = direction;
@@ -70,26 +74,28 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH 
+        var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
             || streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL;
-        var flag_r3 = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH 
+        var flag_r3 = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
             || streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_R3;
 
-        if(flag_fundamental){
-            var generate_copies = true;
+        var generate_copies = true;
+        this.streamline_generator.tubeRadius = tube_radius_fundamental;
+        if (flag_fundamental) {
             this.streamline_generator.check_bounds = true;
             this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
         }
-        else{
+        else {
             this.ClearStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
         }
 
-        if(flag_r3){
-            var generate_copies = false;
+        var generate_copies = false;
+        this.streamline_generator.tubeRadius = tube_radius_fundamental * max_radius_factor_highlight;
+        if (flag_r3) {
             this.streamline_generator.check_bounds = false;
             this.CalculateStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side, generate_copies);
         }
-        else{
+        else {
             this.ClearStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side);
         }
 
@@ -130,7 +136,7 @@ class StreamlineContext {
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].GenerateLineSegments(part_index);
-            if(generate_copies)
+            if (generate_copies)
                 this.lod_list[i].GenerateLineSegmentCopies(part_index);
             this.lod_list[i].CalculateMatrices(part_index);
             this.lod_list[i].CalculateBVH(part_index);

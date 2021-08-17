@@ -1078,6 +1078,7 @@ class UniformLocationsRayTracing {
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
+        this.location_tube_radius_outside = gl.getUniformLocation(program, "tubeRadiusOutside");        
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");
         this.location_projection_index = gl.getUniformLocation(program, "projection_index");
@@ -1186,8 +1187,11 @@ class CanvasWrapper {
         this.p_ftle_manager = ftle_manager;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
-        this.tube_radius = 1.0;
-        this.tube_radius_projection = 1.0;
+        this.tube_radius_fundamental = 0.005;
+        this.max_radius_factor_highlight = 2.0;
+        this.tube_radius_factor = 1.0;
+        this.tube_radius_factor_projection = 1.0;
+        this.tube_radius_factor_projection_highlight = 2.0;
         this.lod_index_panning = 0;
         this.lod_index_still = 0;
         this.fog_density = 0;
@@ -1413,7 +1417,8 @@ class CanvasWrapper {
     drawTextureRaytracing(gl, render_wrapper, width, height) {
         var projection_index = -1;
         var max_iteration_count = this.max_iteration_count;
-        var tube_radius_projection = this.tube_radius;
+        var tube_radius_factor_active = this.tube_radius_factor;
+        var tube_radius_factor_active_outside = this.tube_radius_factor;
 
         var streamline_method = this.draw_mode == DRAW_MODE_PROJECTION ? this.streamline_method_projection : this.streamline_method;
         var show_streamlines = false;
@@ -1436,8 +1441,12 @@ class CanvasWrapper {
         if(this.draw_mode == DRAW_MODE_PROJECTION){
             projection_index = this.projection_index;
             max_iteration_count = 1000;
-            tube_radius_projection = this.tube_radius_projection;
+            tube_radius_factor_active = this.tube_radius_factor_projection;
+            tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
         }
+
+        var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
+        var tube_radius_active_outside = this.tube_radius_fundamental * tube_radius_factor_active_outside;        
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
         //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1454,7 +1463,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
-        gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_projection);
+        gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
+        gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
         gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
@@ -4834,9 +4844,17 @@ const Export = module_export.Export;
         var direction = DIRECTION_FORWARD;
 
         var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
-        
+        var tube_radius_fundamental = parseFloat(document.getElementById("input_tube_radius_fundamental").value);
+        var max_radius_factor_highlight = parseFloat(document.getElementById("input_max_radius_factor_highlight").value);
 
-        streamline_context_static.CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, segment_duplicator_iterations, direction);
+        canvas_wrapper_main.tube_radius_fundamental = tube_radius_fundamental;
+        canvas_wrapper_side.tube_radius_fundamental = tube_radius_fundamental;
+        canvas_wrapper_main.tube_radius_outside = max_radius_factor_highlight;
+        canvas_wrapper_side.tube_radius_outside = max_radius_factor_highlight;
+
+        streamline_context_static.CalculateStreamlines(gl, gl_side, streamline_calculation_method, 
+            shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, 
+            segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
     }
@@ -4892,8 +4910,9 @@ const Export = module_export.Export;
         //MAIN
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
-        canvas_wrapper_main.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
-        canvas_wrapper_side.tube_radius_projection = 0.005 * document.getElementById("input_tube_radius_factor_projection").value;
+        canvas_wrapper_main.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_main.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
+        canvas_wrapper_main.tube_radius_factor_projection_highlight = document.getElementById("input_tube_radius_factor_projection_highlight").value;
         canvas_wrapper_main.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_main.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_main.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
@@ -4935,8 +4954,10 @@ const Export = module_export.Export;
 
         //SIDE
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
-        canvas_wrapper_side.tube_radius = 0.005 * document.getElementById("input_tube_radius_factor").value;
-        canvas_wrapper_side.tube_radius_projection = 0.005 * document.getElementById("input_tube_radius_factor_projection").value;
+        canvas_wrapper_side.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
+        canvas_wrapper_side.tube_radius_factor_projection_highlight = document.getElementById("input_tube_radius_factor_projection_highlight").value;
+        
         canvas_wrapper_side.fog_density = document.getElementById("input_fog_density").value;
         canvas_wrapper_side.fog_type = document.getElementById("select_fog_type").value;
         canvas_wrapper_side.projection_index = document.getElementById("select_projection_index").value;
@@ -113738,6 +113759,7 @@ uniform float maxRayDistance;
 uniform float max_volume_distance;
 uniform int maxIterationCount;
 uniform float tubeRadius;
+uniform float tubeRadiusOutside;
 uniform float fog_density;
 uniform int fog_type;
 uniform int shading_mode_streamlines;
@@ -113859,6 +113881,7 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
 
 vec3 InterpolateVec3(sampler3D texture, vec3 texture_coordinate, int z_offset);
 float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset);
+float GetTubeRadius(int part_index);
 
 //**********************************************************
 
@@ -114546,6 +114569,7 @@ bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout 
 
 void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
 { 
+    float tube_radius = GetTubeRadius(part_index);
 	/*
 	int lineSegmentID = glNode.objectIndex;
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
@@ -114557,7 +114581,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
 
 	Sphere sphere;
-	sphere.radius = tubeRadius;
+	sphere.radius = tube_radius;
 	sphere.center = a;
 	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);
 
@@ -114593,8 +114617,8 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	ray_os.direction = (matrix * vec4(ray.origin+ray.direction, 1)).xyz - ray_os.origin;
 	ray_os.dir_inv = 1.0/ray_os.direction;
 	GL_AABB glAABB_os;
-	glAABB_os.min = vec4(-tubeRadius, -tubeRadius, -tubeRadius, 0);
-	glAABB_os.max = vec4(tubeRadius, tubeRadius, h+tubeRadius, 0);
+	glAABB_os.min = vec4(-tube_radius, -tube_radius, -tube_radius, 0);
+	glAABB_os.max = vec4(tube_radius, tube_radius, h+tube_radius, 0);
 	float tmin;
 	float tmax;
 	bool hitAABB = IntersectGLAABB(glAABB_os, ray_os, ray_local_cutoff, tmin, tmax);
@@ -114609,7 +114633,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	bool ignore_override = false;
 	IntersectCylinder(part_index, check_bounds, ray, ray_local_cutoff, glNode.objectIndex, hit, ignore_override);	
 	Sphere sphere;
-	sphere.radius = tubeRadius;
+	sphere.radius = tube_radius;
 	//SPHERE A
 	if(lineSegment.isBeginning == 1 || copy)
 	{
@@ -114628,7 +114652,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
 				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
-				//sphere.radius = tubeRadius * 1.1;		
+				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
 	}
@@ -114639,7 +114663,9 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 
 void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
 {
-	float r = tubeRadius;// / 2.0;
+    float tube_radius = GetTubeRadius(part_index);
+
+	float r = tube_radius;// / 2.0;
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	vec3 a = GetPosition(lineSegment.indexA, part_index);
 	vec3 b = GetPosition(lineSegment.indexB, part_index);
@@ -115268,6 +115294,8 @@ void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout
 
 void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube)
 {	
+    float tube_radius = GetTubeRadius(part_index);
+
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
@@ -115293,7 +115321,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 	HandleOutOfBound_Cylinder(part_index, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
 		
 	Sphere sphere;
-	sphere.radius = tubeRadius;	
+	sphere.radius = tube_radius;	
 	sphere.center = a;
 	HandleOutOfBound_Sphere(part_index, sphere, hitCube, copy, multiPolyID);
 
@@ -115311,7 +115339,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
 				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
-				//sphere.radius = tubeRadius * 1.1;		
+				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
 	}
@@ -115321,6 +115349,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 
 void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
 {	
+    float tube_radius = GetTubeRadius(part_index);
 	
 	vec3 position_face_os = (matrix * vec4(hitCube.position, 1)).xyz;
 	float f_z = position_face_os.z;
@@ -115330,7 +115359,7 @@ void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitIn
 		return;
 		
 	float distanceToCenter = sqrt(f_x_2 + f_y_2);
-	if(distanceToCenter > tubeRadius)
+	if(distanceToCenter > tube_radius)
 		return;	
 
 	float local_percentage = f_z / h;
@@ -115381,6 +115410,8 @@ void HandleOutOfBound_Sphere(int part_index, Sphere sphere, inout HitInformation
 
 void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit)
 {	
+    float tube_radius = GetTubeRadius(part_index);
+
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
@@ -115407,7 +115438,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 	HandleInside_Cylinder(part_index, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
 		
 	Sphere sphere;
-	sphere.radius = tubeRadius;	
+	sphere.radius = tube_radius;	
 	sphere.center = a;
 	HandleInside_Sphere(part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);
 
@@ -115422,7 +115453,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
 				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
-				//sphere.radius = tubeRadius * 1.1;		
+				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
 	}
@@ -115431,6 +115462,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 
 void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
 {	
+    float tube_radius = GetTubeRadius(part_index);
 	
 	vec3 position_face_os = (matrix * vec4(position, 1)).xyz;
 	float f_z = position_face_os.z;
@@ -115440,7 +115472,7 @@ void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h
 		return;
 		
 	float distanceToCenter = sqrt(f_x_2 + f_y_2);
-	if(distanceToCenter > tubeRadius)
+	if(distanceToCenter > tube_radius)
 		return;	
 
 	float local_percentage = f_z / h;
@@ -116002,6 +116034,10 @@ float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
     return v;
 }
 
+float GetTubeRadius(int part_index){
+    return part_index == 0 ? tubeRadius : tubeRadiusOutside;
+}
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START REGION MEMORY ACCESS
@@ -116184,6 +116220,8 @@ GL_TreeNode GetNode(int index, int part_index)
 
 GL_AABB GetAABB(int index, int part_index)
 {
+    float tube_radius = GetTubeRadius(part_index);
+
 	GL_AABB aabb;
 	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes(part_index) + index * TREE_NODE_FLOAT_COUNT);
 	aabb.min = vec4(
@@ -116201,8 +116239,8 @@ GL_AABB GetAABB(int index, int part_index)
 
     if(projection_index >=0)
     {
-        aabb.min[projection_index] = -tubeRadius;
-        aabb.max[projection_index] = tubeRadius;
+        aabb.min[projection_index] = -tube_radius;
+        aabb.max[projection_index] = tube_radius;
     }
 	return aabb;
 }
@@ -116837,7 +116875,7 @@ class StreamlineContext {
         this.p_lights = p_lights;
         this.ui_seeds = ui_seeds;
         this.list_raw_data = [];
-        for(var i=0; i<NUMBER_OF_LOD_PARTS; i++){
+        for (var i = 0; i < NUMBER_OF_LOD_PARTS; i++) {
             this.list_raw_data.push(new RawData());
         }
 
@@ -116860,7 +116898,7 @@ class StreamlineContext {
         this.lod_0 = this.lod_list[0];
     }
 
-    GetRawData(part_index){
+    GetRawData(part_index) {
         return this.list_raw_data[part_index];
     }
 
@@ -116881,8 +116919,12 @@ class StreamlineContext {
         this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w, input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction) {
+    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
+        input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction,
+        tube_radius_fundamental, max_radius_factor_highlight) {
         console.log("CalculateStreamlines");
+        console.log("tube_radius_fundamental", tube_radius_fundamental)
+        console.log("max_radius_factor_highlight", max_radius_factor_highlight)
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.streamline_generator.direction = direction;
@@ -116896,26 +116938,28 @@ class StreamlineContext {
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.GenerateSeedsFromUI();
 
-        var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH 
+        var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
             || streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL;
-        var flag_r3 = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH 
+        var flag_r3 = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
             || streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_R3;
 
-        if(flag_fundamental){
-            var generate_copies = true;
+        var generate_copies = true;
+        this.streamline_generator.tubeRadius = tube_radius_fundamental;
+        if (flag_fundamental) {
             this.streamline_generator.check_bounds = true;
             this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
         }
-        else{
+        else {
             this.ClearStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
         }
 
-        if(flag_r3){
-            var generate_copies = false;
+        var generate_copies = false;
+        this.streamline_generator.tubeRadius = tube_radius_fundamental * max_radius_factor_highlight;
+        if (flag_r3) {
             this.streamline_generator.check_bounds = false;
             this.CalculateStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side, generate_copies);
         }
-        else{
+        else {
             this.ClearStreamlinesPart(PART_INDEX_OUTSIDE, gl, gl_side);
         }
 
@@ -116956,7 +117000,7 @@ class StreamlineContext {
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].GenerateLineSegments(part_index);
-            if(generate_copies)
+            if (generate_copies)
                 this.lod_list[i].GenerateLineSegmentCopies(part_index);
             this.lod_list[i].CalculateMatrices(part_index);
             this.lod_list[i].CalculateBVH(part_index);
