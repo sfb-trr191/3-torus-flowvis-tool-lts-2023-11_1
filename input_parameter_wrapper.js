@@ -112,6 +112,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
+
+        new InputWrapper(this, "input_tube_radius_fundamental", "tr");
+        new InputWrapper(this, "input_max_radius_factor_highlight", "mrfh");
         //FTLE data
         //FTLE data - slice
         //TODO SLICE INDEX
@@ -131,7 +134,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_max_ray_distance", "mrd");
         new InputWrapper(this, "input_tube_radius_factor", "trf");
         //settings - projection
-        new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");        
+        new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");     
+        new InputWrapper(this, "input_tube_radius_factor_projection_highlight", "trfph");   
         //settings - streamline shading
         new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");

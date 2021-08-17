@@ -90,6 +90,8 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
+        this.group_calculate.AddInput(document.getElementById("input_tube_radius_fundamental"));
+        this.group_calculate.AddInput(document.getElementById("input_max_radius_factor_highlight"));        
     }
 
     GenerateGroupCamera(){
@@ -126,6 +128,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection"));
+        this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection_highlight"));        
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_main"));   

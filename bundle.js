@@ -4244,9 +4244,12 @@ class HideManager {
         this.group_data = new HideGroup("select_data_paramaters_mode");
         this.group_data.AddInputRow("input_row_duplicator_iterations", LEVEL_DEBUG, false);
         this.group_data.AddInputRow("input_row_data_step_size", LEVEL_ADVANCED, false);
+        this.group_data.AddInputRow("input_row_tube_radius_fundamental", LEVEL_ADVANCED, false);
+        this.group_data.AddInputRow("input_row_max_radius_factor_highlight", LEVEL_ADVANCED, false);
         this.groups.push(this.group_data);
 
         this.group_settings = new HideGroup("select_settings_mode");
+        this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);
@@ -5321,6 +5324,8 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
+        this.group_calculate.AddInput(document.getElementById("input_tube_radius_fundamental"));
+        this.group_calculate.AddInput(document.getElementById("input_max_radius_factor_highlight"));        
     }
 
     GenerateGroupCamera(){
@@ -5357,6 +5362,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection"));
+        this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection_highlight"));        
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
         this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_main"));   
@@ -5673,6 +5679,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
+
+        new InputWrapper(this, "input_tube_radius_fundamental", "tr");
+        new InputWrapper(this, "input_max_radius_factor_highlight", "mrfh");
         //FTLE data
         //FTLE data - slice
         //TODO SLICE INDEX
@@ -5692,7 +5701,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_max_ray_distance", "mrd");
         new InputWrapper(this, "input_tube_radius_factor", "trf");
         //settings - projection
-        new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");        
+        new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");     
+        new InputWrapper(this, "input_tube_radius_factor_projection_highlight", "trfph");   
         //settings - streamline shading
         new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");
