@@ -5783,7 +5783,7 @@ class InputParameterWrapper {
 
         switch (style) {
             case STYLE_DEFAULT:
-                setCSS("index.css");
+                setCSS("embedded_thumbnail_default.css");
                 this.css_loaded = "index.css";
                 break;
             case STYLE_EMBEDDED:

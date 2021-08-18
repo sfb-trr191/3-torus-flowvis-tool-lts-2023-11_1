@@ -1,0 +1,16 @@
+@import url("index.css");
+
+canvas {
+    display: none;
+}
+
+#image_thumbnail
+{
+    display: block;
+    width: 1280px;
+    height: 720px;
+    margin: auto;
+    padding: 0;
+    border: none;
+    background-color: black; 
+}
