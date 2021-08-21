@@ -169,16 +169,25 @@
                         <div class="vertical_container">
                             <div class="input_row">
                                 <label>u</label>
-                                <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)">
+                                <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)"
+                                title="First component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                             <div class="input_row">
                                 <label>v</label>
                                 <input id="input_field_equation_v" type="text"
-                                    value="sin(2 * PI * y) + 2 * cos (2 * PI * z)">
+                                    value="sin(2 * PI * y) + 2 * cos (2 * PI * z)"
+                                    title="Second component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                             <div class="input_row">
                                 <label>w</label>
-                                <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)">
+                                <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)"
+                                title="Third component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                         </div>
                     </fieldset>
@@ -187,7 +196,7 @@
                         <div class="vertical_container">
                             <div class="input_row">
                                 <label>parameters</label>
-                                <select id="select_data_paramaters_mode">
+                                <select id="select_data_paramaters_mode" title="Select which parameters are shown.">
                                     <option value="0">basic</option>
                                     <option value="1">intermediate</option>
                                     <option value="2">advanced</option>
@@ -197,9 +206,11 @@
                             <div class="input_row">
                                 <label>calculation method</label>
                                 <select id="select_streamline_calculation_method" title="Streamline calculation method:
-    - fundamental domain: required for the left canvas
-    - R³: required for showing streamlines outside of the fundamental domain in the right canvas
-        (especially helpful in the projection view)">
+    - fundamental domain + R³: all features are supported, but calculation takes longer.
+    - fundamental domain: required for the left canvas.
+    - R³: required for showing streamlines calculated in R³ (right canvas only). 
+        Allows showing streamlines outside of the fundamental domain 
+        and highlighting in the projection view.">
                                     <option value="0">fundamental domain + R³</option>
                                     <option value="1">fundamental domain</option>
                                     <option value="2">R³</option>
@@ -207,23 +218,23 @@
                             </div>
                             <div class="input_row">
                                 <label>points per streamline</label>
-                                <input id="input_num_points_per_streamline" type="text" value="200">
+                                <input id="input_num_points_per_streamline" type="text" value="200" title="The number of points allocated for each streamline.">
                             </div>
                             <div class="input_row" id="input_row_data_step_size">
                                 <label>step size</label>
-                                <input id="input_step_size" type="text" value="0.0125">
+                                <input id="input_step_size" type="text" value="0.0125" title="The step size parameter of RK4 (4th order Runge-Kutta method).">
                             </div>
                             <div class="input_row" id="input_row_tube_radius_fundamental">
                                 <label>tube radius</label>
-                                <input id="input_tube_radius_fundamental" type="text" value="0.005">
+                                <input id="input_tube_radius_fundamental" type="text" value="0.005" title="The radius of the streamlines. To allow changing the radius without recalculating the streamlines, this value is then multiplied by the radius factor found in the settings tab.">
                             </div>
-                            <div class="input_row" id="input_row_max_radius_factor_highlight">
+                            <div class="input_row" id="input_row_max_radius_factor_highlight" title="The maximum radius factor for highlights. In projection mode, the streamlines in R² can have a larger radius for highlighting purposes.">
                                 <label>max factor highlight</label>
                                 <input id="input_max_radius_factor_highlight" type="text" value="5.0">
                             </div>
                             <div class="input_row" id="input_row_duplicator_iterations">
                                 <label>duplicator iterations</label>
-                                <input id="segment_duplicator_iterations" type="text" value="1">
+                                <input id="segment_duplicator_iterations" type="text" value="1" title="This is a debug setting and should not be changed from the deault value: 1.">
                             </div>
                         </div>
                     </fieldset>
