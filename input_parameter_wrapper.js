@@ -170,6 +170,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_lod_panning", "lodp");   
         //transfer function
         new InputWrapper(this, "select_transfer_function_id", "tfid");           
+        new InputWrapper(this, "select_transfer_function_index_scalar", "tfis");     
+        new InputWrapper(this, "select_transfer_function_index_ftle_forward", "tfif");   
+        new InputWrapper(this, "select_transfer_function_index_ftle_backward", "tfib");   
         //export
         new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
         new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);

@@ -4963,6 +4963,10 @@ const Export = module_export.Export;
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
+        canvas_wrapper_main.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
+        canvas_wrapper_main.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
+        canvas_wrapper_main.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
+
         canvas_wrapper_main.streamline_method = document.getElementById("checkbox_show_streamlines_main").checked ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
 
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
@@ -5009,6 +5013,10 @@ const Export = module_export.Export;
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
+        canvas_wrapper_side.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
+        canvas_wrapper_side.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
+        canvas_wrapper_side.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
+
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
@@ -5411,6 +5419,9 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddInput(document.getElementById("select_show_volume_main"));     
         this.group_render_settings.AddInput(document.getElementById("select_show_volume_side"));     
+        this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_scalar"));  
+        this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_forward"));  
+        this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_backward")); 
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
@@ -5769,6 +5780,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_lod_panning", "lodp");   
         //transfer function
         new InputWrapper(this, "select_transfer_function_id", "tfid");           
+        new InputWrapper(this, "select_transfer_function_index_scalar", "tfis");     
+        new InputWrapper(this, "select_transfer_function_index_ftle_forward", "tfif");   
+        new InputWrapper(this, "select_transfer_function_index_ftle_backward", "tfib");   
         //export
         new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
         new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);

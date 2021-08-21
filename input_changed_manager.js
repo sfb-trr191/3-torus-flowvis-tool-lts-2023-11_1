@@ -145,6 +145,9 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddInput(document.getElementById("select_show_volume_main"));     
         this.group_render_settings.AddInput(document.getElementById("select_show_volume_side"));     
+        this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_scalar"));  
+        this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_forward"));  
+        this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_backward")); 
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
