@@ -1094,6 +1094,8 @@ class UniformLocationsRayTracing {
         this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
         this.location_show_streamlines_outside = gl.getUniformLocation(program, "show_streamlines_outside");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
+        this.location_show_volume_rendering_forward = gl.getUniformLocation(program, "show_volume_rendering_forward");
+        this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
         
@@ -1214,7 +1216,9 @@ class CanvasWrapper {
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
-        this.show_volume_rendering = false;
+        this.volume_rendering_mode = 0;
+        this.show_volume_rendering_forward = false;
+        this.show_volume_rendering_backward = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.transfer_function_index_streamline_scalar = 0;
@@ -1445,6 +1449,27 @@ class CanvasWrapper {
             tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
         }
 
+        var show_volume_rendering = false;
+        var show_volume_rendering_forward = false;
+        var show_volume_rendering_backward = false;
+        switch (this.volume_rendering_mode) {
+            case VOLUME_RENDERING_MODE_BOTH:
+                show_volume_rendering = true;
+                show_volume_rendering_forward = true;
+                show_volume_rendering_backward = true;
+                break;
+            case VOLUME_RENDERING_MODE_FORWARD:
+                show_volume_rendering = true;
+                show_volume_rendering_forward = true;
+                break;
+            case VOLUME_RENDERING_MODE_BACKWARD:
+                show_volume_rendering = true;
+                show_volume_rendering_backward = true;
+                break;
+            default:
+                break;
+        }
+
         var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
         var tube_radius_active_outside = this.tube_radius_fundamental * tube_radius_factor_active_outside;        
 
@@ -1483,7 +1508,9 @@ class CanvasWrapper {
 
         
 
-        gl.uniform1i(this.location_raytracing.location_show_volume_rendering, this.show_volume_rendering);
+        gl.uniform1i(this.location_raytracing.location_show_volume_rendering, show_volume_rendering);
+        gl.uniform1i(this.location_raytracing.location_show_volume_rendering_forward, show_volume_rendering_forward);
+        gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
         
@@ -2529,6 +2556,11 @@ global.STREAMLINE_DRAW_METHOD_NONE = 0;
 global.STREAMLINE_DRAW_METHOD_FUNDAMENTAL = 1;
 global.STREAMLINE_DRAW_METHOD_R3 = 2;
 global.STREAMLINE_DRAW_METHOD_BOTH = 3;
+
+global.VOLUME_RENDERING_MODE_NONE = 0;
+global.VOLUME_RENDERING_MODE_BOTH = 1;
+global.VOLUME_RENDERING_MODE_FORWARD = 2;
+global.VOLUME_RENDERING_MODE_BACKWARD = 3;
 
 global.STYLE_DEFAULT = "d";
 global.STYLE_EMBEDDED = "e";
@@ -4927,7 +4959,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
-        canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
+        canvas_wrapper_main.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_main").value);
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -4973,7 +5005,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
-        canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
+        canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -5377,8 +5409,8 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_side"));     
         //this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_main"));     
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_volume_side"));     
+        this.group_render_settings.AddInput(document.getElementById("select_show_volume_main"));     
+        this.group_render_settings.AddInput(document.getElementById("select_show_volume_side"));     
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
@@ -5725,8 +5757,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_cube_axes_origin_length_side", "oll"); 
         new InputWrapper(this, "input_cube_axes_origin_radius_side", "olr"); 
         //settings - volume rendering
-        new InputWrapper(this, "checkbox_show_volume_main", "vl"); 
-        new InputWrapper(this, "checkbox_show_volume_side", "vr"); 
+        new InputWrapper(this, "select_show_volume_main", "vl"); 
+        new InputWrapper(this, "select_show_volume_side", "vr"); 
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto");         
@@ -113786,6 +113818,8 @@ uniform bool show_movable_axes;
 uniform bool show_streamlines;
 uniform bool show_streamlines_outside;
 uniform bool show_volume_rendering;
+uniform bool show_volume_rendering_forward;
+uniform bool show_volume_rendering_backward;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
 uniform float min_scalar_ftle;
@@ -113885,6 +113919,7 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
 //**********************************************************
 
 void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube);
+void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit);
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index);
 
 //**********************************************************
@@ -115900,21 +115935,21 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
             continue;
         }
 
-        //calculate forward color
-        int z_offset = 0;
-        vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);         
         //transfer_function_index_streamline_scalar;
         //transfer_function_index_ftle_forward;
         //transfer_function_index_ftle_backward;
-        vec3 combined_color = rgba_forward.rgb;
-        float combined_alpha = rgba_forward.a;
 
-        //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
-        float alpha_in = hit.vol_accumulated_opacity;
-        hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
-        //apply compositing: C_out = C_in + (1-alpha_in) * C';        
-        vec3 C_in = hit.vol_accumulated_color;
-        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * combined_alpha; 
+        //calculate forward color
+        if(show_volume_rendering_forward){
+            int z_offset = 0;
+            ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_forward, hit);
+        }
+        
+        //calculate backward color
+        if(show_volume_rendering_backward){
+            int z_offset = dim_z;
+            ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_backward, hit);
+        }
 
         //prepare next sample
         sample_index_iteration++;
@@ -115922,6 +115957,20 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         if(hit.vol_accumulated_opacity >= volume_rendering_termination_opacity)
             break;
     } 
+}
+
+void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit){
+    vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);         
+
+    vec3 combined_color = rgba_forward.rgb;
+    float combined_alpha = rgba_forward.a;
+
+    //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
+    float alpha_in = hit.vol_accumulated_opacity;
+    hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
+    //apply compositing: C_out = C_in + (1-alpha_in) * C';        
+    vec3 C_in = hit.vol_accumulated_color;
+    hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * combined_alpha;
 }
 
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)

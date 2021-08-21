@@ -461,8 +461,18 @@
                             <div class="input_row">
                                 <label>show</label>
                                 <div class="horizontal_div_2">
-                                    <input id="checkbox_show_volume_main" type="checkbox">
-                                    <input id="checkbox_show_volume_side" type="checkbox">
+                                    <select id="select_show_volume_main">
+                                        <option value="0">none</option>
+                                        <option value="1">both</option>
+                                        <option value="2">forward</option>
+                                        <option value="3">backward</option>
+                                    </select>
+                                    <select id="select_show_volume_side">
+                                        <option value="0">none</option>
+                                        <option value="1">both</option>
+                                        <option value="2">forward</option>
+                                        <option value="3">backward</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="input_row" id="input_row_volume_rendering_max_distance">

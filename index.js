@@ -617,7 +617,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
         canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
-        canvas_wrapper_main.show_volume_rendering = document.getElementById("checkbox_show_volume_main").checked;
+        canvas_wrapper_main.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_main").value);
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        
@@ -663,7 +663,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
-        canvas_wrapper_side.show_volume_rendering = document.getElementById("checkbox_show_volume_side").checked;
+        canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
        

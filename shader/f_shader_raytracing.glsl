@@ -192,6 +192,8 @@ uniform bool show_movable_axes;
 uniform bool show_streamlines;
 uniform bool show_streamlines_outside;
 uniform bool show_volume_rendering;
+uniform bool show_volume_rendering_forward;
+uniform bool show_volume_rendering_backward;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
 uniform float min_scalar_ftle;
@@ -291,6 +293,7 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
 //**********************************************************
 
 void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube);
+void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit);
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index);
 
 //**********************************************************
@@ -2306,21 +2309,21 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
             continue;
         }
 
-        //calculate forward color
-        int z_offset = 0;
-        vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);         
         //transfer_function_index_streamline_scalar;
         //transfer_function_index_ftle_forward;
         //transfer_function_index_ftle_backward;
-        vec3 combined_color = rgba_forward.rgb;
-        float combined_alpha = rgba_forward.a;
 
-        //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
-        float alpha_in = hit.vol_accumulated_opacity;
-        hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
-        //apply compositing: C_out = C_in + (1-alpha_in) * C';        
-        vec3 C_in = hit.vol_accumulated_color;
-        hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * combined_alpha; 
+        //calculate forward color
+        if(show_volume_rendering_forward){
+            int z_offset = 0;
+            ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_forward, hit);
+        }
+        
+        //calculate backward color
+        if(show_volume_rendering_backward){
+            int z_offset = dim_z;
+            ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_backward, hit);
+        }
 
         //prepare next sample
         sample_index_iteration++;
@@ -2328,6 +2331,20 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         if(hit.vol_accumulated_opacity >= volume_rendering_termination_opacity)
             break;
     } 
+}
+
+void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit){
+    vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);         
+
+    vec3 combined_color = rgba_forward.rgb;
+    float combined_alpha = rgba_forward.a;
+
+    //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
+    float alpha_in = hit.vol_accumulated_opacity;
+    hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
+    //apply compositing: C_out = C_in + (1-alpha_in) * C';        
+    vec3 C_in = hit.vol_accumulated_color;
+    hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * combined_alpha;
 }
 
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)

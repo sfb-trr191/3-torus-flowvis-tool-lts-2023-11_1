@@ -158,8 +158,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_cube_axes_origin_length_side", "oll"); 
         new InputWrapper(this, "input_cube_axes_origin_radius_side", "olr"); 
         //settings - volume rendering
-        new InputWrapper(this, "checkbox_show_volume_main", "vl"); 
-        new InputWrapper(this, "checkbox_show_volume_side", "vr"); 
+        new InputWrapper(this, "select_show_volume_main", "vl"); 
+        new InputWrapper(this, "select_show_volume_side", "vr"); 
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto");         
