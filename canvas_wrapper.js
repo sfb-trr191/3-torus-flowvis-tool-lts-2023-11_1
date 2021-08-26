@@ -386,13 +386,6 @@ class CanvasWrapper {
                 break;
         }
 
-        if(this.draw_mode == DRAW_MODE_PROJECTION){
-            projection_index = this.projection_index;
-            max_iteration_count = 1000;
-            tube_radius_factor_active = this.tube_radius_factor_projection;
-            tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
-        }
-
         var show_volume_rendering = false;
         var show_volume_rendering_forward = false;
         var show_volume_rendering_backward = false;
@@ -412,6 +405,15 @@ class CanvasWrapper {
                 break;
             default:
                 break;
+        }
+
+        if(this.draw_mode == DRAW_MODE_PROJECTION){
+            projection_index = this.projection_index;
+            max_iteration_count = 1000;
+            tube_radius_factor_active = this.tube_radius_factor_projection;
+            tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
+            //deactivate volume rendering in projection mode
+            show_volume_rendering = false;
         }
 
         var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
