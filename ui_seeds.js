@@ -148,7 +148,7 @@ class UISeeds {
     }
 
     generateDefaultSeeds() {
-        var count = 6;
+        var count = 7;
         while (count > this.list.length) {
             this.addSeed();
         }
@@ -157,35 +157,40 @@ class UISeeds {
         }
 
         var i = 0;
-        this.list[i].node_input_x.value = 0.01;
-        this.list[i].node_input_y.value = 0.25;
-        this.list[i].node_input_z.value = 0.25;
-        this.list[i].node_input_c.value = "#FF0000";
+        this.list[i].node_input_x.value = 0.4802;
+        this.list[i].node_input_y.value = 0.7473;
+        this.list[i].node_input_z.value = 0.1558;
+        this.list[i].node_input_c.value = "#EA4335";
         i += 1;
-        this.list[i].node_input_x.value = 0.99;
-        this.list[i].node_input_y.value = 0.25;
-        this.list[i].node_input_z.value = 0.75;
-        this.list[i].node_input_c.value = "#00FF00";
+        this.list[i].node_input_x.value = 0.5035;
+        this.list[i].node_input_y.value = 0.0771;
+        this.list[i].node_input_z.value = 0.8774;
+        this.list[i].node_input_c.value = "#34A853";
         i += 1;
-        this.list[i].node_input_x.value = 0.55;
-        this.list[i].node_input_y.value = 0.25;
-        this.list[i].node_input_z.value = 0.5;
-        this.list[i].node_input_c.value = "#0000FF";
+        this.list[i].node_input_x.value = 0.7352;
+        this.list[i].node_input_y.value = 0.3579;
+        this.list[i].node_input_z.value = 0.3672;
+        this.list[i].node_input_c.value = "#4285F4";
         i += 1;
-        this.list[i].node_input_x.value = 0.95;
-        this.list[i].node_input_y.value = 0.25;
-        this.list[i].node_input_z.value = 0.5;
-        this.list[i].node_input_c.value = "#FFFF00";
+        this.list[i].node_input_x.value = 0.2809;
+        this.list[i].node_input_y.value = 0.1736;
+        this.list[i].node_input_z.value = 0.0425;
+        this.list[i].node_input_c.value = "#FBBC05";
         i += 1;
-        this.list[i].node_input_x.value = 0.25;
-        this.list[i].node_input_y.value = 0.25;
-        this.list[i].node_input_z.value = 0.1;
-        this.list[i].node_input_c.value = "#FF00FF";
+        this.list[i].node_input_x.value = 0.8768;
+        this.list[i].node_input_y.value = 0.0078;
+        this.list[i].node_input_z.value = 0.8723;
+        this.list[i].node_input_c.value = "#B14FF3";
         i += 1;
-        this.list[i].node_input_x.value = 0.25;
-        this.list[i].node_input_y.value = 0.25;
-        this.list[i].node_input_z.value = 0.9;
-        this.list[i].node_input_c.value = "#00FFFF";
+        this.list[i].node_input_x.value = 0.6060;
+        this.list[i].node_input_y.value = 0.9590;
+        this.list[i].node_input_z.value = 0.9770;
+        this.list[i].node_input_c.value = "#FBCFEB";
+        i += 1;
+        this.list[i].node_input_x.value = 0.8768;
+        this.list[i].node_input_y.value = 0.0078;
+        this.list[i].node_input_z.value = 0.1277;
+        this.list[i].node_input_c.value = "#95FEF2";
     }
 
     addSeed() {
