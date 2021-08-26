@@ -254,7 +254,7 @@
                                 <label>index</label>
                                 <div class="slide_container">
                                     <input type="range" min="0" max="99" value="49" class="slider"
-                                        id="slide_slice_index">
+                                        id="slide_slice_index" title="The active slice.">
                                 </div>
                             </div>
                             <div class="input_row">
@@ -266,11 +266,20 @@
                             </div>
                             <div class="input_row">
                                 <label>interpolate</label>
-                                <input id="checkbox_ftle_slice_interpolate" type="checkbox" value="true" checked="true">
+                                <input id="checkbox_ftle_slice_interpolate" type="checkbox" value="true" checked="true" title="Interpolation method:
+    - checked: use bilinear interpolation
+    - unchecked: use nearest value">
                             </div>
                             <div class="input_row">
                                 <label>draw mode</label>
-                                <select id="select_slice_mode">
+                                <select id="select_slice_mode" title="Controls what is shown in the active slice:
+    - combined: forward + backward FTLE
+    - forward: forward FTLE
+    - backward: backward FTLE
+    - forward normal: the normal (=normalized gradient) of the forward FTLE.
+        x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.
+    - backward normal: the normal (=normalized gradient) of the backward FTLE
+        x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.">
                                     <option value="0">combined</option>
                                     <option value="1">forward</option>
                                     <option value="2">backward</option>
@@ -285,15 +294,15 @@
                         <div class="vertical_container">
                             <div class="input_row">
                                 <label>x</label>
-                                <input id="input_ftle_dim_x" type="text" value="100">
+                                <input id="input_ftle_dim_x" type="text" value="100" title="Resolution of the grid in x direction.">
                             </div>
                             <div class="input_row">
                                 <label>y</label>
-                                <input id="input_ftle_dim_y" type="text" value="100">
+                                <input id="input_ftle_dim_y" type="text" value="100" title="Resolution of the grid in y direction.">
                             </div>
                             <div class="input_row">
                                 <label>z</label>
-                                <input id="input_ftle_dim_z" type="text" value="100">
+                                <input id="input_ftle_dim_z" type="text" value="100" title="Resolution of the grid in z direction.">
                             </div>
                         </div>
                     </fieldset>
@@ -302,11 +311,11 @@
                         <div class="vertical_container">
                             <div class="input_row">
                                 <label>advection time</label>
-                                <input id="input_ftle_advection_time" type="text" value="0.5">
+                                <input id="input_ftle_advection_time" type="text" value="0.5" title="Numerical integration of each streamline of the flow map continues until the advection time is reached.">
                             </div>
                             <div class="input_row">
                                 <label>step size</label>
-                                <input id="input_ftle_step_size" type="text" value="0.0125">
+                                <input id="input_ftle_step_size" type="text" value="0.0125" title="Step size used for numerical integration of the flow map.">
                             </div>
                         </div>
                     </fieldset>
