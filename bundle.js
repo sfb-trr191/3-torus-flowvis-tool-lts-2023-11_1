@@ -118433,6 +118433,11 @@ class UITransferFunctions {
 
     removeOpacityPoint(index) {
         console.log("removeOpacityPoint: ", index);
+        if(index <= 0 || index >= this.list_opacity.length-1){
+            console.warn("can not remove point with index: ", index);
+            return;
+        }
+
         var to_remove = this.list_opacity[index];
         this.element_opacities.removeChild(to_remove.node);
         this.list_opacity.splice(index, 1);
@@ -118479,6 +118484,11 @@ class UITransferFunctions {
 
     removeColorPoint(index) {
         console.log("removeColorPoint: ", index);
+        if(index <= 0 || index >= this.list_color.length-1){
+            console.warn("can not remove point with index: ", index);
+            return;
+        }
+
         var to_remove = this.list_color[index];
         this.element_colors.removeChild(to_remove.node);
         this.list_color.splice(index, 1);
