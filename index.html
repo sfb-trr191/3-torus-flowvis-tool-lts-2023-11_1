@@ -452,15 +452,15 @@ The automatically corrected scalar field used for coloring the streamlines.">
                             <div class="input_row" id="input_row_bounding_axes_length">
                                 <label>length</label>
                                 <div class="horizontal_div_2">
-                                    <input id="input_cube_axes_length_main" type="text" value="0.5">
-                                    <input id="input_cube_axes_length_side" type="text" value="0.1">
+                                    <input id="input_cube_axes_length_main" type="text" value="0.5" title="Length of axes in the left canvas.">
+                                    <input id="input_cube_axes_length_side" type="text" value="0.1" title="Length of axes in the right canvas.">
                                 </div>
                             </div>
                             <div class="input_row" id="input_row_bounding_axes_radius">
                                 <label>radius</label>
                                 <div class="horizontal_div_2">
-                                    <input id="input_cube_axes_radius_main" type="text" value="0.01">
-                                    <input id="input_cube_axes_radius_side" type="text" value="0.01">
+                                    <input id="input_cube_axes_radius_main" type="text" value="0.01" title="Radius of axes in the left canvas.">
+                                    <input id="input_cube_axes_radius_side" type="text" value="0.01" title="Radius of axes in the right canvas.">
                                 </div>
                             </div>
                             <div class="input_row" id="input_row_emphasize_origin_axes">
@@ -468,21 +468,24 @@ The automatically corrected scalar field used for coloring the streamlines.">
                                 <div class="horizontal_div_2">
                                     <label></label>
                                     <input id="checkbox_show_origin_axes_side" type="checkbox" value="true"
-                                        checked="true">
+                                        checked="true" title="Emphasize the origin axes by allowing separate settings for length and radius.
+    - Right canvas only.">
                                 </div>
                             </div>
                             <div class="input_row" id="input_row_bounding_axes_origin_length">
                                 <label>length</label>
                                 <div class="horizontal_div_2">
                                     <label></label>
-                                    <input id="input_cube_axes_origin_length_side" type="text" value="0.9">
+                                    <input id="input_cube_axes_origin_length_side" type="text" value="0.9" title="Length of origin axes.
+    - Right canvas only.">
                                 </div>
                             </div>
                             <div class="input_row" id="input_row_bounding_axes_origin_radius">
                                 <label>radius</label>
                                 <div class="horizontal_div_2">
                                     <label></label>
-                                    <input id="input_cube_axes_origin_radius_side" type="text" value="0.01">
+                                    <input id="input_cube_axes_origin_radius_side" type="text" value="0.01" title="Radius of origin axes.
+    - Right canvas only.">
                                 </div>
                             </div>
                             <div class="input_row">
@@ -490,7 +493,8 @@ The automatically corrected scalar field used for coloring the streamlines.">
                                 <div class="horizontal_div_2">
                                     <label></label>
                                     <input id="checkbox_show_bounding_axes_projection_side" type="checkbox" value="true"
-                                        checked="true" title="Show gray axes in projection mode.">
+                                        checked="true" title="Show single color axes in projection mode.
+    - Right canvas only.">
                                 </div>
                             </div>
                         </div>
@@ -501,13 +505,13 @@ The automatically corrected scalar field used for coloring the streamlines.">
                             <div class="input_row">
                                 <label>show</label>
                                 <div class="horizontal_div_2">
-                                    <select id="select_show_volume_main">
+                                    <select id="select_show_volume_main" title="Show FTLE volume rendering in the left canvas.">
                                         <option value="0">none</option>
                                         <option value="1">both</option>
                                         <option value="2">forward</option>
                                         <option value="3">backward</option>
                                     </select>
-                                    <select id="select_show_volume_side">
+                                    <select id="select_show_volume_side" title="Show FTLE volume rendering in the right canvas.">
                                         <option value="0">none</option>
                                         <option value="1">both</option>
                                         <option value="2">forward</option>
@@ -517,15 +521,18 @@ The automatically corrected scalar field used for coloring the streamlines.">
                             </div>
                             <div class="input_row" id="input_row_volume_rendering_max_distance">
                                 <label>max distance</label>
-                                <input id="input_volume_rendering_max_distance" type="text" value="0">
+                                <input id="input_volume_rendering_max_distance" type="text" value="0"  title="Maximum distance of volume rendering.
+    - Volume rendering will not continue beyond the maximum distance specified by 'Settings.General.max distance'.
+    - A value of 0 means that no additional limit is used and 'Settings.General.max distance' is used instead.
+    - Reduce to improve performance.">
                             </div>
                             <div class="input_row" id="input_row_volume_rendering_distance_between_points">
                                 <label>sample distance</label>
-                                <input id="input_volume_rendering_distance_between_points" type="text" value="0.001">
+                                <input id="input_volume_rendering_distance_between_points" type="text" value="0.001" title="Distance between each sample.">
                             </div>
                             <div class="input_row" id="input_row_volume_rendering_termination_opacity">
                                 <label>termination opacity</label>
-                                <input id="input_volume_rendering_termination_opacity" type="text" value="0.99">
+                                <input id="input_volume_rendering_termination_opacity" type="text" value="0.99" title="Opacity threshold where volume rendering is stopped.">
                             </div>
                         </div>
                     </fieldset>
@@ -533,16 +540,26 @@ The automatically corrected scalar field used for coloring the streamlines.">
                         <legend>Quality</legend>
                         <div class="vertical_container">
                             <div class="input_row" id="input_row_still_resolution_factor">
-                                <label>still resolution factor</label>
-                                <input id="input_still_resolution_factor" type="text" value="1.0">
+                                <label>idle resolution factor</label>
+                                <input id="input_still_resolution_factor" type="text" value="1.0" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
+    - This value is used while the camera is NOT in panning mode.
+    - Panning mode is active while the left mouse button is down.
+    - Panning mode can be forced by pressing 'p' after clicking in the canvas.
+    - A lower resolution factor can greatly improve the performance.">
                             </div>
                             <div class="input_row" id="input_row_panning_resolution_factor">
                                 <label>panning resolution factor</label>
-                                <input id="input_panning_resolution_factor" type="text" value="0.5">
+                                <input id="input_panning_resolution_factor" type="text" value="0.5" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
+    - This value is used while the camera is in panning mode.
+    - Panning mode is active while the left mouse button is down.
+    - Panning mode can be forced by pressing 'p' after clicking in the canvas.
+    - A lower resolution factor can greatly improve the performance.">
                             </div>
                             <div class="input_row" id="input_row_lod_still">
-                                <label>LOD still</label>
-                                <select id="select_lod_still">
+                                <label>LOD idle</label>
+                                <select id="select_lod_still" title="The level of detail of the streamlines.
+    - This value is used while the camera is NOT in panning mode.
+    - Quality in descending order: raw, high, medium, low.">
                                     <option value="0">raw</option>
                                     <option value="1">high</option>
                                     <option value="2">medium</option>
@@ -551,7 +568,9 @@ The automatically corrected scalar field used for coloring the streamlines.">
                             </div>
                             <div class="input_row" id="input_row_lod_panning">
                                 <label>LOD panning</label>
-                                <select id="select_lod_panning">
+                                <select id="select_lod_panning" title="The level of detail of the streamlines.
+    - This value is used while the camera is in panning mode.
+    - Quality in descending order: raw, high, medium, low.">
                                     <option value="0">raw</option>
                                     <option value="1">high</option>
                                     <option value="2">medium</option>
