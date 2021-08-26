@@ -448,27 +448,33 @@ class GL_CameraData {
 class CameraState {
 
     constructor() {
+        //saved variables
         this.forward = glMatrix.vec3.create();
         this.up = glMatrix.vec3.create();
         this.position = glMatrix.vec3.create();
+        //unsaved variables
+        this.allow_panning = true;
     }
 
     setProjectionX() {
         this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
         this.up = glMatrix.vec3.fromValues(0, 0, -1);
         this.position = glMatrix.vec3.fromValues(1, 0.5, 0.5);
+        this.allow_panning = false;
     }
 
     setProjectionY() {
         this.forward = glMatrix.vec3.fromValues(0, -1, 0);
         this.up = glMatrix.vec3.fromValues(-1, 0, 0);
         this.position = glMatrix.vec3.fromValues(0.5, 1, 0.5);
+        this.allow_panning = false;
     }
 
     setProjectionZ() {
         this.forward = glMatrix.vec3.fromValues(0, 0, -1);
         this.up = glMatrix.vec3.fromValues(0, -1, 0);
         this.position = glMatrix.vec3.fromValues(0.5, 0.5, 1);
+        this.allow_panning = false;
     }
 
     fromString(s) {
@@ -530,6 +536,7 @@ class Camera {
         this.changed = true;
 
         //panning
+        this.allow_panning = true;
         this.panning = false;
         this.panning_forced = false;
         this.xMouse_old = 0;
@@ -849,6 +856,10 @@ class Camera {
     }
 
     UpdatePanning(x, y, left_handed) {
+        //check if panning mode is allowed
+        if(!this.allow_panning)
+            return
+        //check if currently in panning mode
         if (!this.panning)
             return;
         //console.log("UpdatePanning")
@@ -1031,12 +1042,14 @@ class Camera {
         glMatrix.vec3.copy(this.forward, state_new.forward);
         glMatrix.vec3.copy(this.up, state_new.up);
         glMatrix.vec3.copy(this.position, state_new.position);
+        this.allow_panning = state_new.allow_panning;
 
         this.current_state_name = state_name_new;
         console.log("loadState: ", this.current_state_name);
         console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
         console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
+
     }
 
     saveCurrentState() {
