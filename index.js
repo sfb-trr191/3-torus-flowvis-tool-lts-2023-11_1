@@ -665,6 +665,8 @@ const Export = module_export.Export;
         canvas_wrapper_side.handle_inside = false;
         canvas_wrapper_side.is_main_renderer = false;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
+        canvas_wrapper_side.show_bounding_box_projection = document.getElementById("checkbox_show_bounding_axes_projection_side").checked;
+        
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);

@@ -188,6 +188,7 @@ uniform bool handle_inside;
 uniform bool is_main_renderer;
 uniform bool show_origin_axes;
 uniform bool show_bounding_box;
+uniform bool show_bounding_box_projection;
 uniform bool show_movable_axes;
 uniform bool show_streamlines;
 uniform bool show_streamlines_outside;
@@ -754,14 +755,13 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	
 	if(show_bounding_box)
 	{
-        if(projection_index < 0){
-		    IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
-        }
-        else{
-            bool check_bounds = true;
-            IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
-        }
+        IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
 	}
+    if(show_bounding_box_projection)
+    {
+        bool check_bounds = true;
+        IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
+    }
 
 /*
 	if(show_main_camera_axes)

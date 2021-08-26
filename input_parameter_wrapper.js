@@ -150,6 +150,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "checkbox_show_movable_axes_side", "mar");  
         new InputWrapper(this, "checkbox_show_bounding_axes_main", "bal");  
         new InputWrapper(this, "checkbox_show_bounding_axes_side", "bar");  
+        new InputWrapper(this, "checkbox_show_bounding_axes_projection_side", "barp");          
         new InputWrapper(this, "input_cube_axes_length_main", "all"); 
         new InputWrapper(this, "input_cube_axes_length_side", "alr"); 
         new InputWrapper(this, "input_cube_axes_radius_main", "arl"); 

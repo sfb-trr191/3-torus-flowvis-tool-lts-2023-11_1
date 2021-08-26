@@ -1102,6 +1102,7 @@ class UniformLocationsRayTracing {
         this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");
         this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");
         this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
+        this.location_show_bounding_box_projection = gl.getUniformLocation(program, "show_bounding_box_projection");        
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
         this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
@@ -1220,6 +1221,7 @@ class CanvasWrapper {
         this.min_scalar = 0;
         this.max_scalar = 0;
         this.show_bounding_box = false;
+        this.show_bounding_box_projection = false;
         this.show_movable_axes = false;
         this.show_origin_axes = false;
         this.draw_mode = DRAW_MODE_DEFAULT;
@@ -1437,6 +1439,9 @@ class CanvasWrapper {
         var tube_radius_factor_active = this.tube_radius_factor;
         var tube_radius_factor_active_outside = this.tube_radius_factor;
 
+        var show_bounding_box = this.show_bounding_box;
+        var show_bounding_box_projection = this.show_bounding_box_projection;
+
         var streamline_method = this.draw_mode == DRAW_MODE_PROJECTION ? this.streamline_method_projection : this.streamline_method;
         var show_streamlines = false;
         var show_streamlines_outside = false;
@@ -1483,6 +1488,10 @@ class CanvasWrapper {
             tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
             //deactivate volume rendering in projection mode
             show_volume_rendering = false;
+            show_bounding_box = false;
+        }
+        else{
+            show_bounding_box_projection = false;
         }
 
         var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
@@ -1515,7 +1524,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces);
         gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside);
         gl.uniform1i(this.location_raytracing.location_is_main_renderer, this.is_main_renderer);
-        gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box);
+        gl.uniform1i(this.location_raytracing.location_show_bounding_box, show_bounding_box);
+        gl.uniform1i(this.location_raytracing.location_show_bounding_box_projection, show_bounding_box_projection);
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
         gl.uniform1i(this.location_raytracing.location_show_streamlines, show_streamlines);
@@ -5022,6 +5032,8 @@ const Export = module_export.Export;
         canvas_wrapper_side.handle_inside = false;
         canvas_wrapper_side.is_main_renderer = false;
         canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
+        canvas_wrapper_side.show_bounding_box_projection = document.getElementById("checkbox_show_bounding_axes_projection_side").checked;
+        
         canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);
@@ -5429,7 +5441,8 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_main"));    
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_movable_axes_side"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_main"));  
-        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_side"));     
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_side"));    
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_bounding_axes_projection_side"));    
         //this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_main"));  
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_origin_axes_side"));     
         this.group_render_settings.AddInput(document.getElementById("select_show_volume_main"));     
@@ -5775,6 +5788,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "checkbox_show_movable_axes_side", "mar");  
         new InputWrapper(this, "checkbox_show_bounding_axes_main", "bal");  
         new InputWrapper(this, "checkbox_show_bounding_axes_side", "bar");  
+        new InputWrapper(this, "checkbox_show_bounding_axes_projection_side", "barp");          
         new InputWrapper(this, "input_cube_axes_length_main", "all"); 
         new InputWrapper(this, "input_cube_axes_length_side", "alr"); 
         new InputWrapper(this, "input_cube_axes_radius_main", "arl"); 
@@ -113843,6 +113857,7 @@ uniform bool handle_inside;
 uniform bool is_main_renderer;
 uniform bool show_origin_axes;
 uniform bool show_bounding_box;
+uniform bool show_bounding_box_projection;
 uniform bool show_movable_axes;
 uniform bool show_streamlines;
 uniform bool show_streamlines_outside;
@@ -114409,14 +114424,13 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	
 	if(show_bounding_box)
 	{
-        if(projection_index < 0){
-		    IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
-        }
-        else{
-            bool check_bounds = true;
-            IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
-        }
+        IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
 	}
+    if(show_bounding_box_projection)
+    {
+        bool check_bounds = true;
+        IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
+    }
 
 /*
 	if(show_main_camera_axes)

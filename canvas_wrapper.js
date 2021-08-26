@@ -33,6 +33,7 @@ class UniformLocationsRayTracing {
         this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");
         this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");
         this.location_show_bounding_box = gl.getUniformLocation(program, "show_bounding_box");
+        this.location_show_bounding_box_projection = gl.getUniformLocation(program, "show_bounding_box_projection");        
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
         this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
@@ -151,6 +152,7 @@ class CanvasWrapper {
         this.min_scalar = 0;
         this.max_scalar = 0;
         this.show_bounding_box = false;
+        this.show_bounding_box_projection = false;
         this.show_movable_axes = false;
         this.show_origin_axes = false;
         this.draw_mode = DRAW_MODE_DEFAULT;
@@ -368,6 +370,9 @@ class CanvasWrapper {
         var tube_radius_factor_active = this.tube_radius_factor;
         var tube_radius_factor_active_outside = this.tube_radius_factor;
 
+        var show_bounding_box = this.show_bounding_box;
+        var show_bounding_box_projection = this.show_bounding_box_projection;
+
         var streamline_method = this.draw_mode == DRAW_MODE_PROJECTION ? this.streamline_method_projection : this.streamline_method;
         var show_streamlines = false;
         var show_streamlines_outside = false;
@@ -414,6 +419,10 @@ class CanvasWrapper {
             tube_radius_factor_active_outside = this.tube_radius_factor_projection_highlight;
             //deactivate volume rendering in projection mode
             show_volume_rendering = false;
+            show_bounding_box = false;
+        }
+        else{
+            show_bounding_box_projection = false;
         }
 
         var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
@@ -446,7 +455,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces);
         gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside);
         gl.uniform1i(this.location_raytracing.location_is_main_renderer, this.is_main_renderer);
-        gl.uniform1i(this.location_raytracing.location_show_bounding_box, this.show_bounding_box);
+        gl.uniform1i(this.location_raytracing.location_show_bounding_box, show_bounding_box);
+        gl.uniform1i(this.location_raytracing.location_show_bounding_box_projection, show_bounding_box_projection);
         gl.uniform1i(this.location_raytracing.location_show_movable_axes, this.show_movable_axes);
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
         gl.uniform1i(this.location_raytracing.location_show_streamlines, show_streamlines);
