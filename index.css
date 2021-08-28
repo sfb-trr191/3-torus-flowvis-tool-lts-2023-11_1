@@ -431,6 +431,10 @@ legend {
     display: none;
 }
 
+#button_update_camera{
+    background-image: url("icons/refresh_camera.png");
+}
+
 .toolbar button.camera_unselected {
     background-image: url("icons/camera_unselected.png");
 }

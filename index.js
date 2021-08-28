@@ -397,13 +397,8 @@ const Export = module_export.Export;
         document.getElementById("button_update_camera").addEventListener("click", function () {
             console.log("onClickUpdateCamera");
             UpdateCamera();
-        });
-        document.getElementById("button_update_side_camera").addEventListener("click", function () {
-            console.log("onClickUpdateSideCamera");
             UpdateSideCamera();
         });
-
-
     }
 
     function addOnClickAddSeed() {

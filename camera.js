@@ -207,7 +207,7 @@ class Camera {
         this.input_camera_up_x.value = up_negated[0].toFixed(decimals);
         this.input_camera_up_y.value = up_negated[1].toFixed(decimals);
         this.input_camera_up_z.value = up_negated[2].toFixed(decimals);
-        this.input_changed_manager.UpdateDefaultValues(this.name);
+        this.input_changed_manager.UpdateDefaultValuesCamera();
     }
 
     fromString(s) {

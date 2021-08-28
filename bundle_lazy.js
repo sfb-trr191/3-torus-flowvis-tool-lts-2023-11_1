@@ -82,8 +82,7 @@ global.CANVAS_TRANSFER_FUNCTION_WIDTH = 512;
 global.CANVAS_TRANSFER_FUNCTION_HEIGHT = 256;
 
 global.GROUP_NAME_CALCULATE = "group_calculate";
-global.GROUP_NAME_MAIN_CAMERA = "group_main_camera";
-global.GROUP_NAME_SIDE_CAMERA = "group_side_camera";
+global.GROUP_NAME_CAMERA = "group_camera";
 global.GROUP_NAME_RENDER_SETTINGS = "group_render_settings";
 
 global.TRANSFER_FUNCTION_AREA_NONE = 0;
