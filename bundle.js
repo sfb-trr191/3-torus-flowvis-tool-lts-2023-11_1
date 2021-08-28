@@ -118545,16 +118545,19 @@ class UITransferFunctionOpacityPoint {
         this.node_input_t = document.createElement("input");
         this.node_input_t.type = "text";
         this.node_input_t.value = "0.5";
+        this.node_input_t.title = "Input value of the transfer function between 0 and 1.";
         this.node.appendChild(this.node_input_t);
 
         this.node_input_a = document.createElement("input");
         this.node_input_a.type = "text";
         this.node_input_a.value = "0.5";
+        this.node_input_a.title = "Opacity for the input value on the left.";
         this.node.appendChild(this.node_input_a);
 
         this.node_button = document.createElement("button");
         this.node_button.innerHTML = "x";
         this.node_button.type = "button";
+        this.node_button.title = "Remove this row. \n    - Removing the first or last row is not possible.";
         this.node_button.addEventListener("click", (event) => {
             console.log("this.index: ", event.target.id, this.index);
             this.ui_transfer_functions.removeOpacityPoint(this.index);
@@ -118608,16 +118611,19 @@ class UITransferFunctionColorPoint {
         this.node_input_t = document.createElement("input");
         this.node_input_t.type = "text";
         this.node_input_t.value = "0.5";
+        this.node_input_t.title = "Input value of the transfer function between 0 and 1.";
         this.node.appendChild(this.node_input_t);
 
         this.node_input_c = document.createElement("input");
         this.node_input_c.type = "color";
         this.node_input_c.value = "#FFFFFF";
+        this.node_input_c.title = "Color for the input value on the left.";
         this.node.appendChild(this.node_input_c);
 
         this.node_button = document.createElement("button");
         this.node_button.innerHTML = "x";
         this.node_button.type = "button";
+        this.node_button.title = "Remove this row. \n    - Removing the first or last row is not possible.";
         this.node_button.addEventListener("click", (event) => {
             console.log("this.index: ", event.target.id, this.index);
             this.ui_transfer_functions.removeColorPoint(this.index);

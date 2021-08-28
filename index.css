@@ -185,14 +185,14 @@ legend {
 
 .horizontal_div_tranfer_function_color {
     display: inline-grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 36px;
     column-gap: 4px;
     gap: 4px;
 }
 
 .horizontal_div_tranfer_function_opacity {
     display: inline-grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 36px;
     column-gap: 4px;
     gap: 4px;
 }
@@ -484,6 +484,7 @@ legend {
     margin: 0px 0px 0px 0px;
     padding: 0;
 }
+
 
 #fieldset_seeds #button_delete_this_seed{
     width: 32px;
