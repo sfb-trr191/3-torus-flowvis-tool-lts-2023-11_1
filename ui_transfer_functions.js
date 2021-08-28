@@ -294,7 +294,7 @@ class UITransferFunctions {
             this.addOpacityPoint();
         }
         while (this.list_opacity.length > split.length) {
-            this.removeOpacityPoint(this.list_opacity.length - 1);
+            this.removeOpacityPoint(this.list_opacity.length - 2);
         }
 
         for (var i = 0; i < split.length; i++) {
@@ -317,7 +317,7 @@ class UITransferFunctions {
             this.addColorPoint();
         }
         while (this.list_color.length > split.length) {
-            this.removeColorPoint(this.list_color.length - 1);
+            this.removeColorPoint(this.list_color.length - 2);
         }
 
         for (var i = 0; i < split.length; i++) {

@@ -216,7 +216,7 @@ class HideManager {
         this.groups.push(this.group_data);
 
         this.group_settings = new HideGroup("select_settings_mode");
-        this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
+        //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);

@@ -4306,7 +4306,7 @@ class HideManager {
         this.groups.push(this.group_data);
 
         this.group_settings = new HideGroup("select_settings_mode");
-        this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
+        //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);
@@ -118563,7 +118563,7 @@ class UITransferFunctions {
             this.addOpacityPoint();
         }
         while (this.list_opacity.length > split.length) {
-            this.removeOpacityPoint(this.list_opacity.length - 1);
+            this.removeOpacityPoint(this.list_opacity.length - 2);
         }
 
         for (var i = 0; i < split.length; i++) {
@@ -118586,7 +118586,7 @@ class UITransferFunctions {
             this.addColorPoint();
         }
         while (this.list_color.length > split.length) {
-            this.removeColorPoint(this.list_color.length - 1);
+            this.removeColorPoint(this.list_color.length - 2);
         }
 
         for (var i = 0; i < split.length; i++) {
