@@ -4465,6 +4465,10 @@ class HideManager {
         this.mcw_randomize_seed_colors.set_condition(this.condition_tab_data)
         this.multi_consodtional_elements.push(this.mcw_randomize_seed_colors);
 
+        this.mcw_set_magnetic_field = new MultiConditionalWrapper("wrapper_button_set_magnetic_field");
+        this.mcw_set_magnetic_field.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_set_magnetic_field);
+
         this.mcw_export = new MultiConditionalWrapper("wrapper_button_export");
         this.mcw_export.set_condition(this.condition_tab_export)
         this.multi_consodtional_elements.push(this.mcw_export);
@@ -4611,6 +4615,7 @@ const Export = module_export.Export;
         addOnClickAddSeed();
         addOnClickRandomizeSeedPositions();
         addOnClickUpdateURL();
+        addOnClickSetMagneticField();
         addOnClickExport();
         addOnClickTabs();
         addChangedSideMode();
@@ -4909,6 +4914,13 @@ const Export = module_export.Export;
             RandomizeSeedPositionsNewSeed();
         });
         */
+    }
+
+    function addOnClickSetMagneticField() {
+        document.getElementById("button_set_magnetic_field").addEventListener("click", function () {
+            console.log("onClickSetMagneticField");
+            SetMagneticField();
+        });
     }
 
     function addOnClickUpdateURL() {
@@ -5248,6 +5260,11 @@ const Export = module_export.Export;
         side_camera.saveCurrentState();
         var query_string = input_parameter_wrapper.toQueryString();
         window.history.pushState(null, null, 'index.html' + query_string);
+    }
+
+    function SetMagneticField(){
+        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
+        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
     }
 
     function UpdateHiddenWarnings() {

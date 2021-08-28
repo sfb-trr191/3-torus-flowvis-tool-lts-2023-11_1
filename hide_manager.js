@@ -319,6 +319,10 @@ class HideManager {
         this.mcw_randomize_seed_colors.set_condition(this.condition_tab_data)
         this.multi_consodtional_elements.push(this.mcw_randomize_seed_colors);
 
+        this.mcw_set_magnetic_field = new MultiConditionalWrapper("wrapper_button_set_magnetic_field");
+        this.mcw_set_magnetic_field.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_set_magnetic_field);
+
         this.mcw_export = new MultiConditionalWrapper("wrapper_button_export");
         this.mcw_export.set_condition(this.condition_tab_export)
         this.multi_consodtional_elements.push(this.mcw_export);
