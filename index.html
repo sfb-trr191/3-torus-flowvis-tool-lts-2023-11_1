@@ -112,7 +112,8 @@
                     HTML5 canvas.</canvas>
             </div>
             <div class="horizontal_container">
-                <select id="select_side_mode">
+                <select id="select_side_mode" title="Select what is shown in the right canvas.
+    - 2D FTLE slice: (warning: possibly unintuitive axes)">
                     <option value="0">hide canvas</option>
                     <!--DRAW_MODE_NONE-->
                     <option value="1">3D fundamental domain</option>
@@ -123,13 +124,13 @@
                     <!--DRAW_MODE_FTLE_SLICE-->
                 </select>
                 <div class="show" id="show_projection_index">
-                    <select id="select_projection_index">
-                        <option value="2">horizontal: x vertical: y</option>
-                        <option value="0">horizontal: y vertical: z</option>
-                        <option value="1">horizontal: z vertical: x</option>
+                    <select id="select_projection_index" title="Select the projection. Origin is bottom left of each square.">
+                        <option value="2">z=0 (horizontal: x vertical: y)</option>
+                        <option value="0">x=0 (horizontal: y vertical: z)</option>
+                        <option value="1">y=0 (horizontal: z vertical: x)</option>
                     </select>
                 </div>
-                <div class="show" id="show_slice_axes_order">
+                <div class="show" id="show_slice_axes_order" title="Select the slice direction.">
                     <select id="select_slice_axes_order">
                         <option value="0">horizontal: x vertical: y</option>
                         <option value="1">horizontal: x vertical: z</option>
