@@ -620,6 +620,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_main").value);
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
+        canvas_wrapper_main.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
        
         canvas_wrapper_main.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_main.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
@@ -672,6 +673,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
+        canvas_wrapper_side.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
        
         canvas_wrapper_side.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_side.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);

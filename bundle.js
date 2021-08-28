@@ -1112,7 +1112,7 @@ class UniformLocationsRayTracing {
         this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
-        
+        this.location_volume_rendering_opacity_factor = gl.getUniformLocation(program, "volume_rendering_opacity_factor");
         
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
@@ -1236,6 +1236,7 @@ class CanvasWrapper {
         this.show_volume_rendering_backward = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
+        this.volume_rendering_opacity_factor = 1.0;
         this.transfer_function_index_streamline_scalar = 0;
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
@@ -1538,7 +1539,10 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
+        gl.uniform1f(this.location_raytracing.location_volume_rendering_opacity_factor, this.volume_rendering_opacity_factor);
         
+
+
         gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);
@@ -4315,6 +4319,7 @@ class HideManager {
         this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_distance_between_points", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_termination_opacity", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_volume_rendering_opacity_factor", LEVEL_DEBUG, false);
         this.group_settings.AddInputRow("input_row_still_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED, false);
@@ -4987,6 +4992,7 @@ const Export = module_export.Export;
         canvas_wrapper_main.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_main").value);
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
+        canvas_wrapper_main.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
        
         canvas_wrapper_main.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_main.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
@@ -5039,6 +5045,7 @@ const Export = module_export.Export;
         canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
+        canvas_wrapper_side.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
        
         canvas_wrapper_side.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_side.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
@@ -5452,7 +5459,8 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_backward")); 
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
-        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));          
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));       
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));           
     }
 
     LinkUISeeds(ui_seeds){
@@ -113866,6 +113874,7 @@ uniform bool show_volume_rendering_forward;
 uniform bool show_volume_rendering_backward;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
+uniform float volume_rendering_opacity_factor;
 uniform float min_scalar_ftle;
 uniform float max_scalar_ftle;
 
@@ -116006,7 +116015,7 @@ void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer
     vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);         
 
     vec3 combined_color = rgba_forward.rgb;
-    float combined_alpha = rgba_forward.a;
+    float combined_alpha = rgba_forward.a * volume_rendering_opacity_factor;//volume_rendering_opacity_factor (experimental)
 
     //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
     float alpha_in = hit.vol_accumulated_opacity;

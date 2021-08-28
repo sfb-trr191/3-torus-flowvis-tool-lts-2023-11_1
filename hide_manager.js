@@ -225,6 +225,7 @@ class HideManager {
         this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_distance_between_points", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_termination_opacity", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_volume_rendering_opacity_factor", LEVEL_DEBUG, false);
         this.group_settings.AddInputRow("input_row_still_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED, false);

@@ -43,7 +43,7 @@ class UniformLocationsRayTracing {
         this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
-        
+        this.location_volume_rendering_opacity_factor = gl.getUniformLocation(program, "volume_rendering_opacity_factor");
         
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
@@ -167,6 +167,7 @@ class CanvasWrapper {
         this.show_volume_rendering_backward = false;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
+        this.volume_rendering_opacity_factor = 1.0;
         this.transfer_function_index_streamline_scalar = 0;
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
@@ -469,7 +470,10 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
+        gl.uniform1f(this.location_raytracing.location_volume_rendering_opacity_factor, this.volume_rendering_opacity_factor);
         
+
+
         gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);

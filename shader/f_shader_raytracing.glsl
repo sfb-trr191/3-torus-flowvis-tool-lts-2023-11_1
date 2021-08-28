@@ -197,6 +197,7 @@ uniform bool show_volume_rendering_forward;
 uniform bool show_volume_rendering_backward;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
+uniform float volume_rendering_opacity_factor;
 uniform float min_scalar_ftle;
 uniform float max_scalar_ftle;
 
@@ -2337,7 +2338,7 @@ void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer
     vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);         
 
     vec3 combined_color = rgba_forward.rgb;
-    float combined_alpha = rgba_forward.a;
+    float combined_alpha = rgba_forward.a * volume_rendering_opacity_factor;//volume_rendering_opacity_factor (experimental)
 
     //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
     float alpha_in = hit.vol_accumulated_opacity;
