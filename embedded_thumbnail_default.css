@@ -14,3 +14,7 @@ canvas {
     border: none;
     background-color: black; 
 }
+
+.toolbar {
+    display: none;
+}

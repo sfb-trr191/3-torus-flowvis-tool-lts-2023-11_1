@@ -123,3 +123,7 @@ fieldset {
 {
     display: none;
 }
+
+.toolbar {
+    display: none;
+}
