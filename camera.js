@@ -658,6 +658,8 @@ class Camera {
       
     //order: right, up, forward
     SetOrientation_Yneg_Zpos_Xpos() {
+        if(!this.allow_panning)
+            return;
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(1, epsilon, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
@@ -667,6 +669,8 @@ class Camera {
     
     //order: right, up, forward
     SetOrientation_Ypos_Zpos_Xneg() {
+        if(!this.allow_panning)
+            return;
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(-1, epsilon, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
@@ -676,6 +680,8 @@ class Camera {
     
     //order: right, up, forward
     SetOrientation_Xpos_Zpos_Ypos() {
+        if(!this.allow_panning)
+            return;
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
@@ -685,6 +691,8 @@ class Camera {
 
     //order: right, up, forward
     SetOrientation_Xneg_Zpos_Yneg() {
+        if(!this.allow_panning)
+            return;
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, -1, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
@@ -694,6 +702,8 @@ class Camera {
 
     //order: right, up, forward
     SetOrientation_Xneg_Ypos_Zpos() {
+        if(!this.allow_panning)
+            return;
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
         var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
@@ -703,6 +713,8 @@ class Camera {
 
     //order: right, up, forward
     SetOrientation_Xpos_Ypos_Zneg() {
+        if(!this.allow_panning)
+            return;
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, -1);
         var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
