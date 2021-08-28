@@ -431,6 +431,39 @@ legend {
     display: none;
 }
 
+.toolbar button.camera_unselected {
+    background-image: url("icons/camera_unselected.png");
+}
+
+.toolbar button.camera_selected {
+    background-image: url("icons/camera_selected.png");
+}
+
+#button_camera_Yneg_Zpos_Xpos{
+    background-image: url("icons/axes_x_pos.png");
+}
+
+#button_camera_Ypos_Zpos_Xneg{
+    background-image: url("icons/axes_x_neg.png");
+}
+
+#button_camera_Xpos_Zpos_Ypos{
+    background-image: url("icons/axes_y_pos.png");
+}
+
+#button_camera_Xneg_Zpos_Yneg{
+    background-image: url("icons/axes_y_neg.png");
+}
+
+#button_camera_Xneg_Ypos_Zpos{
+    background-image: url("icons/axes_z_pos.png");
+}
+
+#button_camera_Xpos_Ypos_Zneg{
+    background-image: url("icons/axes_z_neg.png");
+}
+
+
 #select_side_mode{
     width: 1fr;
     margin: 4px;

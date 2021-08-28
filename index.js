@@ -40,6 +40,7 @@ const module_webgl = require("./webgl");
 const getRenderingContext = module_webgl.getRenderingContext;
 const UISeeds = require("./ui_seeds");
 const UITransferFunctions = require("./ui_transfer_functions");
+const UILeftToolBar = require("./ui_left_tool_bar");
 const Lights = require("./lights");
 const TransferFunctionManager = require("./transfer_function_manager");
 const ObjectManager = require("./object_manager");
@@ -101,6 +102,7 @@ const Export = module_export.Export;
 
     var ui_seeds;
     var ui_transfer_functions;
+    var ui_left_tool_bar;
     var global_data;
     var time_last_tick = 0;
     var fps_display;
@@ -175,6 +177,8 @@ const Export = module_export.Export;
         input_changed_manager.LinkUISeeds(ui_seeds);
 
         ui_transfer_functions = new UITransferFunctions();
+
+        ui_left_tool_bar = new UILeftToolBar(main_camera, side_camera);
 
         lights = new Lights();
         lights.GenerateDefaultLighting();

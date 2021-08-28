@@ -404,7 +404,7 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":11,"./utility":1033,"gl-matrix":53}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":11,"./utility":1034,"gl-matrix":53}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -1062,7 +1062,60 @@ class Camera {
         console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
     }
+      
+    //order: right, up, forward
+    SetOrientation_Yneg_Zpos_Xpos() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(1, epsilon, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+    
+    //order: right, up, forward
+    SetOrientation_Ypos_Zpos_Xneg() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(-1, epsilon, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+    
+    //order: right, up, forward
+    SetOrientation_Xpos_Zpos_Ypos() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
 
+    //order: right, up, forward
+    SetOrientation_Xneg_Zpos_Yneg() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, -1, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+
+    //order: right, up, forward
+    SetOrientation_Xneg_Ypos_Zpos() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+
+    //order: right, up, forward
+    SetOrientation_Xpos_Ypos_Zneg() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, -1);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
 }
 
 module.exports = Camera;
@@ -1765,7 +1818,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1026,"./webgl":1034}],6:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1026,"./webgl":1035}],6:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -2523,7 +2576,7 @@ class CanvasWrapperTransferFunction {
 }
 
 module.exports = CanvasWrapperTransferFunction;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1026,"./utility":1033,"./webgl":1034}],7:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1026,"./utility":1034,"./webgl":1035}],7:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -3939,7 +3992,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1026,"./utility":1033,"./webgl":1034,"ml-matrix":990}],16:[function(require,module,exports){
+},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1026,"./utility":1034,"./webgl":1035,"ml-matrix":990}],16:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -4412,6 +4465,7 @@ const module_webgl = require("./webgl");
 const getRenderingContext = module_webgl.getRenderingContext;
 const UISeeds = require("./ui_seeds");
 const UITransferFunctions = require("./ui_transfer_functions");
+const UILeftToolBar = require("./ui_left_tool_bar");
 const Lights = require("./lights");
 const TransferFunctionManager = require("./transfer_function_manager");
 const ObjectManager = require("./object_manager");
@@ -4473,6 +4527,7 @@ const Export = module_export.Export;
 
     var ui_seeds;
     var ui_transfer_functions;
+    var ui_left_tool_bar;
     var global_data;
     var time_last_tick = 0;
     var fps_display;
@@ -4547,6 +4602,8 @@ const Export = module_export.Export;
         input_changed_manager.LinkUISeeds(ui_seeds);
 
         ui_transfer_functions = new UITransferFunctions();
+
+        ui_left_tool_bar = new UILeftToolBar(main_camera, side_camera);
 
         lights = new Lights();
         lights.GenerateDefaultLighting();
@@ -5305,7 +5362,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_resampling.glsl":1018,"./shader/f_shader_sum.glsl":1019,"./shader/f_shader_transfer_function.glsl":1020,"./shader/f_shader_transfer_function_points.glsl":1021,"./shader/v_shader_raytracing.glsl":1022,"./shader/v_shader_resampling.glsl":1023,"./shader/v_shader_transfer_function_points.glsl":1024,"./shader_manager":1025,"./streamline_context":1027,"./tab_manager":1029,"./transfer_function_manager":1030,"./ui_seeds":1031,"./ui_transfer_functions":1032,"./utility":1033,"./webgl":1034,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_resampling.glsl":1018,"./shader/f_shader_sum.glsl":1019,"./shader/f_shader_transfer_function.glsl":1020,"./shader/f_shader_transfer_function_points.glsl":1021,"./shader/v_shader_raytracing.glsl":1022,"./shader/v_shader_resampling.glsl":1023,"./shader/v_shader_transfer_function_points.glsl":1024,"./shader_manager":1025,"./streamline_context":1027,"./tab_manager":1029,"./transfer_function_manager":1030,"./ui_left_tool_bar":1031,"./ui_seeds":1032,"./ui_transfer_functions":1033,"./utility":1034,"./webgl":1035,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -5925,7 +5982,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1033}],23:[function(require,module,exports){
+},{"./utility":1034}],23:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -6488,7 +6545,7 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1033,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1034,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 
@@ -6589,7 +6646,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1033}],26:[function(require,module,exports){
+},{"./utility":1034}],26:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -117947,7 +118004,112 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":11,"./utility":1033,"gl-matrix":53}],1031:[function(require,module,exports){
+},{"./data_types":11,"./utility":1034,"gl-matrix":53}],1031:[function(require,module,exports){
+
+class UISelectedCameraIndicator{
+
+    constructor(){
+        this.button_left = document.getElementById("button_select_camera_left");
+        this.button_right = document.getElementById("button_select_camera_right");
+        this.selected_left = true;
+        this.selected_right = false;
+    }
+
+    Unselect(){
+        this.button_left.className = "camera_unselected";
+        this.button_right.className = "camera_unselected";
+    }
+
+    SelectLeft(){
+        this.selected_left = true;
+        this.selected_right = false;
+        this.button_left.className = "camera_selected";
+        this.button_right.className = "camera_unselected";
+    }
+
+    SelectRight(){
+        this.selected_left = false;
+        this.selected_right = true;
+        this.button_left.className = "camera_unselected";
+        this.button_right.className = "camera_selected";
+    }
+}
+
+class UILeftToolBar{
+
+    constructor(main_camera, side_camera){
+        this.main_camera = main_camera;
+        this.side_camera = side_camera;
+        this.ui_selected_camera_indicator = new UISelectedCameraIndicator();
+        this.ui_selected_camera_indicator.SelectLeft();
+
+        this.ui_selected_camera_indicator.button_left.addEventListener("mousedown", (event) => {
+            this.ui_selected_camera_indicator.SelectLeft();
+        });
+        this.ui_selected_camera_indicator.button_right.addEventListener("mousedown", (event) => {
+            this.ui_selected_camera_indicator.SelectRight();
+        });
+
+        this.button_camera_Yneg_Zpos_Xpos = document.getElementById("button_camera_Yneg_Zpos_Xpos");
+        this.button_camera_Yneg_Zpos_Xpos.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.SetOrientation_Yneg_Zpos_Xpos();
+            if(this.IsRightCameraSelected())
+                this.side_camera.SetOrientation_Yneg_Zpos_Xpos();
+        });
+
+        this.button_camera_Ypos_Zpos_Xneg = document.getElementById("button_camera_Ypos_Zpos_Xneg");
+        this.button_camera_Ypos_Zpos_Xneg.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.SetOrientation_Ypos_Zpos_Xneg();
+            if(this.IsRightCameraSelected())
+                this.side_camera.SetOrientation_Ypos_Zpos_Xneg();
+        });
+
+        this.button_camera_Xpos_Zpos_Ypos = document.getElementById("button_camera_Xpos_Zpos_Ypos");
+        this.button_camera_Xpos_Zpos_Ypos.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.SetOrientation_Xpos_Zpos_Ypos();
+            if(this.IsRightCameraSelected())
+                this.side_camera.SetOrientation_Xpos_Zpos_Ypos();
+        });
+
+        this.button_camera_Xneg_Zpos_Yneg = document.getElementById("button_camera_Xneg_Zpos_Yneg");
+        this.button_camera_Xneg_Zpos_Yneg.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.SetOrientation_Xneg_Zpos_Yneg();
+            if(this.IsRightCameraSelected())
+                this.side_camera.SetOrientation_Xneg_Zpos_Yneg();
+        });
+
+        this.button_camera_Xneg_Ypos_Zpos = document.getElementById("button_camera_Xneg_Ypos_Zpos");
+        this.button_camera_Xneg_Ypos_Zpos.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.SetOrientation_Xneg_Ypos_Zpos();
+            if(this.IsRightCameraSelected())
+                this.side_camera.SetOrientation_Xneg_Ypos_Zpos();
+        });
+
+        this.button_camera_Xpos_Ypos_Zneg = document.getElementById("button_camera_Xpos_Ypos_Zneg");
+        this.button_camera_Xpos_Ypos_Zneg.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.SetOrientation_Xpos_Ypos_Zneg();
+            if(this.IsRightCameraSelected())
+                this.side_camera.SetOrientation_Xpos_Ypos_Zneg();
+        });
+    }   
+
+    IsLeftCameraSelected(){
+        return this.ui_selected_camera_indicator.selected_left;
+    }
+
+    IsRightCameraSelected(){
+        return this.ui_selected_camera_indicator.selected_right;
+    }
+}
+
+module.exports = UILeftToolBar;
+},{}],1032:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -118275,7 +118437,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":11,"./utility":1033,"gl-matrix":53,"seedrandom":993}],1032:[function(require,module,exports){
+},{"./data_types":11,"./utility":1034,"gl-matrix":53,"seedrandom":993}],1033:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -118633,7 +118795,7 @@ class UITransferFunctions {
 */
 
 module.exports = UITransferFunctions;
-},{"./data_types":11,"./utility":1033,"gl-matrix":53,"seedrandom":993}],1033:[function(require,module,exports){
+},{"./data_types":11,"./utility":1034,"gl-matrix":53,"seedrandom":993}],1034:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 exports.getMousePosition = function(canvas, event) {
@@ -118750,7 +118912,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":53}],1034:[function(require,module,exports){
+},{"gl-matrix":53}],1035:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;

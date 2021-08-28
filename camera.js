@@ -655,7 +655,60 @@ class Camera {
         console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
     }
+      
+    //order: right, up, forward
+    SetOrientation_Yneg_Zpos_Xpos() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(1, epsilon, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+    
+    //order: right, up, forward
+    SetOrientation_Ypos_Zpos_Xneg() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(-1, epsilon, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+    
+    //order: right, up, forward
+    SetOrientation_Xpos_Zpos_Ypos() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
 
+    //order: right, up, forward
+    SetOrientation_Xneg_Zpos_Yneg() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, -1, epsilon);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+
+    //order: right, up, forward
+    SetOrientation_Xneg_Ypos_Zpos() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
+
+    //order: right, up, forward
+    SetOrientation_Xpos_Ypos_Zneg() {
+        var epsilon = 0.000001;
+        this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, -1);
+        var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
+        glMatrix.vec3.negate(this.up, up_negated);
+        this.changed = true;
+    }
 }
 
 module.exports = Camera;

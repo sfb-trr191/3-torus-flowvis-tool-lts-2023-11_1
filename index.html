@@ -17,12 +17,47 @@
                 HTML5 canvas.</canvas>
             <p id="fps_display">FPS</p>
             <p id="message_display">activate javascript to see the content</p>
+            <fieldset class="toolbar">
+                <div class="container">
+                    <button type="button" id="button_update_camera" title="Update left camera"></button>
+                    <button type="button" id="button_update_side_camera" title="Update right camera"></button>
+                    <button type="button" class="camera_unselected" id="button_select_camera_left" title="Select left camera"></button>
+                    <button type="button" class="camera_unselected" id="button_select_camera_right" title="Select right camera"></button>
+                    <button type="button" id="button_camera_Yneg_Zpos_Xpos" title="Set the selected camera orientation to:
+    - right: y-
+    - up: z+
+    - forward: x+"></button>            
+                    <button type="button" id="button_camera_Ypos_Zpos_Xneg" title="Set the selected camera orientation to:
+    - right: y+
+    - up: z+
+    - forward: x-"></button>              
+
+
+                    <button type="button" id="button_camera_Xpos_Zpos_Ypos" title="Set the selected camera orientation to:
+    - right: x+
+    - up: z+
+    - forward: y+"></button>      
+                    <button type="button" id="button_camera_Xneg_Zpos_Yneg" title="Set the selected camera orientation to:
+    - right: x-
+    - up: z+
+    - forward: y-"></button>     
+
+
+
+                    <button type="button" id="button_camera_Xneg_Ypos_Zpos" title="Set the selected camera orientation to:
+    - right: x-
+    - up: y+
+    - forward: z+"></button>               
+                    <button type="button" id="button_camera_Xpos_Ypos_Zneg" title="Set the selected camera orientation to:
+    - right: x+
+    - up: y+
+    - forward: z-"></button>
+                </div>
+            </fieldset>
             <div class="container" id="container_bottom_left">
                 <fieldset class="fieldset_camera">
-                    <legend>Main Camera</legend>
+                    <legend>Left Camera</legend>
                     <div class="grid_container">
-                        <button type="button" id="button_update_camera">update camera</button>
-                        <label></label>
                         <label>position</label>
                         <div id="div_input_camera_position" class="horizontal_div_3">
                             <input id="input_camera_position_x" type="text" value="0.5">
@@ -44,10 +79,8 @@
                     </div>
                 </fieldset>
                 <fieldset class="fieldset_camera">
-                    <legend>Side Camera</legend>
+                    <legend>Right Camera</legend>
                     <div class="grid_container">
-                        <button type="button" id="button_update_side_camera">update camera</button>
-                        <label></label>
                         <label>position</label>
                         <div id="div_input_side_camera_position" class="horizontal_div_3">
                             <input id="input_side_camera_position_x" type="text" value="0.5">
