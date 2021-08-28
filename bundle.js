@@ -4854,10 +4854,6 @@ const Export = module_export.Export;
             console.log("onClickUpdateURL");
             UpdateURL();
         });
-        document.getElementById("button_export_update_url").addEventListener("click", function () {
-            console.log("onClickUpdateURL");
-            UpdateURL();
-        });
     }
 
     function addOnClickExport() {

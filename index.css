@@ -427,6 +427,10 @@ legend {
     background-image: url("icons/random_color.png");
 }
 
+#button_export{
+    background-image: url("icons/export.png");
+}
+
 #button_render_settings{
     display: none;
 }
