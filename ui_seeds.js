@@ -18,26 +18,32 @@ class UISeed {
         this.node_input_x = document.createElement("input");
         this.node_input_x.type = "text";
         this.node_input_x.value = "0.5";
+        this.node_input_x.title = "x component of the seed position. \n    - Must be between 0 and 1.";
         this.node.appendChild(this.node_input_x);
 
         this.node_input_y = document.createElement("input");
         this.node_input_y.type = "text";
         this.node_input_y.value = "0.5";
+        this.node_input_y.title = "y component of the seed position. \n    - Must be between 0 and 1.";
         this.node.appendChild(this.node_input_y);
 
         this.node_input_z = document.createElement("input");
         this.node_input_z.type = "text";
         this.node_input_z.value = "0.5";
+        this.node_input_z.title = "z component of the seed position. \n    - Must be between 0 and 1.";
         this.node.appendChild(this.node_input_z);
 
         this.node_input_c = document.createElement("input");
         this.node_input_c.type = "color";
         this.node_input_c.value = "#00FF00";
+        this.node_input_c.title = "Color of the streamline started at this seed.";
         this.node.appendChild(this.node_input_c);
 
         this.node_random = document.createElement("button");
-        this.node_random.innerHTML = "r pos";
+        this.node_random.innerHTML = "";
         this.node_random.type = "button";
+        this.node_random.id = "button_randomize_this_seed_position";
+        this.node_random.title = "Randomize position of this seed.";
         this.node_random.addEventListener("click", (event) => {
             console.log("this.index: ", event.target.id, this.index);
             this.randomizePosition();
@@ -45,8 +51,10 @@ class UISeed {
         this.node.appendChild(this.node_random);
 
         this.node_random_col = document.createElement("button");
-        this.node_random_col.innerHTML = "r col";
+        this.node_random_col.innerHTML = "";
         this.node_random_col.type = "button";
+        this.node_random_col.id = "button_randomize_this_seed_color";
+        this.node_random_col.title = "Randomize color of this seed.";
         this.node_random_col.addEventListener("click", (event) => {
             console.log("this.index: ", event.target.id, this.index);
             this.randomizeColor();
@@ -56,6 +64,8 @@ class UISeed {
         this.node_button = document.createElement("button");
         this.node_button.innerHTML = "x";
         this.node_button.type = "button";
+        this.node_button.id = "button_delete_this_seed";
+        this.node_button.title = "Remove this seed.";
         this.node_button.addEventListener("click", (event) => {
             console.log("this.index: ", event.target.id, this.index);
             this.ui_seeds.removeSeed(this.index);

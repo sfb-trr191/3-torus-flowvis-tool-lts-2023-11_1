@@ -155,13 +155,6 @@ legend {
     margin-left: 8px;
 }
 
-
-#fieldset_seeds {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 4px;
-}
-
 #myProgress {
     width: 100%;
     background-color: grey;
@@ -190,13 +183,6 @@ legend {
     gap: 4px; 
 }
 
-.horizontal_div_seed {
-    display: inline-grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    column-gap: 4px;
-    gap: 4px;
-}
-
 .horizontal_div_tranfer_function_color {
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -218,10 +204,6 @@ legend {
 .horizontal_div_seed input {
     min-width: 75px;
     height: 100%;
-}
-
-.horizontal_div_seed button {
-    min-width: 32px;
 }
 
 .horizontal_div_tranfer_function_color input {
@@ -471,6 +453,45 @@ legend {
     background-image: url("icons/axes_z_neg.png");
 }
 
+
+#fieldset_seeds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.horizontal_div_seed {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 68px 68px 32px;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+#fieldset_seeds button {
+    float: left;
+    cursor: pointer;
+    transition: 0.3s;
+    background-repeat: no-repeat;
+    background-position-x: 0px;
+    background-position-y: 0px;
+    background-size: 64px 32px;
+    height: 36px;  
+    width: 68px;
+    margin: 0px 0px 0px 0px;
+    padding: 0;
+}
+
+#fieldset_seeds #button_delete_this_seed{
+    width: 32px;
+}
+
+#fieldset_seeds #button_randomize_this_seed_position{
+    background-image: url("icons/random_position_horizontal.png");
+}
+
+#fieldset_seeds #button_randomize_this_seed_color{
+    background-image: url("icons/random_color_horizontal.png");
+}
 
 #select_side_mode{
     width: 1fr;
