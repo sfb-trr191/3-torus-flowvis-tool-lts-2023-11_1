@@ -134,6 +134,8 @@ const Export = module_export.Export;
         //testEigenvalueDecomposition();
 
         tab_manager = new TabManager();
+        hide_manager = new HideManager(tab_manager);
+        tab_manager.Link(hide_manager);
 
         main_canvas = document.getElementById("main_canvas");
         side_canvas = document.getElementById("side_canvas");
@@ -142,7 +144,6 @@ const Export = module_export.Export;
 
 
         input_changed_manager = new InputChangedManager();
-        hide_manager = new HideManager();
         main_camera = new Camera("main_camera", input_changed_manager);
         side_camera = new Camera("side_camera", input_changed_manager);
 

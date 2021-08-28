@@ -28,6 +28,10 @@ class TabManager{
         this.initTabs();
     }
 
+    Link(hide_manager){
+        this.hide_manager = hide_manager;
+    }
+
     initTabs(){
         var tab_group_main = new TabGroup(this, "tab_group_main");
         tab_group_main.addTab("tab_data", "button_tab_data", "tabcontent_data");
@@ -61,6 +65,14 @@ class TabManager{
         
         document.getElementById(tab.id_content).style.display = "block";
         document.getElementById(tab.id_button).className += " active";
+
+
+        this.hide_manager.UpdateVisibility();
+    }
+
+    IsTabSelected(tab_group_name, tab_name){
+        var group = this.dict_tab_groups[tab_group_name];
+        return group.selected_name == tab_name;
     }
 }
 

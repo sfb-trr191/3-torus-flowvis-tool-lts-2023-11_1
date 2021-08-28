@@ -4161,6 +4161,23 @@ class Condition {
     }
 }
 
+class TabIsActiveCondition extends Condition{
+    constructor(tab_group_name, required_tab_name, tab_manager) {
+        super();
+        this.tab_group_name = tab_group_name;
+        this.required_tab_name = required_tab_name;
+        this.tab_manager = tab_manager;
+    }
+
+    evaluate() {
+        console.log("evaluate TabIsActiveCondition")
+        console.log("required_tab_name:", this.required_tab_name)
+        var result = this.tab_manager.IsTabSelected(this.tab_group_name, this.required_tab_name)
+        console.log("result:", result)
+        return result;
+    }
+}
+
 class NotifyingCondition extends Condition{
     constructor(element_name, notification_element) {
         super();
@@ -4270,6 +4287,7 @@ class MultiConditionalElement {
     UpdateVisibility() {
         console.log("UpdateVisibility MultiConditionalElement")
         var visible = this.evaluate();
+        console.log("visible:", visible)
         this.element.className = visible ? this.get_visible_name() : "hidden";
     }
 
@@ -4286,6 +4304,16 @@ class MultiConditionalInputRow extends MultiConditionalElement {
 
     get_visible_name() {
         return "input_row";
+    }
+}
+
+class MultiConditionalWrapper extends MultiConditionalElement {
+    constructor(name) {
+        super(name);
+    }
+
+    get_visible_name() {
+        return "wrapper";
     }
 }
 
@@ -4348,7 +4376,8 @@ class HideGroup {
 }
 
 class HideManager {
-    constructor() {
+    constructor(tab_manager) {
+        this.tab_manager = tab_manager;
         this.groups = [];
         this.multi_consodtional_elements = []
 
@@ -4406,7 +4435,39 @@ class HideManager {
         this.mcir_scalar_field_debug.set_condition(this.condition_and)
         this.multi_consodtional_elements.push(this.mcir_scalar_field_debug);
 
+        this.condition_tab_data = new TabIsActiveCondition("tab_group_main", "tab_data", tab_manager);
+        this.condition_tab_ftle = new TabIsActiveCondition("tab_group_main", "tab_ftle", tab_manager);
+        this.condition_tab_export = new TabIsActiveCondition("tab_group_main", "tab_export", tab_manager);
+        
+        /*
+        this.condition_tab_data_or_ftle = new OrCondition();
+        this.condition_tab_data_or_ftle.add_condition(this.condition_tab_data)
+        this.condition_tab_data_or_ftle.add_condition(this.condition_tab_ftle)
 
+        this.mcw_calculate_streamlines = new MultiConditionalWrapper("wrapper_button_request_data");
+        this.mcw_calculate_streamlines.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_calculate_streamlines);
+
+        this.mcw_calculate_ftle = new MultiConditionalWrapper("wrapper_button_calculate_ftle");
+        this.mcw_calculate_ftle.set_condition(this.condition_tab_data_or_ftle)
+        this.multi_consodtional_elements.push(this.mcw_calculate_ftle);
+        */
+
+        this.mcw_add_seed = new MultiConditionalWrapper("wrapper_button_add_seed");
+        this.mcw_add_seed.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_add_seed);
+
+        this.mcw_randomize_seed_positions = new MultiConditionalWrapper("wrapper_button_randomize_seed_positions");
+        this.mcw_randomize_seed_positions.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_randomize_seed_positions);
+
+        this.mcw_randomize_seed_colors = new MultiConditionalWrapper("wrapper_button_randomize_seed_colors");
+        this.mcw_randomize_seed_colors.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_randomize_seed_colors);
+
+        this.mcw_export = new MultiConditionalWrapper("wrapper_button_export");
+        this.mcw_export.set_condition(this.condition_tab_export)
+        this.multi_consodtional_elements.push(this.mcw_export);
     }
 
     UpdateVisibility() {
@@ -4558,6 +4619,8 @@ const Export = module_export.Export;
         //testEigenvalueDecomposition();
 
         tab_manager = new TabManager();
+        hide_manager = new HideManager(tab_manager);
+        tab_manager.Link(hide_manager);
 
         main_canvas = document.getElementById("main_canvas");
         side_canvas = document.getElementById("side_canvas");
@@ -4566,7 +4629,6 @@ const Export = module_export.Export;
 
 
         input_changed_manager = new InputChangedManager();
-        hide_manager = new HideManager();
         main_camera = new Camera("main_camera", input_changed_manager);
         side_camera = new Camera("side_camera", input_changed_manager);
 
@@ -117547,6 +117609,10 @@ class TabManager{
         this.initTabs();
     }
 
+    Link(hide_manager){
+        this.hide_manager = hide_manager;
+    }
+
     initTabs(){
         var tab_group_main = new TabGroup(this, "tab_group_main");
         tab_group_main.addTab("tab_data", "button_tab_data", "tabcontent_data");
@@ -117580,6 +117646,14 @@ class TabManager{
         
         document.getElementById(tab.id_content).style.display = "block";
         document.getElementById(tab.id_button).className += " active";
+
+
+        this.hide_manager.UpdateVisibility();
+    }
+
+    IsTabSelected(tab_group_name, tab_name){
+        var group = this.dict_tab_groups[tab_group_name];
+        return group.selected_name == tab_name;
     }
 }
 
