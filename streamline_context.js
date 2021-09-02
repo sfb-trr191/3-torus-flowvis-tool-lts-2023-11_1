@@ -19,6 +19,7 @@ class StreamlineContext {
         this.segment_duplicator = new SegmentDuplicator(this);
         //this.lod_0 = new LODData(name+"_lod_0", this, gl);
         this.lod_list = [];
+        this.highest_active_lod_index = 3;//only indices 0 to highest_active_lod_index are calculated
 
         var num_lods = 4;
         //var douglasPeukerParameter = 0.0001;
@@ -129,12 +130,18 @@ class StreamlineContext {
         this.lod_0.ExtractMultiPolyLines(part_index);
         raw_data.MakeDataHomogenous();
 
-        //simplify for all lods except lod_0
-        for (var i = 1; i < this.lod_list.length; i++) {
+        //reset all lods that are not calculated
+        for (var i = this.highest_active_lod_index+1; i < this.lod_list.length; i++) {
+            this.lod_list[i].ResetPart(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
+        }        
+
+        //simplify active lods except lod_0
+        for (var i = 1; i <= this.highest_active_lod_index; i++) {
             this.lod_list[i].DouglasPeuker(part_index, this.lod_list[i - 1]);
         }
 
-        for (var i = 0; i < this.lod_list.length; i++) {
+        for (var i = 0; i <= this.highest_active_lod_index; i++) {
             this.lod_list[i].GenerateLineSegments(part_index);
             if (generate_copies)
                 this.lod_list[i].GenerateLineSegmentCopies(part_index);

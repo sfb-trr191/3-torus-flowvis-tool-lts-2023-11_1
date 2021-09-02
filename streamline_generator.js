@@ -70,6 +70,7 @@ class StreamlineGenerator {
 
     CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
+        var t_start = performance.now();
 
         raw_data.initialize(this.seeds, this.num_points_per_streamline);
 
@@ -77,6 +78,9 @@ class StreamlineGenerator {
             this.CalculateRawStreamline(i, raw_data);
         }
         console.log("CalculateRawStreamlines completed");
+
+        var t_stop = performance.now();
+        console.log("Performance: calculated raw streamlines in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     CalculateRawStreamline(seed_index, raw_data) {

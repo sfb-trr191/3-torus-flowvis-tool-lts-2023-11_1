@@ -263,8 +263,16 @@ const Export = module_export.Export;
     }
 
     function on_start_step_2(){
+        var t_start = performance.now();
         canvas_wrapper_main.InitializeShaders(gl);
+        var t_stop = performance.now();
+        console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
+    
+        var t_start = performance.now();
         canvas_wrapper_side.InitializeShaders(gl_side);
+        var t_stop = performance.now();
+        console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
+    
         message_display.innerHTML = "step 3: calculating...";
         setTimeout(on_start_step_3, 1000);
     }
@@ -532,6 +540,8 @@ const Export = module_export.Export;
 
     function CalculateStreamlines() {
         console.log("CalculateStreamlines");
+        var t_start = performance.now();
+
         var shader_formula_u = document.getElementById("input_field_equation_u").value;
         var shader_formula_v = document.getElementById("input_field_equation_v").value;
         var shader_formula_w = document.getElementById("input_field_equation_w").value;
@@ -554,6 +564,9 @@ const Export = module_export.Export;
             segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
+
+        var t_stop = performance.now();
+        console.log("Performance: calculated streamlines in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     function CalculateFTLE() {

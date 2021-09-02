@@ -4764,8 +4764,16 @@ const Export = module_export.Export;
     }
 
     function on_start_step_2(){
+        var t_start = performance.now();
         canvas_wrapper_main.InitializeShaders(gl);
+        var t_stop = performance.now();
+        console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
+    
+        var t_start = performance.now();
         canvas_wrapper_side.InitializeShaders(gl_side);
+        var t_stop = performance.now();
+        console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
+    
         message_display.innerHTML = "step 3: calculating...";
         setTimeout(on_start_step_3, 1000);
     }
@@ -5033,6 +5041,8 @@ const Export = module_export.Export;
 
     function CalculateStreamlines() {
         console.log("CalculateStreamlines");
+        var t_start = performance.now();
+
         var shader_formula_u = document.getElementById("input_field_equation_u").value;
         var shader_formula_v = document.getElementById("input_field_equation_v").value;
         var shader_formula_w = document.getElementById("input_field_equation_w").value;
@@ -5055,6 +5065,9 @@ const Export = module_export.Export;
             segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
+
+        var t_stop = performance.now();
+        console.log("Performance: calculated streamlines in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     function CalculateFTLE() {
@@ -117127,6 +117140,7 @@ class StreamlineContext {
         this.segment_duplicator = new SegmentDuplicator(this);
         //this.lod_0 = new LODData(name+"_lod_0", this, gl);
         this.lod_list = [];
+        this.highest_active_lod_index = 3;//only indices 0 to highest_active_lod_index are calculated
 
         var num_lods = 4;
         //var douglasPeukerParameter = 0.0001;
@@ -117237,12 +117251,18 @@ class StreamlineContext {
         this.lod_0.ExtractMultiPolyLines(part_index);
         raw_data.MakeDataHomogenous();
 
-        //simplify for all lods except lod_0
-        for (var i = 1; i < this.lod_list.length; i++) {
+        //reset all lods that are not calculated
+        for (var i = this.highest_active_lod_index+1; i < this.lod_list.length; i++) {
+            this.lod_list[i].ResetPart(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
+        }        
+
+        //simplify active lods except lod_0
+        for (var i = 1; i <= this.highest_active_lod_index; i++) {
             this.lod_list[i].DouglasPeuker(part_index, this.lod_list[i - 1]);
         }
 
-        for (var i = 0; i < this.lod_list.length; i++) {
+        for (var i = 0; i <= this.highest_active_lod_index; i++) {
             this.lod_list[i].GenerateLineSegments(part_index);
             if (generate_copies)
                 this.lod_list[i].GenerateLineSegmentCopies(part_index);
@@ -117345,6 +117365,7 @@ class StreamlineGenerator {
 
     CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
+        var t_start = performance.now();
 
         raw_data.initialize(this.seeds, this.num_points_per_streamline);
 
@@ -117352,6 +117373,9 @@ class StreamlineGenerator {
             this.CalculateRawStreamline(i, raw_data);
         }
         console.log("CalculateRawStreamlines completed");
+
+        var t_stop = performance.now();
+        console.log("Performance: calculated raw streamlines in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     CalculateRawStreamline(seed_index, raw_data) {
