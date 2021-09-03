@@ -4759,8 +4759,8 @@ const Export = module_export.Export;
 
         hide_manager.UpdateVisibility();
 
-        message_display.innerHTML = "step 2: initializing shaders...";
-        setTimeout(on_start_step_2, 1000);
+        message_display.innerHTML = "step 2: initializing shaders (1/2)...";
+        setTimeout(on_start_step_2, 200);
     }
 
     function on_start_step_2(){
@@ -4769,13 +4769,18 @@ const Export = module_export.Export;
         var t_stop = performance.now();
         console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
     
+        message_display.innerHTML = "step 2: initializing shaders (2/2)...";
+        setTimeout(on_start_step_2_2, 0);
+    }
+
+    function on_start_step_2_2(){
         var t_start = performance.now();
         canvas_wrapper_side.InitializeShaders(gl_side);
         var t_stop = performance.now();
         console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
-    
+
         message_display.innerHTML = "step 3: calculating...";
-        setTimeout(on_start_step_3, 1000);
+        setTimeout(on_start_step_3, 0);
     }
 
     function on_start_step_3(){
