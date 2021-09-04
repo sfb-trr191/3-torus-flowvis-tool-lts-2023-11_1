@@ -27,7 +27,7 @@ exports.loadShaderProgramFromCode = function(gl, program, v_source, f_source) {
         console.log("test point 1 vertexShader");
     }
     var t_stop = performance.now();
-    console.log("Performance: compiled vertex shader in: ", Math.ceil(t_stop-t_start), "ms");
+    //console.log("Performance: compiled vertex shader in: ", Math.ceil(t_stop-t_start), "ms");
     
     var t_start = performance.now();
     var source = f_source;
@@ -41,18 +41,18 @@ exports.loadShaderProgramFromCode = function(gl, program, v_source, f_source) {
         console.log("test point 1 fragmentShader");
     }
     var t_stop = performance.now();
-    console.log("Performance: compiled fragment shader in: ", Math.ceil(t_stop-t_start), "ms");
+    //console.log("Performance: compiled fragment shader in: ", Math.ceil(t_stop-t_start), "ms");
 
 
     var t_start = performance.now();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
-    console.log("Performance: attached shaders in: ", Math.ceil(t_stop-t_start), "ms");
+    //console.log("Performance: attached shaders in: ", Math.ceil(t_stop-t_start), "ms");
 
 
+    //link program: this is the bottleneck
     var t_start = performance.now();
     gl.linkProgram(program);
-    // Check the link status
     var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (!linked) {
         // something went wrong with the link
@@ -60,7 +60,7 @@ exports.loadShaderProgramFromCode = function(gl, program, v_source, f_source) {
         console.log("test point 2");
     }
     var t_stop = performance.now();
-    console.log("Performance: linked program in: ", Math.ceil(t_stop-t_start), "ms");
+    //console.log("Performance: linked program in: ", Math.ceil(t_stop-t_start), "ms");
 
     gl.detachShader(program, vertexShader);
     gl.detachShader(program, fragmentShader);
