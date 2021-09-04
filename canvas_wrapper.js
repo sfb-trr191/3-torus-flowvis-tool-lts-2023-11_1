@@ -243,7 +243,7 @@ class CanvasWrapper {
         }
 
         var t_stop = performance.now();
-        console.log("Performance: generate shader in: ", Math.ceil(t_stop-t_start), "ms");
+        console.log("Performance: generate raytracing shader in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     CalculateLimitedMaxRayDistance() {

@@ -1377,7 +1377,7 @@ class CanvasWrapper {
         }
 
         var t_stop = performance.now();
-        console.log("Performance: generate shader in: ", Math.ceil(t_stop-t_start), "ms");
+        console.log("Performance: generate raytracing shader in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     CalculateLimitedMaxRayDistance() {
@@ -119089,37 +119089,43 @@ exports.getRenderingContext = function(canvas) {
 }
 
 exports.loadShaderProgramFromCode = function(gl, program, v_source, f_source) {
-    //console.log("loadShaderProgramFromCode");
-    //console.log("v_source", v_source);
+    var t_start = performance.now();
     var source = v_source;
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, source);
     gl.compileShader(vertexShader);
-    //source = document.querySelector(fragment_shader_name).innerHTML
-    source = f_source;
-    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, source);
-    gl.compileShader(fragmentShader);
-
-    // Check the compile status
     var compiled = gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS);
     if (!compiled) {
         // Something went wrong during compilation; get the error
         console.error(gl.getShaderInfoLog(vertexShader));
         console.log("test point 1 vertexShader");
     }
-
-    compiled = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
+    var t_stop = performance.now();
+    console.log("Performance: compiled vertex shader in: ", Math.ceil(t_stop-t_start), "ms");
+    
+    var t_start = performance.now();
+    var source = f_source;
+    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, source);
+    gl.compileShader(fragmentShader);
+    var compiled = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
     if (!compiled) {
         // Something went wrong during compilation; get the error
         console.error(gl.getShaderInfoLog(fragmentShader));
         console.log("test point 1 fragmentShader");
     }
+    var t_stop = performance.now();
+    console.log("Performance: compiled fragment shader in: ", Math.ceil(t_stop-t_start), "ms");
 
+
+    var t_start = performance.now();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
+    console.log("Performance: attached shaders in: ", Math.ceil(t_stop-t_start), "ms");
 
+
+    var t_start = performance.now();
+    gl.linkProgram(program);
     // Check the link status
     var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (!linked) {
@@ -119127,6 +119133,8 @@ exports.loadShaderProgramFromCode = function(gl, program, v_source, f_source) {
         console.error(gl.getProgramInfoLog(program));
         console.log("test point 2");
     }
+    var t_stop = performance.now();
+    console.log("Performance: linked program in: ", Math.ceil(t_stop-t_start), "ms");
 
     gl.detachShader(program, vertexShader);
     gl.detachShader(program, fragmentShader);
