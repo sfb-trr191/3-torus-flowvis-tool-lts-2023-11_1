@@ -172,7 +172,10 @@ class CanvasWrapper {
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
         this.max_volume_distance = 0;// 0=same as limited_max_distance
-        
+
+
+        this.last_shader_formula_scalar = "";
+
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_panning_left = new RenderWrapper(gl, name + "_raytracing_panning_left", camera.width_panning, camera.height_panning);
@@ -187,12 +190,15 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    InitializeShaders(gl){
+    InitializeShaders(gl, shader_formula_scalar){        
+        /*
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
         this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");
+        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");      
+        */  
+        this.ReplaceRaytracingShader(gl, shader_formula_scalar);
 
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
@@ -221,11 +227,23 @@ class CanvasWrapper {
 
     ReplaceRaytracingShader(gl, shader_formula_scalar) {
         console.log("ReplaceRaytracingShader");
-        this.program_raytracing = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetShader(shader_formula_scalar));
-        this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
-        this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");
+        var t_start = performance.now();
+
+        var replace = this.last_shader_formula_scalar != shader_formula_scalar;
+        if(replace){
+            this.program_raytracing = gl.createProgram();
+            loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetShader(shader_formula_scalar));
+            this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
+            this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
+            this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
+            this.last_shader_formula_scalar = shader_formula_scalar;
+        }
+        else{
+            console.log("shader did not change");
+        }
+
+        var t_stop = performance.now();
+        console.log("Performance: generate shader in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
     CalculateLimitedMaxRayDistance() {

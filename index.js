@@ -264,7 +264,11 @@ const Export = module_export.Export;
 
     function on_start_step_2(){
         var t_start = performance.now();
-        canvas_wrapper_main.InitializeShaders(gl);
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+        canvas_wrapper_main.InitializeShaders(gl, shader_formula_scalar_float);
         var t_stop = performance.now();
         console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
     
@@ -274,7 +278,11 @@ const Export = module_export.Export;
 
     function on_start_step_2_2(){
         var t_start = performance.now();
-        canvas_wrapper_side.InitializeShaders(gl_side);
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+        canvas_wrapper_side.InitializeShaders(gl_side, shader_formula_scalar_float);
         var t_stop = performance.now();
         console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
 
