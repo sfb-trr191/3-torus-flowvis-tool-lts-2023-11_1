@@ -190,7 +190,7 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    InitializeShaders(gl, shader_formula_scalar){        
+    InitializeShaders(gl){        
         /*
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
@@ -198,7 +198,7 @@ class CanvasWrapper {
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");      
         */  
-        this.ReplaceRaytracingShader(gl, shader_formula_scalar);
+        //this.ReplaceRaytracingShader(gl, shader_formula_scalar);
 
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
@@ -225,6 +225,16 @@ class CanvasWrapper {
         this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
     }
 
+    SetRayTracingProgram(gl, shader_container){
+        console.log("SetRayTracingProgram");
+        this.shader_container_ray_tracing = shader_container;
+        this.program_raytracing = shader_container.program;
+        this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
+        this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
+        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
+    }
+
+    /*
     ReplaceRaytracingShader(gl, shader_formula_scalar) {
         console.log("ReplaceRaytracingShader");
         var t_start = performance.now();
@@ -245,6 +255,7 @@ class CanvasWrapper {
         var t_stop = performance.now();
         console.log("Performance: generate raytracing shader in: ", Math.ceil(t_stop-t_start), "ms");
     }
+    */
 
     CalculateLimitedMaxRayDistance() {
         var d = this.fog_density;

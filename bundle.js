@@ -404,7 +404,7 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":11,"./utility":1034,"gl-matrix":53}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":11,"./utility":1035,"gl-matrix":53}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -1324,7 +1324,7 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    InitializeShaders(gl, shader_formula_scalar){        
+    InitializeShaders(gl){        
         /*
         this.program_raytracing = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
@@ -1332,7 +1332,7 @@ class CanvasWrapper {
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");      
         */  
-        this.ReplaceRaytracingShader(gl, shader_formula_scalar);
+        //this.ReplaceRaytracingShader(gl, shader_formula_scalar);
 
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
@@ -1359,6 +1359,16 @@ class CanvasWrapper {
         this.attribute_location_dummy_program_ftle_slice = gl.getAttribLocation(this.program_ftle_slice, "a_position");
     }
 
+    SetRayTracingProgram(gl, shader_container){
+        console.log("SetRayTracingProgram");
+        this.shader_container_ray_tracing = shader_container;
+        this.program_raytracing = shader_container.program;
+        this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
+        this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
+        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
+    }
+
+    /*
     ReplaceRaytracingShader(gl, shader_formula_scalar) {
         console.log("ReplaceRaytracingShader");
         var t_start = performance.now();
@@ -1379,6 +1389,7 @@ class CanvasWrapper {
         var t_stop = performance.now();
         console.log("Performance: generate raytracing shader in: ", Math.ceil(t_stop-t_start), "ms");
     }
+    */
 
     CalculateLimitedMaxRayDistance() {
         var d = this.fog_density;
@@ -1848,7 +1859,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1026,"./webgl":1035}],6:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1027,"./webgl":1036}],6:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -2606,7 +2617,7 @@ class CanvasWrapperTransferFunction {
 }
 
 module.exports = CanvasWrapperTransferFunction;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1026,"./utility":1034,"./webgl":1035}],7:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1027,"./utility":1035,"./webgl":1036}],7:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -4021,7 +4032,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1026,"./utility":1034,"./webgl":1035,"ml-matrix":990}],16:[function(require,module,exports){
+},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1027,"./utility":1035,"./webgl":1036,"ml-matrix":990}],16:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -4581,6 +4592,9 @@ const Export = module_export.Export;
     "use strict"
     window.addEventListener("load", onStart, false);
 
+    var ext_parallel;
+    var ext_parallel_side;
+
     var gl;
     var gl_side;
     var gl_transfer_function;
@@ -4624,6 +4638,7 @@ const Export = module_export.Export;
     var ui_left_tool_bar;
     var global_data;
     var time_last_tick = 0;
+    var t_start_waiting_for_shaders;
     var fps_display;
     var message_display;
     var current_fps = 0;
@@ -4691,6 +4706,12 @@ const Export = module_export.Export;
         if ((!ext) || (!ext_side) || (!ext_transfer_function)) {
             alert("FTLE not supported: could not load EXT_color_buffer_float");
             return;
+        }
+
+        ext_parallel = gl.getExtension('KHR_parallel_shader_compile');
+        ext_parallel_side = gl_side.getExtension('KHR_parallel_shader_compile');
+        if ((!ext_parallel) || (!ext_parallel_side)) {
+            alert("Parallel not supported");
         }
 
         ui_seeds = new UISeeds();
@@ -4781,7 +4802,58 @@ const Export = module_export.Export;
         setTimeout(on_start_step_2, 200);
     }
 
+    /*
+    function on_start_step_2_alternative(){
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+        shader_manager.CompileRaytracingShaders(gl, gl_side, shader_formula_scalar_float);
+
+        message_display.innerHTML = "step 2: wait for shaders...";
+        setTimeout(on_start_step_2_alternative_2, 200);
+    }
+
+    function on_start_step_2_alternative_2(){
+        shader_manager.CheckRaytracingShaders(gl, gl_side);        
+
+        message_display.innerHTML = "step 2: initializing shaders (1/2)...";
+        setTimeout(on_start_step_2, 0);
+    }
+    */
+
     function on_start_step_2(){
+        //var t_start = performance.now();
+        canvas_wrapper_main.InitializeShaders(gl);
+        //shader_manager.PrepareRaytracingShaderMain(gl);
+        //canvas_wrapper_main.InitializeShaders(gl, shader_formula_scalar_float);
+        //var t_stop = performance.now();
+        //console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
+    
+        message_display.innerHTML = "step 2: initializing shaders (2/2)...";
+        setTimeout(on_start_step_2_2, 0);
+    }
+
+    function on_start_step_2_2(){
+        //var t_start = performance.now();
+        canvas_wrapper_side.InitializeShaders(gl_side);
+        //shader_manager.PrepareRaytracingShaderSide(gl_side);
+        //canvas_wrapper_side.InitializeShaders(gl_side, shader_formula_scalar_float);
+        //var t_stop = performance.now();
+        //console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
+        
+        message_display.innerHTML = "step 3: calculating...";
+        setTimeout(on_start_step_4, 200);
+    }
+
+    function on_start_step_3(){
+        shader_manager.CheckRaytracingShaders(gl, gl_side);
+        
+        message_display.innerHTML = "step 4: calculating...";
+        setTimeout(on_start_step_4, 0);
+    }
+
+    function on_start_step_2_old(){
         var t_start = performance.now();
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
@@ -4795,7 +4867,7 @@ const Export = module_export.Export;
         setTimeout(on_start_step_2_2, 0);
     }
 
-    function on_start_step_2_2(){
+    function on_start_step_2_2_old(){
         var t_start = performance.now();
         var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
         var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
@@ -4804,12 +4876,12 @@ const Export = module_export.Export;
         canvas_wrapper_side.InitializeShaders(gl_side, shader_formula_scalar_float);
         var t_stop = performance.now();
         console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
-
+        
         message_display.innerHTML = "step 3: calculating...";
         setTimeout(on_start_step_3, 0);
     }
 
-    function on_start_step_3(){
+    function on_start_step_4(){
         CalculateStreamlines();
         UpdateRenderSettings();
         UpdateGlobalData();
@@ -4824,9 +4896,52 @@ const Export = module_export.Export;
     }
 
 
+    function prepare_left_shader(time_now){
+        shader_manager.PrepareRaytracingShaderMain(gl);
+        
+        message_display.innerHTML = "initialize shaders (2/2)...";
+        requestAnimationFrame(prepare_right_shader);
+    }
+
+    function prepare_right_shader(time_now){
+        shader_manager.PrepareRaytracingShaderSide(gl_side);
+
+        message_display.innerHTML = "waiting for shaders...";
+        t_start_waiting_for_shaders = performance.now();
+        requestAnimationFrame(wait_for_shader);
+    }
+
+    function wait_for_shader(time_now){
+        tick_counter++;
+        time_last_tick = time_now;
+        strong_tick_counter.innerHTML = tick_counter;
+
+        shader_manager.CheckRaytracingShaders(gl, gl_side, ext_parallel, ext_parallel_side);      
+        if(!shader_manager.AreShadersLinked()){
+            requestAnimationFrame(wait_for_shader);
+            return;
+        }  
+
+        //shaders are now linked
+        message_display.innerHTML = "";
+        canvas_wrapper_main.SetRayTracingProgram(gl, shader_manager.container_main);
+        canvas_wrapper_side.SetRayTracingProgram(gl_side, shader_manager.container_side);
+
+        var t_stop = performance.now();
+        console.log("Performance: Waiting for shaders in: ", Math.ceil(t_stop-t_start_waiting_for_shaders), "ms");
+
+        requestAnimationFrame(on_update);
+    }
+
     function on_update(time_now) {
         tick_counter++;
         var deltaTime = (time_now - time_last_tick) / 1000;
+
+        if(shader_manager.IsDirty()){
+            message_display.innerHTML = "initialize shaders (1/2)...";
+            requestAnimationFrame(prepare_left_shader);
+            return;
+        }        
 
         UpdateAnimation(time_now, deltaTime);
 
@@ -5197,7 +5312,7 @@ const Export = module_export.Export;
         document.getElementById("input_formula_scalar_float").value = shader_formula_scalar_float;
         console.log("shader_formula_scalar", shader_formula_scalar);
         console.log("shader_formula_scalar_float", shader_formula_scalar_float);
-        canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
+        //canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
         //SIDE
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
@@ -5248,9 +5363,13 @@ const Export = module_export.Export;
         document.getElementById("input_formula_scalar_float").value = shader_formula_scalar_float;
         console.log("shader_formula_scalar", shader_formula_scalar);
         console.log("shader_formula_scalar_float", shader_formula_scalar_float);
-        canvas_wrapper_side.ReplaceRaytracingShader(gl_side, shader_formula_scalar_float);
+        //canvas_wrapper_side.ReplaceRaytracingShader(gl_side, shader_formula_scalar_float);
 
         input_changed_manager.UpdateDefaultValuesRenderSettings();
+
+        //shader_manager.PrepareRaytracingShaderMain(gl);
+        //shader_manager.PrepareRaytracingShaderSide(gl_side);
+        shader_manager.NotifySettingsChanged();
     }
 
     function UpdateGlobalData() {
@@ -5487,7 +5606,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_resampling.glsl":1018,"./shader/f_shader_sum.glsl":1019,"./shader/f_shader_transfer_function.glsl":1020,"./shader/f_shader_transfer_function_points.glsl":1021,"./shader/v_shader_raytracing.glsl":1022,"./shader/v_shader_resampling.glsl":1023,"./shader/v_shader_transfer_function_points.glsl":1024,"./shader_manager":1025,"./streamline_context":1027,"./tab_manager":1029,"./transfer_function_manager":1030,"./ui_left_tool_bar":1031,"./ui_seeds":1032,"./ui_transfer_functions":1033,"./utility":1034,"./webgl":1035,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_resampling.glsl":1018,"./shader/f_shader_sum.glsl":1019,"./shader/f_shader_transfer_function.glsl":1020,"./shader/f_shader_transfer_function_points.glsl":1021,"./shader/v_shader_raytracing.glsl":1022,"./shader/v_shader_resampling.glsl":1023,"./shader/v_shader_transfer_function_points.glsl":1024,"./shader_manager":1026,"./streamline_context":1028,"./tab_manager":1030,"./transfer_function_manager":1031,"./ui_left_tool_bar":1032,"./ui_seeds":1033,"./ui_transfer_functions":1034,"./utility":1035,"./webgl":1036,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -6102,7 +6221,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1034}],23:[function(require,module,exports){
+},{"./utility":1035}],23:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -6665,7 +6784,7 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1034,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1035,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 
@@ -6766,7 +6885,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1034}],26:[function(require,module,exports){
+},{"./utility":1035}],26:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -117069,9 +117188,70 @@ void main() {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],1025:[function(require,module,exports){
+class ShaderContainer {
+
+    constructor(gl, f_source, v_source) {
+        this.program = gl.createProgram();
+        this.vertex_shader = gl.createShader(gl.VERTEX_SHADER);
+        this.fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
+        this.load(gl, f_source, v_source);
+    }
+
+    load(gl, f_source, v_source) {
+        gl.shaderSource(this.vertex_shader, v_source);
+        gl.compileShader(this.vertex_shader);
+    
+        gl.shaderSource(this.fragment_shader, f_source);
+        gl.compileShader(this.fragment_shader);
+    
+        gl.attachShader(this.program, this.vertex_shader);
+        gl.attachShader(this.program, this.fragment_shader);
+
+        gl.linkProgram(this.program);
+    }
+
+    check_status(gl, ext_parallel){
+        if (ext_parallel) {
+            if(!gl.getProgramParameter(this.program, ext_parallel.COMPLETION_STATUS_KHR)){
+                return false;
+            }
+            return true;
+        }
+        else{
+            if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+                console.error('Link failed: ' + gl.getProgramInfoLog(this.program));
+                console.error('vs info-log: ' + gl.getShaderInfoLog(this.vertex_shader));
+                console.error('fs info-log: ' + gl.getShaderInfoLog(this.fragment_shader));
+                return false;
+            }
+            return true;
+        }
+    }
+}
+
+module.exports = ShaderContainer;
+},{}],1026:[function(require,module,exports){
+const ShaderContainer = require("./shader_container");
+
 class ShaderManager {
     constructor() {
+        this.shaders_linked = false;
+        this.settings_changed = false;
+        this.dict_shaders_main = {};
+        this.dict_shaders_side = {};
+    }
 
+    NotifySettingsChanged(){
+        this.settings_changed = true;
+        this.shaders_linked = false;
+    }
+
+    IsDirty(){
+        return this.settings_changed;
+    }
+
+    AreShadersLinked(){
+        return this.shaders_linked;
     }
 
     GetDefaultShader() {
@@ -117091,10 +117271,86 @@ class ShaderManager {
         code = code.replace("shader_formula_w", shader_formula_w);
         return code;  
     }
+
+    GetShaderKey(shader_formula_scalar_float){
+        return shader_formula_scalar_float;
+    }
+
+    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float){
+        //the return container
+        var container;
+
+        //get shader key
+        var shader_key = this.GetShaderKey(shader_formula_scalar_float);
+
+        //get old container if possible
+        if(shader_key in dict_shaders){
+            console.log("Performance: shader_key:", shader_key, "already exists");
+            container = dict_shaders[shader_key];
+        }
+        //otherwise create new container
+        else{
+            console.log("Performance: shader_key:", shader_key, "is created");
+            var f_source = this.GetShader(shader_formula_scalar_float);
+            container = new ShaderContainer(gl, f_source, V_SHADER_RAYTRACING);
+            dict_shaders[shader_key] = container;
+        }
+        return container;
+    }
+
+    PrepareRaytracingShaderMain(gl){
+        var t_start = performance.now();
+
+        //get variables
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+
+        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float);
+        
+        var t_stop = performance.now();
+        console.log("Performance: Prepare left shader in: ", Math.ceil(t_stop-t_start), "ms");
+    }
+
+    PrepareRaytracingShaderSide(gl){
+        var t_start = performance.now();
+
+        //get variables
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+
+        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float);
+        
+        var t_stop = performance.now();
+        console.log("Performance: Prepare right shader in: ", Math.ceil(t_stop-t_start), "ms");
+    }
+
+    CheckRaytracingShaders(gl_main, gl_side, ext_parallel_main, ext_parallel_side){
+        var ok_left = this.container_main.check_status(gl_main, ext_parallel_main);
+        var ok_right = this.container_side.check_status(gl_side, ext_parallel_side);
+        this.shaders_linked = ok_left && ok_right;
+        this.settings_changed = false;
+    }
+
+    /*
+    CompileRaytracingShaders(gl_main, gl_side, shader_formula_scalar){
+        var t_start = performance.now();
+        var f_source_main = this.GetShader(shader_formula_scalar);
+        var f_source_side = this.GetShader(shader_formula_scalar);
+        this.container_main = new ShaderContainer(gl_main, f_source_main, V_SHADER_RAYTRACING);
+        this.container_side = new ShaderContainer(gl_side, f_source_side, V_SHADER_RAYTRACING);
+        var t_stop = performance.now();
+        console.log("Performance: CompileRaytracingShaders in: ", Math.ceil(t_stop-t_start), "ms");
+    }
+    */
+
 }
 
 module.exports = ShaderManager;
-},{}],1026:[function(require,module,exports){
+},{"./shader_container":1025}],1027:[function(require,module,exports){
 class ShaderUniform {
 
     constructor(gl, program, name, type, value) {
@@ -117149,7 +117405,7 @@ class ShaderUniforms {
 }
 
 module.exports = ShaderUniforms;
-},{}],1027:[function(require,module,exports){
+},{}],1028:[function(require,module,exports){
 const RawData = require("./raw_data");
 const StreamlineGenerator = require("./streamline_generator");
 const SegmentDuplicator = require("./segment_duplicator");
@@ -117323,7 +117579,7 @@ class StreamlineContext {
 }
 
 module.exports = StreamlineContext;
-},{"./lod_data":24,"./raw_data":1005,"./segment_duplicator":1009,"./streamline_generator":1028}],1028:[function(require,module,exports){
+},{"./lod_data":24,"./raw_data":1005,"./segment_duplicator":1009,"./streamline_generator":1029}],1029:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const math = require("mathjs");
 
@@ -117662,7 +117918,7 @@ class StreamlineGenerator {
 }
 
 module.exports = StreamlineGenerator;
-},{"gl-matrix":53,"mathjs":909}],1029:[function(require,module,exports){
+},{"gl-matrix":53,"mathjs":909}],1030:[function(require,module,exports){
 class TabEntry{
     constructor(name, id_button, id_content){
         this.name = name;
@@ -117742,7 +117998,7 @@ class TabManager{
 }
 
 module.exports = TabManager;
-},{}],1030:[function(require,module,exports){
+},{}],1031:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
@@ -118147,7 +118403,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":11,"./utility":1034,"gl-matrix":53}],1031:[function(require,module,exports){
+},{"./data_types":11,"./utility":1035,"gl-matrix":53}],1032:[function(require,module,exports){
 
 class UISelectedCameraIndicator{
 
@@ -118252,7 +118508,7 @@ class UILeftToolBar{
 }
 
 module.exports = UILeftToolBar;
-},{}],1032:[function(require,module,exports){
+},{}],1033:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -118590,7 +118846,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":11,"./utility":1034,"gl-matrix":53,"seedrandom":993}],1033:[function(require,module,exports){
+},{"./data_types":11,"./utility":1035,"gl-matrix":53,"seedrandom":993}],1034:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -118954,7 +119210,7 @@ class UITransferFunctions {
 */
 
 module.exports = UITransferFunctions;
-},{"./data_types":11,"./utility":1034,"gl-matrix":53,"seedrandom":993}],1034:[function(require,module,exports){
+},{"./data_types":11,"./utility":1035,"gl-matrix":53,"seedrandom":993}],1035:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 exports.getMousePosition = function(canvas, event) {
@@ -119071,7 +119327,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":53}],1035:[function(require,module,exports){
+},{"gl-matrix":53}],1036:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
