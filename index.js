@@ -182,7 +182,7 @@ const Export = module_export.Export;
         ext_parallel = gl.getExtension('KHR_parallel_shader_compile');
         ext_parallel_side = gl_side.getExtension('KHR_parallel_shader_compile');
         if ((!ext_parallel) || (!ext_parallel_side)) {
-            alert("Parallel not supported");
+            //alert("Parallel not supported");
         }
 
         ui_seeds = new UISeeds();
