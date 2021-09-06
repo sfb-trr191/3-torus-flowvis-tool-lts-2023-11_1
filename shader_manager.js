@@ -8,6 +8,11 @@ class ShaderManager {
         this.dict_shaders_side = {};
     }
 
+    Link(canvas_wrapper_main, canvas_wrapper_side){
+        this.canvas_wrapper_main = canvas_wrapper_main;
+        this.canvas_wrapper_side = canvas_wrapper_side;
+    }
+
     NotifySettingsChanged(){
         this.settings_changed = true;
         this.shaders_linked = false;
@@ -26,8 +31,33 @@ class ShaderManager {
         return code;
     }
 
-    GetShader(shader_formula_scalar) {
+    GetShader(shader_formula_scalar, shader_flags) {
         var code = F_SHADER_RAYTRACING_PREPROCESSOR.replace("shader_formula_scalar", shader_formula_scalar);
+
+        var defines = "";
+        if(shader_flags.show_volume_rendering)
+            defines += "\n#define SHOW_VOLUME_RENDERING";        
+        if(shader_flags.show_volume_rendering_forward)
+            defines += "\n#define SHOW_VOLUME_RENDERING_FORWARD";        
+        if(shader_flags.show_volume_rendering_backward)
+            defines += "\n#define SHOW_VOLUME_RENDERING_BACKWARD";        
+        if(shader_flags.show_movable_axes)
+            defines += "\n#define SHOW_MOVABLE_AXES";
+        if(shader_flags.show_streamlines)
+            defines += "\n#define SHOW_STREAMLINES";            
+        if(shader_flags.show_streamlines_outside)
+            defines += "\n#define SHOW_STREAMLINES_OUTSIDE";
+        if(shader_flags.show_bounding_box)
+            defines += "\n#define SHOW_BOUNDING_BOX";
+        if(shader_flags.show_bounding_box_projection)
+            defines += "\n#define SHOW_BOUNDING_BOX_PROJECTION";
+        if(shader_flags.cut_at_cube_faces)
+            defines += "\n#define CUT_AT_CUBE_FACES";
+        if(shader_flags.handle_inside)
+            defines += "\n#define HANDLE_INSIDE";
+        
+        code = code.replace("$defines$", defines);
+        console.log(code);
         return code;
     }
 
@@ -39,16 +69,38 @@ class ShaderManager {
         return code;  
     }
 
-    GetShaderKey(shader_formula_scalar_float){
-        return shader_formula_scalar_float;
+    GetShaderKey(shader_formula_scalar_float, shader_flags){
+        var key = shader_formula_scalar_float;
+
+        if(shader_flags.show_volume_rendering)
+            key += ";SHOW_VOLUME_RENDERING"
+        if(shader_flags.show_volume_rendering_forward)
+            key += ";SHOW_VOLUME_RENDERING_FORWARD"
+        if(shader_flags.show_volume_rendering_backward)
+            key += ";SHOW_VOLUME_RENDERING_BACKWARD"
+        if(shader_flags.show_movable_axes)
+            key += ";SHOW_MOVABLE_AXES"
+        if(shader_flags.show_streamlines)
+            key += ";SHOW_STREAMLINES"
+        if(shader_flags.show_streamlines_outside)
+            key += ";SHOW_STREAMLINES_OUTSIDE"
+        if(shader_flags.show_bounding_box)
+            key += ";SHOW_BOUNDING_BOX"
+        if(shader_flags.show_bounding_box_projection)
+            key += ";SHOW_BOUNDING_BOX_PROJECTION"
+        if(shader_flags.cut_at_cube_faces)
+            key += ";CUT_AT_CUBE_FACES"     
+        if(shader_flags.handle_inside)
+            key += ";HANDLE_INSIDE"          
+        return key;
     }
 
-    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float){
+    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float, shader_flags){
         //the return container
         var container;
 
         //get shader key
-        var shader_key = this.GetShaderKey(shader_formula_scalar_float);
+        var shader_key = this.GetShaderKey(shader_formula_scalar_float, shader_flags);
 
         //get old container if possible
         if(shader_key in dict_shaders){
@@ -58,7 +110,7 @@ class ShaderManager {
         //otherwise create new container
         else{
             console.log("Performance: shader_key:", shader_key, "is created");
-            var f_source = this.GetShader(shader_formula_scalar_float);
+            var f_source = this.GetShader(shader_formula_scalar_float, shader_flags);
             container = new ShaderContainer(gl, f_source, V_SHADER_RAYTRACING);
             dict_shaders[shader_key] = container;
         }
@@ -74,7 +126,11 @@ class ShaderManager {
             return ($2 == ".") ? $0 : $0 + ".0";
         });
 
-        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float);
+        this.canvas_wrapper_main.UpdateShaderFlags();
+        var shader_flags = this.canvas_wrapper_main.shader_flags;
+
+        //get container
+        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float, shader_flags);
         
         var t_stop = performance.now();
         console.log("Performance: Prepare left shader in: ", Math.ceil(t_stop-t_start), "ms");
@@ -89,7 +145,11 @@ class ShaderManager {
             return ($2 == ".") ? $0 : $0 + ".0";
         });
 
-        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float);
+        this.canvas_wrapper_side.UpdateShaderFlags();
+        var shader_flags = this.canvas_wrapper_side.shader_flags;
+
+        //get container
+        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float, shader_flags);
         
         var t_stop = performance.now();
         console.log("Performance: Prepare right shader in: ", Math.ceil(t_stop-t_start), "ms");

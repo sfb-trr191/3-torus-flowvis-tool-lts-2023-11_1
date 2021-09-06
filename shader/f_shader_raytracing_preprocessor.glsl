@@ -1,4 +1,7 @@
 global.F_SHADER_RAYTRACING_PREPROCESSOR = `#version 300 es
+
+$defines$
+
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
 precision highp float;
@@ -183,18 +186,8 @@ uniform float min_scalar;
 uniform float max_scalar;
 uniform int projection_index;
 
-uniform bool cut_at_cube_faces;
-uniform bool handle_inside;
 uniform bool is_main_renderer;
 uniform bool show_origin_axes;
-uniform bool show_bounding_box;
-uniform bool show_bounding_box_projection;
-uniform bool show_movable_axes;
-uniform bool show_streamlines;
-uniform bool show_streamlines_outside;
-uniform bool show_volume_rendering;
-uniform bool show_volume_rendering_forward;
-uniform bool show_volume_rendering_backward;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
 uniform float volume_rendering_opacity_factor;
@@ -230,6 +223,19 @@ const float x_axesPixelOffset = 0.85;
 const float y_axesPixelOffset = 0.75;
 
 uniform GL_CameraData active_camera;
+
+//************************** redundant because of compiler directives ********************************
+
+uniform bool show_volume_rendering;
+uniform bool show_volume_rendering_forward;
+uniform bool show_volume_rendering_backward;
+uniform bool show_movable_axes;
+uniform bool show_streamlines;//not yet entirely redundant
+uniform bool show_streamlines_outside;//not yet entirely redundant
+uniform bool show_bounding_box;
+uniform bool show_bounding_box_projection;
+uniform bool cut_at_cube_faces;
+uniform bool handle_inside;
 
 //**********************************************************
 
@@ -495,16 +501,16 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 	HitInformation hitCube;
 
 	//#decision render_movable_axes
-    if(show_movable_axes){
-        Ray rayPixelOffset = GenerateRayWithPixelOffset(x_offset, y_offset);
-        IntersectMovableAxes(rayPixelOffset, maxRayDistance, hit, hitCube);
-        if(hit.hitType > TYPE_NONE)
-        {
-            //return vec3(1,0,0);
-            vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true);
-            return resultColor;	
-        }
+#ifdef SHOW_MOVABLE_AXES
+    Ray rayPixelOffset = GenerateRayWithPixelOffset(x_offset, y_offset);
+    IntersectMovableAxes(rayPixelOffset, maxRayDistance, hit, hitCube);
+    if(hit.hitType > TYPE_NONE)
+    {
+        //return vec3(1,0,0);
+        vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true);
+        return resultColor;	
     }
+#endif
 
 	Ray ray = GenerateRay(x_offset, y_offset);	
   
@@ -613,16 +619,15 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		float t = min(t_v.x, min(t_v.y, t_v.z));		
 		vec3 exit = variableRay.origin + t * variableRay.direction;
 
-        if (show_volume_rendering)
-        {        
-            bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
-                && variableRay.rayDistance < max_volume_distance;
-            if(volume_flag)
-            {
-                float distance_exit = t;
-                IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
-            }
+#ifdef SHOW_VOLUME_RENDERING
+        bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
+            && variableRay.rayDistance < max_volume_distance;
+        if(volume_flag)
+        {
+            float distance_exit = t;
+            IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
         }
+#endif
 
 		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
 			break;
@@ -664,10 +669,12 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		//break;
 	}	
 
-    if(show_streamlines_outside){
+#ifdef SHOW_STREAMLINES_OUTSIDE
+    {
         bool check_bounds = false;
 	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
     }
+#endif
 }
 
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
@@ -711,7 +718,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		}
 	}
   */
-	if(cut_at_cube_faces)
+#ifdef CUT_AT_CUBE_FACES
 	{
 		IntersectUnitCube(ray, doesIntersect, nearest_t, normal_face);
 		if(doesIntersect)
@@ -722,11 +729,14 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 			hitCube.position = ray.origin + nearest_t * ray.direction;		
 		}
 	}
+#endif
 
-	if(show_streamlines){
+#ifdef SHOW_STREAMLINES
+    {
         bool check_bounds = true;
 	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, maxRayDistance, hit, hitCube);
     }
+#endif
   /*
 	if(show_interactive_streamline)
 		IntersectInstance_Tree(true, ray, maxRayDistance, hit, hitCube);
@@ -754,15 +764,18 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	}
 */
 	
-	if(show_bounding_box)
+#ifdef SHOW_BOUNDING_BOX
 	{
         IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
 	}
-    if(show_bounding_box_projection)
+#endif
+
+#ifdef SHOW_BOUNDING_BOX_PROJECTION
     {
         bool check_bounds = true;
         IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
     }
+#endif
 
 /*
 	if(show_main_camera_axes)
@@ -816,10 +829,11 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 				
 				if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
 				{
-					if(handle_inside)
+#ifdef HANDLE_INSIDE
 					{
 						HandleInside_LineSegment(part_index, ray, glNode.objectIndex, hit);
 					}
+#endif
 					IntersectLineSegment(part_index, check_bounds, ray, ray_local_cutoff, glNode, hit);	
           						
 				}
@@ -1384,20 +1398,6 @@ float ExtractLinearPercentage(float a, float b, float value)
 void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {
     //deciding which hit to use
-
-    if(show_streamlines_outside)
-    {
-        //if we hit a streamline inside the fundamental domain
-        if(hit.hitType == TYPE_STREAMLINE_SEGMENT){
-
-        }
-
-
-        else{
-
-        }
-    }
-
     if(projection_index == -1){
         if(hit_outside.hitType>TYPE_NONE){
             if(hit.hitType == TYPE_NONE){
@@ -2315,16 +2315,20 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         //transfer_function_index_ftle_backward;
 
         //calculate forward color
-        if(show_volume_rendering_forward){
+#ifdef SHOW_VOLUME_RENDERING_FORWARD
+        {
             int z_offset = 0;
             ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_forward, hit);
         }
-        
+#endif
+
         //calculate backward color
-        if(show_volume_rendering_backward){
+#ifdef SHOW_VOLUME_RENDERING_BACKWARD
+        {
             int z_offset = dim_z;
             ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_backward, hit);
         }
+#endif
 
         //prepare next sample
         sample_index_iteration++;

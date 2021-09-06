@@ -1,6 +1,7 @@
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
+const ShaderFlags = require("./shader_flags");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 
@@ -188,6 +189,8 @@ class CanvasWrapper {
 
         //this.GenerateDummyBuffer(gl);
         this.dummy_quad = new DummyQuad(gl);
+
+        this.shader_flags = new ShaderFlags();
     }
 
     InitializeShaders(gl){    
@@ -349,6 +352,25 @@ class CanvasWrapper {
                 console.warn("DRAW MODE ERROR", this.draw_mode);
                 break;
         }
+    }
+
+    UpdateShaderFlags(){
+        this.shader_flags.Update(
+            this.projection_index, 
+            this.draw_mode, 
+            this.max_iteration_count, 
+            this.tube_radius_fundamental,
+            this.tube_radius_factor, 
+            this.tube_radius_factor_projection, 
+            this.tube_radius_factor_projection_highlight,
+            this.show_bounding_box,
+            this.show_bounding_box_projection,
+            this.streamline_method,
+            this.streamline_method_projection, 
+            this.volume_rendering_mode,
+            this.show_movable_axes,
+            this.cut_at_cube_faces,
+            this.handle_inside);
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {

@@ -404,7 +404,7 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":11,"./utility":1036,"gl-matrix":53}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":11,"./utility":1037,"gl-matrix":53}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -1135,6 +1135,7 @@ module.exports = Camera;
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
+const ShaderFlags = require("./shader_flags");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 
@@ -1322,6 +1323,8 @@ class CanvasWrapper {
 
         //this.GenerateDummyBuffer(gl);
         this.dummy_quad = new DummyQuad(gl);
+
+        this.shader_flags = new ShaderFlags();
     }
 
     InitializeShaders(gl){    
@@ -1483,6 +1486,25 @@ class CanvasWrapper {
                 console.warn("DRAW MODE ERROR", this.draw_mode);
                 break;
         }
+    }
+
+    UpdateShaderFlags(){
+        this.shader_flags.Update(
+            this.projection_index, 
+            this.draw_mode, 
+            this.max_iteration_count, 
+            this.tube_radius_fundamental,
+            this.tube_radius_factor, 
+            this.tube_radius_factor_projection, 
+            this.tube_radius_factor_projection_highlight,
+            this.show_bounding_box,
+            this.show_bounding_box_projection,
+            this.streamline_method,
+            this.streamline_method_projection, 
+            this.volume_rendering_mode,
+            this.show_movable_axes,
+            this.cut_at_cube_faces,
+            this.handle_inside);
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
@@ -1827,7 +1849,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1028,"./webgl":1037}],6:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_flags":1027,"./shader_uniforms":1029,"./webgl":1038}],6:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -2585,7 +2607,7 @@ class CanvasWrapperTransferFunction {
 }
 
 module.exports = CanvasWrapperTransferFunction;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1028,"./utility":1036,"./webgl":1037}],7:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1029,"./utility":1037,"./webgl":1038}],7:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -4000,7 +4022,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1028,"./utility":1036,"./webgl":1037,"ml-matrix":990}],16:[function(require,module,exports){
+},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1029,"./utility":1037,"./webgl":1038,"ml-matrix":990}],16:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -4749,6 +4771,8 @@ const Export = module_export.Export;
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
+        shader_manager.Link(canvas_wrapper_main, canvas_wrapper_side);
+
         tick_counter = 0;
         frame_counter = 0;
         var strongs = document.querySelectorAll("strong");
@@ -5067,6 +5091,7 @@ const Export = module_export.Export;
         var streamline_method = parseInt(document.getElementById("select_side_canvas_streamline_method").value);
         var streamline_method_projection = parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value);
         canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
+        shader_manager.NotifySettingsChanged();
     }
 
     function addChangedTransferFunction(){
@@ -5502,7 +5527,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_raytracing_preprocessor.glsl":1018,"./shader/f_shader_resampling.glsl":1019,"./shader/f_shader_sum.glsl":1020,"./shader/f_shader_transfer_function.glsl":1021,"./shader/f_shader_transfer_function_points.glsl":1022,"./shader/v_shader_raytracing.glsl":1023,"./shader/v_shader_resampling.glsl":1024,"./shader/v_shader_transfer_function_points.glsl":1025,"./shader_manager":1027,"./streamline_context":1029,"./tab_manager":1031,"./transfer_function_manager":1032,"./ui_left_tool_bar":1033,"./ui_seeds":1034,"./ui_transfer_functions":1035,"./utility":1036,"./webgl":1037,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_raytracing_preprocessor.glsl":1018,"./shader/f_shader_resampling.glsl":1019,"./shader/f_shader_sum.glsl":1020,"./shader/f_shader_transfer_function.glsl":1021,"./shader/f_shader_transfer_function_points.glsl":1022,"./shader/v_shader_raytracing.glsl":1023,"./shader/v_shader_resampling.glsl":1024,"./shader/v_shader_transfer_function_points.glsl":1025,"./shader_manager":1028,"./streamline_context":1030,"./tab_manager":1032,"./transfer_function_manager":1033,"./ui_left_tool_bar":1034,"./ui_seeds":1035,"./ui_transfer_functions":1036,"./utility":1037,"./webgl":1038,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -6117,7 +6142,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1036}],23:[function(require,module,exports){
+},{"./utility":1037}],23:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -6680,7 +6705,7 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1036,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1037,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 
@@ -6781,7 +6806,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1036}],26:[function(require,module,exports){
+},{"./utility":1037}],26:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -116677,6 +116702,9 @@ GL_Cylinder GetCylinder(int index)
 },{}],1018:[function(require,module,exports){
 (function (global){(function (){
 global.F_SHADER_RAYTRACING_PREPROCESSOR = `#version 300 es
+
+$defines$
+
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
 precision highp float;
@@ -116861,18 +116889,8 @@ uniform float min_scalar;
 uniform float max_scalar;
 uniform int projection_index;
 
-uniform bool cut_at_cube_faces;
-uniform bool handle_inside;
 uniform bool is_main_renderer;
 uniform bool show_origin_axes;
-uniform bool show_bounding_box;
-uniform bool show_bounding_box_projection;
-uniform bool show_movable_axes;
-uniform bool show_streamlines;
-uniform bool show_streamlines_outside;
-uniform bool show_volume_rendering;
-uniform bool show_volume_rendering_forward;
-uniform bool show_volume_rendering_backward;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
 uniform float volume_rendering_opacity_factor;
@@ -116908,6 +116926,19 @@ const float x_axesPixelOffset = 0.85;
 const float y_axesPixelOffset = 0.75;
 
 uniform GL_CameraData active_camera;
+
+//************************** redundant because of compiler directives ********************************
+
+uniform bool show_volume_rendering;
+uniform bool show_volume_rendering_forward;
+uniform bool show_volume_rendering_backward;
+uniform bool show_movable_axes;
+uniform bool show_streamlines;//not yet entirely redundant
+uniform bool show_streamlines_outside;//not yet entirely redundant
+uniform bool show_bounding_box;
+uniform bool show_bounding_box_projection;
+uniform bool cut_at_cube_faces;
+uniform bool handle_inside;
 
 //**********************************************************
 
@@ -117173,16 +117204,16 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 	HitInformation hitCube;
 
 	//#decision render_movable_axes
-    if(show_movable_axes){
-        Ray rayPixelOffset = GenerateRayWithPixelOffset(x_offset, y_offset);
-        IntersectMovableAxes(rayPixelOffset, maxRayDistance, hit, hitCube);
-        if(hit.hitType > TYPE_NONE)
-        {
-            //return vec3(1,0,0);
-            vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true);
-            return resultColor;	
-        }
+#ifdef SHOW_MOVABLE_AXES
+    Ray rayPixelOffset = GenerateRayWithPixelOffset(x_offset, y_offset);
+    IntersectMovableAxes(rayPixelOffset, maxRayDistance, hit, hitCube);
+    if(hit.hitType > TYPE_NONE)
+    {
+        //return vec3(1,0,0);
+        vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true);
+        return resultColor;	
     }
+#endif
 
 	Ray ray = GenerateRay(x_offset, y_offset);	
   
@@ -117291,16 +117322,15 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		float t = min(t_v.x, min(t_v.y, t_v.z));		
 		vec3 exit = variableRay.origin + t * variableRay.direction;
 
-        if (show_volume_rendering)
-        {        
-            bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
-                && variableRay.rayDistance < max_volume_distance;
-            if(volume_flag)
-            {
-                float distance_exit = t;
-                IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
-            }
+#ifdef SHOW_VOLUME_RENDERING
+        bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
+            && variableRay.rayDistance < max_volume_distance;
+        if(volume_flag)
+        {
+            float distance_exit = t;
+            IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
         }
+#endif
 
 		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
 			break;
@@ -117342,10 +117372,12 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		//break;
 	}	
 
-    if(show_streamlines_outside){
+#ifdef SHOW_STREAMLINES_OUTSIDE
+    {
         bool check_bounds = false;
 	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
     }
+#endif
 }
 
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
@@ -117389,7 +117421,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 		}
 	}
   */
-	if(cut_at_cube_faces)
+#ifdef CUT_AT_CUBE_FACES
 	{
 		IntersectUnitCube(ray, doesIntersect, nearest_t, normal_face);
 		if(doesIntersect)
@@ -117400,11 +117432,14 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 			hitCube.position = ray.origin + nearest_t * ray.direction;		
 		}
 	}
+#endif
 
-	if(show_streamlines){
+#ifdef SHOW_STREAMLINES
+    {
         bool check_bounds = true;
 	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, maxRayDistance, hit, hitCube);
     }
+#endif
   /*
 	if(show_interactive_streamline)
 		IntersectInstance_Tree(true, ray, maxRayDistance, hit, hitCube);
@@ -117432,15 +117467,18 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	}
 */
 	
-	if(show_bounding_box)
+#ifdef SHOW_BOUNDING_BOX
 	{
         IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
 	}
-    if(show_bounding_box_projection)
+#endif
+
+#ifdef SHOW_BOUNDING_BOX_PROJECTION
     {
         bool check_bounds = true;
         IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
     }
+#endif
 
 /*
 	if(show_main_camera_axes)
@@ -117494,10 +117532,11 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 				
 				if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
 				{
-					if(handle_inside)
+#ifdef HANDLE_INSIDE
 					{
 						HandleInside_LineSegment(part_index, ray, glNode.objectIndex, hit);
 					}
+#endif
 					IntersectLineSegment(part_index, check_bounds, ray, ray_local_cutoff, glNode, hit);	
           						
 				}
@@ -118062,20 +118101,6 @@ float ExtractLinearPercentage(float a, float b, float value)
 void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {
     //deciding which hit to use
-
-    if(show_streamlines_outside)
-    {
-        //if we hit a streamline inside the fundamental domain
-        if(hit.hitType == TYPE_STREAMLINE_SEGMENT){
-
-        }
-
-
-        else{
-
-        }
-    }
-
     if(projection_index == -1){
         if(hit_outside.hitType>TYPE_NONE){
             if(hit.hitType == TYPE_NONE){
@@ -118993,16 +119018,20 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         //transfer_function_index_ftle_backward;
 
         //calculate forward color
-        if(show_volume_rendering_forward){
+#ifdef SHOW_VOLUME_RENDERING_FORWARD
+        {
             int z_offset = 0;
             ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_forward, hit);
         }
-        
+#endif
+
         //calculate backward color
-        if(show_volume_rendering_backward){
+#ifdef SHOW_VOLUME_RENDERING_BACKWARD
+        {
             int z_offset = dim_z;
             ApplyVolumeSample(ray, sample_position, z_offset, transfer_function_index_ftle_backward, hit);
         }
+#endif
 
         //prepare next sample
         sample_index_iteration++;
@@ -119936,6 +119965,92 @@ class ShaderContainer {
 
 module.exports = ShaderContainer;
 },{}],1027:[function(require,module,exports){
+class ShaderFlags {
+    constructor() {
+        this.changed = true;
+    }
+
+    Update(projection_index, draw_mode, max_iteration_count, tube_radius_fundamental,
+        tube_radius_factor, tube_radius_factor_projection, tube_radius_factor_projection_highlight, 
+        show_bounding_box, show_bounding_box_projection,
+        streamline_method, streamline_method_projection, 
+        volume_rendering_mode, show_movable_axes, cut_at_cube_faces, handle_inside){
+
+        this.changed = true;
+        this.show_movable_axes = show_movable_axes;
+        this.cut_at_cube_faces = cut_at_cube_faces;
+        this.handle_inside = handle_inside;
+
+        this.projection_index = -1;
+        this.max_iteration_count = max_iteration_count;
+        this.tube_radius_factor_active = tube_radius_factor;
+        this.tube_radius_factor_active_outside = tube_radius_factor;
+
+        this.show_bounding_box = show_bounding_box;
+        this.show_bounding_box_projection = show_bounding_box_projection;
+
+        this.streamline_method = draw_mode == DRAW_MODE_PROJECTION ? streamline_method_projection : streamline_method;
+        this.show_streamlines = false;
+        this.show_streamlines_outside = false;
+        switch (this.streamline_method) {
+            case STREAMLINE_DRAW_METHOD_FUNDAMENTAL:
+                this.show_streamlines = true;
+                break;
+            case STREAMLINE_DRAW_METHOD_R3:
+                this.show_streamlines_outside = true;
+                break;
+            case STREAMLINE_DRAW_METHOD_BOTH:
+                this.show_streamlines = true;
+                this.show_streamlines_outside = true;
+                break;
+            default:
+                break;
+        }
+
+        this.show_volume_rendering = false;
+        this.show_volume_rendering_forward = false;
+        this.show_volume_rendering_backward = false;
+        switch (volume_rendering_mode) {
+            case VOLUME_RENDERING_MODE_BOTH:
+                this.show_volume_rendering = true;
+                this.show_volume_rendering_forward = true;
+                this.show_volume_rendering_backward = true;
+                break;
+            case VOLUME_RENDERING_MODE_FORWARD:
+                this.show_volume_rendering = true;
+                this.show_volume_rendering_forward = true;
+                break;
+            case VOLUME_RENDERING_MODE_BACKWARD:
+                this.show_volume_rendering = true;
+                this.show_volume_rendering_backward = true;
+                break;
+            default:
+                break;
+        }
+
+        if(draw_mode == DRAW_MODE_PROJECTION){
+            this.projection_index = projection_index;
+            this.max_iteration_count = 1000;
+            this.tube_radius_factor_active = tube_radius_factor_projection;
+            this.tube_radius_factor_active_outside = tube_radius_factor_projection_highlight;
+            //deactivate volume rendering in projection mode
+            this.show_volume_rendering = false;
+            this.show_bounding_box = false;
+        }
+        else{
+            this.show_bounding_box_projection = false;
+        }
+
+        this.tube_radius_active = tube_radius_fundamental * this.tube_radius_factor_active;
+        this.tube_radius_active_outside = tube_radius_fundamental * this.tube_radius_factor_active_outside;
+    }
+
+
+
+}
+
+module.exports = ShaderFlags;
+},{}],1028:[function(require,module,exports){
 const ShaderContainer = require("./shader_container");
 
 class ShaderManager {
@@ -119944,6 +120059,11 @@ class ShaderManager {
         this.settings_changed = false;
         this.dict_shaders_main = {};
         this.dict_shaders_side = {};
+    }
+
+    Link(canvas_wrapper_main, canvas_wrapper_side){
+        this.canvas_wrapper_main = canvas_wrapper_main;
+        this.canvas_wrapper_side = canvas_wrapper_side;
     }
 
     NotifySettingsChanged(){
@@ -119964,8 +120084,33 @@ class ShaderManager {
         return code;
     }
 
-    GetShader(shader_formula_scalar) {
+    GetShader(shader_formula_scalar, shader_flags) {
         var code = F_SHADER_RAYTRACING_PREPROCESSOR.replace("shader_formula_scalar", shader_formula_scalar);
+
+        var defines = "";
+        if(shader_flags.show_volume_rendering)
+            defines += "\n#define SHOW_VOLUME_RENDERING";        
+        if(shader_flags.show_volume_rendering_forward)
+            defines += "\n#define SHOW_VOLUME_RENDERING_FORWARD";        
+        if(shader_flags.show_volume_rendering_backward)
+            defines += "\n#define SHOW_VOLUME_RENDERING_BACKWARD";        
+        if(shader_flags.show_movable_axes)
+            defines += "\n#define SHOW_MOVABLE_AXES";
+        if(shader_flags.show_streamlines)
+            defines += "\n#define SHOW_STREAMLINES";            
+        if(shader_flags.show_streamlines_outside)
+            defines += "\n#define SHOW_STREAMLINES_OUTSIDE";
+        if(shader_flags.show_bounding_box)
+            defines += "\n#define SHOW_BOUNDING_BOX";
+        if(shader_flags.show_bounding_box_projection)
+            defines += "\n#define SHOW_BOUNDING_BOX_PROJECTION";
+        if(shader_flags.cut_at_cube_faces)
+            defines += "\n#define CUT_AT_CUBE_FACES";
+        if(shader_flags.handle_inside)
+            defines += "\n#define HANDLE_INSIDE";
+        
+        code = code.replace("$defines$", defines);
+        console.log(code);
         return code;
     }
 
@@ -119977,16 +120122,38 @@ class ShaderManager {
         return code;  
     }
 
-    GetShaderKey(shader_formula_scalar_float){
-        return shader_formula_scalar_float;
+    GetShaderKey(shader_formula_scalar_float, shader_flags){
+        var key = shader_formula_scalar_float;
+
+        if(shader_flags.show_volume_rendering)
+            key += ";SHOW_VOLUME_RENDERING"
+        if(shader_flags.show_volume_rendering_forward)
+            key += ";SHOW_VOLUME_RENDERING_FORWARD"
+        if(shader_flags.show_volume_rendering_backward)
+            key += ";SHOW_VOLUME_RENDERING_BACKWARD"
+        if(shader_flags.show_movable_axes)
+            key += ";SHOW_MOVABLE_AXES"
+        if(shader_flags.show_streamlines)
+            key += ";SHOW_STREAMLINES"
+        if(shader_flags.show_streamlines_outside)
+            key += ";SHOW_STREAMLINES_OUTSIDE"
+        if(shader_flags.show_bounding_box)
+            key += ";SHOW_BOUNDING_BOX"
+        if(shader_flags.show_bounding_box_projection)
+            key += ";SHOW_BOUNDING_BOX_PROJECTION"
+        if(shader_flags.cut_at_cube_faces)
+            key += ";CUT_AT_CUBE_FACES"     
+        if(shader_flags.handle_inside)
+            key += ";HANDLE_INSIDE"          
+        return key;
     }
 
-    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float){
+    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float, shader_flags){
         //the return container
         var container;
 
         //get shader key
-        var shader_key = this.GetShaderKey(shader_formula_scalar_float);
+        var shader_key = this.GetShaderKey(shader_formula_scalar_float, shader_flags);
 
         //get old container if possible
         if(shader_key in dict_shaders){
@@ -119996,7 +120163,7 @@ class ShaderManager {
         //otherwise create new container
         else{
             console.log("Performance: shader_key:", shader_key, "is created");
-            var f_source = this.GetShader(shader_formula_scalar_float);
+            var f_source = this.GetShader(shader_formula_scalar_float, shader_flags);
             container = new ShaderContainer(gl, f_source, V_SHADER_RAYTRACING);
             dict_shaders[shader_key] = container;
         }
@@ -120012,7 +120179,11 @@ class ShaderManager {
             return ($2 == ".") ? $0 : $0 + ".0";
         });
 
-        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float);
+        this.canvas_wrapper_main.UpdateShaderFlags();
+        var shader_flags = this.canvas_wrapper_main.shader_flags;
+
+        //get container
+        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float, shader_flags);
         
         var t_stop = performance.now();
         console.log("Performance: Prepare left shader in: ", Math.ceil(t_stop-t_start), "ms");
@@ -120027,7 +120198,11 @@ class ShaderManager {
             return ($2 == ".") ? $0 : $0 + ".0";
         });
 
-        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float);
+        this.canvas_wrapper_side.UpdateShaderFlags();
+        var shader_flags = this.canvas_wrapper_side.shader_flags;
+
+        //get container
+        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float, shader_flags);
         
         var t_stop = performance.now();
         console.log("Performance: Prepare right shader in: ", Math.ceil(t_stop-t_start), "ms");
@@ -120043,7 +120218,7 @@ class ShaderManager {
 }
 
 module.exports = ShaderManager;
-},{"./shader_container":1026}],1028:[function(require,module,exports){
+},{"./shader_container":1026}],1029:[function(require,module,exports){
 class ShaderUniform {
 
     constructor(gl, program, name, type, value) {
@@ -120098,7 +120273,7 @@ class ShaderUniforms {
 }
 
 module.exports = ShaderUniforms;
-},{}],1029:[function(require,module,exports){
+},{}],1030:[function(require,module,exports){
 const RawData = require("./raw_data");
 const StreamlineGenerator = require("./streamline_generator");
 const SegmentDuplicator = require("./segment_duplicator");
@@ -120272,7 +120447,7 @@ class StreamlineContext {
 }
 
 module.exports = StreamlineContext;
-},{"./lod_data":24,"./raw_data":1005,"./segment_duplicator":1009,"./streamline_generator":1030}],1030:[function(require,module,exports){
+},{"./lod_data":24,"./raw_data":1005,"./segment_duplicator":1009,"./streamline_generator":1031}],1031:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const math = require("mathjs");
 
@@ -120611,7 +120786,7 @@ class StreamlineGenerator {
 }
 
 module.exports = StreamlineGenerator;
-},{"gl-matrix":53,"mathjs":909}],1031:[function(require,module,exports){
+},{"gl-matrix":53,"mathjs":909}],1032:[function(require,module,exports){
 class TabEntry{
     constructor(name, id_button, id_content){
         this.name = name;
@@ -120691,7 +120866,7 @@ class TabManager{
 }
 
 module.exports = TabManager;
-},{}],1032:[function(require,module,exports){
+},{}],1033:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
@@ -121096,7 +121271,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":11,"./utility":1036,"gl-matrix":53}],1033:[function(require,module,exports){
+},{"./data_types":11,"./utility":1037,"gl-matrix":53}],1034:[function(require,module,exports){
 
 class UISelectedCameraIndicator{
 
@@ -121201,7 +121376,7 @@ class UILeftToolBar{
 }
 
 module.exports = UILeftToolBar;
-},{}],1034:[function(require,module,exports){
+},{}],1035:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -121539,7 +121714,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":11,"./utility":1036,"gl-matrix":53,"seedrandom":993}],1035:[function(require,module,exports){
+},{"./data_types":11,"./utility":1037,"gl-matrix":53,"seedrandom":993}],1036:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -121903,7 +122078,7 @@ class UITransferFunctions {
 */
 
 module.exports = UITransferFunctions;
-},{"./data_types":11,"./utility":1036,"gl-matrix":53,"seedrandom":993}],1036:[function(require,module,exports){
+},{"./data_types":11,"./utility":1037,"gl-matrix":53,"seedrandom":993}],1037:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 exports.getMousePosition = function(canvas, event) {
@@ -122020,7 +122195,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":53}],1037:[function(require,module,exports){
+},{"gl-matrix":53}],1038:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;

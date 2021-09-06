@@ -251,6 +251,8 @@ const Export = module_export.Export;
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
+        shader_manager.Link(canvas_wrapper_main, canvas_wrapper_side);
+
         tick_counter = 0;
         frame_counter = 0;
         var strongs = document.querySelectorAll("strong");
@@ -569,6 +571,7 @@ const Export = module_export.Export;
         var streamline_method = parseInt(document.getElementById("select_side_canvas_streamline_method").value);
         var streamline_method_projection = parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value);
         canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
+        shader_manager.NotifySettingsChanged();
     }
 
     function addChangedTransferFunction(){
