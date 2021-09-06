@@ -8,6 +8,7 @@ const f_shader_copy = require("./shader/f_shader_copy.glsl");
 const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl");
 const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
 const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
+const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_preprocessor.glsl");
 const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
 const f_shader_sum = require("./shader/f_shader_sum.glsl");
 const f_shader_transfer_function = require("./shader/f_shader_transfer_function.glsl");
@@ -766,8 +767,6 @@ const Export = module_export.Export;
 
         input_changed_manager.UpdateDefaultValuesRenderSettings();
 
-        //shader_manager.PrepareRaytracingShaderMain(gl);
-        //shader_manager.PrepareRaytracingShaderSide(gl_side);
         shader_manager.NotifySettingsChanged();
     }
 
