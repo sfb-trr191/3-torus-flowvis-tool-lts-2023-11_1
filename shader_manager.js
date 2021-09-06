@@ -102,18 +102,6 @@ class ShaderManager {
         this.settings_changed = false;
     }
 
-    /*
-    CompileRaytracingShaders(gl_main, gl_side, shader_formula_scalar){
-        var t_start = performance.now();
-        var f_source_main = this.GetShader(shader_formula_scalar);
-        var f_source_side = this.GetShader(shader_formula_scalar);
-        this.container_main = new ShaderContainer(gl_main, f_source_main, V_SHADER_RAYTRACING);
-        this.container_side = new ShaderContainer(gl_side, f_source_side, V_SHADER_RAYTRACING);
-        var t_stop = performance.now();
-        console.log("Performance: CompileRaytracingShaders in: ", Math.ceil(t_stop-t_start), "ms");
-    }
-    */
-
 }
 
 module.exports = ShaderManager;

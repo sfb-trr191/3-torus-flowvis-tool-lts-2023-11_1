@@ -1324,16 +1324,7 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    InitializeShaders(gl){        
-        /*
-        this.program_raytracing = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
-        this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
-        this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");      
-        */  
-        //this.ReplaceRaytracingShader(gl, shader_formula_scalar);
-
+    InitializeShaders(gl){    
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
         this.location_average = new UniformLocationsAverage(gl, this.program_average);
@@ -1367,29 +1358,6 @@ class CanvasWrapper {
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
     }
-
-    /*
-    ReplaceRaytracingShader(gl, shader_formula_scalar) {
-        console.log("ReplaceRaytracingShader");
-        var t_start = performance.now();
-
-        var replace = this.last_shader_formula_scalar != shader_formula_scalar;
-        if(replace){
-            this.program_raytracing = gl.createProgram();
-            loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetShader(shader_formula_scalar));
-            this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
-            this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-            this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
-            this.last_shader_formula_scalar = shader_formula_scalar;
-        }
-        else{
-            console.log("shader did not change");
-        }
-
-        var t_stop = performance.now();
-        console.log("Performance: generate raytracing shader in: ", Math.ceil(t_stop-t_start), "ms");
-    }
-    */
 
     CalculateLimitedMaxRayDistance() {
         var d = this.fog_density;
@@ -4798,90 +4766,19 @@ const Export = module_export.Export;
 
         hide_manager.UpdateVisibility();
 
-        message_display.innerHTML = "step 2: initializing shaders (1/2)...";
+        message_display.innerHTML = "step 2: initializing basic shaders...";
         setTimeout(on_start_step_2, 200);
     }
 
-    /*
-    function on_start_step_2_alternative(){
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
-        shader_manager.CompileRaytracingShaders(gl, gl_side, shader_formula_scalar_float);
-
-        message_display.innerHTML = "step 2: wait for shaders...";
-        setTimeout(on_start_step_2_alternative_2, 200);
-    }
-
-    function on_start_step_2_alternative_2(){
-        shader_manager.CheckRaytracingShaders(gl, gl_side);        
-
-        message_display.innerHTML = "step 2: initializing shaders (1/2)...";
-        setTimeout(on_start_step_2, 0);
-    }
-    */
-
     function on_start_step_2(){
-        //var t_start = performance.now();
         canvas_wrapper_main.InitializeShaders(gl);
-        //shader_manager.PrepareRaytracingShaderMain(gl);
-        //canvas_wrapper_main.InitializeShaders(gl, shader_formula_scalar_float);
-        //var t_stop = performance.now();
-        //console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
-    
-        message_display.innerHTML = "step 2: initializing shaders (2/2)...";
-        setTimeout(on_start_step_2_2, 0);
-    }
-
-    function on_start_step_2_2(){
-        //var t_start = performance.now();
         canvas_wrapper_side.InitializeShaders(gl_side);
-        //shader_manager.PrepareRaytracingShaderSide(gl_side);
-        //canvas_wrapper_side.InitializeShaders(gl_side, shader_formula_scalar_float);
-        //var t_stop = performance.now();
-        //console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
-        
+    
         message_display.innerHTML = "step 3: calculating...";
-        setTimeout(on_start_step_4, 200);
+        setTimeout(on_start_step_3, 200);
     }
 
     function on_start_step_3(){
-        shader_manager.CheckRaytracingShaders(gl, gl_side);
-        
-        message_display.innerHTML = "step 4: calculating...";
-        setTimeout(on_start_step_4, 0);
-    }
-
-    function on_start_step_2_old(){
-        var t_start = performance.now();
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
-        canvas_wrapper_main.InitializeShaders(gl, shader_formula_scalar_float);
-        var t_stop = performance.now();
-        console.log("Performance: initialized shader left in: ", Math.ceil(t_stop-t_start), "ms");
-    
-        message_display.innerHTML = "step 2: initializing shaders (2/2)...";
-        setTimeout(on_start_step_2_2, 0);
-    }
-
-    function on_start_step_2_2_old(){
-        var t_start = performance.now();
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
-        canvas_wrapper_side.InitializeShaders(gl_side, shader_formula_scalar_float);
-        var t_stop = performance.now();
-        console.log("Performance: initialized shader right in: ", Math.ceil(t_stop-t_start), "ms");
-        
-        message_display.innerHTML = "step 3: calculating...";
-        setTimeout(on_start_step_3, 0);
-    }
-
-    function on_start_step_4(){
         CalculateStreamlines();
         UpdateRenderSettings();
         UpdateGlobalData();
@@ -117334,18 +117231,6 @@ class ShaderManager {
         this.shaders_linked = ok_left && ok_right;
         this.settings_changed = false;
     }
-
-    /*
-    CompileRaytracingShaders(gl_main, gl_side, shader_formula_scalar){
-        var t_start = performance.now();
-        var f_source_main = this.GetShader(shader_formula_scalar);
-        var f_source_side = this.GetShader(shader_formula_scalar);
-        this.container_main = new ShaderContainer(gl_main, f_source_main, V_SHADER_RAYTRACING);
-        this.container_side = new ShaderContainer(gl_side, f_source_side, V_SHADER_RAYTRACING);
-        var t_stop = performance.now();
-        console.log("Performance: CompileRaytracingShaders in: ", Math.ceil(t_stop-t_start), "ms");
-    }
-    */
 
 }
 

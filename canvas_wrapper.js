@@ -190,16 +190,7 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    InitializeShaders(gl){        
-        /*
-        this.program_raytracing = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetDefaultShader());
-        this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
-        this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-        this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position");      
-        */  
-        //this.ReplaceRaytracingShader(gl, shader_formula_scalar);
-
+    InitializeShaders(gl){    
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
         this.location_average = new UniformLocationsAverage(gl, this.program_average);
@@ -233,29 +224,6 @@ class CanvasWrapper {
         this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
     }
-
-    /*
-    ReplaceRaytracingShader(gl, shader_formula_scalar) {
-        console.log("ReplaceRaytracingShader");
-        var t_start = performance.now();
-
-        var replace = this.last_shader_formula_scalar != shader_formula_scalar;
-        if(replace){
-            this.program_raytracing = gl.createProgram();
-            loadShaderProgramFromCode(gl, this.program_raytracing, V_SHADER_RAYTRACING, this.shader_manager.GetShader(shader_formula_scalar));
-            this.location_raytracing = new UniformLocationsRayTracing(gl, this.program_raytracing);
-            this.shader_uniforms_raytracing = this.loadShaderUniformsRayTracing(gl, this.program_raytracing);
-            this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
-            this.last_shader_formula_scalar = shader_formula_scalar;
-        }
-        else{
-            console.log("shader did not change");
-        }
-
-        var t_stop = performance.now();
-        console.log("Performance: generate raytracing shader in: ", Math.ceil(t_stop-t_start), "ms");
-    }
-    */
 
     CalculateLimitedMaxRayDistance() {
         var d = this.fog_density;
