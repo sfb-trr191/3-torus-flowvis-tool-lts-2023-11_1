@@ -278,15 +278,23 @@ class CanvasWrapper {
 
     }
 
-    draw(gl, data_changed, settings_changed, mouse_in_canvas) {
+    draw(gl, data_changed, settings_changed) {
         if (this.camera.changed || data_changed || settings_changed)
             this.aliasing_index = 0;
 
         if (this.aliasing_index == this.aliasing.num_rays_per_pixel)
             return;
 
-        if (this.aliasing_index > 0 && !mouse_in_canvas)
-            return;
+        //if at least one frame is drawn, check if progressive drawing is allowed
+        if (this.aliasing_index > 0){
+            //panning camera has priority
+            if(this.camera.other_camera_is_panning)
+                return;   
+                         
+            var continue_drawing = this.camera.mouse_in_canvas || this.camera.panning;
+            if(!continue_drawing)
+                return;
+        }
 
         //console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);
         //console.log("offset_x: ", this.aliasing.offset_x[this.aliasing_index]);

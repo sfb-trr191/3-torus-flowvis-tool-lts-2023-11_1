@@ -374,8 +374,8 @@ const Export = module_export.Export;
         object_manager.Update();
         UpdateGlobalDataIfDirty();
 
-        canvas_wrapper_main.draw(gl, data_changed, settings_changed, main_camera.mouse_in_canvas);
-        canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, side_camera.mouse_in_canvas);
+        canvas_wrapper_main.draw(gl, data_changed, settings_changed);
+        canvas_wrapper_side.draw(gl_side, data_changed, settings_changed);
         canvas_wrapper_transfer_function.draw(gl_transfer_function);
         frame_counter++;
         frame_counter = canvas_wrapper_main.aliasing_index;
