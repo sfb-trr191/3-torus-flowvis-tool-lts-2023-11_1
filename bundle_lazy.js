@@ -96,6 +96,8 @@ global.NUMBER_OF_LOD_PARTS = 2;
 global.PART_INDEX_DEFAULT = 0;//streamlines only in fundamental domain
 global.PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
 
+global.TASK_NONE = 0;
+global.TASK_CALCULATE_STREAMLINES = 1;
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){

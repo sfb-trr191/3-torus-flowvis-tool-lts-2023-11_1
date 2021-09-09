@@ -111,16 +111,19 @@ const Export = module_export.Export;
     var time_last_tick = 0;
     var t_start_waiting_for_shaders;
     var fps_display;
-    var message_display;
+    //var message_display;
     var current_fps = 0;
 
     var tab_manager;
+    var sheduled_task = TASK_CALCULATE_STREAMLINES;
 
     function onStart(evt) {
         console.log("onStart");
-        window.removeEventListener(evt.type, onStart, false);
-        message_display = document.getElementById("message_display");
-        message_display.innerHTML = "step 1: initializing...";
+        window.removeEventListener(evt.type, onStart, false);        
+        document.getElementById("wrapper_dialog_javascript").className = "hidden";   
+        //document.getElementById("wrapper_transparent_overlay").className = "hidden";    
+        //message_display = document.getElementById("message_display");
+        //message_display.innerHTML = "step 1: initializing...";
         setTimeout(on_start_step_1, 200);
     }
 
@@ -271,7 +274,7 @@ const Export = module_export.Export;
 
         hide_manager.UpdateVisibility();
 
-        message_display.innerHTML = "step 2: initializing basic shaders...";
+        //message_display.innerHTML = "step 2: initializing basic shaders...";
         setTimeout(on_start_step_2, 200);
     }
 
@@ -279,37 +282,48 @@ const Export = module_export.Export;
         canvas_wrapper_main.InitializeShaders(gl);
         canvas_wrapper_side.InitializeShaders(gl_side);
     
-        message_display.innerHTML = "step 3: calculating...";
-        setTimeout(on_start_step_3, 200);
-    }
-
-    function on_start_step_3(){
-        CalculateStreamlines();
-        UpdateRenderSettings();
-        UpdateGlobalData();
-        on_fully_loaded();
+        //message_display.innerHTML = "";
+        //message_display.innerHTML = "step 3: calculating...";
+        //document.getElementById("wrapper_dialog_calculating").className = "wrapper";
+        //document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+        //setTimeout(on_start_step_3, 200);
         requestAnimationFrame(on_update);
     }
 
     function on_fully_loaded() {
         console.log("on_fully_loaded");
         setCSS(input_parameter_wrapper.css_loaded);
-        message_display.innerHTML = "";
+        //message_display.innerHTML = "";
     }
 
+    function start_calculating(time_now){
+        CalculateStreamlines();
+        UpdateRenderSettings();
+        UpdateGlobalData();
+        UpdateURL();
+        sheduled_task = TASK_NONE;
+        document.getElementById("wrapper_dialog_calculating").className = "hidden";
+        //document.getElementById("wrapper_transparent_overlay").className = "hidden";   
+        requestAnimationFrame(on_update);
+    }
 
     function prepare_left_shader(time_now){
         shader_manager.PrepareRaytracingShaderMain(gl);
         
-        message_display.innerHTML = "initialize shaders (2/2)...";
+        //message_display.innerHTML = "initialize shaders (2/2)...";
+        document.getElementById("wrapper_dialog_prepare_left_shader").className = "hidden";
+        document.getElementById("wrapper_dialog_prepare_right_shader").className = "wrapper";
         requestAnimationFrame(prepare_right_shader);
     }
 
     function prepare_right_shader(time_now){
         shader_manager.PrepareRaytracingShaderSide(gl_side);
 
-        message_display.innerHTML = "waiting for shaders...";
+        //message_display.innerHTML = "waiting for shaders...";
         t_start_waiting_for_shaders = performance.now();
+
+        document.getElementById("wrapper_dialog_prepare_right_shader").className = "hidden";
+        document.getElementById("wrapper_dialog_wait_for_shader").className = "wrapper";
         requestAnimationFrame(wait_for_shader);
     }
 
@@ -325,13 +339,16 @@ const Export = module_export.Export;
         }  
 
         //shaders are now linked
-        message_display.innerHTML = "";
+        //message_display.innerHTML = "";
         canvas_wrapper_main.SetRayTracingProgram(gl, shader_manager.container_main);
         canvas_wrapper_side.SetRayTracingProgram(gl_side, shader_manager.container_side);
 
         var t_stop = performance.now();
         console.log("Performance: Waiting for shaders in: ", Math.ceil(t_stop-t_start_waiting_for_shaders), "ms");
 
+        document.getElementById("wrapper_dialog_wait_for_shader").className = "hidden";
+        document.getElementById("wrapper_transparent_overlay").className = "hidden";   
+        on_fully_loaded();          
         requestAnimationFrame(on_update);
     }
 
@@ -339,8 +356,17 @@ const Export = module_export.Export;
         tick_counter++;
         var deltaTime = (time_now - time_last_tick) / 1000;
 
+        if(sheduled_task == TASK_CALCULATE_STREAMLINES){
+            document.getElementById("wrapper_dialog_calculating").className = "wrapper";
+            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            requestAnimationFrame(start_calculating);
+            return;  
+        }
+
         if(shader_manager.IsDirty()){
-            message_display.innerHTML = "initialize shaders (1/2)...";
+            //message_display.innerHTML = "initialize shaders (1/2)...";
+            document.getElementById("wrapper_dialog_prepare_left_shader").className = "wrapper";
+            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
             requestAnimationFrame(prepare_left_shader);
             return;
         }        
@@ -427,10 +453,12 @@ const Export = module_export.Export;
             //MARKER url changes
             //window.location.href = window.location.pathname + '?u=123';
             //window.history.replaceState(null, null, 'index.html?u=123');
-            CalculateStreamlines();
-            UpdateRenderSettings();
-            UpdateGlobalData();
-            UpdateURL();
+            
+            //CalculateStreamlines();
+            //UpdateRenderSettings();
+            //UpdateGlobalData();
+            //UpdateURL();
+            sheduled_task = TASK_CALCULATE_STREAMLINES;
         });
         document.getElementById("button_calculate_ftle").addEventListener("click", function () {
             console.log("onClickCalculateFTLE");

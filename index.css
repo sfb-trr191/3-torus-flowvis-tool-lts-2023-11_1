@@ -299,10 +299,6 @@ legend {
     overflow-y: scroll;
 }
 
-.hidden {
-    display: none;
-}
-
 .list_entry {
     text-align: left;
 }
