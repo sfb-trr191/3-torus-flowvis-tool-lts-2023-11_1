@@ -356,12 +356,6 @@ const Export = module_export.Export;
 
     function on_update(time_now) {
         tick_counter++;
-        /*
-        if(tick_counter % 2 == 0){
-            requestAnimationFrame(on_update);
-            return;
-        }
-        */
         var deltaTime = (time_now - time_last_tick) / 1000;
         var deltaTimeDraw = (time_now - time_last_draw) / 1000;
 
@@ -409,18 +403,13 @@ const Export = module_export.Export;
         object_manager.Update();
         UpdateGlobalDataIfDirty();
 
-        var render;//should we render this tick?
-        if(fence_sync === null){
-            //if there is no current rendering process, we can render
-            console.log("STATUS: NULL")
-            render = true;
-        }else{
-            //if there is a current rendering process, we only render if it has completed
+        var render = true;//should we render this tick? assume there is no current rendering process --> we can render
+        //if there is a current rendering process, we only render if it has completed
+        if(fence_sync !== null){
             var status = gl.getSyncParameter(fence_sync, gl.SYNC_STATUS);
             render = (status == gl.SIGNALED)
         }
         if(render){
-            console.log("STATUS: FINISHED")
             canvas_wrapper_main.draw(gl, data_changed, settings_changed);
             canvas_wrapper_side.draw(gl_side, data_changed, settings_changed);
             canvas_wrapper_transfer_function.draw(gl_transfer_function);
@@ -436,13 +425,7 @@ const Export = module_export.Export;
 
             time_last_draw = time_now;
             current_fps = 1 / deltaTimeDraw;
-        }else{
-            console.log("STATUS: RENDERING")
         }
-
-
-
-        //gl.finish();
 
         strong_tick_counter.innerHTML = tick_counter;
         strong_frame_counter.innerHTML = frame_counter;
