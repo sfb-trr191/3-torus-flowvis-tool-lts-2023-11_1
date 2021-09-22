@@ -404,9 +404,11 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":11,"./utility":1037,"gl-matrix":53}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":11,"./utility":1038,"gl-matrix":53}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
+
+const { tb_project_to_sphere, trackball } = require("./trackball");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 
 class GL_CameraData {
@@ -535,6 +537,10 @@ class Camera {
         this.rollspeed = 0.5;
         this.changed = true;
 
+        this.control_mode = CAMERA_CONTROL_MOUSE_AND_KEYBOARD;
+        this.trackball_sensitivity = 1.0;
+        this.trackball_focus_distance = 0.5;
+
         //panning
         this.allow_panning = true;
         this.panning = false;
@@ -587,6 +593,11 @@ class Camera {
         this.input_camera_up_x = input_camera_up_x;
         this.input_camera_up_y = input_camera_up_y;
         this.input_camera_up_z = input_camera_up_z;
+    }
+
+    set_control(mode){
+        this.control_mode = mode;
+        console.log(this.control_mode, CAMERA_CONTROL_MOUSE_AND_KEYBOARD)
     }
 
     FromInput() {
@@ -826,10 +837,12 @@ class Camera {
         console.log("this.panning_forced", this.panning_forced);
     }
 
-    StartPanning(x, y) {
+    StartPanning(x, y, x_canonical, y_canonical) {
         //console.log("start panning")
         this.xMouse_old = x;
         this.yMouse_old = y;
+        this.xMouse_old_canonical = x_canonical;
+        this.yMouse_old_canonical = y_canonical;
         this.panning = true;
         this.changed = true;
         this.SetCorrectResolution();
@@ -855,14 +868,24 @@ class Camera {
         }
     }
 
-    UpdatePanning(x, y, left_handed) {
+    UpdatePanning(x, y, x_canonical, y_canonical, left_handed) {
         //check if panning mode is allowed
         if(!this.allow_panning)
             return
         //check if currently in panning mode
         if (!this.panning)
             return;
-        //console.log("UpdatePanning")
+
+
+        if(this.control_mode == CAMERA_CONTROL_MOUSE_AND_KEYBOARD){
+            this.UpdatePanningMouseAndKeyboard(x, y, left_handed);
+        }
+        if(this.control_mode == CAMERA_CONTROL_TRACKBALL){
+            this.UpdatePanningTrackball(x_canonical, y_canonical, left_handed);
+        }
+    }
+
+    UpdatePanningMouseAndKeyboard(x, y, left_handed) {
 
         var forward = this.forward;
         var up = this.up;
@@ -904,6 +927,58 @@ class Camera {
         this.yMouse_old = y;
 
         this.changed = true;
+    }
+
+    UpdatePanningTrackball(x, y, left_handed){
+        var r = 0.5;
+
+        //normalize forward and up vectors just to be sure they really are normalized
+        glMatrix.vec3.normalize(this.forward, this.forward);
+        glMatrix.vec3.normalize(this.up, this.up);
+
+        //calculate focus point
+        var forward_scaled = glMatrix.vec3.create();
+        var focus_point = glMatrix.vec3.create();
+        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec3.add(focus_point, this.position, forward_scaled);
+
+        //move camera so that position of focus point is at origin
+        //--> we are now in object space of the focus point
+        //the camera has arbitrary rotation but looks at the origin
+        var pos_cam = glMatrix.vec3.create();
+        glMatrix.vec3.subtract(pos_cam, this.position, focus_point);
+
+        //get the rotation quaternion
+        var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_sensitivity);
+
+        //two helper points offset by forward and up vector respectively
+        var pos_cam_forward = glMatrix.vec3.create();
+        var pos_cam_up = glMatrix.vec3.create();
+        glMatrix.vec3.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec3.add(pos_cam_up, pos_cam, this.up);
+
+        //rotate the position and two helper points
+        glMatrix.vec3.transformQuat(pos_cam, pos_cam, quaternion);
+        glMatrix.vec3.transformQuat(pos_cam_forward, pos_cam_forward, quaternion);
+        glMatrix.vec3.transformQuat(pos_cam_up, pos_cam_up, quaternion);
+
+        //calculate new forward and up vectors from new position and helper points
+        glMatrix.vec3.subtract(this.forward, pos_cam_forward, pos_cam);
+        glMatrix.vec3.subtract(this.up, pos_cam_up, pos_cam);
+
+        //normalize forward and up vectors just to be sure they are still normalized
+        glMatrix.vec3.normalize(this.forward, this.forward);
+        glMatrix.vec3.normalize(this.up, this.up);
+
+        //add the focus point to position
+        //--> we are now back in world space
+        glMatrix.vec3.add(this.position, pos_cam, focus_point);
+
+        this.xMouse_old_canonical = x;
+        this.yMouse_old_canonical = y;
+        this.changed = true;
+
+        console.log("DCAM focus_point: ", focus_point)
     }
 
     RollLeft(deltaTime, left_handed) {
@@ -1131,7 +1206,7 @@ class Camera {
 }
 
 module.exports = Camera;
-},{"./gl_matrix_extensions":16,"gl-matrix":53}],5:[function(require,module,exports){
+},{"./gl_matrix_extensions":16,"./trackball":1033,"gl-matrix":53}],5:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -1857,7 +1932,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_flags":1027,"./shader_uniforms":1029,"./webgl":1038}],6:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_flags":1027,"./shader_uniforms":1029,"./webgl":1039}],6:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -2615,7 +2690,7 @@ class CanvasWrapperTransferFunction {
 }
 
 module.exports = CanvasWrapperTransferFunction;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1029,"./utility":1037,"./webgl":1038}],7:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1029,"./utility":1038,"./webgl":1039}],7:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -2747,6 +2822,9 @@ global.PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
 global.TASK_NONE = 0;
 global.TASK_CALCULATE_STREAMLINES = 1;
 
+global.CAMERA_CONTROL_NONE = 0;
+global.CAMERA_CONTROL_TRACKBALL = 1;
+global.CAMERA_CONTROL_MOUSE_AND_KEYBOARD = 2;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],9:[function(require,module,exports){
 class DataContainer {
@@ -4032,7 +4110,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1029,"./utility":1037,"./webgl":1038,"ml-matrix":990}],16:[function(require,module,exports){
+},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1029,"./utility":1038,"./webgl":1039,"ml-matrix":990}],16:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -4670,6 +4748,7 @@ const Export = module_export.Export;
         addOnClickExport();
         addOnClickTabs();
         addChangedSideMode();
+        addChangedCameraControl();
         addChangedTransferFunction();
         //testWebGPU();
         //testEigenvalueDecomposition();
@@ -4802,6 +4881,7 @@ const Export = module_export.Export;
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager);
         input_parameter_wrapper.fromURL();
         onChangedDrawMode();
+        onChangedCameraControl();
         OnSelectedTransferFunction();
 
         hide_manager.UpdateVisibility();
@@ -5138,6 +5218,15 @@ const Export = module_export.Export;
         });
     }
 
+    function addChangedCameraControl() {
+        document.getElementById("select_camera_control_3d_left").addEventListener("change", (event) => {
+            onChangedCameraControl();
+        });
+        document.getElementById("select_camera_control_3d_right").addEventListener("change", (event) => {
+            onChangedCameraControl();
+        });
+    }    
+
     function onChangedDrawMode(){
         var draw_mode = parseInt(document.getElementById("select_side_mode").value);
         var projection_index = parseInt(document.getElementById("select_projection_index").value);
@@ -5145,6 +5234,13 @@ const Export = module_export.Export;
         var streamline_method_projection = parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value);
         canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
         shader_manager.NotifySettingsChanged();
+    }
+
+    function onChangedCameraControl(){
+        var camera_control_left = parseInt(document.getElementById("select_camera_control_3d_left").value);
+        var camera_control_right = parseInt(document.getElementById("select_camera_control_3d_right").value);
+        main_camera.set_control(camera_control_left);
+        side_camera.set_control(camera_control_right);
     }
 
     function addChangedTransferFunction(){
@@ -5239,6 +5335,12 @@ const Export = module_export.Export;
             camera_axes_invert_color_side, cube_use_axes_colors_side);
 
         console.log(object_manager.cylinders);
+
+        main_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        main_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_left").value);
+
+        side_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
         //MAIN
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
@@ -5580,7 +5682,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_raytracing_preprocessor.glsl":1018,"./shader/f_shader_resampling.glsl":1019,"./shader/f_shader_sum.glsl":1020,"./shader/f_shader_transfer_function.glsl":1021,"./shader/f_shader_transfer_function_points.glsl":1022,"./shader/v_shader_raytracing.glsl":1023,"./shader/v_shader_resampling.glsl":1024,"./shader/v_shader_transfer_function_points.glsl":1025,"./shader_manager":1028,"./streamline_context":1030,"./tab_manager":1032,"./transfer_function_manager":1033,"./ui_left_tool_bar":1034,"./ui_seeds":1035,"./ui_transfer_functions":1036,"./utility":1037,"./webgl":1038,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_raytracing_preprocessor.glsl":1018,"./shader/f_shader_resampling.glsl":1019,"./shader/f_shader_sum.glsl":1020,"./shader/f_shader_transfer_function.glsl":1021,"./shader/f_shader_transfer_function_points.glsl":1022,"./shader/v_shader_raytracing.glsl":1023,"./shader/v_shader_resampling.glsl":1024,"./shader/v_shader_transfer_function_points.glsl":1025,"./shader_manager":1028,"./streamline_context":1030,"./tab_manager":1032,"./transfer_function_manager":1034,"./ui_left_tool_bar":1035,"./ui_seeds":1036,"./ui_transfer_functions":1037,"./utility":1038,"./webgl":1039,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -5730,7 +5832,11 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));       
-        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));           
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     
+
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_rotation_sensitivity"));  
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_left"));     
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_right"));      
     }
 
     LinkUISeeds(ui_seeds){
@@ -6195,7 +6301,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1037}],23:[function(require,module,exports){
+},{"./utility":1038}],23:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -6758,9 +6864,10 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1037,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1038,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
+const getMousePositionCanonical = module_utility.getMousePositionCanonical;
 
 class MouseManager {
 
@@ -6794,8 +6901,9 @@ class MouseManager {
         switch (event.which) {
             case 1:
                 var pos = getMousePositionPercentage(canvas, event)
+                var pos_canonical = getMousePositionCanonical(canvas, event);
                 //console.log("down", "x: " + pos.x, "y: " + pos.y);
-                camera.StartPanning(pos.x, pos.y);
+                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y);
                 this.active_camera = camera;
                 other_camera.other_camera_is_panning = true;
                 break;
@@ -6870,9 +6978,11 @@ class MouseManager {
         */
         document.addEventListener("mousemove", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
-            this.camera.UpdatePanning(pos.x, pos.y, false);
+            var pos_canonical = getMousePositionCanonical(this.canvas, event);
+            this.camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
             var pos = getMousePositionPercentage(this.side_canvas, event)
-            this.side_camera.UpdatePanning(pos.x, pos.y, false);
+            var pos_canonical = getMousePositionCanonical(this.side_canvas, event);
+            this.side_camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
         });
     }
 
@@ -6887,7 +6997,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1037}],26:[function(require,module,exports){
+},{"./utility":1038}],26:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -120949,6 +121059,193 @@ class TabManager{
 module.exports = TabManager;
 },{}],1033:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
+const module_gl_matrix_extensions = require("./gl_matrix_extensions");
+const TRACKBALLSIZE = 2;
+
+/**
+ * Reprojecting mouse position onto a sphere.
+ * Project an x,y pair onto a sphere of radius r OR a hyperbolic sheet if we are away from the center of the sphere. 
+ * Param float r
+ * Param float x
+ * Param float y
+ * return: float
+ */
+function tb_project_to_sphere(r, x, y)
+{
+    var d, t, z;
+
+    d = Math.sqrt(x*x + y*y);
+    if (d < r * 0.70710678118654752440) {    /* Inside sphere */
+        z = Math.sqrt(r*r - d*d);
+    } else {           /* On hyperbola */
+        t = r / 1.41421356237309504880;
+        z = t*t / d;
+    }
+    return z;
+}
+
+
+/**
+ * Project the points onto the virtual trackball, then figure out the axis of rotation,
+ * which is the cross product of P1 P2 and O P1 (O is the center of the ball, 0,0,0) 
+ * Note: This is a deformed trackball
+ * -- is a trackball in the center, but is deformed into a hyperbolic sheet of rotation away from the center. 
+ * This particular function was chosen after trying out several variations.
+ * It is assumed that the arguments to this routine are in the range (-1.0 ... 1.0) 
+ * 
+ * Param float p1x
+ * Param float p1y
+ * Param float p2x
+ * Param float p2y
+ * 
+ * return quaternion q
+ */
+function trackball(p1x, p1y, p2x, p2y, position, forward, up, sensitivity){
+    var q = glMatrix.quat.create(); //return value
+    var a = glMatrix.vec3.create(); //float a[3]        Axis of rotation
+    var phi;    //float phi         how much to rotate about axis
+    var p1 = glMatrix.vec3.create();//float p1[3]
+    var p2 = glMatrix.vec3.create();//float p2[3]
+    var d = glMatrix.vec3.create(); //float d[3]
+    var t;      //float t
+
+    if (p1x == p2x && p1y == p2y) {
+        //Zero rotation
+        glMatrix.quat.identity(q);
+        return q;
+    }  
+    
+    //First, figure out z-coordinates for projection of P1 and P2 to
+    //deformed sphere    
+    //vset(p1,p1x,p1y,tb_project_to_sphere(TRACKBALLSIZE,p1x,p1y));
+    //vset(p2,p2x,p2y,tb_project_to_sphere(TRACKBALLSIZE,p2x,p2y));
+    p1z = tb_project_to_sphere(TRACKBALLSIZE,p1x,p1y);
+    p2z = tb_project_to_sphere(TRACKBALLSIZE,p2x,p2y);
+    //p1 = glMatrix.vec3.fromValues(p1x, p1y, p1z);
+    //p2 = glMatrix.vec3.fromValues(p2x, p2y, p2z);
+
+    //###############################################################
+    //start of inserted code
+    //###############################################################
+
+    //calculate right vector
+    var left = glMatrix.vec3.create();
+    var right = glMatrix.vec3.create();
+    glMatrix.vec3.cross(left, forward, up);
+    glMatrix.vec3.negate(right, left);
+
+    //apply camera vectors
+    var p_forward = glMatrix.vec3.create();
+    var p_up = glMatrix.vec3.create();
+    var p_right = glMatrix.vec3.create();    
+    //apply camera vectors to p1
+    glMatrix.vec3.scale(p_forward, forward, p1z);
+    glMatrix.vec3.scale(p_up, up, p1y);
+    glMatrix.vec3.scale(p_right, right, p1x);
+    glMatrix.vec3.add(p1, p_forward, p_up);
+    glMatrix.vec3.add(p1, p1, p_right);
+    //apply camera vectors to p2
+    glMatrix.vec3.scale(p_forward, forward, p2z);
+    glMatrix.vec3.scale(p_up, up, p2y);
+    glMatrix.vec3.scale(p_right, right, p2x);
+    glMatrix.vec3.add(p2, p_forward, p_up);
+    glMatrix.vec3.add(p2, p2, p_right);
+
+    //###############################################################
+    //end of inserted code
+    //###############################################################
+    
+    //Now, we want the cross product of P1 and P2
+    //vcross(p2,p1,a);
+    glMatrix.vec3.cross(a, p2, p1);
+
+    //Figure out how much to rotate around that axis.
+    //vsub(p1,p2,d);
+    //t = vlength(d) / (2.0*TRACKBALLSIZE);
+    glMatrix.vec3.subtract(d, p1, p2);
+    t = glMatrix.vec3.length(d) / (2.0*TRACKBALLSIZE);
+    
+    //Avoid problems with out-of-control values...
+    if (t > 1.0) t = 1.0;
+    if (t < -1.0) t = -1.0;
+    phi = 2.0 * Math.asin(t);
+
+    console.log("DCAM phi:", phi);
+
+    //axis_to_quat(a,phi,q);
+    glMatrix.quat.setAxisAngle(q, a, -phi * sensitivity);
+    
+   return q;
+}
+
+/**
+ * Project the points onto the virtual trackball, then figure out the axis of rotation,
+ * which is the cross product of P1 P2 and O P1 (O is the center of the ball, 0,0,0) 
+ * Note: This is a deformed trackball
+ * -- is a trackball in the center, but is deformed into a hyperbolic sheet of rotation away from the center. 
+ * This particular function was chosen after trying out several variations.
+ * It is assumed that the arguments to this routine are in the range (-1.0 ... 1.0) 
+ * 
+ * Param float p1x
+ * Param float p1y
+ * Param float p2x
+ * Param float p2y
+ * 
+ * return quaternion q
+ */
+ function trackball_old(p1x, p1y, p2x, p2y){
+    var q = glMatrix.quat.create(); //return value
+    var a = glMatrix.vec3.create(); //float a[3]        Axis of rotation
+    var phi;    //float phi         how much to rotate about axis
+    var p1;     //float p1[3]
+    var p2;     //float p2[3]
+    var d = glMatrix.vec3.create(); //float d[3]
+    var t;      //float t
+
+    console.log("x", p2x)
+    console.log("y", p2y)
+
+    if (p1x == p2x && p1y == p2y) {
+        //Zero rotation
+        glMatrix.quat.identity(q);
+        return q;
+    }  
+    
+    //First, figure out z-coordinates for projection of P1 and P2 to
+    //deformed sphere    
+    //vset(p1,p1x,p1y,tb_project_to_sphere(TRACKBALLSIZE,p1x,p1y));
+    //vset(p2,p2x,p2y,tb_project_to_sphere(TRACKBALLSIZE,p2x,p2y));
+    p1z = tb_project_to_sphere(TRACKBALLSIZE,p1x,p1y);
+    p2z = tb_project_to_sphere(TRACKBALLSIZE,p2x,p2y);
+    p1 = glMatrix.vec3.fromValues(p1x, p1y, p1z);
+    p2 = glMatrix.vec3.fromValues(p2x, p2y, p2z);
+    
+    //Now, we want the cross product of P1 and P2
+    //vcross(p2,p1,a);
+    glMatrix.vec3.cross(a, p2, p1);
+
+    //Figure out how much to rotate around that axis.
+    //vsub(p1,p2,d);
+    //t = vlength(d) / (2.0*TRACKBALLSIZE);
+    glMatrix.vec3.subtract(d, p1, p2);
+    t = glMatrix.vec3.length(d) / (2.0*TRACKBALLSIZE);
+    
+    //Avoid problems with out-of-control values...
+    if (t > 1.0) t = 1.0;
+    if (t < -1.0) t = -1.0;
+    phi = 2.0 * Math.asin(t);
+
+    console.log("DCAM phi:", phi);
+
+    //axis_to_quat(a,phi,q);
+    glMatrix.quat.setAxisAngle(q, a, phi);
+    
+   return q;
+}
+
+module.exports = { tb_project_to_sphere, trackball }
+},{"./gl_matrix_extensions":16,"gl-matrix":53}],1034:[function(require,module,exports){
+const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const lerp = module_utility.lerp;
@@ -121352,7 +121649,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":11,"./utility":1037,"gl-matrix":53}],1034:[function(require,module,exports){
+},{"./data_types":11,"./utility":1038,"gl-matrix":53}],1035:[function(require,module,exports){
 
 class UISelectedCameraIndicator{
 
@@ -121457,7 +121754,7 @@ class UILeftToolBar{
 }
 
 module.exports = UILeftToolBar;
-},{}],1035:[function(require,module,exports){
+},{}],1036:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -121795,7 +122092,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":11,"./utility":1037,"gl-matrix":53,"seedrandom":993}],1036:[function(require,module,exports){
+},{"./data_types":11,"./utility":1038,"gl-matrix":53,"seedrandom":993}],1037:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -122159,7 +122456,7 @@ class UITransferFunctions {
 */
 
 module.exports = UITransferFunctions;
-},{"./data_types":11,"./utility":1037,"gl-matrix":53,"seedrandom":993}],1037:[function(require,module,exports){
+},{"./data_types":11,"./utility":1038,"gl-matrix":53,"seedrandom":993}],1038:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 exports.getMousePosition = function(canvas, event) {
@@ -122186,6 +122483,25 @@ exports.getMousePositionPercentage = function (canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = (event.clientX - rect.left) / rect.width;
     let y = (event.clientY - rect.top) / rect.height;
+    return {
+        x: x,
+        y: y
+    };
+}
+
+/**
+ * 
+ * @param {*} canvas 
+ * @param {*} event 
+ * @returns x,y coordinates in [-1,1]
+ */
+exports.getMousePositionCanonical = function (canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let s = Math.min(rect.width, rect.height)
+    let cx = rect.left + 0.5 * rect.width;
+    let cy = rect.top + 0.5 * rect.height;
+    let x = 2 * (event.clientX - cx) / s;
+    let y = 2 * (event.clientY - cy) / s;
     return {
         x: x,
         y: y
@@ -122276,7 +122592,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":53}],1038:[function(require,module,exports){
+},{"gl-matrix":53}],1039:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;

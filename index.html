@@ -711,6 +711,48 @@ The automatically corrected scalar field used for coloring the streamlines.">
                             </div>
                         </div>
                     </fieldset>
+                    <fieldset class="fieldset_camera">
+                        <legend>Cameras</legend>
+                        <div class="vertical_container">
+                            <div class="input_row" id="input_row_camera_control_3d_left">
+                                <label>left</label>
+                                <select id="select_camera_control_3d_left" title="The camera control used in the left view.
+    - Trackball: 
+    - Mouse and Keyboard:">
+                                    <option value="1">Trackball</option>
+                                    <option value="2">Mouse and Keyboard</option>
+                                </select>
+                            </div>
+                            <div class="input_row" id="input_row_camera_control_3d_right">
+                                <label>right</label>
+                                <select id="select_camera_control_3d_right" title="The camera control used in the right view.
+    - Trackball: 
+    - Mouse and Keyboard:">
+                                    <option value="1">Trackball</option>
+                                    <option value="2">Mouse and Keyboard</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>            
+                    <fieldset class="fieldset_camera">
+                        <legend>Trackball</legend>
+                        <div class="vertical_container">
+                            <div class="input_row" id="input_row_trackball_rotation_sensitivity">
+                                <label>rotation sensitivity</label>
+                                <input id="input_trackball_rotation_sensitivity" type="text" value="5.0" title="
+Sensitivity when rotating the camera. This value is multiplied by the angle obtained from the mouse movement.">
+                            </div>
+                            <div class="input_row" id="input_row_trackball_focus_distance">
+                                <label>focus distance</label>
+                                <div class="horizontal_div_2">
+                                    <input id="input_trackball_focus_distance_left" type="text" value="0.5" 
+                                    title="Distance of the focus point from the camera in the left canvas.">
+                                    <input id="input_trackball_focus_distance_right" type="text" value="0.5"
+                                    title="Distance of the focus point from the camera in the right canvas.">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                 </form>
             </div>
             <div id="tabcontent_transfer_function" class="tabcontent">

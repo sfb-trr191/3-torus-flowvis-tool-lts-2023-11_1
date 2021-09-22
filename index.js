@@ -140,6 +140,7 @@ const Export = module_export.Export;
         addOnClickExport();
         addOnClickTabs();
         addChangedSideMode();
+        addChangedCameraControl();
         addChangedTransferFunction();
         //testWebGPU();
         //testEigenvalueDecomposition();
@@ -272,6 +273,7 @@ const Export = module_export.Export;
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager);
         input_parameter_wrapper.fromURL();
         onChangedDrawMode();
+        onChangedCameraControl();
         OnSelectedTransferFunction();
 
         hide_manager.UpdateVisibility();
@@ -608,6 +610,15 @@ const Export = module_export.Export;
         });
     }
 
+    function addChangedCameraControl() {
+        document.getElementById("select_camera_control_3d_left").addEventListener("change", (event) => {
+            onChangedCameraControl();
+        });
+        document.getElementById("select_camera_control_3d_right").addEventListener("change", (event) => {
+            onChangedCameraControl();
+        });
+    }    
+
     function onChangedDrawMode(){
         var draw_mode = parseInt(document.getElementById("select_side_mode").value);
         var projection_index = parseInt(document.getElementById("select_projection_index").value);
@@ -615,6 +626,13 @@ const Export = module_export.Export;
         var streamline_method_projection = parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value);
         canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
         shader_manager.NotifySettingsChanged();
+    }
+
+    function onChangedCameraControl(){
+        var camera_control_left = parseInt(document.getElementById("select_camera_control_3d_left").value);
+        var camera_control_right = parseInt(document.getElementById("select_camera_control_3d_right").value);
+        main_camera.set_control(camera_control_left);
+        side_camera.set_control(camera_control_right);
     }
 
     function addChangedTransferFunction(){
@@ -709,6 +727,12 @@ const Export = module_export.Export;
             camera_axes_invert_color_side, cube_use_axes_colors_side);
 
         console.log(object_manager.cylinders);
+
+        main_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        main_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_left").value);
+
+        side_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
         //MAIN
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);

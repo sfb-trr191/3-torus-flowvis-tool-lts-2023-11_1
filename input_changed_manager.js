@@ -147,7 +147,11 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_streamlines_main"));         
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));       
-        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));           
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     
+
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_rotation_sensitivity"));  
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_left"));     
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_right"));      
     }
 
     LinkUISeeds(ui_seeds){

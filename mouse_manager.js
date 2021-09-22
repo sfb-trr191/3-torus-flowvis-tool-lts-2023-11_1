@@ -1,5 +1,6 @@
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
+const getMousePositionCanonical = module_utility.getMousePositionCanonical;
 
 class MouseManager {
 
@@ -33,8 +34,9 @@ class MouseManager {
         switch (event.which) {
             case 1:
                 var pos = getMousePositionPercentage(canvas, event)
+                var pos_canonical = getMousePositionCanonical(canvas, event);
                 //console.log("down", "x: " + pos.x, "y: " + pos.y);
-                camera.StartPanning(pos.x, pos.y);
+                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y);
                 this.active_camera = camera;
                 other_camera.other_camera_is_panning = true;
                 break;
@@ -109,9 +111,11 @@ class MouseManager {
         */
         document.addEventListener("mousemove", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
-            this.camera.UpdatePanning(pos.x, pos.y, false);
+            var pos_canonical = getMousePositionCanonical(this.canvas, event);
+            this.camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
             var pos = getMousePositionPercentage(this.side_canvas, event)
-            this.side_camera.UpdatePanning(pos.x, pos.y, false);
+            var pos_canonical = getMousePositionCanonical(this.side_canvas, event);
+            this.side_camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
         });
     }
 

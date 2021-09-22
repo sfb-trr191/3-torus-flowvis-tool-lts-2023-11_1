@@ -99,6 +99,9 @@ global.PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
 global.TASK_NONE = 0;
 global.TASK_CALCULATE_STREAMLINES = 1;
 
+global.CAMERA_CONTROL_NONE = 0;
+global.CAMERA_CONTROL_TRACKBALL = 1;
+global.CAMERA_CONTROL_MOUSE_AND_KEYBOARD = 2;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){
 const module_const = require("./const");

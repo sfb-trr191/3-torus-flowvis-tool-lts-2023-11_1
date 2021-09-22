@@ -30,6 +30,25 @@ exports.getMousePositionPercentage = function (canvas, event) {
     };
 }
 
+/**
+ * 
+ * @param {*} canvas 
+ * @param {*} event 
+ * @returns x,y coordinates in [-1,1]
+ */
+exports.getMousePositionCanonical = function (canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let s = Math.min(rect.width, rect.height)
+    let cx = rect.left + 0.5 * rect.width;
+    let cy = rect.top + 0.5 * rect.height;
+    let x = 2 * (event.clientX - cx) / s;
+    let y = 2 * (event.clientY - cy) / s;
+    return {
+        x: x,
+        y: y
+    };
+}
+
 exports.GetIndexInList = function (value, vector) {
     for (var i = 0; i < vector.length; i++) {
         if (vector[i] == value)
