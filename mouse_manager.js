@@ -19,6 +19,7 @@ class MouseManager {
         this.addOnMouseMove();
         this.addOnMouseEnter();
         this.addOnMouseOut();
+        this.addOnMouseWheel();
     }
 
     addOnMouseDown() {
@@ -33,10 +34,12 @@ class MouseManager {
     onMouseDown(event, canvas, camera, other_camera){
         switch (event.which) {
             case 1:
+                var shift_pressed = event.getModifierState("Shift");
+                var ctrl_pressed = event.getModifierState("Control");
                 var pos = getMousePositionPercentage(canvas, event)
                 var pos_canonical = getMousePositionCanonical(canvas, event);
                 //console.log("down", "x: " + pos.x, "y: " + pos.y);
-                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y);
+                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
                 this.active_camera = camera;
                 other_camera.other_camera_is_panning = true;
                 break;
@@ -112,11 +115,45 @@ class MouseManager {
         document.addEventListener("mousemove", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
             var pos_canonical = getMousePositionCanonical(this.canvas, event);
-            this.camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
+            this.camera.UpdateMouseMove(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
             var pos = getMousePositionPercentage(this.side_canvas, event)
             var pos_canonical = getMousePositionCanonical(this.side_canvas, event);
-            this.side_camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
+            this.side_camera.UpdateMouseMove(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
         });
+    }
+
+    addOnMouseWheel() {
+        this.canvas.addEventListener("wheel", (event) => {
+            this.onMouseWheel(event, this.canvas, this.camera, this.side_camera);
+        });
+        this.side_canvas.addEventListener("wheel", (event) => {
+            this.onMouseWheel(event, this.side_canvas, this.side_camera, this.camera);
+        });
+    }
+
+    onMouseWheel(event, canvas, camera, other_camera){
+        var slow = false;
+        camera.move_forward_backward_wheel(event.deltaY, slow);
+        /*
+        switch (event.which) {
+            case 1:
+                var shift_pressed = event.getModifierState("Shift");
+                var ctrl_pressed = event.getModifierState("Control");
+                var pos = getMousePositionPercentage(canvas, event)
+                var pos_canonical = getMousePositionCanonical(canvas, event);
+                //console.log("down", "x: " + pos.x, "y: " + pos.y);
+                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
+                this.active_camera = camera;
+                other_camera.other_camera_is_panning = true;
+                break;
+            case 2:
+                //Middle Mouse button
+                break;
+            case 3:
+                //Right Mouse button
+                break;
+        }    
+        */
     }
 
     /**

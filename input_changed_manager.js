@@ -150,6 +150,8 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     
 
         this.group_render_settings.AddInput(document.getElementById("input_trackball_rotation_sensitivity"));  
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_translation_sensitivity"));  
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_wheel_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_left"));     
         this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_right"));      
     }

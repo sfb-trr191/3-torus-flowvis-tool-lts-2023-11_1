@@ -131,7 +131,9 @@ class Camera {
         this.changed = true;
 
         this.control_mode = CAMERA_CONTROL_MOUSE_AND_KEYBOARD;
-        this.trackball_sensitivity = 1.0;
+        this.trackball_rotation_sensitivity = 1.0;
+        this.trackball_translation_sensitivity = 1.0;
+        this.trackball_wheel_sensitivity = 0.001;
         this.trackball_focus_distance = 0.5;
 
         //panning
@@ -430,7 +432,7 @@ class Camera {
         console.log("this.panning_forced", this.panning_forced);
     }
 
-    StartPanning(x, y, x_canonical, y_canonical) {
+    StartPanning(x, y, x_canonical, y_canonical, shift, control) {
         //console.log("start panning")
         this.xMouse_old = x;
         this.yMouse_old = y;
@@ -438,7 +440,14 @@ class Camera {
         this.yMouse_old_canonical = y_canonical;
         this.panning = true;
         this.changed = true;
+        this.paning_shift = shift;
+        this.paning_control = control;
         this.SetCorrectResolution();
+
+        //if projection and no control is pressed, instead of doing nothing fall back to shift
+        if((!this.allow_panning) && (!this.paning_control)){
+            this.paning_shift = true;
+        }
     }
 
     StopPanning() {
@@ -459,6 +468,30 @@ class Camera {
             this.width = this.width_still;
             this.height = this.height_still;
         }
+    }
+
+    UpdateMouseMove(x, y, x_canonical, y_canonical, left_handed){
+        //check if currently in panning mode
+        if (!this.panning)
+            return;
+
+        var slow = false;
+        var deltaX = x - this.xMouse_old;
+        var deltaY = y - this.yMouse_old;
+
+        if(this.paning_shift){
+            this.move_left_right(deltaX, slow);
+            this.move_up_down(deltaY, slow);
+        }
+        else if(this.paning_control){
+            this.move_forward_backward(deltaY, slow);
+        }
+        else{
+            this.UpdatePanning(x, y, x_canonical, y_canonical, left_handed);
+        }
+
+        this.xMouse_old = x;
+        this.yMouse_old = y;
     }
 
     UpdatePanning(x, y, x_canonical, y_canonical, left_handed) {
@@ -542,7 +575,7 @@ class Camera {
         glMatrix.vec3.subtract(pos_cam, this.position, focus_point);
 
         //get the rotation quaternion
-        var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_sensitivity);
+        var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_rotation_sensitivity);
 
         //two helper points offset by forward and up vector respectively
         var pos_cam_forward = glMatrix.vec3.create();
@@ -620,6 +653,20 @@ class Camera {
         this.changed = true;
     }
 
+    move_left_right(delta_x, slow){
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+
+        var left = glMatrix.vec3.create();
+        var change = glMatrix.vec3.create();
+
+        glMatrix.vec3.cross(left, this.forward, this.up);
+        glMatrix.vec3.normalize(left, left);
+        glMatrix.vec3.scale(change, left, (delta_x * v));
+        glMatrix.vec3.add(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
     moveForward(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
@@ -638,6 +685,28 @@ class Camera {
         glMatrix.vec3.scale(change, this.forward, (deltaTime * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
         //console.log(this.position);
+
+        this.changed = true;
+    }
+
+    move_forward_backward(delta_y, slow){
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+
+        var change = glMatrix.vec3.create();
+
+        glMatrix.vec3.scale(change, this.forward, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
+    move_forward_backward_wheel(delta_y, slow){
+        var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
+
+        var change = glMatrix.vec3.create();
+
+        glMatrix.vec3.scale(change, this.forward, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
 
         this.changed = true;
     }
@@ -666,6 +735,17 @@ class Camera {
         this.changed = true;
     }
 
+    move_up_down(delta_y, slow){
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+        var handedness = this.left_handed ? 1 : -1;
+
+        var change = glMatrix.vec3.create();
+        glMatrix.vec3.scale(change, this.up, (delta_y * v * handedness));
+        glMatrix.vec3.add(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
     repositionCamera(is_projection, projection_index, allow_default) {
         if (is_projection) {
             this.repositionCameraProjection(projection_index);
@@ -678,10 +758,12 @@ class Camera {
     repositionCameraDefault() {
         for (var i = 0; i < 3; i++) {
             if (this.position[i] > 1.0) {
-                this.position[i] -= 1.0;
+                var change = Math.floor( Math.abs(this.position[i]))
+                this.position[i] -= change;
             }
             else if (this.position[i] < 0.0) {
-                this.position[i] += 1.0;
+                var change = Math.ceil( Math.abs(this.position[i]))
+                this.position[i] += change;
             }
         }
     }
@@ -693,10 +775,12 @@ class Camera {
             }
             else {
                 if (this.position[i] > 1.0) {
-                    this.position[i] -= 1.0;
+                    var change = Math.floor( Math.abs(this.position[i]))
+                    this.position[i] -= change;
                 }
                 else if (this.position[i] < 0.0) {
-                    this.position[i] += 1.0;
+                    var change = Math.ceil( Math.abs(this.position[i]))
+                    this.position[i] += change;
                 }
             }
         }

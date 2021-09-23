@@ -728,10 +728,14 @@ const Export = module_export.Export;
 
         console.log(object_manager.cylinders);
 
-        main_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        main_camera.trackball_rotation_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        main_camera.trackball_translation_sensitivity = parseFloat(document.getElementById("input_trackball_translation_sensitivity").value);
+        main_camera.trackball_wheel_sensitivity = parseFloat(document.getElementById("input_trackball_wheel_sensitivity").value);
         main_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_left").value);
 
-        side_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        side_camera.trackball_rotation_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        side_camera.trackball_translation_sensitivity = parseFloat(document.getElementById("input_trackball_translation_sensitivity").value);
+        side_camera.trackball_wheel_sensitivity = parseFloat(document.getElementById("input_trackball_wheel_sensitivity").value);
         side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
         //MAIN

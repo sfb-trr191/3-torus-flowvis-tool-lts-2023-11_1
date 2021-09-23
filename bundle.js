@@ -538,7 +538,9 @@ class Camera {
         this.changed = true;
 
         this.control_mode = CAMERA_CONTROL_MOUSE_AND_KEYBOARD;
-        this.trackball_sensitivity = 1.0;
+        this.trackball_rotation_sensitivity = 1.0;
+        this.trackball_translation_sensitivity = 1.0;
+        this.trackball_wheel_sensitivity = 0.001;
         this.trackball_focus_distance = 0.5;
 
         //panning
@@ -837,7 +839,7 @@ class Camera {
         console.log("this.panning_forced", this.panning_forced);
     }
 
-    StartPanning(x, y, x_canonical, y_canonical) {
+    StartPanning(x, y, x_canonical, y_canonical, shift, control) {
         //console.log("start panning")
         this.xMouse_old = x;
         this.yMouse_old = y;
@@ -845,7 +847,14 @@ class Camera {
         this.yMouse_old_canonical = y_canonical;
         this.panning = true;
         this.changed = true;
+        this.paning_shift = shift;
+        this.paning_control = control;
         this.SetCorrectResolution();
+
+        //if projection and no control is pressed, instead of doing nothing fall back to shift
+        if((!this.allow_panning) && (!this.paning_control)){
+            this.paning_shift = true;
+        }
     }
 
     StopPanning() {
@@ -866,6 +875,30 @@ class Camera {
             this.width = this.width_still;
             this.height = this.height_still;
         }
+    }
+
+    UpdateMouseMove(x, y, x_canonical, y_canonical, left_handed){
+        //check if currently in panning mode
+        if (!this.panning)
+            return;
+
+        var slow = false;
+        var deltaX = x - this.xMouse_old;
+        var deltaY = y - this.yMouse_old;
+
+        if(this.paning_shift){
+            this.move_left_right(deltaX, slow);
+            this.move_up_down(deltaY, slow);
+        }
+        else if(this.paning_control){
+            this.move_forward_backward(deltaY, slow);
+        }
+        else{
+            this.UpdatePanning(x, y, x_canonical, y_canonical, left_handed);
+        }
+
+        this.xMouse_old = x;
+        this.yMouse_old = y;
     }
 
     UpdatePanning(x, y, x_canonical, y_canonical, left_handed) {
@@ -949,7 +982,7 @@ class Camera {
         glMatrix.vec3.subtract(pos_cam, this.position, focus_point);
 
         //get the rotation quaternion
-        var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_sensitivity);
+        var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_rotation_sensitivity);
 
         //two helper points offset by forward and up vector respectively
         var pos_cam_forward = glMatrix.vec3.create();
@@ -1027,6 +1060,20 @@ class Camera {
         this.changed = true;
     }
 
+    move_left_right(delta_x, slow){
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+
+        var left = glMatrix.vec3.create();
+        var change = glMatrix.vec3.create();
+
+        glMatrix.vec3.cross(left, this.forward, this.up);
+        glMatrix.vec3.normalize(left, left);
+        glMatrix.vec3.scale(change, left, (delta_x * v));
+        glMatrix.vec3.add(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
     moveForward(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
@@ -1045,6 +1092,28 @@ class Camera {
         glMatrix.vec3.scale(change, this.forward, (deltaTime * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
         //console.log(this.position);
+
+        this.changed = true;
+    }
+
+    move_forward_backward(delta_y, slow){
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+
+        var change = glMatrix.vec3.create();
+
+        glMatrix.vec3.scale(change, this.forward, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
+    move_forward_backward_wheel(delta_y, slow){
+        var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
+
+        var change = glMatrix.vec3.create();
+
+        glMatrix.vec3.scale(change, this.forward, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
 
         this.changed = true;
     }
@@ -1073,6 +1142,17 @@ class Camera {
         this.changed = true;
     }
 
+    move_up_down(delta_y, slow){
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+        var handedness = this.left_handed ? 1 : -1;
+
+        var change = glMatrix.vec3.create();
+        glMatrix.vec3.scale(change, this.up, (delta_y * v * handedness));
+        glMatrix.vec3.add(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
     repositionCamera(is_projection, projection_index, allow_default) {
         if (is_projection) {
             this.repositionCameraProjection(projection_index);
@@ -1085,10 +1165,12 @@ class Camera {
     repositionCameraDefault() {
         for (var i = 0; i < 3; i++) {
             if (this.position[i] > 1.0) {
-                this.position[i] -= 1.0;
+                var change = Math.floor( Math.abs(this.position[i]))
+                this.position[i] -= change;
             }
             else if (this.position[i] < 0.0) {
-                this.position[i] += 1.0;
+                var change = Math.ceil( Math.abs(this.position[i]))
+                this.position[i] += change;
             }
         }
     }
@@ -1100,10 +1182,12 @@ class Camera {
             }
             else {
                 if (this.position[i] > 1.0) {
-                    this.position[i] -= 1.0;
+                    var change = Math.floor( Math.abs(this.position[i]))
+                    this.position[i] -= change;
                 }
                 else if (this.position[i] < 0.0) {
-                    this.position[i] += 1.0;
+                    var change = Math.ceil( Math.abs(this.position[i]))
+                    this.position[i] += change;
                 }
             }
         }
@@ -5336,10 +5420,14 @@ const Export = module_export.Export;
 
         console.log(object_manager.cylinders);
 
-        main_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        main_camera.trackball_rotation_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        main_camera.trackball_translation_sensitivity = parseFloat(document.getElementById("input_trackball_translation_sensitivity").value);
+        main_camera.trackball_wheel_sensitivity = parseFloat(document.getElementById("input_trackball_wheel_sensitivity").value);
         main_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_left").value);
 
-        side_camera.trackball_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        side_camera.trackball_rotation_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
+        side_camera.trackball_translation_sensitivity = parseFloat(document.getElementById("input_trackball_translation_sensitivity").value);
+        side_camera.trackball_wheel_sensitivity = parseFloat(document.getElementById("input_trackball_wheel_sensitivity").value);
         side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
         //MAIN
@@ -5835,6 +5923,8 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     
 
         this.group_render_settings.AddInput(document.getElementById("input_trackball_rotation_sensitivity"));  
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_translation_sensitivity"));  
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_wheel_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_left"));     
         this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_right"));      
     }
@@ -6886,6 +6976,7 @@ class MouseManager {
         this.addOnMouseMove();
         this.addOnMouseEnter();
         this.addOnMouseOut();
+        this.addOnMouseWheel();
     }
 
     addOnMouseDown() {
@@ -6900,10 +6991,12 @@ class MouseManager {
     onMouseDown(event, canvas, camera, other_camera){
         switch (event.which) {
             case 1:
+                var shift_pressed = event.getModifierState("Shift");
+                var ctrl_pressed = event.getModifierState("Control");
                 var pos = getMousePositionPercentage(canvas, event)
                 var pos_canonical = getMousePositionCanonical(canvas, event);
                 //console.log("down", "x: " + pos.x, "y: " + pos.y);
-                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y);
+                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
                 this.active_camera = camera;
                 other_camera.other_camera_is_panning = true;
                 break;
@@ -6979,11 +7072,45 @@ class MouseManager {
         document.addEventListener("mousemove", (event) => {
             var pos = getMousePositionPercentage(this.canvas, event)
             var pos_canonical = getMousePositionCanonical(this.canvas, event);
-            this.camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
+            this.camera.UpdateMouseMove(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
             var pos = getMousePositionPercentage(this.side_canvas, event)
             var pos_canonical = getMousePositionCanonical(this.side_canvas, event);
-            this.side_camera.UpdatePanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
+            this.side_camera.UpdateMouseMove(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
         });
+    }
+
+    addOnMouseWheel() {
+        this.canvas.addEventListener("wheel", (event) => {
+            this.onMouseWheel(event, this.canvas, this.camera, this.side_camera);
+        });
+        this.side_canvas.addEventListener("wheel", (event) => {
+            this.onMouseWheel(event, this.side_canvas, this.side_camera, this.camera);
+        });
+    }
+
+    onMouseWheel(event, canvas, camera, other_camera){
+        var slow = false;
+        camera.move_forward_backward_wheel(event.deltaY, slow);
+        /*
+        switch (event.which) {
+            case 1:
+                var shift_pressed = event.getModifierState("Shift");
+                var ctrl_pressed = event.getModifierState("Control");
+                var pos = getMousePositionPercentage(canvas, event)
+                var pos_canonical = getMousePositionCanonical(canvas, event);
+                //console.log("down", "x: " + pos.x, "y: " + pos.y);
+                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
+                this.active_camera = camera;
+                other_camera.other_camera_is_panning = true;
+                break;
+            case 2:
+                //Middle Mouse button
+                break;
+            case 3:
+                //Right Mouse button
+                break;
+        }    
+        */
     }
 
     /**
