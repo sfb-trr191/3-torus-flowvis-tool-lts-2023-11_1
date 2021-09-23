@@ -130,7 +130,7 @@ class Camera {
         this.rollspeed = 0.5;
         this.changed = true;
 
-        this.control_mode = CAMERA_CONTROL_MOUSE_AND_KEYBOARD;
+        this.control_mode = CAMERA_CONTROL_ROTATE_AROUND_CAMERA;
         this.trackball_rotation_sensitivity = 1.0;
         this.trackball_translation_sensitivity = 1.0;
         this.trackball_wheel_sensitivity = 0.001;
@@ -192,7 +192,6 @@ class Camera {
 
     set_control(mode){
         this.control_mode = mode;
-        console.log(this.control_mode, CAMERA_CONTROL_MOUSE_AND_KEYBOARD)
     }
 
     FromInput() {
@@ -503,15 +502,15 @@ class Camera {
             return;
 
 
-        if(this.control_mode == CAMERA_CONTROL_MOUSE_AND_KEYBOARD){
-            this.UpdatePanningMouseAndKeyboard(x, y, left_handed);
+        if(this.control_mode == CAMERA_CONTROL_ROTATE_AROUND_CAMERA){
+            this.UpdatePanningRotateAroundCamera(x, y, left_handed);
         }
         if(this.control_mode == CAMERA_CONTROL_TRACKBALL){
             this.UpdatePanningTrackball(x_canonical, y_canonical, left_handed);
         }
     }
 
-    UpdatePanningMouseAndKeyboard(x, y, left_handed) {
+    UpdatePanningRotateAroundCamera(x, y, left_handed) {
 
         var forward = this.forward;
         var up = this.up;
