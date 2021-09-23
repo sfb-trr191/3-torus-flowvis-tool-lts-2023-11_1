@@ -4925,12 +4925,12 @@ const Export = module_export.Export;
             document.getElementById("input_camera_up_z"));
 
         side_camera.SetRenderSizes(512, 384, 256, 192);
-        //side_camera.position = glMatrix.vec3.fromValues(-0.750000, 0.500000, 1.250000);
-        //side_camera.forward = glMatrix.vec3.fromValues(0.824459, 0.005006, -0.565899);
-        //side_camera.up = glMatrix.vec3.fromValues(0.565852, 0.008385, 0.824465);
-        side_camera.position = glMatrix.vec3.fromValues(0.500000, -0.750000, 1.200000);
-        side_camera.forward = glMatrix.vec3.fromValues(-0.023683, 0.813820, -0.580633);
-        side_camera.up = glMatrix.vec3.fromValues(-0.008492, -0.580940, -0.813903);
+        //side_camera.position = glMatrix.vec3.fromValues(0.500000, -0.750000, 1.200000);
+        //side_camera.forward = glMatrix.vec3.fromValues(-0.023683, 0.813820, -0.580633);
+        //side_camera.up = glMatrix.vec3.fromValues(-0.008492, -0.580940, -0.813903);
+        side_camera.position = glMatrix.vec3.fromValues(0.500000, -1.000000, 0.500000);
+        side_camera.forward = glMatrix.vec3.fromValues(0.000001, 1.000000, 0.000001);
+        side_camera.up = glMatrix.vec3.fromValues(-0.000001, -0.000001, -1.000000);
 
         side_camera.LinkInput(
             document.getElementById("input_side_camera_position_x"),
