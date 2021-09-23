@@ -259,6 +259,10 @@ class HideManager {
         this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_lod_panning", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_trackball_rotation_sensitivity", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_trackball_translation_sensitivity", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_trackball_wheel_sensitivity", LEVEL_ADVANCED, false);
+        this.group_settings.AddInputRow("input_row_trackball_focus_distance", LEVEL_ADVANCED, false);
         this.groups.push(this.group_settings);
 
         this.group_shading_mode = new HideGroup("select_shading_mode_streamlines");
