@@ -404,11 +404,12 @@ class BVH_AA {
 }
 
 module.exports = BVH_AA;
-},{"./aabb":1,"./data_types":11,"./utility":1038,"gl-matrix":53}],4:[function(require,module,exports){
+},{"./aabb":1,"./data_types":11,"./utility":1039,"gl-matrix":53}],4:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 
 const { tb_project_to_sphere, trackball } = require("./trackball");
+const { ndcToArcBall, trackball_rotate, getRotationQuaternion } = require("./trackball2");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 
 class GL_CameraData {
@@ -915,6 +916,9 @@ class Camera {
         if(this.control_mode == CAMERA_CONTROL_TRACKBALL){
             this.UpdatePanningTrackball(x_canonical, y_canonical, left_handed);
         }
+        if(this.control_mode == CAMERA_CONTROL_TRACKBALL2){
+            this.UpdatePanningTrackball2(x_canonical, y_canonical, left_handed);
+        }
     }
 
     UpdatePanningRotateAroundCamera(x, y, left_handed) {
@@ -1011,6 +1015,28 @@ class Camera {
         this.changed = true;
 
         console.log("DCAM focus_point: ", focus_point)
+    }
+
+    UpdatePanningTrackball2(x, y, left_handed){
+        var r = 0.5;
+
+        
+        //get the rotation quaternion
+        var f = glMatrix.vec3.fromValues(0,1,0);
+        var u = glMatrix.vec3.fromValues(0,0,1);
+        var rot = getRotationQuaternion(f, u);
+        var quaternion = trackball_rotate(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, rot);
+
+        //var mat = glMatrix.mat3.create();
+        //glMatrix.mat3.fromQuat(mat, quaternion);
+        glMatrix.vec3.transformQuat(this.forward, this.forward, quaternion);
+        glMatrix.vec3.transformQuat(this.up, this.up, quaternion);
+        this.changed = true;
+
+        //console.log("DCAM focus_point: ", focus_point)
+        console.log("DCAM rot: ", rot)
+        console.log("DCAM quaternion: ", quaternion)
+        //console.log("DCAM mat: ", mat)
     }
 
     RollLeft(deltaTime, left_handed) {
@@ -1289,7 +1315,7 @@ class Camera {
 }
 
 module.exports = Camera;
-},{"./gl_matrix_extensions":16,"./trackball":1033,"gl-matrix":53}],5:[function(require,module,exports){
+},{"./gl_matrix_extensions":16,"./trackball":1033,"./trackball2":1034,"gl-matrix":53}],5:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -2015,7 +2041,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_flags":1027,"./shader_uniforms":1029,"./webgl":1039}],6:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_flags":1027,"./shader_uniforms":1029,"./webgl":1040}],6:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -2773,7 +2799,7 @@ class CanvasWrapperTransferFunction {
 }
 
 module.exports = CanvasWrapperTransferFunction;
-},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1029,"./utility":1038,"./webgl":1039}],7:[function(require,module,exports){
+},{"./dummy_quad":13,"./render_wrapper":1008,"./shader_uniforms":1029,"./utility":1039,"./webgl":1040}],7:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -2907,6 +2933,7 @@ global.TASK_CALCULATE_STREAMLINES = 1;
 
 global.CAMERA_CONTROL_NONE = 0;
 global.CAMERA_CONTROL_TRACKBALL = 1;
+global.CAMERA_CONTROL_TRACKBALL2 = 3;
 global.CAMERA_CONTROL_ROTATE_AROUND_CAMERA = 2;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],9:[function(require,module,exports){
@@ -4193,7 +4220,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1029,"./utility":1038,"./webgl":1039,"ml-matrix":990}],16:[function(require,module,exports){
+},{"./compute_wraper":7,"./data_textures":10,"./dummy_quad":13,"./shader_uniforms":1029,"./utility":1039,"./webgl":1040,"ml-matrix":990}],16:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -5773,7 +5800,7 @@ const Export = module_export.Export;
     }
 
 })();
-},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_raytracing_preprocessor.glsl":1018,"./shader/f_shader_resampling.glsl":1019,"./shader/f_shader_sum.glsl":1020,"./shader/f_shader_transfer_function.glsl":1021,"./shader/f_shader_transfer_function_points.glsl":1022,"./shader/v_shader_raytracing.glsl":1023,"./shader/v_shader_resampling.glsl":1024,"./shader/v_shader_transfer_function_points.glsl":1025,"./shader_manager":1028,"./streamline_context":1030,"./tab_manager":1032,"./transfer_function_manager":1034,"./ui_left_tool_bar":1035,"./ui_seeds":1036,"./ui_transfer_functions":1037,"./utility":1038,"./webgl":1039,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
+},{"./aliasing":2,"./camera":4,"./canvas_wrapper":5,"./canvas_wrapper_transfer_function":6,"./const":8,"./export":14,"./ftle_manager":15,"./global_data":17,"./hide_manager":18,"./input_changed_manager":20,"./input_manager":21,"./input_parameter_wrapper":22,"./lights":23,"./mouse_manager":25,"./object_manager":1004,"./shader/f_shader_average.glsl":1010,"./shader/f_shader_compute_flow_map_slice.glsl":1011,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1012,"./shader/f_shader_compute_ftle_normals.glsl":1013,"./shader/f_shader_copy.glsl":1014,"./shader/f_shader_flow_map_slice.glsl":1015,"./shader/f_shader_placeholder.glsl":1016,"./shader/f_shader_raytracing.glsl":1017,"./shader/f_shader_raytracing_preprocessor.glsl":1018,"./shader/f_shader_resampling.glsl":1019,"./shader/f_shader_sum.glsl":1020,"./shader/f_shader_transfer_function.glsl":1021,"./shader/f_shader_transfer_function_points.glsl":1022,"./shader/v_shader_raytracing.glsl":1023,"./shader/v_shader_resampling.glsl":1024,"./shader/v_shader_transfer_function_points.glsl":1025,"./shader_manager":1028,"./streamline_context":1030,"./tab_manager":1032,"./transfer_function_manager":1035,"./ui_left_tool_bar":1036,"./ui_seeds":1037,"./ui_transfer_functions":1038,"./utility":1039,"./webgl":1040,"gl-matrix":53,"ml-matrix":990}],20:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -6394,7 +6421,7 @@ class InputParameterWrapper {
 }
 
 module.exports = InputParameterWrapper;
-},{"./utility":1038}],23:[function(require,module,exports){
+},{"./utility":1039}],23:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
 
@@ -6957,7 +6984,7 @@ class LODData {
 }
 
 module.exports = LODData;
-},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1038,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
+},{"./bvh_aa":3,"./data_container":9,"./data_textures":10,"./data_types":11,"./data_unit":12,"./utility":1039,"gl-matrix":53,"mathjs":909}],25:[function(require,module,exports){
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 const getMousePositionCanonical = module_utility.getMousePositionCanonical;
@@ -7127,7 +7154,7 @@ class MouseManager {
 
 
 module.exports = MouseManager;
-},{"./utility":1038}],26:[function(require,module,exports){
+},{"./utility":1039}],26:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
@@ -121300,6 +121327,7 @@ function trackball(p1x, p1y, p2x, p2y, position, forward, up, sensitivity){
     if (t < -1.0) t = -1.0;
     phi = 2.0 * Math.asin(t);
 
+    console.log("DCAM p2z:", p2z);
     console.log("DCAM phi:", phi);
 
     //axis_to_quat(a,phi,q);
@@ -121375,6 +121403,94 @@ function trackball(p1x, p1y, p2x, p2y, position, forward, up, sensitivity){
 
 module.exports = { tb_project_to_sphere, trackball }
 },{"./gl_matrix_extensions":16,"gl-matrix":53}],1034:[function(require,module,exports){
+const glMatrix = require("gl-matrix");
+const module_gl_matrix_extensions = require("./gl_matrix_extensions");
+const TRACKBALLSIZE = 2;
+
+/**
+ * Project a point in NDC onto the arcball sphere 
+ * returns quaternion
+ */
+function ndcToArcBall(x, y) {
+    var p = glMatrix.vec2.fromValues(x, y);
+    var dist = glMatrix.vec2.dot(p,p);
+
+    /* Point is on sphere */
+    if(dist <= 1.0){
+        var z = Math.sqrt(1.0 - dist);
+        return glMatrix.quat.fromValues(x, y, z, 0);
+    }
+
+    /* Point is outside sphere */
+    else {
+        var proj = glMatrix.vec2.create();
+        glMatrix.vec2.normalize(proj, p);
+        return glMatrix.quat.fromValues(proj[0], proj[1], 0, 0);
+    }
+}
+
+function trackball_rotate(p1x, p1y, p2x, p2y, rot) {
+    //const Vector2 mousePosNDC = screenCoordToNDC(mousePos);
+    var currentQRotation = ndcToArcBall(p2x, p2y);
+    var prevQRotation = ndcToArcBall(p1x, p1y);
+    //_targetQRotation = (currentQRotation*prevQRotation*_targetQRotation).normalized();
+
+    var currentQRotation_prevQRotation = glMatrix.quat.create();
+    var result_rot = glMatrix.quat.create();
+    glMatrix.quat.multiply(currentQRotation_prevQRotation, currentQRotation, prevQRotation);
+    glMatrix.quat.multiply(result_rot, currentQRotation_prevQRotation, rot);
+    glMatrix.quat.normalize(result_rot, result_rot);
+    return result_rot;
+}
+
+function getRotationQuaternion(forward, up)
+{
+    _targetQRotation = glMatrix.quat.create();
+    zAxis = glMatrix.vec3.create();
+    xAxis = glMatrix.vec3.create();
+    yAxis = glMatrix.vec3.create();
+    tmp = glMatrix.vec3.create();
+    //const Vector3 dir = viewCenter - position;
+    glMatrix.vec3.normalize(forward, forward);
+    glMatrix.vec3.normalize(up, up);
+
+    //Vector3 zAxis = dir.normalized();
+    glMatrix.vec3.copy(zAxis, forward);
+    //Vector3 xAxis = (Math::cross(zAxis, up.normalized())).normalized();
+    glMatrix.vec3.cross(tmp, zAxis, up);
+    glMatrix.vec3.normalize(xAxis, tmp);
+    //Vector3 yAxis = (Math::cross(xAxis, zAxis)).normalized();
+    glMatrix.vec3.cross(tmp, xAxis, zAxis);
+    glMatrix.vec3.normalize(yAxis, tmp);
+    //xAxis = (Math::cross(zAxis, yAxis)).normalized();
+    glMatrix.vec3.cross(tmp, zAxis, yAxis);
+    glMatrix.vec3.normalize(xAxis, tmp);
+
+    //_targetPosition = -viewCenter;
+    //_targetZooming = -dir.length();
+    //_targetQRotation = Quaternion::fromMatrix(
+    //    Matrix3x3{xAxis, yAxis, -zAxis}.transposed()).normalized();
+
+    var mat = glMatrix.mat3.fromValues(
+            xAxis[0], xAxis[1], xAxis[2],
+            yAxis[0], yAxis[1], yAxis[2],
+            -zAxis[0], -zAxis[1], -zAxis[2]
+        )
+
+    glMatrix.mat3.transpose(mat, mat);
+    glMatrix.quat.fromMat3(_targetQRotation, mat);
+    glMatrix.quat.normalize(_targetQRotation, _targetQRotation);
+    return _targetQRotation;
+
+    //_positionT0  = _currentPosition = _targetPosition;
+    //_zoomingT0 = _currentZooming = _targetZooming;
+    //_qRotationT0 = _currentQRotation = _targetQRotation;
+
+    //updateInternalTransformations();
+}
+
+module.exports = { ndcToArcBall, trackball_rotate, getRotationQuaternion }
+},{"./gl_matrix_extensions":16,"gl-matrix":53}],1035:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
@@ -121779,7 +121895,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":11,"./utility":1038,"gl-matrix":53}],1035:[function(require,module,exports){
+},{"./data_types":11,"./utility":1039,"gl-matrix":53}],1036:[function(require,module,exports){
 
 class UISelectedCameraIndicator{
 
@@ -121884,7 +122000,7 @@ class UILeftToolBar{
 }
 
 module.exports = UILeftToolBar;
-},{}],1036:[function(require,module,exports){
+},{}],1037:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -122222,7 +122338,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":11,"./utility":1038,"gl-matrix":53,"seedrandom":993}],1037:[function(require,module,exports){
+},{"./data_types":11,"./utility":1039,"gl-matrix":53,"seedrandom":993}],1038:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -122586,7 +122702,7 @@ class UITransferFunctions {
 */
 
 module.exports = UITransferFunctions;
-},{"./data_types":11,"./utility":1038,"gl-matrix":53,"seedrandom":993}],1038:[function(require,module,exports){
+},{"./data_types":11,"./utility":1039,"gl-matrix":53,"seedrandom":993}],1039:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 exports.getMousePosition = function(canvas, event) {
@@ -122722,7 +122838,7 @@ exports.regexIntToFloat = function(input_string) {
 }
 
 
-},{"gl-matrix":53}],1039:[function(require,module,exports){
+},{"gl-matrix":53}],1040:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;

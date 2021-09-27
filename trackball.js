@@ -110,6 +110,7 @@ function trackball(p1x, p1y, p2x, p2y, position, forward, up, sensitivity){
     if (t < -1.0) t = -1.0;
     phi = 2.0 * Math.asin(t);
 
+    console.log("DCAM p2z:", p2z);
     console.log("DCAM phi:", phi);
 
     //axis_to_quat(a,phi,q);

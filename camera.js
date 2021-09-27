@@ -2,6 +2,7 @@ const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 
 const { tb_project_to_sphere, trackball } = require("./trackball");
+const { ndcToArcBall, trackball_rotate, getRotationQuaternion } = require("./trackball2");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 
 class GL_CameraData {
@@ -508,6 +509,9 @@ class Camera {
         if(this.control_mode == CAMERA_CONTROL_TRACKBALL){
             this.UpdatePanningTrackball(x_canonical, y_canonical, left_handed);
         }
+        if(this.control_mode == CAMERA_CONTROL_TRACKBALL2){
+            this.UpdatePanningTrackball2(x_canonical, y_canonical, left_handed);
+        }
     }
 
     UpdatePanningRotateAroundCamera(x, y, left_handed) {
@@ -604,6 +608,28 @@ class Camera {
         this.changed = true;
 
         console.log("DCAM focus_point: ", focus_point)
+    }
+
+    UpdatePanningTrackball2(x, y, left_handed){
+        var r = 0.5;
+
+        
+        //get the rotation quaternion
+        var f = glMatrix.vec3.fromValues(0,1,0);
+        var u = glMatrix.vec3.fromValues(0,0,1);
+        var rot = getRotationQuaternion(f, u);
+        var quaternion = trackball_rotate(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, rot);
+
+        //var mat = glMatrix.mat3.create();
+        //glMatrix.mat3.fromQuat(mat, quaternion);
+        glMatrix.vec3.transformQuat(this.forward, this.forward, quaternion);
+        glMatrix.vec3.transformQuat(this.up, this.up, quaternion);
+        this.changed = true;
+
+        //console.log("DCAM focus_point: ", focus_point)
+        console.log("DCAM rot: ", rot)
+        console.log("DCAM quaternion: ", quaternion)
+        //console.log("DCAM mat: ", mat)
     }
 
     RollLeft(deltaTime, left_handed) {
