@@ -24,11 +24,25 @@ function ndcToArcBall(x, y) {
     }
 }
 
-function trackball_rotate(p1x, p1y, p2x, p2y, rot) {
+function trackball2(p1x, p1y, p2x, p2y, rot) {
     //const Vector2 mousePosNDC = screenCoordToNDC(mousePos);
     var currentQRotation = ndcToArcBall(p2x, p2y);
     var prevQRotation = ndcToArcBall(p1x, p1y);
     //_targetQRotation = (currentQRotation*prevQRotation*_targetQRotation).normalized();
+
+    var prevQRotation_inv = glMatrix.quat.create();
+    var diff = glMatrix.quat.create();
+    var result_rot = glMatrix.quat.create();
+
+    glMatrix.quat.invert(prevQRotation_inv, prevQRotation);
+    glMatrix.quat.multiply(diff, currentQRotation, prevQRotation);//diff = q2 * inverse(q1) with inverse(q1) = prevQRotation, q2 = currentQRotation
+    
+    //glMatrix.quat.multiply(result_rot, rot, diff);
+    glMatrix.quat.multiply(result_rot, diff, rot);
+
+    glMatrix.quat.normalize(result_rot, result_rot);
+    return result_rot;
+
 
     var currentQRotation_prevQRotation = glMatrix.quat.create();
     var result_rot = glMatrix.quat.create();
@@ -65,12 +79,18 @@ function getRotationQuaternion(forward, up)
     //_targetZooming = -dir.length();
     //_targetQRotation = Quaternion::fromMatrix(
     //    Matrix3x3{xAxis, yAxis, -zAxis}.transposed()).normalized();
-
     var mat = glMatrix.mat3.fromValues(
             xAxis[0], xAxis[1], xAxis[2],
             yAxis[0], yAxis[1], yAxis[2],
             -zAxis[0], -zAxis[1], -zAxis[2]
         )
+    /*
+    var mat = glMatrix.mat3.fromValues(
+            xAxis[0], yAxis[0], -zAxis[0],
+            xAxis[1], yAxis[1], -zAxis[1],
+            xAxis[2], yAxis[2], -zAxis[2]
+        )
+    */
 
     glMatrix.mat3.transpose(mat, mat);
     glMatrix.quat.fromMat3(_targetQRotation, mat);
@@ -84,4 +104,4 @@ function getRotationQuaternion(forward, up)
     //updateInternalTransformations();
 }
 
-module.exports = { ndcToArcBall, trackball_rotate, getRotationQuaternion }
+module.exports = { ndcToArcBall, trackball2, getRotationQuaternion }

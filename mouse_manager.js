@@ -39,6 +39,7 @@ class MouseManager {
                 var pos = getMousePositionPercentage(canvas, event)
                 var pos_canonical = getMousePositionCanonical(canvas, event);
                 //console.log("down", "x: " + pos.x, "y: " + pos.y);
+                console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
                 camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
                 this.active_camera = camera;
                 other_camera.other_camera_is_panning = true;

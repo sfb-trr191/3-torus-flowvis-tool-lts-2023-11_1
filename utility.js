@@ -42,7 +42,7 @@ exports.getMousePositionCanonical = function (canvas, event) {
     let cx = rect.left + 0.5 * rect.width;
     let cy = rect.top + 0.5 * rect.height;
     let x = 2 * (event.clientX - cx) / s;
-    let y = 2 * (event.clientY - cy) / s;
+    let y = -2 * (event.clientY - cy) / s;
     return {
         x: x,
         y: y

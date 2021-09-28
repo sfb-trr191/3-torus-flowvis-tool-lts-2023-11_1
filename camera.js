@@ -2,7 +2,8 @@ const glMatrix = require("gl-matrix");
 const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 
 const { tb_project_to_sphere, trackball } = require("./trackball");
-const { ndcToArcBall, trackball_rotate, getRotationQuaternion } = require("./trackball2");
+const { ndcToArcBall, trackball2, getRotationQuaternion } = require("./trackball2");
+const { trackball3 } = require("./trackball3");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 
 class GL_CameraData {
@@ -172,6 +173,8 @@ class Camera {
         this.states["state_projection_z"].setProjectionZ();
 
         this.current_state_name = "state_default";
+
+        this.InitTracknall2();
     }
 
     LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z,
@@ -457,6 +460,7 @@ class Camera {
         this.panning = false;
         this.changed = true;
         this.SetCorrectResolution();
+        glMatrix.quat.copy(this.trackball_rot_start_quaternion, this.trackball_rot_quaternion);
     }
 
     SetCorrectResolution() {
@@ -512,6 +516,10 @@ class Camera {
         if(this.control_mode == CAMERA_CONTROL_TRACKBALL2){
             this.UpdatePanningTrackball2(x_canonical, y_canonical, left_handed);
         }
+        if(this.control_mode == CAMERA_CONTROL_TRACKBALL3){
+            this.UpdatePanningTrackball3(x_canonical, y_canonical, left_handed);
+        }
+        
     }
 
     UpdatePanningRotateAroundCamera(x, y, left_handed) {
@@ -610,26 +618,102 @@ class Camera {
         console.log("DCAM focus_point: ", focus_point)
     }
 
+    InitTracknall2(){
+        this.TRACKBALL_F = glMatrix.vec3.fromValues(0,1,0);
+        this.TRACKBALL_U = glMatrix.vec3.fromValues(0,0,-1);
+        //this.trackball_rot_start_quaternion = getRotationQuaternion(this.TRACKBALL_F, this.TRACKBALL_U);     
+        this.trackball_rot_quaternion = glMatrix.quat.create();
+        this.trackball_rot_start_quaternion = glMatrix.quat.create();
+        glMatrix.quat.identity(this.trackball_rot_start_quaternion);
+    }
+    
+    StartTrackball2(x, y){
+        this.xMouse_old_canonical = x;
+        this.yMouse_old_canonical = y;
+    }
+    
     UpdatePanningTrackball2(x, y, left_handed){
         var r = 0.5;
-
+        var offset_vector = glMatrix.vec3.create();
         
         //get the rotation quaternion
-        var f = glMatrix.vec3.fromValues(0,1,0);
-        var u = glMatrix.vec3.fromValues(0,0,1);
-        var rot = getRotationQuaternion(f, u);
-        var quaternion = trackball_rotate(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, rot);
+        //this.trackball_rot_quaternion = getRotationQuaternion(this.forward, this.up);
+        var quaternion = trackball2(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, this.trackball_rot_quaternion);
 
         //var mat = glMatrix.mat3.create();
         //glMatrix.mat3.fromQuat(mat, quaternion);
-        glMatrix.vec3.transformQuat(this.forward, this.forward, quaternion);
-        glMatrix.vec3.transformQuat(this.up, this.up, quaternion);
-        this.changed = true;
+        glMatrix.quat.invert(quaternion, quaternion);
+        glMatrix.vec3.transformQuat(this.forward, this.TRACKBALL_F, quaternion);
+        glMatrix.vec3.transformQuat(this.up, this.TRACKBALL_U, quaternion);
+
+        var focus_point = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        glMatrix.vec3.scale(offset_vector, this.forward, 1.5);
+        glMatrix.vec3.subtract(this.position, focus_point, offset_vector);
 
         //console.log("DCAM focus_point: ", focus_point)
-        console.log("DCAM rot: ", rot)
+        //console.log("DCAM rot: ", this.trackball_rot_quaternion)
         console.log("DCAM quaternion: ", quaternion)
         //console.log("DCAM mat: ", mat)
+
+        
+        glMatrix.quat.copy(this.trackball_rot_quaternion, quaternion);
+        //this.xMouse_old_canonical = x;
+        //this.yMouse_old_canonical = y;
+        this.changed = true;
+    }
+
+
+    UpdatePanningTrackball3(x, y, left_handed){
+        var r = 0.5;
+
+        //normalize forward and up vectors just to be sure they really are normalized
+        glMatrix.vec3.normalize(this.forward, this.forward);
+        glMatrix.vec3.normalize(this.up, this.up);
+
+        //calculate focus point
+        var forward_scaled = glMatrix.vec3.create();
+        var focus_point = glMatrix.vec3.create();
+        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec3.add(focus_point, this.position, forward_scaled);
+
+        //move camera so that position of focus point is at origin
+        //--> we are now in object space of the focus point
+        //the camera has arbitrary rotation but looks at the origin
+        var pos_cam = glMatrix.vec3.create();
+        glMatrix.vec3.subtract(pos_cam, this.position, focus_point);
+
+        //get the rotation quaternion
+        var quaternion = trackball3(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_rotation_sensitivity);
+        glMatrix.quat.invert(quaternion, quaternion);
+
+        //two helper points offset by forward and up vector respectively
+        var pos_cam_forward = glMatrix.vec3.create();
+        var pos_cam_up = glMatrix.vec3.create();
+        glMatrix.vec3.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec3.add(pos_cam_up, pos_cam, this.up);
+
+        //rotate the position and two helper points
+        glMatrix.vec3.transformQuat(pos_cam, pos_cam, quaternion);
+        glMatrix.vec3.transformQuat(pos_cam_forward, pos_cam_forward, quaternion);
+        glMatrix.vec3.transformQuat(pos_cam_up, pos_cam_up, quaternion);
+
+        //calculate new forward and up vectors from new position and helper points
+        glMatrix.vec3.subtract(this.forward, pos_cam_forward, pos_cam);
+        glMatrix.vec3.subtract(this.up, pos_cam_up, pos_cam);
+
+        //normalize forward and up vectors just to be sure they are still normalized
+        glMatrix.vec3.normalize(this.forward, this.forward);
+        glMatrix.vec3.normalize(this.up, this.up);
+
+        //add the focus point to position
+        //--> we are now back in world space
+        glMatrix.vec3.add(this.position, pos_cam, focus_point);
+
+        this.xMouse_old_canonical = x;
+        this.yMouse_old_canonical = y;
+        this.changed = true;
+
+        console.log("DCAM focus_point: ", focus_point)
     }
 
     RollLeft(deltaTime, left_handed) {
