@@ -587,6 +587,7 @@ class Camera {
 
         //get the rotation quaternion
         var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_rotation_sensitivity);
+        glMatrix.quat.invert(quaternion, quaternion);
 
         //two helper points offset by forward and up vector respectively
         var pos_cam_forward = glMatrix.vec3.create();

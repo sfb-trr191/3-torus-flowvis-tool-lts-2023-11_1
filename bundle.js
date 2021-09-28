@@ -994,6 +994,7 @@ class Camera {
 
         //get the rotation quaternion
         var quaternion = trackball(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, pos_cam, this.forward, this.up, this.trackball_rotation_sensitivity);
+        glMatrix.quat.invert(quaternion, quaternion);
 
         //two helper points offset by forward and up vector respectively
         var pos_cam_forward = glMatrix.vec3.create();
@@ -121384,13 +121385,13 @@ function trackball(p1x, p1y, p2x, p2y, position, forward, up, sensitivity){
     //apply camera vectors to p1
     glMatrix.vec3.scale(p_forward, forward, p1z);
     glMatrix.vec3.scale(p_up, up, p1y);
-    glMatrix.vec3.scale(p_right, right, p1x);
+    glMatrix.vec3.scale(p_right, right, -p1x);//TRACKBALL_MARKER negated makes it left
     glMatrix.vec3.add(p1, p_forward, p_up);
     glMatrix.vec3.add(p1, p1, p_right);
     //apply camera vectors to p2
     glMatrix.vec3.scale(p_forward, forward, p2z);
     glMatrix.vec3.scale(p_up, up, p2y);
-    glMatrix.vec3.scale(p_right, right, p2x);
+    glMatrix.vec3.scale(p_right, right, -p2x);//TRACKBALL_MARKER negated makes it left
     glMatrix.vec3.add(p2, p_forward, p_up);
     glMatrix.vec3.add(p2, p2, p_right);
 
