@@ -98,6 +98,7 @@ function trackball(p1x, p1y, p2x, p2y, position, forward, up, sensitivity){
     //Now, we want the cross product of P1 and P2
     //vcross(p2,p1,a);
     glMatrix.vec3.cross(a, p2, p1);
+    glMatrix.vec3.normalize(a, a);
 
     //Figure out how much to rotate around that axis.
     //vsub(p1,p2,d);
