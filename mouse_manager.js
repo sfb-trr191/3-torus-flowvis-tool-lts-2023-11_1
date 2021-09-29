@@ -32,25 +32,34 @@ class MouseManager {
     }
 
     onMouseDown(event, canvas, camera, other_camera){
+        var shift_pressed = event.getModifierState("Shift");
+        var ctrl_pressed = event.getModifierState("Control");
+        var pos = getMousePositionPercentage(canvas, event)
+        var pos_canonical = getMousePositionCanonical(canvas, event);
+        console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
         switch (event.which) {
             case 1:
-                var shift_pressed = event.getModifierState("Shift");
-                var ctrl_pressed = event.getModifierState("Control");
-                var pos = getMousePositionPercentage(canvas, event)
-                var pos_canonical = getMousePositionCanonical(canvas, event);
-                //console.log("down", "x: " + pos.x, "y: " + pos.y);
-                console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
-                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
-                this.active_camera = camera;
-                other_camera.other_camera_is_panning = true;
+                //Left Mouse button
+                shift_pressed = event.getModifierState("Shift");
+                ctrl_pressed = event.getModifierState("Control");
                 break;
             case 2:
                 //Middle Mouse button
+                shift_pressed = true;
+                ctrl_pressed = false;
                 break;
             case 3:
                 //Right Mouse button
+                shift_pressed = false;
+                ctrl_pressed = true;
                 break;
-        }    
+            default:
+                //unsupported button
+                return;
+        } 
+        camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
+        this.active_camera = camera;
+        other_camera.other_camera_is_panning = true;   
     }
 
     addOnMouseUp() {

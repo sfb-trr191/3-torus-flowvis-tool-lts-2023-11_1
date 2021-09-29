@@ -154,6 +154,8 @@ const Export = module_export.Export;
         transfer_function_canvas = document.getElementById("transfer_function_canvas");
         fps_display = document.getElementById("fps_display");
 
+        addBlockContextMenu();
+
 
         input_changed_manager = new InputChangedManager();
         main_camera = new Camera("main_camera", input_changed_manager);
@@ -638,6 +640,18 @@ const Export = module_export.Export;
     function addChangedTransferFunction(){
         document.getElementById("select_transfer_function_id").addEventListener("change", (event) => {
             OnSelectedTransferFunction();
+        });
+    }
+
+    function addBlockContextMenu(){
+        main_canvas.addEventListener("contextmenu", ( e )=> { 
+            e.preventDefault(); return false; 
+        });
+        side_canvas.addEventListener("contextmenu", ( e )=> { 
+            e.preventDefault(); return false; 
+        });
+        transfer_function_canvas.addEventListener("contextmenu", ( e )=> { 
+            e.preventDefault(); return false; 
         });
     }
 
