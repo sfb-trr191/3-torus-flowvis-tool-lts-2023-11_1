@@ -155,6 +155,7 @@ const Export = module_export.Export;
         fps_display = document.getElementById("fps_display");
 
         addBlockContextMenu();
+        addBlockScroll();
 
 
         input_changed_manager = new InputChangedManager();
@@ -652,6 +653,15 @@ const Export = module_export.Export;
         });
         transfer_function_canvas.addEventListener("contextmenu", ( e )=> { 
             e.preventDefault(); return false; 
+        });
+    }
+
+    function addBlockScroll(){
+        addEventListener("mousedown", (e) =>{ 
+            if (e.button === 1){
+                //Middle Mouse Button
+                e.preventDefault(); return false;
+            }
         });
     }
 
