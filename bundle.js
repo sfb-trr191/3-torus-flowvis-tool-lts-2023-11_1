@@ -6411,6 +6411,15 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   
         new InputWrapper(this, "select_lod_still", "lods");   
         new InputWrapper(this, "select_lod_panning", "lodp");   
+        //settings - cameras
+        new InputWrapper(this, "select_camera_control_3d_left", "cc3l");   
+        new InputWrapper(this, "select_camera_control_3d_right", "cc3r");  
+        //settings - trackball
+        new InputWrapper(this, "input_trackball_rotation_sensitivity", "trs");  
+        new InputWrapper(this, "input_trackball_translation_sensitivity", "tts");  
+        new InputWrapper(this, "input_trackball_wheel_sensitivity", "tws");  
+        new InputWrapper(this, "input_trackball_focus_distance_left", "tfdl");  
+        new InputWrapper(this, "input_trackball_focus_distance_right", "tfdr");    
         //transfer function
         new InputWrapper(this, "select_transfer_function_id", "tfid");           
         new InputWrapper(this, "select_transfer_function_index_scalar", "tfis");     
