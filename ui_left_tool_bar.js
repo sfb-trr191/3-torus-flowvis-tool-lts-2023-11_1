@@ -90,6 +90,14 @@ class UILeftToolBar{
             if(this.IsRightCameraSelected())
                 this.side_camera.SetOrientation_Xpos_Ypos_Zneg();
         });
+
+        this.button_focus_center = document.getElementById("button_focus_center");
+        this.button_focus_center.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.FocusCenter();
+            if(this.IsRightCameraSelected())
+                this.side_camera.FocusCenter();
+        });
     }   
 
     IsLeftCameraSelected(){

@@ -1397,6 +1397,21 @@ class Camera {
         glMatrix.vec3.negate(this.up, up_negated);
         this.changed = true;
     }
+
+    //set camera focus to (0.5, 0.5, 0.5)
+    FocusCenter(){
+        //calculate focus point
+        var forward_scaled = glMatrix.vec3.create();
+        var focus_point = glMatrix.vec3.create();
+        var diff = glMatrix.vec3.create();
+        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec3.add(focus_point, this.position, forward_scaled);
+
+        var center = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
+        glMatrix.vec3.subtract(diff, focus_point, center);
+        glMatrix.vec3.subtract(this.position, this.position, diff);
+        this.changed = true;
+    }
 }
 
 module.exports = Camera;
@@ -122285,6 +122300,14 @@ class UILeftToolBar{
                 this.main_camera.SetOrientation_Xpos_Ypos_Zneg();
             if(this.IsRightCameraSelected())
                 this.side_camera.SetOrientation_Xpos_Ypos_Zneg();
+        });
+
+        this.button_focus_center = document.getElementById("button_focus_center");
+        this.button_focus_center.addEventListener("mousedown", (event) => {
+            if(this.IsLeftCameraSelected())
+                this.main_camera.FocusCenter();
+            if(this.IsRightCameraSelected())
+                this.side_camera.FocusCenter();
         });
     }   
 

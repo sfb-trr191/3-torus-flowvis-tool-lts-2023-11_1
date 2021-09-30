@@ -453,6 +453,9 @@ legend {
     background-image: url("icons/axes_z_neg.png");
 }
 
+#button_focus_center{
+    background-image: url("icons/focus_center.png");
+}
 
 #fieldset_seeds {
     display: grid;
