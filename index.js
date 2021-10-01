@@ -683,7 +683,7 @@ const Export = module_export.Export;
         var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
         var step_size = document.getElementById("input_step_size").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
-        var direction = DIRECTION_FORWARD;
+        var direction = parseInt(document.getElementById("select_streamline_calculation_direction").value);
 
         var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
         var tube_radius_fundamental = parseFloat(document.getElementById("input_tube_radius_fundamental").value);

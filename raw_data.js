@@ -1,5 +1,6 @@
 const RawDataEntry = require("./raw_data_entry");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const glMatrix = require("gl-matrix");
 
 /**
  * The RawData class contains the points calculated by the StreamlineGenerator
@@ -29,7 +30,7 @@ class RawData {
         }
         for (var i = 0; i < this.num_seeds; i++) {
             var index = i * num_points_per_streamline;
-            this.data[index].position = seeds[i];
+            glMatrix.vec4.copy(this.data[index].position, seeds[i]);
             this.data[index].u_v_w_signum[3] = seeds[i][3];
         }
         console.log("data length: ", this.data.length);

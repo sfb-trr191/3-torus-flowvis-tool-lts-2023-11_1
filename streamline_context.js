@@ -64,6 +64,7 @@ class StreamlineContext {
         console.log("max_radius_factor_highlight", max_radius_factor_highlight)
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
+        this.ui_seeds.direction = direction;
         this.streamline_generator.direction = direction;
         this.streamline_generator.shader_formula_u = shader_formula_u;
         this.streamline_generator.shader_formula_v = shader_formula_v;
@@ -125,6 +126,7 @@ class StreamlineContext {
 
     CalculateStreamlinesPart(part_index, gl, gl_side, generate_copies) {
         var raw_data = this.GetRawData(part_index);
+        console.log("CalculateStreamlinesPart");
 
         this.streamline_generator.CalculateRawStreamlines(raw_data);
         this.lod_0.ExtractMultiPolyLines(part_index);

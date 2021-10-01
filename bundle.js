@@ -5506,7 +5506,7 @@ const Export = module_export.Export;
         var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
         var step_size = document.getElementById("input_step_size").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
-        var direction = DIRECTION_FORWARD;
+        var direction = parseInt(document.getElementById("select_streamline_calculation_direction").value);
 
         var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
         var tube_radius_fundamental = parseFloat(document.getElementById("input_tube_radius_fundamental").value);
@@ -113262,6 +113262,7 @@ module.exports = ObjectManager;
 },{"./data_types":11,"./gl_matrix_extensions":16,"./movable_axes_state":26,"gl-matrix":53}],1005:[function(require,module,exports){
 const RawDataEntry = require("./raw_data_entry");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const glMatrix = require("gl-matrix");
 
 /**
  * The RawData class contains the points calculated by the StreamlineGenerator
@@ -113291,7 +113292,7 @@ class RawData {
         }
         for (var i = 0; i < this.num_seeds; i++) {
             var index = i * num_points_per_streamline;
-            this.data[index].position = seeds[i];
+            glMatrix.vec4.copy(this.data[index].position, seeds[i]);
             this.data[index].u_v_w_signum[3] = seeds[i][3];
         }
         console.log("data length: ", this.data.length);
@@ -113321,7 +113322,7 @@ class RawData {
 }
 
 module.exports = RawData;
-},{"./data_types":11,"./raw_data_entry":1006}],1006:[function(require,module,exports){
+},{"./data_types":11,"./raw_data_entry":1006,"gl-matrix":53}],1006:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 class RawDataEntry {
@@ -120832,6 +120833,7 @@ class StreamlineContext {
         console.log("max_radius_factor_highlight", max_radius_factor_highlight)
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
+        this.ui_seeds.direction = direction;
         this.streamline_generator.direction = direction;
         this.streamline_generator.shader_formula_u = shader_formula_u;
         this.streamline_generator.shader_formula_v = shader_formula_v;
@@ -120893,6 +120895,7 @@ class StreamlineContext {
 
     CalculateStreamlinesPart(part_index, gl, gl_side, generate_copies) {
         var raw_data = this.GetRawData(part_index);
+        console.log("CalculateStreamlinesPart");
 
         this.streamline_generator.CalculateRawStreamlines(raw_data);
         this.lod_0.ExtractMultiPolyLines(part_index);
@@ -122478,6 +122481,7 @@ class UISeeds {
         this.element = document.getElementById("fieldset_seeds");
         this.list = [];
         this.rng_positions = seedrandom();
+        this.direction = DIRECTION_FORWARD;
         //this.rng_positions_seed_string = 'hello.';
     }
 
@@ -122612,8 +122616,22 @@ class UISeeds {
             var x = entry.node_input_x.value;
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
-            var seed = glMatrix.vec4.fromValues(x, y, z, 1);
-            point_list.push(seed);
+            switch(this.direction){
+                case DIRECTION_FORWARD:
+                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    point_list.push(seed);
+                    break;
+                case DIRECTION_BACKWARD:
+                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
+                    point_list.push(seed);
+                    break;
+                case DIRECTION_BOTH:
+                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    point_list.push(seed);
+                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
+                    point_list.push(seed);
+                    break;
+            }
         }
         return point_list;
     }

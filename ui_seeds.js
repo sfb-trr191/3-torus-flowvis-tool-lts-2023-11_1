@@ -154,6 +154,7 @@ class UISeeds {
         this.element = document.getElementById("fieldset_seeds");
         this.list = [];
         this.rng_positions = seedrandom();
+        this.direction = DIRECTION_FORWARD;
         //this.rng_positions_seed_string = 'hello.';
     }
 
@@ -288,8 +289,22 @@ class UISeeds {
             var x = entry.node_input_x.value;
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
-            var seed = glMatrix.vec4.fromValues(x, y, z, 1);
-            point_list.push(seed);
+            switch(this.direction){
+                case DIRECTION_FORWARD:
+                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    point_list.push(seed);
+                    break;
+                case DIRECTION_BACKWARD:
+                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
+                    point_list.push(seed);
+                    break;
+                case DIRECTION_BOTH:
+                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    point_list.push(seed);
+                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
+                    point_list.push(seed);
+                    break;
+            }
         }
         return point_list;
     }
