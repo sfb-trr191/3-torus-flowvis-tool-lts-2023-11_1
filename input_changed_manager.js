@@ -85,6 +85,7 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
+        this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_direction"));        
         this.group_calculate.AddInput(document.getElementById("input_tube_radius_fundamental"));
         this.group_calculate.AddInput(document.getElementById("input_max_radius_factor_highlight"));        
     }

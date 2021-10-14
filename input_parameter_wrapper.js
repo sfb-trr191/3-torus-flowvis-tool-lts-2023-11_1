@@ -109,6 +109,7 @@ class InputParameterWrapper {
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
+        new InputWrapper(this, "select_streamline_calculation_direction", "scd");        
         new InputWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
