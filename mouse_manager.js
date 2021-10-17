@@ -1,6 +1,7 @@
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 const getMousePositionCanonical = module_utility.getMousePositionCanonical;
+const getMousePosition = module_utility.getMousePosition;
 
 class MouseManager {
 
@@ -143,7 +144,8 @@ class MouseManager {
 
     onMouseWheel(event, canvas, camera, other_camera){
         var slow = false;
-        camera.move_forward_backward_wheel(event.deltaY, slow);
+        var pos = getMousePosition(canvas, event)
+        camera.move_forward_backward_wheel(event.deltaY, pos.x, pos.y, slow);
         /*
         switch (event.which) {
             case 1:

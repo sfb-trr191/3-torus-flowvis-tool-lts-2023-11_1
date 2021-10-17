@@ -1217,15 +1217,43 @@ class Camera {
         this.changed = true;
     }
 
-    move_forward_backward_wheel(delta_y, slow){
+    move_forward_backward_wheel(delta_y, x, y, slow){
         var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
 
         var change = glMatrix.vec3.create();
 
-        glMatrix.vec3.scale(change, this.forward, (delta_y * v));
+        var direction = this.forward;
+        if(true){
+            direction = this.generate_ray_direction(x, y)
+        }
+
+        glMatrix.vec3.scale(change, direction, (delta_y * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
 
         this.changed = true;
+    }
+
+    generate_ray_direction(x, y){
+        console.log("generate_ray_direction: ", x, y);
+        var p_ij = glMatrix.vec3.create();
+        var r_ij = glMatrix.vec3.create();
+        var tmp = glMatrix.vec3.create();
+
+        //float i = gl_FragCoord[0];//x
+        var i = x;
+        //float j = float(height) - gl_FragCoord[1];//y
+        var j = y;
+
+        //vec3 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
+        glMatrix.vec3.copy(p_ij, this.p_1m);
+        glMatrix.vec3.scale(tmp, this.q_x, (i-1));
+        glMatrix.vec3.add(p_ij, p_ij, tmp);
+        glMatrix.vec3.scale(tmp, this.q_y, (j-1));
+        glMatrix.vec3.add(p_ij, p_ij, tmp);
+
+        //vec3 r_ij = normalize(p_ij);
+        glMatrix.vec3.normalize(r_ij, p_ij);
+        return r_ij;
     }
 
     moveUp(deltaTime, slow) {
@@ -7124,6 +7152,7 @@ module.exports = LODData;
 const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 const getMousePositionCanonical = module_utility.getMousePositionCanonical;
+const getMousePosition = module_utility.getMousePosition;
 
 class MouseManager {
 
@@ -7266,7 +7295,8 @@ class MouseManager {
 
     onMouseWheel(event, canvas, camera, other_camera){
         var slow = false;
-        camera.move_forward_backward_wheel(event.deltaY, slow);
+        var pos = getMousePosition(canvas, event)
+        camera.move_forward_backward_wheel(event.deltaY, pos.x, pos.y, slow);
         /*
         switch (event.which) {
             case 1:
