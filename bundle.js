@@ -2997,6 +2997,7 @@ global.VOLUME_RENDERING_MODE_BACKWARD = 3;
 
 global.STYLE_DEFAULT = "d";
 global.STYLE_EMBEDDED = "e";
+global.STYLE_EMBEDDED_RIGHT = "er";
 
 global.FOG_NONE = 0;
 global.FOG_LINEAR = 1;
@@ -3021,11 +3022,13 @@ global.PARAM_segment_duplicator_iterations = "di";
 global.PARAM_STREAMLINE_CALCULATION_METHOD = "scm"
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
+global.PARAM_THUMBNAIL_RIGHT = "etr";
 global.PARAM_TAB_MAIN = "tab";
 global.PARAM_SIDE_MODE = "sm";
 global.PARAM_PROJECTION_INDEX = "pi"
 global.PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 global.PARAM_EXPORT_THUMBNAIL_NAME = "etn";
+global.PARAM_EXPORT_THUMBNAIL_NAME_RIGHT = "etnr"
 global.PARAM_RNG_SEED_POSITION = "rngp";
 
 
@@ -3855,6 +3858,7 @@ exports.Export = function(input_parameter_wrapper) {
     var zip = new JSZip();
     var dir_name = document.getElementById("input_thumbnail_directory").value;
     var file_name = document.getElementById("input_thumbnail_name").value;
+    var file_name_right = document.getElementById("input_thumbnail_name_right").value;
 
     
     var query_string = input_parameter_wrapper.toQueryString();
@@ -3862,19 +3866,52 @@ exports.Export = function(input_parameter_wrapper) {
     url_without_query = url_without_query.replace("index", "lazy");
     var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
     var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
+    var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
     //console.log("query_string: ", query_string);
     //console.log("window.location.href: ", window.location.href);
     //console.log("url_without_query: ", url_without_query);
     //console.log("url_default: ", url_default);
     //console.log("url_embedded: ", url_embedded);
 
-    zip.file("latex/latex_snippet_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
-    zip.file("latex/latex_snippet_embedded.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
-    zip.file("html/html_snippet_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
-    zip.file("html/html_snippet_embedded.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded"));
+    zip.file("latex/latex_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
+    zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
+    zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name));
+    zip.file("html/html_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
+    zip.file("html/html_embedded_left.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded_left"));
+    zip.file("html/html_embedded_right.txt", GenerateExportString_HTML(url_embedded_r, "iframe_reeb_vector_fields_embedded_right"));
     zip.file("url/url_default.txt", url_default);
-    zip.file("url/url_embedded.txt", url_embedded);
+    zip.file("url/url_embedded_left.txt", url_embedded);
+    zip.file("url/url_embedded_right.txt", url_embedded_r);
 
+    main_canvas.toBlob(function (blob) {
+        zip.file(file_name+".png", blob);
+        side_canvas.toBlob(function (blob) {
+            zip.file(file_name+"2.png", blob);
+            zip.generateAsync({ type: "blob" })
+                .then(function (content) {
+                    FileSaver.saveAs(content, "RVF-exported.zip");
+                    document.getElementById("button_export").disabled = false;
+                });
+        });  
+    });  
+
+    /*
+    main_canvas.toBlob(function (blob) {
+        zip.file(file_name+".png", blob, {binary:true});
+    });  
+    
+    side_canvas.toBlob(function (blob) {
+        zip.file(file_name+"2.png", blob, {binary:true});
+    });
+
+    zip.generateAsync({ type: "blob" })
+    .then(function (content) {
+        FileSaver.saveAs(content, "RVF-exported.zip");
+        document.getElementById("button_export").disabled = false;
+    });
+    */
+
+    /*
     main_canvas.toBlob(function (blob) {
         zip.file(file_name+".png", blob);
         zip.generateAsync({ type: "blob" })
@@ -3882,7 +3919,8 @@ exports.Export = function(input_parameter_wrapper) {
                 FileSaver.saveAs(content, "RVF-exported.zip");
                 document.getElementById("button_export").disabled = false;
             });
-    });        
+    });  
+    */
 }
 
 function GenerateExportString_Latex(url, file_name){
@@ -6482,8 +6520,10 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_transfer_function_index_ftle_backward", "tfib");   
         //export
         new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
+        new InputWrapper(this, "input_thumbnail_right", PARAM_THUMBNAIL_RIGHT);
         new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
+        new InputWrapper(this, "input_thumbnail_name_right", PARAM_EXPORT_THUMBNAIL_NAME_RIGHT);
         new InputWrapper(this, "select_tab", PARAM_TAB_MAIN);
         //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
 
@@ -6519,10 +6559,18 @@ class InputParameterWrapper {
         console.log("STYLE:", style)
 
         const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
-        console.log("thumbnail_url:", thumbnail_url)
-        var invalid_thumbnail = thumbnail_url === null || thumbnail_url === "";
+        const thumbnail_url_right = urlParams.get(PARAM_THUMBNAIL_RIGHT);
+
+        var url = thumbnail_url;
+        if(style == STYLE_EMBEDDED_RIGHT){
+            var url = thumbnail_url_right;
+        }
+        console.log("used thumbnail url:", url)
+
+
+        var invalid_thumbnail = url === null || url === "";
         if (!invalid_thumbnail)
-            document.getElementById("image_thumbnail").src = thumbnail_url;
+            document.getElementById("image_thumbnail").src = url;
 
         switch (style) {
             case STYLE_DEFAULT:
@@ -6532,6 +6580,10 @@ class InputParameterWrapper {
             case STYLE_EMBEDDED:
                 setCSS("embedded_thumbnail.css");
                 this.css_loaded = "embedded.css";
+                break;
+            case STYLE_EMBEDDED_RIGHT:
+                setCSS("embedded_thumbnail.css");
+                this.css_loaded = "embedded_right.css";
                 break;
             default:
                 setCSS("index.css");

@@ -186,8 +186,10 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_transfer_function_index_ftle_backward", "tfib");   
         //export
         new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
+        new InputWrapper(this, "input_thumbnail_right", PARAM_THUMBNAIL_RIGHT);
         new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
+        new InputWrapper(this, "input_thumbnail_name_right", PARAM_EXPORT_THUMBNAIL_NAME_RIGHT);
         new InputWrapper(this, "select_tab", PARAM_TAB_MAIN);
         //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
 
@@ -223,10 +225,18 @@ class InputParameterWrapper {
         console.log("STYLE:", style)
 
         const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
-        console.log("thumbnail_url:", thumbnail_url)
-        var invalid_thumbnail = thumbnail_url === null || thumbnail_url === "";
+        const thumbnail_url_right = urlParams.get(PARAM_THUMBNAIL_RIGHT);
+
+        var url = thumbnail_url;
+        if(style == STYLE_EMBEDDED_RIGHT){
+            var url = thumbnail_url_right;
+        }
+        console.log("used thumbnail url:", url)
+
+
+        var invalid_thumbnail = url === null || url === "";
         if (!invalid_thumbnail)
-            document.getElementById("image_thumbnail").src = thumbnail_url;
+            document.getElementById("image_thumbnail").src = url;
 
         switch (style) {
             case STYLE_DEFAULT:
@@ -236,6 +246,10 @@ class InputParameterWrapper {
             case STYLE_EMBEDDED:
                 setCSS("embedded_thumbnail.css");
                 this.css_loaded = "embedded.css";
+                break;
+            case STYLE_EMBEDDED_RIGHT:
+                setCSS("embedded_thumbnail.css");
+                this.css_loaded = "embedded_right.css";
                 break;
             default:
                 setCSS("index.css");

@@ -37,6 +37,7 @@ global.VOLUME_RENDERING_MODE_BACKWARD = 3;
 
 global.STYLE_DEFAULT = "d";
 global.STYLE_EMBEDDED = "e";
+global.STYLE_EMBEDDED_RIGHT = "er";
 
 global.FOG_NONE = 0;
 global.FOG_LINEAR = 1;
@@ -61,11 +62,13 @@ global.PARAM_segment_duplicator_iterations = "di";
 global.PARAM_STREAMLINE_CALCULATION_METHOD = "scm"
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
+global.PARAM_THUMBNAIL_RIGHT = "etr";
 global.PARAM_TAB_MAIN = "tab";
 global.PARAM_SIDE_MODE = "sm";
 global.PARAM_PROJECTION_INDEX = "pi"
 global.PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 global.PARAM_EXPORT_THUMBNAIL_NAME = "etn";
+global.PARAM_EXPORT_THUMBNAIL_NAME_RIGHT = "etnr"
 global.PARAM_RNG_SEED_POSITION = "rngp";
 
 
@@ -125,11 +128,18 @@ const module_const = require("./const");
 
     function setThumbnail(){
         const urlParams = new URLSearchParams(window.location.search);
+        const style = urlParams.get(PARAM_STYLE);
         const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
+        const thumbnail_url_right = urlParams.get(PARAM_THUMBNAIL_RIGHT);
         //console.log("thumbnail_url:", thumbnail_url)
-        var invalid_thumbnail = thumbnail_url === null || thumbnail_url === "";
+        var url = thumbnail_url;
+        if(style == STYLE_EMBEDDED_RIGHT){
+            var url = thumbnail_url_right;
+        }
+
+        var invalid_thumbnail = url === null || url === "";
         if(!invalid_thumbnail)
-            document.getElementById("image_thumbnail").src = thumbnail_url;
+            document.getElementById("image_thumbnail").src = url;
     }
 
     function redirect() {

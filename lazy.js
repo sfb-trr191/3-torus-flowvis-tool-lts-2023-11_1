@@ -17,11 +17,18 @@ const module_const = require("./const");
 
     function setThumbnail(){
         const urlParams = new URLSearchParams(window.location.search);
+        const style = urlParams.get(PARAM_STYLE);
         const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
+        const thumbnail_url_right = urlParams.get(PARAM_THUMBNAIL_RIGHT);
         //console.log("thumbnail_url:", thumbnail_url)
-        var invalid_thumbnail = thumbnail_url === null || thumbnail_url === "";
+        var url = thumbnail_url;
+        if(style == STYLE_EMBEDDED_RIGHT){
+            var url = thumbnail_url_right;
+        }
+
+        var invalid_thumbnail = url === null || url === "";
         if(!invalid_thumbnail)
-            document.getElementById("image_thumbnail").src = thumbnail_url;
+            document.getElementById("image_thumbnail").src = url;
     }
 
     function redirect() {

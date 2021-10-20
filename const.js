@@ -35,6 +35,7 @@ global.VOLUME_RENDERING_MODE_BACKWARD = 3;
 
 global.STYLE_DEFAULT = "d";
 global.STYLE_EMBEDDED = "e";
+global.STYLE_EMBEDDED_RIGHT = "er";
 
 global.FOG_NONE = 0;
 global.FOG_LINEAR = 1;
@@ -59,11 +60,13 @@ global.PARAM_segment_duplicator_iterations = "di";
 global.PARAM_STREAMLINE_CALCULATION_METHOD = "scm"
 global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
+global.PARAM_THUMBNAIL_RIGHT = "etr";
 global.PARAM_TAB_MAIN = "tab";
 global.PARAM_SIDE_MODE = "sm";
 global.PARAM_PROJECTION_INDEX = "pi"
 global.PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
 global.PARAM_EXPORT_THUMBNAIL_NAME = "etn";
+global.PARAM_EXPORT_THUMBNAIL_NAME_RIGHT = "etnr"
 global.PARAM_RNG_SEED_POSITION = "rngp";
 
 
