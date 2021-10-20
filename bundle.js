@@ -3868,12 +3868,12 @@ exports.Export = function(input_parameter_wrapper) {
     //console.log("url_default: ", url_default);
     //console.log("url_embedded: ", url_embedded);
 
-    zip.file("latex_snippet_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
-    zip.file("latex_snippet_embedded.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
-    zip.file("html_snippet_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
-    zip.file("html_snippet_embedded.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded"));
-    zip.file("url_default.txt", url_default);
-    zip.file("url_embedded.txt", url_embedded);
+    zip.file("latex/latex_snippet_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
+    zip.file("latex/latex_snippet_embedded.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
+    zip.file("html/html_snippet_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
+    zip.file("html/html_snippet_embedded.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded"));
+    zip.file("url/url_default.txt", url_default);
+    zip.file("url/url_embedded.txt", url_embedded);
 
     main_canvas.toBlob(function (blob) {
         zip.file(file_name+".png", blob);
@@ -3886,7 +3886,7 @@ exports.Export = function(input_parameter_wrapper) {
 }
 
 function GenerateExportString_Latex(url, file_name){
-    var latex = "\\href{"+url+"}{\\includegraphics{"+file_name+"}}";
+    var latex = "\\href{"+url+"}{\\includegraphics[width=\\textwidth]{"+file_name+"}}";
     return latex;    
 }
 
