@@ -174,6 +174,8 @@ class Camera {
 
         this.current_state_name = "state_default";
 
+        this.last_mouse_position = {"x":0, "y":0};
+
         this.InitTracknall2();
     }
 
@@ -826,6 +828,32 @@ class Camera {
         this.changed = true;
     }
 
+    move_forward_to_cursor(deltaTime, slow){
+        this.move_forward_or_backward_cursor(deltaTime, slow, -1);
+    }    
+
+    move_backward_from_cursor(deltaTime, slow){
+        this.move_forward_or_backward_cursor(deltaTime, slow, 1);
+    }    
+
+    move_forward_or_backward_cursor(deltaTime, slow, signum){
+        var x = this.last_mouse_position["x"];
+        var y = this.last_mouse_position["y"];
+        var v = slow ? this.velocity_slow : this.velocity;
+
+        var change = glMatrix.vec3.create();
+
+        var direction = this.forward;
+        if(true){
+            direction = this.generate_ray_direction(x, y)
+        }
+
+        glMatrix.vec3.scale(change, direction, (signum * deltaTime * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+
+        this.changed = true;  
+    }
+
     generate_ray_direction(x, y){
         console.log("generate_ray_direction: ", x, y);
         var p_ij = glMatrix.vec3.create();
@@ -1032,6 +1060,10 @@ class Camera {
         glMatrix.vec3.subtract(diff, focus_point, center);
         glMatrix.vec3.subtract(this.position, this.position, diff);
         this.changed = true;
+    }
+
+    SetLastMousePosition(pos){
+        this.last_mouse_position = pos;
     }
 }
 

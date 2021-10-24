@@ -1,6 +1,6 @@
 class InputManager {
 
-    NUMBER_OF_KEYS = 8;//only continuous keys
+    NUMBER_OF_KEYS = 10;//only continuous keys
 
     KEY_INDEX_W = 0;
     KEY_INDEX_A = 1;
@@ -10,6 +10,8 @@ class InputManager {
     KEY_INDEX_F = 5;
     KEY_INDEX_Q = 6;
     KEY_INDEX_E = 7;
+    KEY_INDEX_T = 8;
+    KEY_INDEX_G = 9;
 
     KEY_STATE_INACTIVE = 0;
     KEY_STATE_ACTIVE = 1;
@@ -56,6 +58,10 @@ class InputManager {
             this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_ACTIVE;
         if (event.key == 'e')
             this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_ACTIVE;
+        if (event.key == 't')
+            this.key_states[this.KEY_INDEX_T] = this.KEY_STATE_ACTIVE;
+        if (event.key == 'g')
+            this.key_states[this.KEY_INDEX_G] = this.KEY_STATE_ACTIVE;
     }
 
     addOnKeyUp() {
@@ -85,6 +91,10 @@ class InputManager {
             this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_INACTIVE;
         if (event.key == 'e')
             this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_INACTIVE;
+        if (event.key == 't')
+            this.key_states[this.KEY_INDEX_T] = this.KEY_STATE_INACTIVE;
+        if (event.key == 'g')
+            this.key_states[this.KEY_INDEX_G] = this.KEY_STATE_INACTIVE;
 
         //HANDLING NON CONTINUOUS KEYS
         if (event.key == 'p')
@@ -147,6 +157,14 @@ class InputManager {
         if (this.isKeyDown(this.KEY_INDEX_E)) {
             var left_handed = false;
             camera.RollRight(delta_time, left_handed);
+        }
+        if (this.isKeyDown(this.KEY_INDEX_T)) {
+            var slow = false;
+            camera.move_forward_to_cursor(delta_time, slow);
+        }
+        if (this.isKeyDown(this.KEY_INDEX_G)) {
+            var slow = false;
+            camera.move_backward_from_cursor(delta_time, slow);            
         }
     }
 }

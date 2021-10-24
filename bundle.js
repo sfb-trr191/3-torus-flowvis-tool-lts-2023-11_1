@@ -581,6 +581,8 @@ class Camera {
 
         this.current_state_name = "state_default";
 
+        this.last_mouse_position = {"x":0, "y":0};
+
         this.InitTracknall2();
     }
 
@@ -1233,6 +1235,32 @@ class Camera {
         this.changed = true;
     }
 
+    move_forward_to_cursor(deltaTime, slow){
+        this.move_forward_or_backward_cursor(deltaTime, slow, -1);
+    }    
+
+    move_backward_from_cursor(deltaTime, slow){
+        this.move_forward_or_backward_cursor(deltaTime, slow, 1);
+    }    
+
+    move_forward_or_backward_cursor(deltaTime, slow, signum){
+        var x = this.last_mouse_position["x"];
+        var y = this.last_mouse_position["y"];
+        var v = slow ? this.velocity_slow : this.velocity;
+
+        var change = glMatrix.vec3.create();
+
+        var direction = this.forward;
+        if(true){
+            direction = this.generate_ray_direction(x, y)
+        }
+
+        glMatrix.vec3.scale(change, direction, (signum * deltaTime * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+
+        this.changed = true;  
+    }
+
     generate_ray_direction(x, y){
         console.log("generate_ray_direction: ", x, y);
         var p_ij = glMatrix.vec3.create();
@@ -1439,6 +1467,10 @@ class Camera {
         glMatrix.vec3.subtract(diff, focus_point, center);
         glMatrix.vec3.subtract(this.position, this.position, diff);
         this.changed = true;
+    }
+
+    SetLastMousePosition(pos){
+        this.last_mouse_position = pos;
     }
 }
 
@@ -6179,7 +6211,7 @@ module.exports = InputChangedManager;
 },{}],21:[function(require,module,exports){
 class InputManager {
 
-    NUMBER_OF_KEYS = 8;//only continuous keys
+    NUMBER_OF_KEYS = 10;//only continuous keys
 
     KEY_INDEX_W = 0;
     KEY_INDEX_A = 1;
@@ -6189,6 +6221,8 @@ class InputManager {
     KEY_INDEX_F = 5;
     KEY_INDEX_Q = 6;
     KEY_INDEX_E = 7;
+    KEY_INDEX_T = 8;
+    KEY_INDEX_G = 9;
 
     KEY_STATE_INACTIVE = 0;
     KEY_STATE_ACTIVE = 1;
@@ -6235,6 +6269,10 @@ class InputManager {
             this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_ACTIVE;
         if (event.key == 'e')
             this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_ACTIVE;
+        if (event.key == 't')
+            this.key_states[this.KEY_INDEX_T] = this.KEY_STATE_ACTIVE;
+        if (event.key == 'g')
+            this.key_states[this.KEY_INDEX_G] = this.KEY_STATE_ACTIVE;
     }
 
     addOnKeyUp() {
@@ -6264,6 +6302,10 @@ class InputManager {
             this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_INACTIVE;
         if (event.key == 'e')
             this.key_states[this.KEY_INDEX_E] = this.KEY_STATE_INACTIVE;
+        if (event.key == 't')
+            this.key_states[this.KEY_INDEX_T] = this.KEY_STATE_INACTIVE;
+        if (event.key == 'g')
+            this.key_states[this.KEY_INDEX_G] = this.KEY_STATE_INACTIVE;
 
         //HANDLING NON CONTINUOUS KEYS
         if (event.key == 'p')
@@ -6326,6 +6368,14 @@ class InputManager {
         if (this.isKeyDown(this.KEY_INDEX_E)) {
             var left_handed = false;
             camera.RollRight(delta_time, left_handed);
+        }
+        if (this.isKeyDown(this.KEY_INDEX_T)) {
+            var slow = false;
+            camera.move_forward_to_cursor(delta_time, slow);
+        }
+        if (this.isKeyDown(this.KEY_INDEX_G)) {
+            var slow = false;
+            camera.move_backward_from_cursor(delta_time, slow);            
         }
     }
 }
@@ -7238,7 +7288,7 @@ class MouseManager {
     onMouseDown(event, canvas, camera, other_camera){
         var shift_pressed = event.getModifierState("Shift");
         var ctrl_pressed = event.getModifierState("Control");
-        var pos = getMousePositionPercentage(canvas, event)
+        var pos_percentage = getMousePositionPercentage(canvas, event)
         var pos_canonical = getMousePositionCanonical(canvas, event);
         console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
         switch (event.which) {
@@ -7261,7 +7311,7 @@ class MouseManager {
                 //unsupported button
                 return;
         } 
-        camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
+        camera.StartPanning(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
         this.active_camera = camera;
         other_camera.other_camera_is_panning = true;   
     }
@@ -7298,41 +7348,26 @@ class MouseManager {
 
     addOnMouseOut() {
         this.canvas.addEventListener("mouseout", (event) => {
-            var pos = getMousePositionPercentage(this.canvas, event)
-            //console.log("out", "x: " + pos.x, "y: " + pos.y);
-            //this.camera.StopPanning();
             this.camera.mouse_in_canvas = false;
         });
         this.side_canvas.addEventListener("mouseout", (event) => {
-            var pos = getMousePositionPercentage(this.side_canvas, event)
-            //console.log("out", "x: " + pos.x, "y: " + pos.y);
-            //this.side_camera.StopPanning();
             this.side_camera.mouse_in_canvas = false;
         });
     }
 
     addOnMouseMove() {
-        /*
-        this.canvas.addEventListener("mousemove", (event) => {
-            var pos = getMousePositionPercentage(this.canvas, event)
-            this.camera.UpdatePanning(pos.x, pos.y, false);
-            this.camera.mouse_in_canvas = true;
-            this.active_camera = this.camera;
-        });
-        this.side_canvas.addEventListener("mousemove", (event) => {
-            var pos = getMousePositionPercentage(this.side_canvas, event)
-            this.side_camera.UpdatePanning(pos.x, pos.y, false);
-            this.side_camera.mouse_in_canvas = true;
-            this.active_camera = this.side_camera;
-        });
-        */
         document.addEventListener("mousemove", (event) => {
-            var pos = getMousePositionPercentage(this.canvas, event)
+            var pos = getMousePosition(this.canvas, event);
+            var pos_percentage = getMousePositionPercentage(this.canvas, event)
             var pos_canonical = getMousePositionCanonical(this.canvas, event);
-            this.camera.UpdateMouseMove(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
-            var pos = getMousePositionPercentage(this.side_canvas, event)
+            this.camera.UpdateMouseMove(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, false);
+            this.camera.SetLastMousePosition(pos);
+
+            var pos = getMousePosition(this.side_canvas, event);
+            var pos_percentage = getMousePositionPercentage(this.side_canvas, event)
             var pos_canonical = getMousePositionCanonical(this.side_canvas, event);
-            this.side_camera.UpdateMouseMove(pos.x, pos.y, pos_canonical.x, pos_canonical.y, false);
+            this.side_camera.UpdateMouseMove(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, false);
+            this.side_camera.SetLastMousePosition(pos);
         });
     }
 
@@ -7347,28 +7382,8 @@ class MouseManager {
 
     onMouseWheel(event, canvas, camera, other_camera){
         var slow = false;
-        var pos = getMousePosition(canvas, event)
+        var pos = getMousePosition(canvas, event);
         camera.move_forward_backward_wheel(event.deltaY, pos.x, pos.y, slow);
-        /*
-        switch (event.which) {
-            case 1:
-                var shift_pressed = event.getModifierState("Shift");
-                var ctrl_pressed = event.getModifierState("Control");
-                var pos = getMousePositionPercentage(canvas, event)
-                var pos_canonical = getMousePositionCanonical(canvas, event);
-                //console.log("down", "x: " + pos.x, "y: " + pos.y);
-                camera.StartPanning(pos.x, pos.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
-                this.active_camera = camera;
-                other_camera.other_camera_is_panning = true;
-                break;
-            case 2:
-                //Middle Mouse button
-                break;
-            case 3:
-                //Right Mouse button
-                break;
-        }    
-        */
     }
 
     /**
