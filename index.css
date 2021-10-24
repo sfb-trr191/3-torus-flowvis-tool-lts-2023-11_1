@@ -87,6 +87,10 @@ input {
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
     gap: 0px;  
+    overflow-y: hidden;
+}
+
+.multi_tab {
     overflow-y: scroll;
 }
 
