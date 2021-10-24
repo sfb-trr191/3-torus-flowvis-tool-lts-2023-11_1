@@ -1392,10 +1392,15 @@ class Camera {
     SetOrientation_Yneg_Zpos_Xpos() {
         if(!this.allow_panning)
             return;
+        var focus_point = this.CalculateFocusPoint();
+
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(1, epsilon, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
         glMatrix.vec3.negate(this.up, up_negated);
+
+        if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
+            this.position = this.CalculatePositionFromFocus(focus_point);
         this.changed = true;
     }
     
@@ -1403,10 +1408,15 @@ class Camera {
     SetOrientation_Ypos_Zpos_Xneg() {
         if(!this.allow_panning)
             return;
+        var focus_point = this.CalculateFocusPoint();
+
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(-1, epsilon, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
         glMatrix.vec3.negate(this.up, up_negated);
+
+        if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
+            this.position = this.CalculatePositionFromFocus(focus_point);
         this.changed = true;
     }
     
@@ -1414,10 +1424,15 @@ class Camera {
     SetOrientation_Xpos_Zpos_Ypos() {
         if(!this.allow_panning)
             return;
+        var focus_point = this.CalculateFocusPoint();
+
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
         glMatrix.vec3.negate(this.up, up_negated);
+
+        if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
+            this.position = this.CalculatePositionFromFocus(focus_point);
         this.changed = true;
     }
 
@@ -1425,10 +1440,15 @@ class Camera {
     SetOrientation_Xneg_Zpos_Yneg() {
         if(!this.allow_panning)
             return;
+        var focus_point = this.CalculateFocusPoint();
+
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, -1, epsilon);
         var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
         glMatrix.vec3.negate(this.up, up_negated);
+
+        if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
+            this.position = this.CalculatePositionFromFocus(focus_point);
         this.changed = true;
     }
 
@@ -1436,10 +1456,15 @@ class Camera {
     SetOrientation_Xneg_Ypos_Zpos() {
         if(!this.allow_panning)
             return;
+        var focus_point = this.CalculateFocusPoint();
+
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
         var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
         glMatrix.vec3.negate(this.up, up_negated);
+
+        if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
+            this.position = this.CalculatePositionFromFocus(focus_point);
         this.changed = true;
     }
 
@@ -1447,11 +1472,32 @@ class Camera {
     SetOrientation_Xpos_Ypos_Zneg() {
         if(!this.allow_panning)
             return;
+        var focus_point = this.CalculateFocusPoint();
+
         var epsilon = 0.000001;
         this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, -1);
         var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
         glMatrix.vec3.negate(this.up, up_negated);
+
+        if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
+            this.position = this.CalculatePositionFromFocus(focus_point);
         this.changed = true;
+    }
+
+    CalculateFocusPoint(){
+        var forward_scaled = glMatrix.vec3.create();
+        var focus_point = glMatrix.vec3.create();
+        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec3.add(focus_point, this.position, forward_scaled);
+        return focus_point;
+    }
+
+    CalculatePositionFromFocus(focus_point){
+        var forward_scaled = glMatrix.vec3.create();
+        var position = glMatrix.vec3.create();
+        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec3.subtract(position, focus_point, forward_scaled);
+        return position;
     }
 
     //set camera focus to (0.5, 0.5, 0.5)
