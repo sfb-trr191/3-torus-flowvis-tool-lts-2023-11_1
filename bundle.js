@@ -3953,7 +3953,7 @@ exports.Export = function(input_parameter_wrapper) {
 
     zip.file("latex/latex_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
     zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
-    zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name));
+    zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name_right));
     zip.file("html/html_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
     zip.file("html/html_embedded_left.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded_left"));
     zip.file("html/html_embedded_right.txt", GenerateExportString_HTML(url_embedded_r, "iframe_reeb_vector_fields_embedded_right"));
@@ -3964,7 +3964,7 @@ exports.Export = function(input_parameter_wrapper) {
     main_canvas.toBlob(function (blob) {
         zip.file(file_name+".png", blob);
         side_canvas.toBlob(function (blob) {
-            zip.file(file_name+"2.png", blob);
+            zip.file(file_name_right+".png", blob);
             zip.generateAsync({ type: "blob" })
                 .then(function (content) {
                     FileSaver.saveAs(content, "RVF-exported.zip");
