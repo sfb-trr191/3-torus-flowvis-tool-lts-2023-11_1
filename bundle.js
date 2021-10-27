@@ -3940,26 +3940,30 @@ exports.Export = function(input_parameter_wrapper) {
 
     
     var query_string = input_parameter_wrapper.toQueryString();
+
+    //direct loading for latex
     var url_without_query = window.location.toString().replace(window.location.search, "");
+    var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
+    var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
+    var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
+    zip.file("latex/latex_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
+    zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
+    zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name_right));
+    zip.file("url/direct/url_default.txt", url_default);
+    zip.file("url/direct/url_embedded_left.txt", url_embedded);
+    zip.file("url/direct/url_embedded_right.txt", url_embedded_r);
+
+    //lazy loading for html
     url_without_query = url_without_query.replace("index", "lazy");
     var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
     var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
     var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
-    //console.log("query_string: ", query_string);
-    //console.log("window.location.href: ", window.location.href);
-    //console.log("url_without_query: ", url_without_query);
-    //console.log("url_default: ", url_default);
-    //console.log("url_embedded: ", url_embedded);
-
-    zip.file("latex/latex_default.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
-    zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
-    zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name_right));
     zip.file("html/html_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
     zip.file("html/html_embedded_left.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded_left"));
     zip.file("html/html_embedded_right.txt", GenerateExportString_HTML(url_embedded_r, "iframe_reeb_vector_fields_embedded_right"));
-    zip.file("url/url_default.txt", url_default);
-    zip.file("url/url_embedded_left.txt", url_embedded);
-    zip.file("url/url_embedded_right.txt", url_embedded_r);
+    zip.file("url/lazy/url_default.txt", url_default);
+    zip.file("url/lazy/url_embedded_left.txt", url_embedded);
+    zip.file("url/lazy/url_embedded_right.txt", url_embedded_r);
 
     main_canvas.toBlob(function (blob) {
         zip.file(file_name+".png", blob);
