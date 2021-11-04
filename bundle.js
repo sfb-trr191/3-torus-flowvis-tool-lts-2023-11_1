@@ -5099,6 +5099,15 @@ const Export = module_export.Export;
         //message_display = document.getElementById("message_display");
         //message_display.innerHTML = "step 1: initializing...";
         setTimeout(on_start_step_1, 200);
+
+        var url_without_query = window.location.toString().replace(window.location.search, "");
+        if(url_without_query.includes("localhost")){
+            document.title = "[LOCAL] 3-Torus FlowVis Tool";
+        }
+        else if(url_without_query.includes("christian-lang")){
+            document.title = "[DEV] 3-Torus FlowVis Tool";
+        }
+        console.log("url_without_query", url_without_query);
     }
 
     function on_start_step_1(){
