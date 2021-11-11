@@ -17,10 +17,10 @@ exports.Export = function(input_parameter_wrapper) {
     var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
     var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
     var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
-    zip.file("latex/latex_default_left.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
-    zip.file("latex/latex_default_right.txt", GenerateExportString_Latex(url_default, dir_name+file_name_right));
-    zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
-    zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name_right));
+    zip.file("latex/latex_left.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
+    zip.file("latex/latex_right.txt", GenerateExportString_Latex(url_default, dir_name+file_name_right));
+    //zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
+    //zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name_right));
     zip.file("url/direct/url_default.txt", url_default);
     zip.file("url/direct/url_embedded_left.txt", url_embedded);
     zip.file("url/direct/url_embedded_right.txt", url_embedded_r);
