@@ -6233,25 +6233,25 @@ exports.Export = function(input_parameter_wrapper) {
     var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
     var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
     var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
-    zip.file("latex/latex_left.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
-    zip.file("latex/latex_right.txt", GenerateExportString_Latex(url_default, dir_name+file_name_right));
+    zip.file("latex/latex_main.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
+    zip.file("latex/latex_aux.txt", GenerateExportString_Latex(url_default, dir_name+file_name_right));
     //zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
     //zip.file("latex/latex_embedded_right.txt", GenerateExportString_Latex(url_embedded_r, dir_name+file_name_right));
     zip.file("url/direct/url_default.txt", url_default);
-    zip.file("url/direct/url_embedded_left.txt", url_embedded);
-    zip.file("url/direct/url_embedded_right.txt", url_embedded_r);
+    zip.file("url/direct/url_embedded_main.txt", url_embedded);
+    zip.file("url/direct/url_embedded_aux.txt", url_embedded_r);
 
     //lazy loading for html
     url_without_query = url_without_query.replace("index", "lazy");
     var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
     var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
     var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
-    zip.file("html/html_default.txt", GenerateExportString_HTML(url_default, "iframe_reeb_vector_fields_default"));
-    zip.file("html/html_embedded_left.txt", GenerateExportString_HTML(url_embedded, "iframe_reeb_vector_fields_embedded_left"));
-    zip.file("html/html_embedded_right.txt", GenerateExportString_HTML(url_embedded_r, "iframe_reeb_vector_fields_embedded_right"));
+    zip.file("html/html_default.txt", GenerateExportString_HTML(url_default, "iframe_3_torus_flowvis_tool_default"));
+    zip.file("html/html_embedded_main.txt", GenerateExportString_HTML(url_embedded, "iframe_3_torus_flowvis_tool_embedded_main"));
+    zip.file("html/html_embedded_aux.txt", GenerateExportString_HTML(url_embedded_r, "iframe_3_torus_flowvis_tool_embedded_aux"));
     zip.file("url/lazy/url_default.txt", url_default);
-    zip.file("url/lazy/url_embedded_left.txt", url_embedded);
-    zip.file("url/lazy/url_embedded_right.txt", url_embedded_r);
+    zip.file("url/lazy/url_embedded_main.txt", url_embedded);
+    zip.file("url/lazy/url_embedded_aux.txt", url_embedded_r);
 
     main_canvas.toBlob(function (blob) {
         zip.file(file_name+".png", blob);

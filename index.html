@@ -64,9 +64,9 @@
                 <div class="container">
                     <button type="button" id="button_update_camera" title="Update cameras from input fields"></button>
                     <button type="button" class="camera_unselected" id="button_select_camera_left"
-                        title="Select left camera"></button>
+                        title="Select main camera"></button>
                     <button type="button" class="camera_unselected" id="button_select_camera_right"
-                        title="Select right camera"></button>
+                        title="Select auxiliary camera"></button>
                     <button type="button" id="button_camera_Yneg_Zpos_Xpos" title="Set the orientation of the selected camera to:
     - right: y-
     - up: z+
@@ -102,7 +102,7 @@
             </fieldset>
             <div class="container" id="container_bottom_left">
                 <fieldset class="fieldset_camera">
-                    <legend>Left Camera</legend>
+                    <legend>Main Camera</legend>
                     <div class="grid_container">
                         <label>position</label>
                         <div id="div_input_camera_position" class="horizontal_div_3">
@@ -140,7 +140,7 @@
                     </div>
                 </fieldset>
                 <fieldset class="fieldset_camera">
-                    <legend>Right Camera</legend>
+                    <legend>Auxiliary Camera</legend>
                     <div class="grid_container">
                         <label>position</label>
                         <div id="div_input_side_camera_position" class="horizontal_div_3">
@@ -925,16 +925,16 @@ Sensitivity when using the mouse wheel to move forward / backward.">
                         <fieldset class="fieldset_camera">
                             <legend>Export</legend>
                             <div class="grid_container">
-                                <label>thumbnail URL L</label>
+                                <label>thumbnail URL main</label>
                                 <input id="input_thumbnail" type="text" value="">
-                                <label>thumbnail URL R</label>
+                                <label>thumbnail URL aux.</label>
                                 <input id="input_thumbnail_right" type="text" value="">
                                 <label>latex thumbnail dir</label>
                                 <input id="input_thumbnail_directory" type="text" value="images/">
-                                <label>latex thumbnail file L</label>
-                                <input id="input_thumbnail_name" type="text" value="thumbnail_l">
-                                <label>latex thumbnail file R</label>
-                                <input id="input_thumbnail_name_right" type="text" value="thumbnail_r">
+                                <label>latex thumbnail file main</label>
+                                <input id="input_thumbnail_name" type="text" value="thumbnail_main">
+                                <label>latex thumbnail file aux.</label>
+                                <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">
                                 <label>selected tab</label>
                                 <select id="select_tab">
                                     <option value="tab_data">data</option>
