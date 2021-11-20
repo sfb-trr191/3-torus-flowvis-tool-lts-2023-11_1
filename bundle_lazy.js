@@ -107,6 +107,12 @@ global.CAMERA_CONTROL_TRACKBALL = 1;
 global.CAMERA_CONTROL_TRACKBALL2 = 3;
 global.CAMERA_CONTROL_TRACKBALL3 = 4;
 global.CAMERA_CONTROL_ROTATE_AROUND_CAMERA = 2;
+
+global.TYPE_UNDEFINED = "UNDEFINED";
+global.TYPE_UINT8 = "UI8";
+global.TYPE_UINT16 = "UI16";
+global.TYPE_UINT32 = "UI32";
+global.TYPE_FLOAT32 = "F32";
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){
 const module_const = require("./const");

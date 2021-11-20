@@ -1,5 +1,6 @@
 //########## GLOBALS ##########
 const module_const = require("./const");
+const module_version = require("./version");
 const f_shader_average = require("./shader/f_shader_average.glsl");
 const f_shader_compute_flow_map_slice = require("./shader/f_shader_compute_flow_map_slice.glsl");
 const f_shader_compute_flowmap_finite_differences = require("./shader/f_shader_compute_flowmap_finite_differences.glsl");
@@ -58,6 +59,9 @@ const setCSS = module_utility.setCSS;
 const lerp = module_utility.lerp;
 const module_export = require("./export");
 const Export = module_export.Export;
+const module_data_conversion = require("./data_conversion");
+const conversionTest = module_data_conversion.conversionTest;
+const StateManager = require("./state_manager");
 
 ; (function () {
     "use strict"
@@ -116,11 +120,19 @@ const Export = module_export.Export;
     var current_fps = 0;
 
     var tab_manager;
+    var state_manager;
     var sheduled_task = TASK_CALCULATE_STREAMLINES;
     var fence_sync = null;//used to check if rendering completed
 
     function onStart(evt) {
         console.log("onStart");
+       
+        var base64 = conversionTest();
+        state_manager = new StateManager();
+        state_manager.generateStateBase64(STATE_VERSION);
+        state_manager.executeStateBase64();
+        return;
+
         window.removeEventListener(evt.type, onStart, false);        
         document.getElementById("wrapper_dialog_javascript").className = "hidden";   
         //document.getElementById("wrapper_transparent_overlay").className = "hidden";    
