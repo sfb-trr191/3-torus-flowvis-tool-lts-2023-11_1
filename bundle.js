@@ -6291,7 +6291,7 @@ exports.Export = function(input_parameter_wrapper) {
     var file_name_right = document.getElementById("input_thumbnail_name_right").value;
 
     
-    var query_string = input_parameter_wrapper.toQueryString();
+    var query_string = input_parameter_wrapper.toQueryString(true);
 
     //direct loading for latex
     var url_without_query = window.location.toString().replace(window.location.search, "");
@@ -7453,9 +7453,9 @@ const StateManager = require("./state_manager");
        
         var base64 = conversionTest();
         state_manager = new StateManager();
-        state_manager.generateStateBase64(STATE_VERSION);
-        state_manager.executeStateBase64();
-        return;
+        //state_manager.generateStateBase64(STATE_VERSION);
+        //state_manager.executeStateBase64Url();
+        //return;
 
         window.removeEventListener(evt.type, onStart, false);        
         document.getElementById("wrapper_dialog_javascript").className = "hidden";   
@@ -7618,7 +7618,7 @@ const StateManager = require("./state_manager");
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
         onChangedDrawMode();
         onChangedCameraControl();
@@ -8274,7 +8274,7 @@ const StateManager = require("./state_manager");
         console.log("UpdateURL");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
-        var query_string = input_parameter_wrapper.toQueryString();
+        var query_string = input_parameter_wrapper.toQueryString(true);
         window.history.pushState(null, null, 'index.html' + query_string);
     }
 
@@ -8892,12 +8892,13 @@ class InputWrapper {
 
 class InputParameterWrapper {
 
-    constructor(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager) {
+    constructor(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager) {
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
         this.side_camera = side_camera;
         this.transfer_function_manager = transfer_function_manager;
         this.tab_manager = tab_manager;
+        this.state_manager = state_manager;
         this.dict_url_parameter_name_to_input_wrapper = {};
         this.dict_input_element_name_to_input_wrapper = {};
 
@@ -9006,14 +9007,29 @@ class InputParameterWrapper {
     fromURL() {
         console.log("fromURL:", window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
-        for (var key in this.dict_url_parameter_name_to_input_wrapper) {
-            var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
-            const value = urlParams.get(input_wrapper.url_parameter_name);
-            console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
-            if (value === null)
-                continue;
-            input_wrapper.setValue(value);
+
+        const complete = urlParams.has("c") || window.location.search.length < 1;
+        if(!complete){
+            window.alert("Error: Incomplete URL.\nIf you clicked on a link in a PDF, try using a different PDF viewer.");
         }
+
+        var use_data_array = urlParams.has("data");
+        if(use_data_array){
+            const data = urlParams.get("data");
+            this.state_manager.base64_url = data;
+            this.state_manager.executeStateBase64Url();
+        }
+        else{
+            for (var key in this.dict_url_parameter_name_to_input_wrapper) {
+                var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
+                const value = urlParams.get(input_wrapper.url_parameter_name);
+                console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
+                if (value === null)
+                    continue;
+                input_wrapper.setValue(value);
+            }
+        }
+
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
 
@@ -9072,22 +9088,28 @@ class InputParameterWrapper {
         this.tab_manager.selectTab("tab_group_main", tab);
     }
 
-    toQueryString() {
+    toQueryString(use_data_array) {
         console.log("toURL");
         var params = {};
-        for (var key in this.dict_url_parameter_name_to_input_wrapper) {
-            var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
-            console.log("key:", key);
-            const value = input_wrapper.getValue();
-            console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
-            if (value === null)
-                continue;
-            params[input_wrapper.url_parameter_name] = value;
+        if(use_data_array){
+            this.state_manager.generateStateBase64(STATE_VERSION);
+            params["data"] = this.state_manager.base64_url;
         }
-        params[PARAM_SEEDS] = this.ui_seeds.toString();
-        params[PARAM_CAMERA] = this.main_camera.toString();
-        params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
-        params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+        else{
+            for (var key in this.dict_url_parameter_name_to_input_wrapper) {
+                var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
+                console.log("key:", key);
+                const value = input_wrapper.getValue();
+                console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
+                if (value === null)
+                    continue;
+                params[input_wrapper.url_parameter_name] = value;
+            }
+            params[PARAM_SEEDS] = this.ui_seeds.toString();
+            params[PARAM_CAMERA] = this.main_camera.toString();
+            params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
+            params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+        }
         /*
         params["text"] = `
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu neque efficitur augue malesuada tristique. Mauris aliquam bibendum risus quis vestibulum. Sed dictum dignissim libero, commodo faucibus ex. Aenean lobortis in justo eget rutrum. Suspendisse maximus felis massa, non ornare risus rhoncus non. Quisque congue ex nulla, mollis tincidunt arcu auctor vitae. Mauris orci diam, suscipit sed commodo ac, eleifend et urna. Nullam dapibus urna eros, in euismod nibh iaculis accumsan. Proin ut ipsum at dolor tempus maximus a non diam. Vivamus leo nisi, rhoncus vitae dignissim a, scelerisque at ex. Quisque ipsum nulla, posuere at tempor quis, molestie vitae risus. Morbi ut metus non ex malesuada porta. Donec varius eros purus. Aliquam vehicula libero ac arcu venenatis vestibulum. Integer justo arcu, imperdiet id turpis ut, tincidunt ultrices mi.
@@ -9103,7 +9125,7 @@ class InputParameterWrapper {
         */
         var query_string = "?" + Object.entries(params)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&')
+            .join('&') + "&c=1"
 
         console.log("query_string:", query_string);
         return query_string;
@@ -121011,25 +121033,9 @@ class StateData {
         this.clear();
     }
 
-    /*
-    generateHeader(state_version, version_year, version_month, version_number){
-        console.log("StateData: generateHeader");
-        console.log("state_version:", state_version);
-        console.log("version_year:", version_year);
-        console.log("version_month:", version_month);
-        console.log("version_number:", version_number);
-        var header = new Uint16Array(4);
-        header[0] = state_version;
-        header[1] = version_year;
-        header[2] = version_month;
-        header[3] = version_number;
-        this.data_uint8 = new Uint8Array(0);
-    }
-    */
-
     clear(){        
         this.data_base64 = "";
-        this.data_uint8 = new Uint8Array(42);//array that holds the entire state data
+        this.data_uint8 = new Uint8Array(128);//array that holds the entire state data
         this.pointer = 0;//current pointer position used to write into the data_uint8 array
     }
 
@@ -121037,9 +121043,9 @@ class StateData {
         this.pointer = 0;//reset pointer to start reading or writing
     }
 
-    generateBase64(){
+    generateBase64FromUint8(){
         this.data_base64 = Buffer.from(this.data_uint8).toString('base64');
-        console.log("generateBase64:", this.data_base64);
+        console.log("generateBase64FromUint8:", this.data_base64);
     }
 
     generateDataUint8FromBase64(){
@@ -121047,8 +121053,25 @@ class StateData {
         console.log("generateDataUint8FromBase64:", this.data_uint8);
     }
 
+    generateBase64URLFromBase64(){
+        this.data_base64_url = this.data_base64.replaceAll("+", "-");
+        this.data_base64_url = this.data_base64_url.replaceAll("/", "_");
+        this.data_base64_url = this.data_base64_url.replaceAll("=", "~");   
+        console.log("generateBase64URLFromBase64:", this.data_base64_url);     
+    }
+
+    generateBase64FromBase64URL(){
+        this.data_base64 = this.data_base64_url.replaceAll("-", "+");
+        this.data_base64 = this.data_base64.replaceAll("_", "/");
+        this.data_base64 = this.data_base64.replaceAll("~", "=");       
+        console.log("generateBase64FromBase64URL:", this.data_base64);     
+    }
+
     writeValue(value, data_type){
         switch (data_type) {
+            case "UI8":
+                this.writeUint8(value);
+                break;
             case "UI16":
                 this.writeUint16(value);
                 break;
@@ -121061,24 +121084,44 @@ class StateData {
         }
     }
 
+    checkArraySpace(bytes_to_insert){
+        if(this.pointer + bytes_to_insert <= this.data_uint8.byteLength)
+            return;
+        var new_array = new Uint8Array(2 * this.data_uint8.byteLength);
+        new_array.set(this.data_uint8);
+        this.data_uint8 = new_array;
+    }
+
+    /**
+     * Sets a Uint16 value at the current pointer position and incements the pointer by 2
+     * @param {*} value 
+     */
+    writeUint8(value){
+        this.checkArraySpace(1);
+        this.data_uint8[this.pointer] = value;
+        this.pointer += 1;
+        console.log("writeUint8:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
+    }
+
     /**
      * Sets a Uint16 value at the current pointer position and incements the pointer by 2
      * @param {*} value 
      */
     writeUint16(value){
+        this.checkArraySpace(2);
         //convert value to uint8 array
-        console.log("writeUint16:", value);
         var data_16 = new Uint16Array(1);
         data_16[0] = value;
-        console.log("data_16:", data_16);
+        //console.log("data_16:", data_16);
         var data_8 = new Uint8Array(data_16.buffer, data_16.byteOffset, data_16.byteLength);
-        console.log("data_8:", data_8);
+        //console.log("data_8:", data_8);
 
         //set copy converted uint8 values
         this.data_uint8[this.pointer] = data_8[0];
         this.data_uint8[this.pointer+1] = data_8[1];
         this.pointer += 2;
-        console.log("data_uint8:", this.data_uint8);
+        //console.log("data_uint8:", this.data_uint8);
+        console.log("writeUint16:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
     /**
@@ -121086,13 +121129,14 @@ class StateData {
      * @param {*} value 
      */
     writeFloat32(value){
+        this.checkArraySpace(4);
         //convert value to uint8 array
-        console.log("writeFloat32:", value);
+        //console.log("writeFloat32:", value);
         var data_32 = new Float32Array(1);
         data_32[0] = value;
-        console.log("data_32:", data_32);
+        //console.log("data_32:", data_32);
         var data_8 = new Uint8Array(data_32.buffer, data_32.byteOffset, data_32.byteLength);
-        console.log("data_8:", data_8);
+        //console.log("data_8:", data_8);
 
         //set copy converted uint8 values
         this.data_uint8[this.pointer] = data_8[0];
@@ -121100,11 +121144,14 @@ class StateData {
         this.data_uint8[this.pointer+2] = data_8[2];
         this.data_uint8[this.pointer+3] = data_8[3];
         this.pointer += 4;
-        console.log("data_uint8:", this.data_uint8);
+        //console.log("data_uint8:", this.data_uint8);
+        console.log("writeFloat32:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
     readValue(data_type){
         switch (data_type) {
+            case "UI8":
+                return this.readUint8();
             case "UI16":
                 return this.readUint16();
             case "F32":
@@ -121113,6 +121160,14 @@ class StateData {
                 console.log("ERROR UNKNOWN data_type");
                 return undefined;
         }
+    }
+
+    readUint8(){  
+        //copy uint8 data values into temporary array
+        var value = this.data_uint8[this.pointer]
+        this.pointer += 1;
+        console.log("readUint8:", value);
+        return value;
     }
 
     readUint16(){  
@@ -121157,8 +121212,98 @@ const Entry = require("./state_description");
 
 exports.addEntries_1 = function (list) {    
     console.log("addEntries_1");
+
+    //top right select
+    list.push(new Entry("select_side_mode", "field", "UI8"));
+    list.push(new Entry("select_projection_index", "field", "UI8"));
+    list.push(new Entry("select_slice_axes_order", "field", "UI8"));
+    list.push(new Entry("select_side_canvas_streamline_method", "field", "UI8"));
+    list.push(new Entry("select_side_canvas_streamline_method_projection", "field", "UI8"));
+
+    //data
+    //data - equations
+    //new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);                   <-- TODO
+    //new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);                   <-- TODO
+    //new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);                   <-- TODO
+    //data - parameters  
+    list.push(new Entry("select_data_paramaters_mode", "field", "UI8"));
+    list.push(new Entry("select_streamline_calculation_method", "field", "UI8"));
+    list.push(new Entry("select_streamline_calculation_direction", "field", "UI8"));
     list.push(new Entry("input_num_points_per_streamline", "field", "F32"));
+    list.push(new Entry("input_step_size", "field", "F32"));
+    list.push(new Entry("segment_duplicator_iterations", "field", "F32"));
+    list.push(new Entry("input_tube_radius_fundamental", "field", "F32"));
+    list.push(new Entry("input_max_radius_factor_highlight", "field", "F32"));
+    //FTLE data
+    //FTLE data - slice
+    //TODO SLICE INDEX
+    list.push(new Entry("checkbox_animate_slice_index", "checkbox", "UI8"));
+    list.push(new Entry("checkbox_ftle_slice_interpolate", "checkbox", "UI8"));
+    list.push(new Entry("select_slice_mode", "field", "UI8"));
+    //FTLE data - resolution
+    list.push(new Entry("input_ftle_dim_x", "field", "UI16"));
+    list.push(new Entry("input_ftle_dim_y", "field", "UI16"));
+    list.push(new Entry("input_ftle_dim_z", "field", "UI16"));
+    //FTLE data - parameters
+    list.push(new Entry("input_ftle_advection_time", "field", "F32"));
+    list.push(new Entry("input_ftle_step_size", "field", "F32"));  
+    //settings
+    //settings - general
+    list.push(new Entry("select_settings_mode", "field", "UI8"));
+    list.push(new Entry("input_max_ray_distance", "field", "F32"));  
+    list.push(new Entry("input_tube_radius_factor", "field", "F32"));  
+    //settings - projection
+    list.push(new Entry("input_tube_radius_factor_projection", "field", "F32"));  
+    list.push(new Entry("input_tube_radius_factor_projection_highlight", "field", "F32"));  
+    //settings - streamline shading
+    list.push(new Entry("checkbox_show_streamlines_main", "checkbox", "UI8"));
+    list.push(new Entry("select_shading_mode_streamlines", "field", "UI8"));
+    //new InputWrapper(this, "input_formula_scalar", "fs");                                             <-- TODO
+    list.push(new Entry("input_min_scalar", "field", "F32"));  
+    list.push(new Entry("input_max_scalar", "field", "F32"));  
+    //settings - fog
+    list.push(new Entry("select_fog_type", "field", "UI8"));
+    list.push(new Entry("input_fog_density", "field", "F32"));  
+    //settings - axes   
+    list.push(new Entry("checkbox_show_movable_axes_main", "checkbox", "UI8"));
+    list.push(new Entry("checkbox_show_movable_axes_side", "checkbox", "UI8"));
+    list.push(new Entry("checkbox_show_bounding_axes_main", "checkbox", "UI8"));
+    list.push(new Entry("checkbox_show_bounding_axes_side", "checkbox", "UI8"));
+    list.push(new Entry("checkbox_show_bounding_axes_projection_side", "checkbox", "UI8"));
+    list.push(new Entry("input_cube_axes_length_main", "field", "F32"));  
+    list.push(new Entry("input_cube_axes_length_side", "field", "F32"));  
+    list.push(new Entry("input_cube_axes_radius_main", "field", "F32"));  
+    list.push(new Entry("input_cube_axes_radius_side", "field", "F32"));  
+    list.push(new Entry("checkbox_show_origin_axes_side", "checkbox", "UI8"));
+    list.push(new Entry("input_cube_axes_origin_length_side", "field", "F32"));  
+    list.push(new Entry("input_cube_axes_origin_radius_side", "field", "F32"));  
+    //settings - volume rendering
+    list.push(new Entry("select_show_volume_main", "field", "UI8"));
+    list.push(new Entry("select_show_volume_side", "field", "UI8"));
+    list.push(new Entry("input_volume_rendering_max_distance", "field", "F32"));  
+    list.push(new Entry("input_volume_rendering_distance_between_points", "field", "F32"));  
+    list.push(new Entry("input_volume_rendering_termination_opacity", "field", "F32")); 
+    //settings - quality        
+    list.push(new Entry("input_still_resolution_factor", "field", "F32"));  
+    list.push(new Entry("input_panning_resolution_factor", "field", "F32"));  
+    list.push(new Entry("select_lod_still", "field", "UI8"));
+    list.push(new Entry("select_lod_panning", "field", "UI8"));
+    //settings - cameras
+    list.push(new Entry("select_camera_control_3d_left", "field", "UI8"));
+    list.push(new Entry("select_camera_control_3d_right", "field", "UI8"));
+    //settings - trackball
+    list.push(new Entry("input_trackball_rotation_sensitivity", "field", "F32"));  
+    list.push(new Entry("input_trackball_translation_sensitivity", "field", "F32"));  
+    list.push(new Entry("input_trackball_wheel_sensitivity", "field", "F32"));  
+    list.push(new Entry("input_trackball_focus_distance_left", "field", "F32"));  
+    list.push(new Entry("input_trackball_focus_distance_right", "field", "F32"));  
+    //transfer function
+    list.push(new Entry("select_transfer_function_id", "field", "UI8"));
+    list.push(new Entry("select_transfer_function_index_scalar", "field", "UI8"));
+    list.push(new Entry("select_transfer_function_index_ftle_forward", "field", "UI8"));
+    list.push(new Entry("select_transfer_function_index_ftle_backward", "field", "UI8"));
 }
+
 },{"./state_description":1033}],1033:[function(require,module,exports){
 class StateDescriptionEntry {
 
@@ -121201,12 +121346,13 @@ class StateManager {
         return list;
     }
 
-    executeStateBase64(){
+    executeStateBase64Url(){
         console.log("StateManager: execute state");
-        console.log("base64:", this.base64);
+        console.log("base64_url:", this.base64_url);
 
         var state_data = new StateData();
-        state_data.data_base64 = this.base64;
+        state_data.data_base64_url = this.base64_url;
+        state_data.generateBase64FromBase64URL();
         state_data.generateDataUint8FromBase64();
 
         var state_version = state_data.readValue("UI16");
@@ -121219,6 +121365,20 @@ class StateManager {
             var data_type = list[i].data_type;
             var value = state_data.readValue(data_type);
             console.log(name, value);
+            switch (list[i].element_type) {
+                case "global":
+                    //do nothing for now
+                    break;
+                case "field":       
+                    window[list[i].name].value = value;
+                    break;
+                case "checkbox":       
+                    window[list[i].name].checked = value;
+                    break;
+                default:
+                    console.log("ERROR UNKNOWN element_type");
+                    break;
+            }
         }
     }
 
@@ -121239,13 +121399,20 @@ class StateManager {
                     var data_type = list[i].data_type;
                     state_data.writeValue(value, data_type);
                     break;
+                case "checkbox":                    
+                    var value = window[list[i].name].checked;
+                    var data_type = list[i].data_type;
+                    state_data.writeValue(value, data_type);
+                    break;
                 default:
                     console.log("ERROR UNKNOWN element_type");
                     break;
             }
         }
-        state_data.generateBase64();
+        state_data.generateBase64FromUint8();
+        state_data.generateBase64URLFromBase64();
         this.base64 = state_data.data_base64;
+        this.base64_url = state_data.data_base64_url;
     }
 }
 

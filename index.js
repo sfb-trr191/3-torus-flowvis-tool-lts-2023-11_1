@@ -129,9 +129,9 @@ const StateManager = require("./state_manager");
        
         var base64 = conversionTest();
         state_manager = new StateManager();
-        state_manager.generateStateBase64(STATE_VERSION);
-        state_manager.executeStateBase64();
-        return;
+        //state_manager.generateStateBase64(STATE_VERSION);
+        //state_manager.executeStateBase64Url();
+        //return;
 
         window.removeEventListener(evt.type, onStart, false);        
         document.getElementById("wrapper_dialog_javascript").className = "hidden";   
@@ -294,7 +294,7 @@ const StateManager = require("./state_manager");
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager);
+        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
         onChangedDrawMode();
         onChangedCameraControl();
@@ -950,7 +950,7 @@ const StateManager = require("./state_manager");
         console.log("UpdateURL");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
-        var query_string = input_parameter_wrapper.toQueryString();
+        var query_string = input_parameter_wrapper.toQueryString(true);
         window.history.pushState(null, null, 'index.html' + query_string);
     }
 

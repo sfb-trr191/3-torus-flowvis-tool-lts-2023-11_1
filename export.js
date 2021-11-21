@@ -10,7 +10,7 @@ exports.Export = function(input_parameter_wrapper) {
     var file_name_right = document.getElementById("input_thumbnail_name_right").value;
 
     
-    var query_string = input_parameter_wrapper.toQueryString();
+    var query_string = input_parameter_wrapper.toQueryString(true);
 
     //direct loading for latex
     var url_without_query = window.location.toString().replace(window.location.search, "");

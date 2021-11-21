@@ -84,12 +84,13 @@ class InputWrapper {
 
 class InputParameterWrapper {
 
-    constructor(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager) {
+    constructor(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager) {
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
         this.side_camera = side_camera;
         this.transfer_function_manager = transfer_function_manager;
         this.tab_manager = tab_manager;
+        this.state_manager = state_manager;
         this.dict_url_parameter_name_to_input_wrapper = {};
         this.dict_input_element_name_to_input_wrapper = {};
 
@@ -198,14 +199,29 @@ class InputParameterWrapper {
     fromURL() {
         console.log("fromURL:", window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
-        for (var key in this.dict_url_parameter_name_to_input_wrapper) {
-            var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
-            const value = urlParams.get(input_wrapper.url_parameter_name);
-            console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
-            if (value === null)
-                continue;
-            input_wrapper.setValue(value);
+
+        const complete = urlParams.has("c") || window.location.search.length < 1;
+        if(!complete){
+            window.alert("Error: Incomplete URL.\nIf you clicked on a link in a PDF, try using a different PDF viewer.");
         }
+
+        var use_data_array = urlParams.has("data");
+        if(use_data_array){
+            const data = urlParams.get("data");
+            this.state_manager.base64_url = data;
+            this.state_manager.executeStateBase64Url();
+        }
+        else{
+            for (var key in this.dict_url_parameter_name_to_input_wrapper) {
+                var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
+                const value = urlParams.get(input_wrapper.url_parameter_name);
+                console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
+                if (value === null)
+                    continue;
+                input_wrapper.setValue(value);
+            }
+        }
+
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
 
@@ -264,22 +280,28 @@ class InputParameterWrapper {
         this.tab_manager.selectTab("tab_group_main", tab);
     }
 
-    toQueryString() {
+    toQueryString(use_data_array) {
         console.log("toURL");
         var params = {};
-        for (var key in this.dict_url_parameter_name_to_input_wrapper) {
-            var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
-            console.log("key:", key);
-            const value = input_wrapper.getValue();
-            console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
-            if (value === null)
-                continue;
-            params[input_wrapper.url_parameter_name] = value;
+        if(use_data_array){
+            this.state_manager.generateStateBase64(STATE_VERSION);
+            params["data"] = this.state_manager.base64_url;
         }
-        params[PARAM_SEEDS] = this.ui_seeds.toString();
-        params[PARAM_CAMERA] = this.main_camera.toString();
-        params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
-        params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+        else{
+            for (var key in this.dict_url_parameter_name_to_input_wrapper) {
+                var input_wrapper = this.dict_url_parameter_name_to_input_wrapper[key];
+                console.log("key:", key);
+                const value = input_wrapper.getValue();
+                console.log("url_parameter_name:", input_wrapper.url_parameter_name, "value:", value);
+                if (value === null)
+                    continue;
+                params[input_wrapper.url_parameter_name] = value;
+            }
+            params[PARAM_SEEDS] = this.ui_seeds.toString();
+            params[PARAM_CAMERA] = this.main_camera.toString();
+            params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
+            params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+        }
         /*
         params["text"] = `
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu neque efficitur augue malesuada tristique. Mauris aliquam bibendum risus quis vestibulum. Sed dictum dignissim libero, commodo faucibus ex. Aenean lobortis in justo eget rutrum. Suspendisse maximus felis massa, non ornare risus rhoncus non. Quisque congue ex nulla, mollis tincidunt arcu auctor vitae. Mauris orci diam, suscipit sed commodo ac, eleifend et urna. Nullam dapibus urna eros, in euismod nibh iaculis accumsan. Proin ut ipsum at dolor tempus maximus a non diam. Vivamus leo nisi, rhoncus vitae dignissim a, scelerisque at ex. Quisque ipsum nulla, posuere at tempor quis, molestie vitae risus. Morbi ut metus non ex malesuada porta. Donec varius eros purus. Aliquam vehicula libero ac arcu venenatis vestibulum. Integer justo arcu, imperdiet id turpis ut, tincidunt ultrices mi.
@@ -295,7 +317,7 @@ class InputParameterWrapper {
         */
         var query_string = "?" + Object.entries(params)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&')
+            .join('&') + "&c=1"
 
         console.log("query_string:", query_string);
         return query_string;

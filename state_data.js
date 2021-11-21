@@ -5,25 +5,9 @@ class StateData {
         this.clear();
     }
 
-    /*
-    generateHeader(state_version, version_year, version_month, version_number){
-        console.log("StateData: generateHeader");
-        console.log("state_version:", state_version);
-        console.log("version_year:", version_year);
-        console.log("version_month:", version_month);
-        console.log("version_number:", version_number);
-        var header = new Uint16Array(4);
-        header[0] = state_version;
-        header[1] = version_year;
-        header[2] = version_month;
-        header[3] = version_number;
-        this.data_uint8 = new Uint8Array(0);
-    }
-    */
-
     clear(){        
         this.data_base64 = "";
-        this.data_uint8 = new Uint8Array(42);//array that holds the entire state data
+        this.data_uint8 = new Uint8Array(128);//array that holds the entire state data
         this.pointer = 0;//current pointer position used to write into the data_uint8 array
     }
 
@@ -31,9 +15,9 @@ class StateData {
         this.pointer = 0;//reset pointer to start reading or writing
     }
 
-    generateBase64(){
+    generateBase64FromUint8(){
         this.data_base64 = Buffer.from(this.data_uint8).toString('base64');
-        console.log("generateBase64:", this.data_base64);
+        console.log("generateBase64FromUint8:", this.data_base64);
     }
 
     generateDataUint8FromBase64(){
@@ -41,8 +25,25 @@ class StateData {
         console.log("generateDataUint8FromBase64:", this.data_uint8);
     }
 
+    generateBase64URLFromBase64(){
+        this.data_base64_url = this.data_base64.replaceAll("+", "-");
+        this.data_base64_url = this.data_base64_url.replaceAll("/", "_");
+        this.data_base64_url = this.data_base64_url.replaceAll("=", "~");   
+        console.log("generateBase64URLFromBase64:", this.data_base64_url);     
+    }
+
+    generateBase64FromBase64URL(){
+        this.data_base64 = this.data_base64_url.replaceAll("-", "+");
+        this.data_base64 = this.data_base64.replaceAll("_", "/");
+        this.data_base64 = this.data_base64.replaceAll("~", "=");       
+        console.log("generateBase64FromBase64URL:", this.data_base64);     
+    }
+
     writeValue(value, data_type){
         switch (data_type) {
+            case "UI8":
+                this.writeUint8(value);
+                break;
             case "UI16":
                 this.writeUint16(value);
                 break;
@@ -55,24 +56,44 @@ class StateData {
         }
     }
 
+    checkArraySpace(bytes_to_insert){
+        if(this.pointer + bytes_to_insert <= this.data_uint8.byteLength)
+            return;
+        var new_array = new Uint8Array(2 * this.data_uint8.byteLength);
+        new_array.set(this.data_uint8);
+        this.data_uint8 = new_array;
+    }
+
+    /**
+     * Sets a Uint16 value at the current pointer position and incements the pointer by 2
+     * @param {*} value 
+     */
+    writeUint8(value){
+        this.checkArraySpace(1);
+        this.data_uint8[this.pointer] = value;
+        this.pointer += 1;
+        console.log("writeUint8:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
+    }
+
     /**
      * Sets a Uint16 value at the current pointer position and incements the pointer by 2
      * @param {*} value 
      */
     writeUint16(value){
+        this.checkArraySpace(2);
         //convert value to uint8 array
-        console.log("writeUint16:", value);
         var data_16 = new Uint16Array(1);
         data_16[0] = value;
-        console.log("data_16:", data_16);
+        //console.log("data_16:", data_16);
         var data_8 = new Uint8Array(data_16.buffer, data_16.byteOffset, data_16.byteLength);
-        console.log("data_8:", data_8);
+        //console.log("data_8:", data_8);
 
         //set copy converted uint8 values
         this.data_uint8[this.pointer] = data_8[0];
         this.data_uint8[this.pointer+1] = data_8[1];
         this.pointer += 2;
-        console.log("data_uint8:", this.data_uint8);
+        //console.log("data_uint8:", this.data_uint8);
+        console.log("writeUint16:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
     /**
@@ -80,13 +101,14 @@ class StateData {
      * @param {*} value 
      */
     writeFloat32(value){
+        this.checkArraySpace(4);
         //convert value to uint8 array
-        console.log("writeFloat32:", value);
+        //console.log("writeFloat32:", value);
         var data_32 = new Float32Array(1);
         data_32[0] = value;
-        console.log("data_32:", data_32);
+        //console.log("data_32:", data_32);
         var data_8 = new Uint8Array(data_32.buffer, data_32.byteOffset, data_32.byteLength);
-        console.log("data_8:", data_8);
+        //console.log("data_8:", data_8);
 
         //set copy converted uint8 values
         this.data_uint8[this.pointer] = data_8[0];
@@ -94,11 +116,14 @@ class StateData {
         this.data_uint8[this.pointer+2] = data_8[2];
         this.data_uint8[this.pointer+3] = data_8[3];
         this.pointer += 4;
-        console.log("data_uint8:", this.data_uint8);
+        //console.log("data_uint8:", this.data_uint8);
+        console.log("writeFloat32:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
     readValue(data_type){
         switch (data_type) {
+            case "UI8":
+                return this.readUint8();
             case "UI16":
                 return this.readUint16();
             case "F32":
@@ -107,6 +132,14 @@ class StateData {
                 console.log("ERROR UNKNOWN data_type");
                 return undefined;
         }
+    }
+
+    readUint8(){  
+        //copy uint8 data values into temporary array
+        var value = this.data_uint8[this.pointer]
+        this.pointer += 1;
+        console.log("readUint8:", value);
+        return value;
     }
 
     readUint16(){  
