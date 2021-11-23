@@ -1,7 +1,7 @@
-class StateData {
+class BinaryArray {
 
     constructor() {
-        console.log("Generate StateData");
+        console.log("Generate BinaryArray");
         this.clear();
     }
 
@@ -219,4 +219,4 @@ class StateData {
     }
 }
 
-module.exports = StateData;
+module.exports = BinaryArray;

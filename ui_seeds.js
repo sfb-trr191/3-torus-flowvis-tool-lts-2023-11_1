@@ -248,7 +248,7 @@ class UISeeds {
     
     toSpecialData(){   
         /*     
-        var binary_data = new BinaryArry();
+        var binary_data = new BinaryArray();
         for (var i = 0; i < this.list.length; i++) {
             
         }

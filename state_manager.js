@@ -2,7 +2,7 @@ const Entry = require("./state_description/state_description");
 const module_version = require("./version");
 const getStateDescriptionDict = module_version.getStateDescriptionDict;
 const getSpecialDescriptionList = module_version.getSpecialDescriptionList;
-const StateData = require("./state_data");
+const BinaryArray = require("./binary_array");
 const { forEach } = require("mathjs");
 
 class StateManager {
@@ -28,7 +28,7 @@ class StateManager {
         console.log("StateManager: execute state");
         console.log("base64_url:", this.base64_url);
 
-        var state_data = new StateData();
+        var state_data = new BinaryArray();
         state_data.data_base64_url = this.base64_url;
         state_data.generateBase64FromBase64URL();
         state_data.generateDataUint8FromBase64();
@@ -73,7 +73,7 @@ class StateManager {
     generateStateBase64(state_version){
         console.log("StateManager: generateStateBase64");
         var list = this.generateListEntriesDefault(state_version);
-        var state_data = new StateData();
+        var state_data = new BinaryArray();
         for(var i=0; i<list.length; i++){
             console.log(i, list[i]);
             switch (list[i].element_type) {
