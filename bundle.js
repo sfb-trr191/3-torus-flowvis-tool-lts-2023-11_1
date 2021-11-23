@@ -121078,6 +121078,9 @@ class StateData {
             case "F32":
                 this.writeFloat32(value);
                 break;
+            case "STR":
+                this.writeStr(value);
+                break;
             default:
                 console.log("ERROR UNKNOWN data_type");
                 break;
@@ -121148,6 +121151,26 @@ class StateData {
         console.log("writeFloat32:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
+    /**
+     * Writes string and 
+     * @param {*} value 
+     */
+    writeStr(value){
+        //write the number of bytes as UI16
+        var buffer = Buffer.from(value, 'utf16le');
+        var byte_length = buffer.length;
+        this.writeUint16(byte_length);
+
+        //write the string data
+        this.checkArraySpace(byte_length);
+        for(var i=0; i<byte_length; i++){
+            this.data_uint8[this.pointer+i] = buffer[i];
+        }
+        this.pointer += byte_length;
+
+        console.log("writeStr:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
+    }
+
     readValue(data_type){
         switch (data_type) {
             case "UI8":
@@ -121156,6 +121179,8 @@ class StateData {
                 return this.readUint16();
             case "F32":
                 return this.readFloat32();
+            case "STR":
+                return this.readStr();
             default:
                 console.log("ERROR UNKNOWN data_type");
                 return undefined;
@@ -121203,6 +121228,22 @@ class StateData {
         console.log("readFloat32:", value);
         return value;
     }
+
+    readStr(){  
+        //read the number of bytes of the string data
+        var byte_length = this.readUint16();
+        //copy uint8 data values into temporary array
+        var data_8 = new Uint8Array(byte_length);
+        for(var i=0; i<byte_length; i++){
+            data_8[i] = this.data_uint8[this.pointer+i];
+        }
+        this.pointer += byte_length;
+        console.log("data_8:", data_8);
+        
+        var value = Buffer.from(data_8).toString('utf16le');
+        console.log("readStr:", value);
+        return value;
+    }
 }
 
 module.exports = StateData;
@@ -121222,9 +121263,9 @@ exports.addEntries_1 = function (list) {
 
     //data
     //data - equations
-    //new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);                   <-- TODO
-    //new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);                   <-- TODO
-    //new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);                   <-- TODO
+    list.push(new Entry("input_field_equation_u", "field", "STR"));
+    list.push(new Entry("input_field_equation_v", "field", "STR"));
+    list.push(new Entry("input_field_equation_w", "field", "STR"));
     //data - parameters  
     list.push(new Entry("select_data_paramaters_mode", "field", "UI8"));
     list.push(new Entry("select_streamline_calculation_method", "field", "UI8"));
@@ -121258,7 +121299,7 @@ exports.addEntries_1 = function (list) {
     //settings - streamline shading
     list.push(new Entry("checkbox_show_streamlines_main", "checkbox", "UI8"));
     list.push(new Entry("select_shading_mode_streamlines", "field", "UI8"));
-    //new InputWrapper(this, "input_formula_scalar", "fs");                                             <-- TODO
+    list.push(new Entry("input_formula_scalar", "field", "STR"));
     list.push(new Entry("input_min_scalar", "field", "F32"));  
     list.push(new Entry("input_max_scalar", "field", "F32"));  
     //settings - fog

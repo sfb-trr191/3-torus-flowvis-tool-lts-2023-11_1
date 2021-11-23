@@ -50,6 +50,9 @@ class StateData {
             case "F32":
                 this.writeFloat32(value);
                 break;
+            case "STR":
+                this.writeStr(value);
+                break;
             default:
                 console.log("ERROR UNKNOWN data_type");
                 break;
@@ -120,6 +123,26 @@ class StateData {
         console.log("writeFloat32:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
+    /**
+     * Writes string and 
+     * @param {*} value 
+     */
+    writeStr(value){
+        //write the number of bytes as UI16
+        var buffer = Buffer.from(value, 'utf16le');
+        var byte_length = buffer.length;
+        this.writeUint16(byte_length);
+
+        //write the string data
+        this.checkArraySpace(byte_length);
+        for(var i=0; i<byte_length; i++){
+            this.data_uint8[this.pointer+i] = buffer[i];
+        }
+        this.pointer += byte_length;
+
+        console.log("writeStr:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
+    }
+
     readValue(data_type){
         switch (data_type) {
             case "UI8":
@@ -128,6 +151,8 @@ class StateData {
                 return this.readUint16();
             case "F32":
                 return this.readFloat32();
+            case "STR":
+                return this.readStr();
             default:
                 console.log("ERROR UNKNOWN data_type");
                 return undefined;
@@ -173,6 +198,22 @@ class StateData {
         var data_32 = new Float32Array(data_8.buffer);
         var value = data_32[0];
         console.log("readFloat32:", value);
+        return value;
+    }
+
+    readStr(){  
+        //read the number of bytes of the string data
+        var byte_length = this.readUint16();
+        //copy uint8 data values into temporary array
+        var data_8 = new Uint8Array(byte_length);
+        for(var i=0; i<byte_length; i++){
+            data_8[i] = this.data_uint8[this.pointer+i];
+        }
+        this.pointer += byte_length;
+        console.log("data_8:", data_8);
+        
+        var value = Buffer.from(data_8).toString('utf16le');
+        console.log("readStr:", value);
         return value;
     }
 }

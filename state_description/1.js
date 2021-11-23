@@ -12,9 +12,9 @@ exports.addEntries_1 = function (list) {
 
     //data
     //data - equations
-    //new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);                   <-- TODO
-    //new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);                   <-- TODO
-    //new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);                   <-- TODO
+    list.push(new Entry("input_field_equation_u", "field", "STR"));
+    list.push(new Entry("input_field_equation_v", "field", "STR"));
+    list.push(new Entry("input_field_equation_w", "field", "STR"));
     //data - parameters  
     list.push(new Entry("select_data_paramaters_mode", "field", "UI8"));
     list.push(new Entry("select_streamline_calculation_method", "field", "UI8"));
@@ -48,7 +48,7 @@ exports.addEntries_1 = function (list) {
     //settings - streamline shading
     list.push(new Entry("checkbox_show_streamlines_main", "checkbox", "UI8"));
     list.push(new Entry("select_shading_mode_streamlines", "field", "UI8"));
-    //new InputWrapper(this, "input_formula_scalar", "fs");                                             <-- TODO
+    list.push(new Entry("input_formula_scalar", "field", "STR"));
     list.push(new Entry("input_min_scalar", "field", "F32"));  
     list.push(new Entry("input_max_scalar", "field", "F32"));  
     //settings - fog
