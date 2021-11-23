@@ -245,6 +245,16 @@ class UISeeds {
         }
     }
     */
+    
+    toSpecialData(){   
+        /*     
+        var binary_data = new BinaryArry();
+        for (var i = 0; i < this.list.length; i++) {
+            
+        }
+        window["special_data_seeds"] = binary_data;
+        */
+    }
 
     toString() {
         var s = "";

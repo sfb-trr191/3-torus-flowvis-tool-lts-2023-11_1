@@ -7,6 +7,7 @@ class StateData {
 
     clear(){        
         this.data_base64 = "";
+        this.data_base64_url = "";
         this.data_uint8 = new Uint8Array(128);//array that holds the entire state data
         this.pointer = 0;//current pointer position used to write into the data_uint8 array
     }

@@ -1,6 +1,7 @@
 const Entry = require("./state_description/state_description");
-const state_description_1 = require("./state_description/1");
-const addEntries_1 = state_description_1.addEntries_1;
+const module_version = require("./version");
+const getStateDescriptionDict = module_version.getStateDescriptionDict;
+const getSpecialDescriptionList = module_version.getSpecialDescriptionList;
 const StateData = require("./state_data");
 const { forEach } = require("mathjs");
 
@@ -10,20 +11,16 @@ class StateManager {
         console.log("Generate StateManager");
     }
 
-    generateListEntries(state_version) {
+    generateListEntriesDefault(state_version) {
+        var state_description_dict = getStateDescriptionDict(state_version);
         var list = [];
         list.push(new Entry("STATE_VERSION", "global", "UI16"));
         list.push(new Entry("VERSION_YEAR", "global", "UI16"));
         list.push(new Entry("VERSION_MONTH", "global", "UI16"));
         list.push(new Entry("VERSION_NUMBER", "global", "UI16"));
-        switch (state_version) {
-            case 1:
-                addEntries_1(list);                
-                break;        
-            default:
-                console.log("ERROR UNKNOWN STATE VERSION");
-                break;
-        }
+        var list_default = state_description_dict["default"];
+        list = list.concat(list_default);
+        console.log(list);
         return list;
     }
 
@@ -38,7 +35,8 @@ class StateManager {
 
         var state_version = state_data.readValue("UI16");
 
-        var list = this.generateListEntries(state_version);
+        var state_description_dict = getStateDescriptionDict(state_version);
+        var list = this.generateListEntriesDefault(state_version);
 
         state_data.begin();
         for(var i=0; i<list.length; i++){
@@ -61,11 +59,20 @@ class StateManager {
                     break;
             }
         }
+
+        /*
+        var list_special = getSpecialDescriptionList(state_version);
+        for(var i=0; i<list_special.length; i++){
+            console.log(i, list_special[i]);
+            console.log(state_description_dict[list_special[i]]);
+        }
+        */
+        //stop_script;
     }
 
     generateStateBase64(state_version){
         console.log("StateManager: generateStateBase64");
-        var list = this.generateListEntries(state_version);
+        var list = this.generateListEntriesDefault(state_version);
         var state_data = new StateData();
         for(var i=0; i<list.length; i++){
             console.log(i, list[i]);
@@ -90,6 +97,15 @@ class StateManager {
                     break;
             }
         }
+
+        var state_description_dict = getStateDescriptionDict(state_version);
+        var list_special = getSpecialDescriptionList(state_version);
+        for(var i=0; i<list_special.length; i++){
+            console.log(i, list_special[i]);
+            console.log(state_description_dict[list_special[i]]);
+        }
+
+
         state_data.generateBase64FromUint8();
         state_data.generateBase64URLFromBase64();
         this.base64 = state_data.data_base64;
