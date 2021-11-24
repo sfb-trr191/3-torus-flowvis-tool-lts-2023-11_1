@@ -3,6 +3,8 @@ const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const BinaryArray = require("./binary_array");
+const getStateDescription = require("./version").getStateDescription;
 
 class UISeed {
     constructor(ui_seeds, index) {
@@ -110,6 +112,24 @@ class UISeed {
         return s;
     }
 
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "seed");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "seed");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
+    }
+
     getColorVector() {
         var hex = this.node_input_c.value;
         console.log("hex: ", hex);
@@ -145,6 +165,72 @@ class UISeed {
                 return true;
         }
         return false;
+    }
+
+    getValueByName(name){
+        switch (name) {
+            case "position_x":
+                return this.node_input_x.value;
+            case "position_y":
+                return this.node_input_y.value;
+            case "position_z":
+                return this.node_input_z.value;
+            case "color":
+                return this.node_input_c.value;
+            case "color_byte_r":        
+                var hex = this.node_input_c.value;
+                return parseInt(hex.substr(1, 2), 16);
+            case "color_byte_g":        
+                var hex = this.node_input_c.value;
+                return parseInt(hex.substr(3, 2), 16);
+            case "color_byte_b":        
+                var hex = this.node_input_c.value;
+                return parseInt(hex.substr(5, 2), 16);
+            default:
+                console.error("ui_seeds: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "position_x":
+                this.node_input_x.value = value;
+                break;
+            case "position_y":
+                this.node_input_y.value = value;
+                break;
+            case "position_z":
+                this.node_input_z.value = value;
+                break;
+            case "color":
+                this.node_input_c.value = value;
+                break;
+            case "color_byte_r":        
+                var hex = this.node_input_c.value;
+                var r = value;
+                var g = parseInt(hex.substr(3, 2), 16);
+                var b = parseInt(hex.substr(5, 2), 16);
+                this.node_input_c.value = rgbToHex(r, g, b);
+                break;
+            case "color_byte_g":        
+                var hex = this.node_input_c.value;
+                var r = parseInt(hex.substr(1, 2), 16);
+                var g = value;
+                var b = parseInt(hex.substr(5, 2), 16);
+                this.node_input_c.value = rgbToHex(r, g, b);
+                break;
+            case "color_byte_b":        
+                var hex = this.node_input_c.value;
+                var r = parseInt(hex.substr(1, 2), 16);
+                var g = parseInt(hex.substr(3, 2), 16);
+                var b = value;
+                this.node_input_c.value = rgbToHex(r, g, b);
+                break;
+            default:
+                console.error("ui_seeds: getValueByName: Unknown name");
+                break;
+        }
     }
 }
 
@@ -246,14 +332,33 @@ class UISeeds {
     }
     */
     
-    toSpecialData(){   
-        /*     
-        var binary_data = new BinaryArray();
+    toSpecialData(){          
+        //getStateDescriptionDict(STATE_VERSION);
+        
+        var binary_array = new BinaryArray();
+        binary_array.writeUint16(this.list.length);
         for (var i = 0; i < this.list.length; i++) {
-            
+            this.list[i].writeToBinaryArray(binary_array);   
         }
-        window["special_data_seeds"] = binary_data;
-        */
+        binary_array.resizeToContent();
+        console.log(binary_array);
+        window["special_data_seeds"] = binary_array;  
+    }
+
+    fromSpecialData() {
+        var binary_array = window["special_data_seeds"];
+        binary_array.begin();
+        var list_length = binary_array.readUint16();
+
+        while (list_length > this.list.length) {
+            this.addSeed();
+        }
+        while (this.list.length > list_length) {
+            this.removeSeed(this.list.length - 1);
+        }
+        for(var i=0; i<list_length; i++){
+            this.list[i].readFromBinaryArray(binary_array);
+        }
     }
 
     toString() {

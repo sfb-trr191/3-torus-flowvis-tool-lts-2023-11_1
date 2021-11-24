@@ -210,6 +210,8 @@ class InputParameterWrapper {
             const data = urlParams.get("data");
             this.state_manager.base64_url = data;
             this.state_manager.executeStateBase64Url();
+
+            this.ui_seeds.fromSpecialData();
         }
         else{
             for (var key in this.dict_url_parameter_name_to_input_wrapper) {
@@ -220,13 +222,15 @@ class InputParameterWrapper {
                     continue;
                 input_wrapper.setValue(value);
             }
+
+            const seeds = urlParams.get(PARAM_SEEDS);
+            this.ui_seeds.fromString(seeds);
         }
 
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
 
-        const seeds = urlParams.get(PARAM_SEEDS);
-        this.ui_seeds.fromString(seeds);
+
 
         const camera = urlParams.get(PARAM_CAMERA);
         this.main_camera.fromString(camera);
@@ -283,7 +287,9 @@ class InputParameterWrapper {
     toQueryString(use_data_array) {
         console.log("toURL");
         var params = {};
-        if(use_data_array){
+        if(use_data_array){            
+            this.ui_seeds.toSpecialData();
+
             this.state_manager.generateStateBase64(STATE_VERSION);
             params["data"] = this.state_manager.base64_url;
         }

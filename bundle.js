@@ -2414,6 +2414,10 @@ class BinaryArray {
         this.pointer = 0;//reset pointer to start reading or writing
     }
 
+    resizeToContent(){
+        this.data_uint8 = this.data_uint8.slice(0, this.pointer);
+    }
+
     generateBase64FromUint8(){
         this.data_base64 = Buffer.from(this.data_uint8).toString('base64');
         console.log("generateBase64FromUint8:", this.data_base64);
@@ -9243,6 +9247,8 @@ class InputParameterWrapper {
             const data = urlParams.get("data");
             this.state_manager.base64_url = data;
             this.state_manager.executeStateBase64Url();
+
+            this.ui_seeds.fromSpecialData();
         }
         else{
             for (var key in this.dict_url_parameter_name_to_input_wrapper) {
@@ -9253,13 +9259,15 @@ class InputParameterWrapper {
                     continue;
                 input_wrapper.setValue(value);
             }
+
+            const seeds = urlParams.get(PARAM_SEEDS);
+            this.ui_seeds.fromString(seeds);
         }
 
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
 
-        const seeds = urlParams.get(PARAM_SEEDS);
-        this.ui_seeds.fromString(seeds);
+
 
         const camera = urlParams.get(PARAM_CAMERA);
         this.main_camera.fromString(camera);
@@ -9316,7 +9324,9 @@ class InputParameterWrapper {
     toQueryString(use_data_array) {
         console.log("toURL");
         var params = {};
-        if(use_data_array){
+        if(use_data_array){            
+            this.ui_seeds.toSpecialData();
+
             this.state_manager.generateStateBase64(STATE_VERSION);
             params["data"] = this.state_manager.base64_url;
         }
@@ -121346,7 +121356,7 @@ exports.state_description_dict = {
     //list of special data
     "special" : [
         "special_data_seeds",
-        "special_data_camera_main"
+        //"special_data_camera_main"
     ],
     //special data
     "special_data_seeds" : new Entry("special_data_seeds", "list", "seed"),
@@ -121356,7 +121366,9 @@ exports.state_description_dict = {
         new Entry("position_x", "variable", "F32"),
         new Entry("position_y", "variable", "F32"),
         new Entry("position_z", "variable", "F32"),
-        new Entry("color", "variable", "STR"),
+        new Entry("color_byte_r", "variable", "UI8"),
+        new Entry("color_byte_g", "variable", "UI8"),
+        new Entry("color_byte_b", "variable", "UI8"),
     ],
     "camera_state" : [
         new Entry("position_x", "variable", "F32"),
@@ -121439,14 +121451,18 @@ class StateManager {
             }
         }
 
-        /*
         var list_special = getSpecialDescriptionList(state_version);
         for(var i=0; i<list_special.length; i++){
             console.log(i, list_special[i]);
-            console.log(state_description_dict[list_special[i]]);
+            var arr_length = state_data.readUint16();
+            var arr = new BinaryArray(arr_length);
+            for(var j=0; j<arr_length; j++){
+                var byte = state_data.readUint8();
+                arr.writeUint8(byte);
+            }
+            window[list_special[i]] = arr;
+            console.log(window[list_special[i]]);
         }
-        */
-        //stop_script;
     }
 
     generateStateBase64(state_version){
@@ -121477,14 +121493,15 @@ class StateManager {
             }
         }
 
-        var state_description_dict = getStateDescriptionDict(state_version);
         var list_special = getSpecialDescriptionList(state_version);
         for(var i=0; i<list_special.length; i++){
-            console.log(i, list_special[i]);
-            console.log(state_description_dict[list_special[i]]);
+            var arr = window[list_special[i]].data_uint8;
+            state_data.writeUint16(arr.length);
+            for(var j=0; j<arr.length; j++){
+                state_data.writeUint8(arr[j]);
+            }
         }
-
-
+        state_data.resizeToContent();
         state_data.generateBase64FromUint8();
         state_data.generateBase64URLFromBase64();
         this.base64 = state_data.data_base64;
@@ -123057,6 +123074,8 @@ const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const BinaryArray = require("./binary_array");
+const getStateDescription = require("./version").getStateDescription;
 
 class UISeed {
     constructor(ui_seeds, index) {
@@ -123164,6 +123183,24 @@ class UISeed {
         return s;
     }
 
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "seed");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "seed");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
+    }
+
     getColorVector() {
         var hex = this.node_input_c.value;
         console.log("hex: ", hex);
@@ -123199,6 +123236,72 @@ class UISeed {
                 return true;
         }
         return false;
+    }
+
+    getValueByName(name){
+        switch (name) {
+            case "position_x":
+                return this.node_input_x.value;
+            case "position_y":
+                return this.node_input_y.value;
+            case "position_z":
+                return this.node_input_z.value;
+            case "color":
+                return this.node_input_c.value;
+            case "color_byte_r":        
+                var hex = this.node_input_c.value;
+                return parseInt(hex.substr(1, 2), 16);
+            case "color_byte_g":        
+                var hex = this.node_input_c.value;
+                return parseInt(hex.substr(3, 2), 16);
+            case "color_byte_b":        
+                var hex = this.node_input_c.value;
+                return parseInt(hex.substr(5, 2), 16);
+            default:
+                console.error("ui_seeds: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "position_x":
+                this.node_input_x.value = value;
+                break;
+            case "position_y":
+                this.node_input_y.value = value;
+                break;
+            case "position_z":
+                this.node_input_z.value = value;
+                break;
+            case "color":
+                this.node_input_c.value = value;
+                break;
+            case "color_byte_r":        
+                var hex = this.node_input_c.value;
+                var r = value;
+                var g = parseInt(hex.substr(3, 2), 16);
+                var b = parseInt(hex.substr(5, 2), 16);
+                this.node_input_c.value = rgbToHex(r, g, b);
+                break;
+            case "color_byte_g":        
+                var hex = this.node_input_c.value;
+                var r = parseInt(hex.substr(1, 2), 16);
+                var g = value;
+                var b = parseInt(hex.substr(5, 2), 16);
+                this.node_input_c.value = rgbToHex(r, g, b);
+                break;
+            case "color_byte_b":        
+                var hex = this.node_input_c.value;
+                var r = parseInt(hex.substr(1, 2), 16);
+                var g = parseInt(hex.substr(3, 2), 16);
+                var b = value;
+                this.node_input_c.value = rgbToHex(r, g, b);
+                break;
+            default:
+                console.error("ui_seeds: getValueByName: Unknown name");
+                break;
+        }
     }
 }
 
@@ -123300,14 +123403,33 @@ class UISeeds {
     }
     */
     
-    toSpecialData(){   
-        /*     
-        var binary_data = new BinaryArray();
+    toSpecialData(){          
+        //getStateDescriptionDict(STATE_VERSION);
+        
+        var binary_array = new BinaryArray();
+        binary_array.writeUint16(this.list.length);
         for (var i = 0; i < this.list.length; i++) {
-            
+            this.list[i].writeToBinaryArray(binary_array);   
         }
-        window["special_data_seeds"] = binary_data;
-        */
+        binary_array.resizeToContent();
+        console.log(binary_array);
+        window["special_data_seeds"] = binary_array;  
+    }
+
+    fromSpecialData() {
+        var binary_array = window["special_data_seeds"];
+        binary_array.begin();
+        var list_length = binary_array.readUint16();
+
+        while (list_length > this.list.length) {
+            this.addSeed();
+        }
+        while (this.list.length > list_length) {
+            this.removeSeed(this.list.length - 1);
+        }
+        for(var i=0; i<list_length; i++){
+            this.list[i].readFromBinaryArray(binary_array);
+        }
     }
 
     toString() {
@@ -123414,7 +123536,7 @@ class UISeeds {
 */
 
 module.exports = UISeeds;
-},{"./data_types":19,"./utility":1045,"gl-matrix":58,"seedrandom":996}],1044:[function(require,module,exports){
+},{"./binary_array":9,"./data_types":19,"./utility":1045,"./version":1046,"gl-matrix":58,"seedrandom":996}],1044:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
@@ -123941,6 +124063,9 @@ exports.getSpecialDescriptionList = function(state_version){
     return exports.getStateDescriptionDict(state_version)["special"];
 }
 
+exports.getStateDescription = function(state_version, name){
+    return exports.getStateDescriptionDict(state_version)[name];
+}
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./state_description/1":1032}],1047:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {

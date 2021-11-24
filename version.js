@@ -22,3 +22,7 @@ exports.getStateDescriptionDict = function(state_version){
 exports.getSpecialDescriptionList = function(state_version){
     return exports.getStateDescriptionDict(state_version)["special"];
 }
+
+exports.getStateDescription = function(state_version, name){
+    return exports.getStateDescriptionDict(state_version)[name];
+}

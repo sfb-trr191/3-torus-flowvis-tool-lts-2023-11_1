@@ -60,14 +60,18 @@ class StateManager {
             }
         }
 
-        /*
         var list_special = getSpecialDescriptionList(state_version);
         for(var i=0; i<list_special.length; i++){
             console.log(i, list_special[i]);
-            console.log(state_description_dict[list_special[i]]);
+            var arr_length = state_data.readUint16();
+            var arr = new BinaryArray(arr_length);
+            for(var j=0; j<arr_length; j++){
+                var byte = state_data.readUint8();
+                arr.writeUint8(byte);
+            }
+            window[list_special[i]] = arr;
+            console.log(window[list_special[i]]);
         }
-        */
-        //stop_script;
     }
 
     generateStateBase64(state_version){
@@ -98,14 +102,15 @@ class StateManager {
             }
         }
 
-        var state_description_dict = getStateDescriptionDict(state_version);
         var list_special = getSpecialDescriptionList(state_version);
         for(var i=0; i<list_special.length; i++){
-            console.log(i, list_special[i]);
-            console.log(state_description_dict[list_special[i]]);
+            var arr = window[list_special[i]].data_uint8;
+            state_data.writeUint16(arr.length);
+            for(var j=0; j<arr.length; j++){
+                state_data.writeUint8(arr[j]);
+            }
         }
-
-
+        state_data.resizeToContent();
         state_data.generateBase64FromUint8();
         state_data.generateBase64URLFromBase64();
         this.base64 = state_data.data_base64;

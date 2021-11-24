@@ -16,6 +16,10 @@ class BinaryArray {
         this.pointer = 0;//reset pointer to start reading or writing
     }
 
+    resizeToContent(){
+        this.data_uint8 = this.data_uint8.slice(0, this.pointer);
+    }
+
     generateBase64FromUint8(){
         this.data_base64 = Buffer.from(this.data_uint8).toString('base64');
         console.log("generateBase64FromUint8:", this.data_base64);
