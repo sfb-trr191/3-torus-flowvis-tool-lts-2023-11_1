@@ -212,6 +212,8 @@ class InputParameterWrapper {
             this.state_manager.executeStateBase64Url();
 
             this.ui_seeds.fromSpecialData();
+            this.main_camera.fromSpecialData();
+            this.side_camera.fromSpecialData();
         }
         else{
             for (var key in this.dict_url_parameter_name_to_input_wrapper) {
@@ -225,18 +227,16 @@ class InputParameterWrapper {
 
             const seeds = urlParams.get(PARAM_SEEDS);
             this.ui_seeds.fromString(seeds);
+
+            const camera = urlParams.get(PARAM_CAMERA);
+            this.main_camera.fromString(camera);
+    
+            const side_camera = urlParams.get(PARAM_SIDE_CAMERA);
+            this.side_camera.fromString(side_camera);
         }
 
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
-
-
-
-        const camera = urlParams.get(PARAM_CAMERA);
-        this.main_camera.fromString(camera);
-
-        const side_camera = urlParams.get(PARAM_SIDE_CAMERA);
-        this.side_camera.fromString(side_camera);
 
         const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
         this.transfer_function_manager.fromString(transfer_function_manager);
@@ -289,6 +289,8 @@ class InputParameterWrapper {
         var params = {};
         if(use_data_array){            
             this.ui_seeds.toSpecialData();
+            this.main_camera.toSpecialData();
+            this.side_camera.toSpecialData();
 
             this.state_manager.generateStateBase64(STATE_VERSION);
             params["data"] = this.state_manager.base64_url;

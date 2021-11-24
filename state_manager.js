@@ -5,6 +5,13 @@ const getSpecialDescriptionList = module_version.getSpecialDescriptionList;
 const BinaryArray = require("./binary_array");
 const { forEach } = require("mathjs");
 
+global.URL_VERSION_YEAR = 0;
+global.URL_VERSION_MONTH = 0;
+global.URL_VERSION_NUMBER = 0;
+global.URL_STATE_VERSION = 0;
+global.current_state_name_main = "";
+global.current_state_name_aux = "";
+
 class StateManager {
 
     constructor() {
@@ -14,10 +21,10 @@ class StateManager {
     generateListEntriesDefault(state_version) {
         var state_description_dict = getStateDescriptionDict(state_version);
         var list = [];
-        list.push(new Entry("STATE_VERSION", "global", "UI16"));
-        list.push(new Entry("VERSION_YEAR", "global", "UI16"));
-        list.push(new Entry("VERSION_MONTH", "global", "UI16"));
-        list.push(new Entry("VERSION_NUMBER", "global", "UI16"));
+        list.push(new Entry("URL_STATE_VERSION", "global", "UI16"));
+        list.push(new Entry("URL_VERSION_YEAR", "global", "UI16"));
+        list.push(new Entry("URL_VERSION_MONTH", "global", "UI16"));
+        list.push(new Entry("URL_VERSION_NUMBER", "global", "UI16"));
         var list_default = state_description_dict["default"];
         list = list.concat(list_default);
         console.log(list);
@@ -46,7 +53,7 @@ class StateManager {
             console.log(name, value);
             switch (list[i].element_type) {
                 case "global":
-                    //do nothing for now
+                    window[list[i].name] = value;
                     break;
                 case "field":       
                     window[list[i].name].value = value;

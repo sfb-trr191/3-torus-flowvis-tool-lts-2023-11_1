@@ -2928,6 +2928,8 @@ const { tb_project_to_sphere, trackball } = require("./trackball");
 const { ndcToArcBall, trackball2, getRotationQuaternion } = require("./trackball2");
 const { trackball3 } = require("./trackball3");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
+const getStateDescription = require("./version").getStateDescription;
+const BinaryArray = require("./binary_array");
 
 class GL_CameraData {
     constructor() {
@@ -3030,6 +3032,84 @@ class CameraState {
         return s;
     }
 
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "camera_state");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }        
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "camera_state");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
+    }
+
+    getValueByName(name){
+        switch (name) {
+            case "position_x":
+                return this.position[0];
+            case "position_y":
+                return this.position[1];
+            case "position_z":
+                return this.position[2];
+            case "forward_x":
+                return this.forward[0];
+            case "forward_y":
+                return this.forward[1];
+            case "forward_z":
+                return this.forward[2];
+            case "up_x":
+                return this.up[0];
+            case "up_y":
+                return this.up[1];
+            case "up_z":
+                return this.up[2];
+            default:
+                console.error("ui_seeds: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "position_x":
+                this.position[0] = value;
+                break;
+            case "position_y":
+                this.position[1] = value;
+                break;
+            case "position_z":
+                this.position[2] = value;
+                break;
+            case "forward_x":
+                this.forward[0] = value;
+                break;
+            case "forward_y":
+                this.forward[1] = value;
+                break;
+            case "forward_z":
+                this.forward[2] = value;
+                break;
+            case "up_x":
+                this.up[0] = value;
+                break;
+            case "up_y":
+                this.up[1] = value;
+                break;
+            case "up_z":
+                this.up[2] = value;
+                break;
+            default:
+                console.error("camera_state: getValueByName: Unknown name");
+                break;
+        }
+    }
 }
 
 class Camera {
@@ -3037,8 +3117,10 @@ class Camera {
      * 
      * @param {string} name the name of the camera
      */
-    constructor(name, input_changed_manager) {
+    constructor(name, special_data_name, varname_current_state_name, input_changed_manager) {
         this.name = name;
+        this.special_data_name =  special_data_name;
+        this.varname_current_state_name = varname_current_state_name;
         this.input_changed_manager = input_changed_manager;
         this.width = 0;
         this.height = 0;
@@ -3149,6 +3231,40 @@ class Camera {
         this.input_camera_up_y.value = up_negated[1].toFixed(decimals);
         this.input_camera_up_z.value = up_negated[2].toFixed(decimals);
         this.input_changed_manager.UpdateDefaultValuesCamera();
+    }
+
+    toSpecialData(){                  
+        var binary_array = new BinaryArray();
+        this.states["state_default"].writeToBinaryArray(binary_array);
+        this.states["state_projection_x"].writeToBinaryArray(binary_array);
+        this.states["state_projection_y"].writeToBinaryArray(binary_array);
+        this.states["state_projection_z"].writeToBinaryArray(binary_array);
+        binary_array.resizeToContent();
+        console.log(binary_array);
+        window[this.special_data_name] = binary_array;  
+
+        window[this.varname_current_state_name] = this.current_state_name;
+        
+        console.log("varname_current_state_name", this.varname_current_state_name);
+        console.log("window[this.varname_current_state_name]", window[this.varname_current_state_name])
+
+    }
+
+    fromSpecialData() {
+        var binary_array = window[this.special_data_name];
+        binary_array.begin();
+        this.states["state_default"].readFromBinaryArray(binary_array);
+        this.states["state_projection_x"].readFromBinaryArray(binary_array);
+        this.states["state_projection_y"].readFromBinaryArray(binary_array);
+        this.states["state_projection_z"].readFromBinaryArray(binary_array);
+        
+        this.current_state_name = window[this.varname_current_state_name];
+
+        console.log("varname_current_state_name", this.varname_current_state_name);
+        console.log("current_state_name", this.current_state_name);
+        console.log("state_default", this.states["state_default"]);
+        
+        this.loadState(this.current_state_name, false);
     }
 
     fromString(s) {
@@ -4037,7 +4153,7 @@ class Camera {
 }
 
 module.exports = Camera;
-},{"./gl_matrix_extensions":24,"./trackball":1038,"./trackball2":1039,"./trackball3":1040,"gl-matrix":58}],12:[function(require,module,exports){
+},{"./binary_array":9,"./gl_matrix_extensions":24,"./trackball":1038,"./trackball2":1039,"./trackball3":1040,"./version":1046,"gl-matrix":58}],12:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -7680,6 +7796,11 @@ const StateManager = require("./state_manager");
     function onStart(evt) {
         console.log("onStart");
        
+        window["URL_VERSION_YEAR"] = window["VERSION_YEAR"];
+        window["URL_VERSION_MONTH"] = window["VERSION_MONTH"];
+        window["URL_VERSION_NUMBER"] = window["VERSION_NUMBER"];
+        window["URL_STATE_VERSION"] = window["STATE_VERSION"];
+
         var base64 = conversionTest();
         state_manager = new StateManager();
         //state_manager.generateStateBase64(STATE_VERSION);
@@ -7733,8 +7854,8 @@ const StateManager = require("./state_manager");
 
 
         input_changed_manager = new InputChangedManager();
-        main_camera = new Camera("main_camera", input_changed_manager);
-        side_camera = new Camera("side_camera", input_changed_manager);
+        main_camera = new Camera("main_camera", "special_data_camera_main", "current_state_name_main", input_changed_manager);
+        side_camera = new Camera("side_camera", "special_data_camera_aux", "current_state_name_aux", input_changed_manager);
 
 
         input_manager = new InputManager(main_canvas, main_camera, side_canvas, side_camera);
@@ -9249,6 +9370,8 @@ class InputParameterWrapper {
             this.state_manager.executeStateBase64Url();
 
             this.ui_seeds.fromSpecialData();
+            this.main_camera.fromSpecialData();
+            this.side_camera.fromSpecialData();
         }
         else{
             for (var key in this.dict_url_parameter_name_to_input_wrapper) {
@@ -9262,18 +9385,16 @@ class InputParameterWrapper {
 
             const seeds = urlParams.get(PARAM_SEEDS);
             this.ui_seeds.fromString(seeds);
+
+            const camera = urlParams.get(PARAM_CAMERA);
+            this.main_camera.fromString(camera);
+    
+            const side_camera = urlParams.get(PARAM_SIDE_CAMERA);
+            this.side_camera.fromString(side_camera);
         }
 
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
-
-
-
-        const camera = urlParams.get(PARAM_CAMERA);
-        this.main_camera.fromString(camera);
-
-        const side_camera = urlParams.get(PARAM_SIDE_CAMERA);
-        this.side_camera.fromString(side_camera);
 
         const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
         this.transfer_function_manager.fromString(transfer_function_manager);
@@ -9326,6 +9447,8 @@ class InputParameterWrapper {
         var params = {};
         if(use_data_array){            
             this.ui_seeds.toSpecialData();
+            this.main_camera.toSpecialData();
+            this.side_camera.toSpecialData();
 
             this.state_manager.generateStateBase64(STATE_VERSION);
             params["data"] = this.state_manager.base64_url;
@@ -121351,16 +121474,23 @@ exports.state_description_dict = {
         new Entry("select_transfer_function_id", "field", "UI8"),
         new Entry("select_transfer_function_index_scalar", "field", "UI8"),
         new Entry("select_transfer_function_index_ftle_forward", "field", "UI8"),
-        new Entry("select_transfer_function_index_ftle_backward", "field", "UI8")
+        new Entry("select_transfer_function_index_ftle_backward", "field", "UI8"),
+
+
+        
+        new Entry("current_state_name_main", "global", "STR"),
+        new Entry("current_state_name_aux", "global", "STR"),
     ],
     //list of special data
     "special" : [
         "special_data_seeds",
-        //"special_data_camera_main"
+        "special_data_camera_main",
+        "special_data_camera_aux"
     ],
     //special data
     "special_data_seeds" : new Entry("special_data_seeds", "list", "seed"),
     "special_data_camera_main" : new Entry("special_data_camera_main", "list", "camera_state"),
+    "special_data_camera_aux" : new Entry("special_data_camera_aux", "list", "camera_state"),
     //
     "seed" : [
         new Entry("position_x", "variable", "F32"),
@@ -121374,6 +121504,12 @@ exports.state_description_dict = {
         new Entry("position_x", "variable", "F32"),
         new Entry("position_y", "variable", "F32"),
         new Entry("position_z", "variable", "F32"),
+        new Entry("forward_x", "variable", "F32"),
+        new Entry("forward_y", "variable", "F32"),
+        new Entry("forward_z", "variable", "F32"),
+        new Entry("up_x", "variable", "F32"),
+        new Entry("up_y", "variable", "F32"),
+        new Entry("up_z", "variable", "F32"),
     ]
 }
 },{"./state_description":1033}],1033:[function(require,module,exports){
@@ -121389,12 +121525,20 @@ class StateDescriptionEntry {
 
 module.exports = StateDescriptionEntry;
 },{}],1034:[function(require,module,exports){
+(function (global){(function (){
 const Entry = require("./state_description/state_description");
 const module_version = require("./version");
 const getStateDescriptionDict = module_version.getStateDescriptionDict;
 const getSpecialDescriptionList = module_version.getSpecialDescriptionList;
 const BinaryArray = require("./binary_array");
 const { forEach } = require("mathjs");
+
+global.URL_VERSION_YEAR = 0;
+global.URL_VERSION_MONTH = 0;
+global.URL_VERSION_NUMBER = 0;
+global.URL_STATE_VERSION = 0;
+global.current_state_name_main = "";
+global.current_state_name_aux = "";
 
 class StateManager {
 
@@ -121405,10 +121549,10 @@ class StateManager {
     generateListEntriesDefault(state_version) {
         var state_description_dict = getStateDescriptionDict(state_version);
         var list = [];
-        list.push(new Entry("STATE_VERSION", "global", "UI16"));
-        list.push(new Entry("VERSION_YEAR", "global", "UI16"));
-        list.push(new Entry("VERSION_MONTH", "global", "UI16"));
-        list.push(new Entry("VERSION_NUMBER", "global", "UI16"));
+        list.push(new Entry("URL_STATE_VERSION", "global", "UI16"));
+        list.push(new Entry("URL_VERSION_YEAR", "global", "UI16"));
+        list.push(new Entry("URL_VERSION_MONTH", "global", "UI16"));
+        list.push(new Entry("URL_VERSION_NUMBER", "global", "UI16"));
         var list_default = state_description_dict["default"];
         list = list.concat(list_default);
         console.log(list);
@@ -121437,7 +121581,7 @@ class StateManager {
             console.log(name, value);
             switch (list[i].element_type) {
                 case "global":
-                    //do nothing for now
+                    window[list[i].name] = value;
                     break;
                 case "field":       
                     window[list[i].name].value = value;
@@ -121510,6 +121654,7 @@ class StateManager {
 }
 
 module.exports = StateManager;
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./binary_array":9,"./state_description/state_description":1033,"./version":1046,"mathjs":913}],1035:[function(require,module,exports){
 const RawData = require("./raw_data");
 const StreamlineGenerator = require("./streamline_generator");

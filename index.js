@@ -127,6 +127,11 @@ const StateManager = require("./state_manager");
     function onStart(evt) {
         console.log("onStart");
        
+        window["URL_VERSION_YEAR"] = window["VERSION_YEAR"];
+        window["URL_VERSION_MONTH"] = window["VERSION_MONTH"];
+        window["URL_VERSION_NUMBER"] = window["VERSION_NUMBER"];
+        window["URL_STATE_VERSION"] = window["STATE_VERSION"];
+
         var base64 = conversionTest();
         state_manager = new StateManager();
         //state_manager.generateStateBase64(STATE_VERSION);
@@ -180,8 +185,8 @@ const StateManager = require("./state_manager");
 
 
         input_changed_manager = new InputChangedManager();
-        main_camera = new Camera("main_camera", input_changed_manager);
-        side_camera = new Camera("side_camera", input_changed_manager);
+        main_camera = new Camera("main_camera", "special_data_camera_main", "current_state_name_main", input_changed_manager);
+        side_camera = new Camera("side_camera", "special_data_camera_aux", "current_state_name_aux", input_changed_manager);
 
 
         input_manager = new InputManager(main_canvas, main_camera, side_canvas, side_camera);

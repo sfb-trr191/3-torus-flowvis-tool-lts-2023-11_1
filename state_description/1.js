@@ -89,16 +89,23 @@ exports.state_description_dict = {
         new Entry("select_transfer_function_id", "field", "UI8"),
         new Entry("select_transfer_function_index_scalar", "field", "UI8"),
         new Entry("select_transfer_function_index_ftle_forward", "field", "UI8"),
-        new Entry("select_transfer_function_index_ftle_backward", "field", "UI8")
+        new Entry("select_transfer_function_index_ftle_backward", "field", "UI8"),
+
+
+        
+        new Entry("current_state_name_main", "global", "STR"),
+        new Entry("current_state_name_aux", "global", "STR"),
     ],
     //list of special data
     "special" : [
         "special_data_seeds",
-        //"special_data_camera_main"
+        "special_data_camera_main",
+        "special_data_camera_aux"
     ],
     //special data
     "special_data_seeds" : new Entry("special_data_seeds", "list", "seed"),
     "special_data_camera_main" : new Entry("special_data_camera_main", "list", "camera_state"),
+    "special_data_camera_aux" : new Entry("special_data_camera_aux", "list", "camera_state"),
     //
     "seed" : [
         new Entry("position_x", "variable", "F32"),
@@ -112,5 +119,11 @@ exports.state_description_dict = {
         new Entry("position_x", "variable", "F32"),
         new Entry("position_y", "variable", "F32"),
         new Entry("position_z", "variable", "F32"),
+        new Entry("forward_x", "variable", "F32"),
+        new Entry("forward_y", "variable", "F32"),
+        new Entry("forward_z", "variable", "F32"),
+        new Entry("up_x", "variable", "F32"),
+        new Entry("up_y", "variable", "F32"),
+        new Entry("up_z", "variable", "F32"),
     ]
 }
