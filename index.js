@@ -951,11 +951,13 @@ const StateManager = require("./state_manager");
         RandomizeSeedPositions();
     }
     */
+   
     function UpdateURL() {
         console.log("UpdateURL");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
-        var query_string = input_parameter_wrapper.toQueryString(true);
+        var use_data_array = document.getElementById("checkbox_url_data_array").checked;
+        var query_string = input_parameter_wrapper.toQueryString(use_data_array);
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 

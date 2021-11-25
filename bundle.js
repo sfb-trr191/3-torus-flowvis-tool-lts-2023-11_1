@@ -8663,11 +8663,13 @@ const StateManager = require("./state_manager");
         RandomizeSeedPositions();
     }
     */
+   
     function UpdateURL() {
         console.log("UpdateURL");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
-        var query_string = input_parameter_wrapper.toQueryString(true);
+        var use_data_array = document.getElementById("checkbox_url_data_array").checked;
+        var query_string = input_parameter_wrapper.toQueryString(use_data_array);
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 
@@ -9407,6 +9409,7 @@ class InputParameterWrapper {
         }
 
         var use_data_array = urlParams.has("data");
+        document.getElementById("checkbox_url_data_array").checked = use_data_array;
         if(use_data_array){
             const data = urlParams.get("data");
             this.state_manager.base64_url = data;
