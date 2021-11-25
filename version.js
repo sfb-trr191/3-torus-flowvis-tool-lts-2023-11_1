@@ -26,3 +26,25 @@ exports.getSpecialDescriptionList = function(state_version){
 exports.getStateDescription = function(state_version, name){
     return exports.getStateDescriptionDict(state_version)[name];
 }
+
+exports.getReadValueConversion = function(state_version, value_conversion_name){
+
+    if(value_conversion_name === null)
+        return null;
+
+    var dict = exports.getStateDescriptionDict(state_version);
+    var dict_read = dict["conversion_read"];
+    var value_conversion = dict_read[value_conversion_name];
+    return value_conversion;
+}
+
+exports.getWriteValueConversion = function(state_version, value_conversion_name){
+
+    if(value_conversion_name === null)
+        return null;
+
+    var dict = exports.getStateDescriptionDict(state_version);
+    var dict_write = dict["conversion_write"];
+    var value_conversion = dict_write[value_conversion_name];
+    return value_conversion;
+}

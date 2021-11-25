@@ -117,7 +117,8 @@ class UISeed {
         console.log(list);
         for(var i=0; i<list.length; i++){
             var value = this.getValueByName(list[i].name);
-            binary_array.writeValue(value, list[i].data_type);            
+            var value_conversion = null;
+            binary_array.writeValue(value, list[i].data_type, value_conversion);            
         }
     }
 

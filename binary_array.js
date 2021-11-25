@@ -47,7 +47,19 @@ class BinaryArray {
         console.log("generateBase64FromBase64URL:", this.data_base64);     
     }
 
-    writeValue(value, data_type){
+    writeValue(value, data_type, value_conversion=null){
+        
+        if(value_conversion !== null){
+            console.log("data_type", data_type)
+            console.log("value_conversion", value_conversion)
+            console.log("value old", value)
+            value = value_conversion[value];
+            console.log("value", value)
+            if(!value){
+                console.error("unknown key in value_conversion")
+            }
+        }
+
         switch (data_type) {
             case "UI8":
                 this.writeUint8(value);
@@ -155,22 +167,42 @@ class BinaryArray {
         console.log("writeStr:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
-    readValue(data_type){
+    readValue(data_type, value_conversion=null){
+        var value;
         switch (data_type) {
             case "UI8":
-                return this.readUint8();
+                value = this.readUint8();
+                break;
             case "UI8_N":
-                return this.readUint8() / 255;
+                value = this.readUint8() / 255;
+                break;
             case "UI16":
-                return this.readUint16();
+                value = this.readUint16();
+                break;
             case "F32":
-                return this.readFloat32();
+                value = this.readFloat32();
+                break;
             case "STR":
-                return this.readStr();
+                value = this.readStr();
+                break;
             default:
                 console.log("ERROR UNKNOWN data_type");
-                return undefined;
+                value = null;
+                break;
         }
+
+        if(value_conversion !== null){
+            console.log("data_type", data_type)
+            console.log("value_conversion", value_conversion)
+            console.log("value old", value)
+            value = value_conversion[value];
+            console.log("value", value)
+            if(!value){
+                console.error("unknown key in value_conversion")
+            }
+        }
+
+        return value;
     }
 
     readUint8(){  

@@ -90,8 +90,13 @@ exports.state_description_dict = {
         new Entry("select_transfer_function_index_scalar", "field", "UI8"),
         new Entry("select_transfer_function_index_ftle_forward", "field", "UI8"),
         new Entry("select_transfer_function_index_ftle_backward", "field", "UI8"),
-
-
+        //export
+        new Entry("input_thumbnail", "field", "STR"),
+        new Entry("input_thumbnail_right", "field", "STR"),
+        new Entry("input_thumbnail_directory", "field", "STR"),
+        new Entry("input_thumbnail_name", "field", "STR"),
+        new Entry("input_thumbnail_name_right", "field", "STR"),
+        new Entry("select_tab", "field", "UI8", "tab_names"),
         
         new Entry("current_state_name_main", "global", "STR"),
         new Entry("current_state_name_aux", "global", "STR"),
@@ -137,5 +142,24 @@ exports.state_description_dict = {
         new Entry("t", "variable", "F32"),
         new Entry("a", "variable", "F32"),
     ],
-    
+    "conversion_write" : {
+        "tab_names" : {
+            "tab_data" : 1,
+            "tab_ftle" : 2,
+            "tab_settings" : 3,
+            "tab_transfer_function" : 4,
+            "tab_export" : 5,
+            "tab_help" : 6,
+        }
+    },
+    "conversion_read" : {
+        "tab_names" : {
+            1 : "tab_data",
+            2 : "tab_ftle",
+            3 : "tab_settings",
+            4 : "tab_transfer_function",
+            5 : "tab_export",
+            6 : "tab_help",
+        }
+    },    
 }

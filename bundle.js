@@ -2445,7 +2445,19 @@ class BinaryArray {
         console.log("generateBase64FromBase64URL:", this.data_base64);     
     }
 
-    writeValue(value, data_type){
+    writeValue(value, data_type, value_conversion=null){
+        
+        if(value_conversion !== null){
+            console.log("data_type", data_type)
+            console.log("value_conversion", value_conversion)
+            console.log("value old", value)
+            value = value_conversion[value];
+            console.log("value", value)
+            if(!value){
+                console.error("unknown key in value_conversion")
+            }
+        }
+
         switch (data_type) {
             case "UI8":
                 this.writeUint8(value);
@@ -2553,22 +2565,42 @@ class BinaryArray {
         console.log("writeStr:", value, "(", this.pointer, "/", this.data_uint8.byteLength, ")");
     }
 
-    readValue(data_type){
+    readValue(data_type, value_conversion=null){
+        var value;
         switch (data_type) {
             case "UI8":
-                return this.readUint8();
+                value = this.readUint8();
+                break;
             case "UI8_N":
-                return this.readUint8() / 255;
+                value = this.readUint8() / 255;
+                break;
             case "UI16":
-                return this.readUint16();
+                value = this.readUint16();
+                break;
             case "F32":
-                return this.readFloat32();
+                value = this.readFloat32();
+                break;
             case "STR":
-                return this.readStr();
+                value = this.readStr();
+                break;
             default:
                 console.log("ERROR UNKNOWN data_type");
-                return undefined;
+                value = null;
+                break;
         }
+
+        if(value_conversion !== null){
+            console.log("data_type", data_type)
+            console.log("value_conversion", value_conversion)
+            console.log("value old", value)
+            value = value_conversion[value];
+            console.log("value", value)
+            if(!value){
+                console.error("unknown key in value_conversion")
+            }
+        }
+
+        return value;
     }
 
     readUint8(){  
@@ -3046,7 +3078,8 @@ class CameraState {
         console.log(list);
         for(var i=0; i<list.length; i++){
             var value = this.getValueByName(list[i].name);
-            binary_array.writeValue(value, list[i].data_type);            
+            var value_conversion = null;
+            binary_array.writeValue(value, list[i].data_type, value_conversion);            
         }        
     }
 
@@ -121486,8 +121519,13 @@ exports.state_description_dict = {
         new Entry("select_transfer_function_index_scalar", "field", "UI8"),
         new Entry("select_transfer_function_index_ftle_forward", "field", "UI8"),
         new Entry("select_transfer_function_index_ftle_backward", "field", "UI8"),
-
-
+        //export
+        new Entry("input_thumbnail", "field", "STR"),
+        new Entry("input_thumbnail_right", "field", "STR"),
+        new Entry("input_thumbnail_directory", "field", "STR"),
+        new Entry("input_thumbnail_name", "field", "STR"),
+        new Entry("input_thumbnail_name_right", "field", "STR"),
+        new Entry("select_tab", "field", "UI8", "tab_names"),
         
         new Entry("current_state_name_main", "global", "STR"),
         new Entry("current_state_name_aux", "global", "STR"),
@@ -121533,16 +121571,36 @@ exports.state_description_dict = {
         new Entry("t", "variable", "F32"),
         new Entry("a", "variable", "F32"),
     ],
-    
+    "conversion_write" : {
+        "tab_names" : {
+            "tab_data" : 1,
+            "tab_ftle" : 2,
+            "tab_settings" : 3,
+            "tab_transfer_function" : 4,
+            "tab_export" : 5,
+            "tab_help" : 6,
+        }
+    },
+    "conversion_read" : {
+        "tab_names" : {
+            1 : "tab_data",
+            2 : "tab_ftle",
+            3 : "tab_settings",
+            4 : "tab_transfer_function",
+            5 : "tab_export",
+            6 : "tab_help",
+        }
+    },    
 }
 },{"./state_description":1033}],1033:[function(require,module,exports){
 class StateDescriptionEntry {
 
-    constructor(name, element_type, data_type) {
+    constructor(name, element_type, data_type, value_conversion_name = null) {
         this.name = name;
         this.element_type = element_type;
         this.data_type = data_type;
-        console.log("StateDescriptionEntry: ", name, element_type, data_type);
+        this.value_conversion_name = value_conversion_name;
+        console.log("StateDescriptionEntry: ", name, element_type, data_type, value_conversion_name);
     }
 }
 
@@ -121553,6 +121611,8 @@ const Entry = require("./state_description/state_description");
 const module_version = require("./version");
 const getStateDescriptionDict = module_version.getStateDescriptionDict;
 const getSpecialDescriptionList = module_version.getSpecialDescriptionList;
+const getReadValueConversion = module_version.getReadValueConversion;
+const getWriteValueConversion = module_version.getWriteValueConversion;
 const BinaryArray = require("./binary_array");
 const { forEach } = require("mathjs");
 
@@ -121600,7 +121660,9 @@ class StateManager {
         for(var i=0; i<list.length; i++){
             var name = list[i].name;
             var data_type = list[i].data_type;
-            var value = state_data.readValue(data_type);
+            var value_conversion_name = list[i].value_conversion_name;
+            var value_conversion = getReadValueConversion(state_version, value_conversion_name);
+            var value = state_data.readValue(data_type, value_conversion);
             console.log(name, value);
             switch (list[i].element_type) {
                 case "global":
@@ -121642,17 +121704,23 @@ class StateManager {
                 case "global":
                     var value = window[list[i].name];
                     var data_type = list[i].data_type;
-                    state_data.writeValue(value, data_type);
+                    var value_conversion_name = list[i].value_conversion_name;
+                    var value_conversion = getWriteValueConversion(state_version, value_conversion_name);
+                    state_data.writeValue(value, data_type, value_conversion);
                     break;
                 case "field":                    
                     var value = window[list[i].name].value;
                     var data_type = list[i].data_type;
-                    state_data.writeValue(value, data_type);
+                    var value_conversion_name = list[i].value_conversion_name;
+                    var value_conversion = getWriteValueConversion(state_version, value_conversion_name);
+                    state_data.writeValue(value, data_type, value_conversion);
                     break;
                 case "checkbox":                    
                     var value = window[list[i].name].checked;
                     var data_type = list[i].data_type;
-                    state_data.writeValue(value, data_type);
+                    var value_conversion_name = list[i].value_conversion_name;
+                    var value_conversion = getWriteValueConversion(state_version, value_conversion_name);
+                    state_data.writeValue(value, data_type, value_conversion);
                     break;
                 default:
                     console.log("ERROR UNKNOWN element_type");
@@ -122742,7 +122810,8 @@ class TransferFunctionColorPoint {
         console.log(list);
         for(var i=0; i<list.length; i++){
             var value = this.getValueByName(list[i].name);
-            binary_array.writeValue(value, list[i].data_type);            
+            var value_conversion = null;
+            binary_array.writeValue(value, list[i].data_type, value_conversion);            
         }
     }
 
@@ -122824,7 +122893,8 @@ class TransferFunctionOpacityPoint {
         console.log(list);
         for(var i=0; i<list.length; i++){
             var value = this.getValueByName(list[i].name);
-            binary_array.writeValue(value, list[i].data_type);            
+            var value_conversion = null;
+            binary_array.writeValue(value, list[i].data_type, value_conversion);            
         }
     }
 
@@ -123523,7 +123593,8 @@ class UISeed {
         console.log(list);
         for(var i=0; i<list.length; i++){
             var value = this.getValueByName(list[i].name);
-            binary_array.writeValue(value, list[i].data_type);            
+            var value_conversion = null;
+            binary_array.writeValue(value, list[i].data_type, value_conversion);            
         }
     }
 
@@ -124400,6 +124471,28 @@ exports.getSpecialDescriptionList = function(state_version){
 
 exports.getStateDescription = function(state_version, name){
     return exports.getStateDescriptionDict(state_version)[name];
+}
+
+exports.getReadValueConversion = function(state_version, value_conversion_name){
+
+    if(value_conversion_name === null)
+        return null;
+
+    var dict = exports.getStateDescriptionDict(state_version);
+    var dict_read = dict["conversion_read"];
+    var value_conversion = dict_read[value_conversion_name];
+    return value_conversion;
+}
+
+exports.getWriteValueConversion = function(state_version, value_conversion_name){
+
+    if(value_conversion_name === null)
+        return null;
+
+    var dict = exports.getStateDescriptionDict(state_version);
+    var dict_write = dict["conversion_write"];
+    var value_conversion = dict_write[value_conversion_name];
+    return value_conversion;
 }
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./state_description/1":1032}],1047:[function(require,module,exports){

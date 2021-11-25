@@ -2,6 +2,8 @@ const Entry = require("./state_description/state_description");
 const module_version = require("./version");
 const getStateDescriptionDict = module_version.getStateDescriptionDict;
 const getSpecialDescriptionList = module_version.getSpecialDescriptionList;
+const getReadValueConversion = module_version.getReadValueConversion;
+const getWriteValueConversion = module_version.getWriteValueConversion;
 const BinaryArray = require("./binary_array");
 const { forEach } = require("mathjs");
 
@@ -49,7 +51,9 @@ class StateManager {
         for(var i=0; i<list.length; i++){
             var name = list[i].name;
             var data_type = list[i].data_type;
-            var value = state_data.readValue(data_type);
+            var value_conversion_name = list[i].value_conversion_name;
+            var value_conversion = getReadValueConversion(state_version, value_conversion_name);
+            var value = state_data.readValue(data_type, value_conversion);
             console.log(name, value);
             switch (list[i].element_type) {
                 case "global":
@@ -91,17 +95,23 @@ class StateManager {
                 case "global":
                     var value = window[list[i].name];
                     var data_type = list[i].data_type;
-                    state_data.writeValue(value, data_type);
+                    var value_conversion_name = list[i].value_conversion_name;
+                    var value_conversion = getWriteValueConversion(state_version, value_conversion_name);
+                    state_data.writeValue(value, data_type, value_conversion);
                     break;
                 case "field":                    
                     var value = window[list[i].name].value;
                     var data_type = list[i].data_type;
-                    state_data.writeValue(value, data_type);
+                    var value_conversion_name = list[i].value_conversion_name;
+                    var value_conversion = getWriteValueConversion(state_version, value_conversion_name);
+                    state_data.writeValue(value, data_type, value_conversion);
                     break;
                 case "checkbox":                    
                     var value = window[list[i].name].checked;
                     var data_type = list[i].data_type;
-                    state_data.writeValue(value, data_type);
+                    var value_conversion_name = list[i].value_conversion_name;
+                    var value_conversion = getWriteValueConversion(state_version, value_conversion_name);
+                    state_data.writeValue(value, data_type, value_conversion);
                     break;
                 default:
                     console.log("ERROR UNKNOWN element_type");
