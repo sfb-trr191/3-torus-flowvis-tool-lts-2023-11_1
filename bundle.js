@@ -6679,12 +6679,13 @@ exports.Export = function(input_parameter_wrapper) {
 
     
     var query_string = input_parameter_wrapper.toQueryString(true);
+    console.log(query_string["default"]);
 
     //direct loading for latex
     var url_without_query = window.location.toString().replace(window.location.search, "");
-    var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
-    var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
-    var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
+    var url_default = url_without_query + query_string["default"];
+    var url_embedded = url_without_query + query_string["embedded_main"];
+    var url_embedded_r = url_without_query + query_string["embedded_aux"];
     zip.file("latex/latex_main.txt", GenerateExportString_Latex(url_default, dir_name+file_name));
     zip.file("latex/latex_aux.txt", GenerateExportString_Latex(url_default, dir_name+file_name_right));
     //zip.file("latex/latex_embedded_left.txt", GenerateExportString_Latex(url_embedded, dir_name+file_name));
@@ -6695,9 +6696,9 @@ exports.Export = function(input_parameter_wrapper) {
 
     //lazy loading for html
     url_without_query = url_without_query.replace("index", "lazy");
-    var url_default = url_without_query + query_string +"&style=" + STYLE_DEFAULT;
-    var url_embedded = url_without_query + query_string +"&style=" + STYLE_EMBEDDED;
-    var url_embedded_r = url_without_query + query_string +"&style=" + STYLE_EMBEDDED_RIGHT;
+    var url_default = url_without_query + query_string["default"];
+    var url_embedded = url_without_query + query_string["embedded_main"];
+    var url_embedded_r = url_without_query + query_string["embedded_aux"];
     zip.file("html/html_default.txt", GenerateExportString_HTML(url_default, "iframe_3_torus_flowvis_tool_default"));
     zip.file("html/html_embedded_main.txt", GenerateExportString_HTML(url_embedded, "iframe_3_torus_flowvis_tool_embedded_main"));
     zip.file("html/html_embedded_aux.txt", GenerateExportString_HTML(url_embedded_r, "iframe_3_torus_flowvis_tool_embedded_aux"));
@@ -8667,7 +8668,7 @@ const StateManager = require("./state_manager");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
         var query_string = input_parameter_wrapper.toQueryString(true);
-        window.history.pushState(null, null, 'index.html' + query_string);
+        window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 
     function SetMagneticField(){
@@ -9527,10 +9528,14 @@ class InputParameterWrapper {
         */
         var query_string = "?" + Object.entries(params)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&') + "&c=1"
+            .join('&')
 
         console.log("query_string:", query_string);
-        return query_string;
+        return {
+            "default" : query_string + "&style=" + STYLE_DEFAULT + "&c=1",
+            "embedded_main" : query_string + "&style=" + STYLE_EMBEDDED + "&c=1",
+            "embedded_aux" : query_string + "&style=" + STYLE_EMBEDDED_RIGHT + "&c=1",
+        };
     }
 }
 

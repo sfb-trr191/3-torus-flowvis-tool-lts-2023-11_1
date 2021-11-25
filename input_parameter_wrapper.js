@@ -327,10 +327,14 @@ class InputParameterWrapper {
         */
         var query_string = "?" + Object.entries(params)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&') + "&c=1"
+            .join('&')
 
         console.log("query_string:", query_string);
-        return query_string;
+        return {
+            "default" : query_string + "&style=" + STYLE_DEFAULT + "&c=1",
+            "embedded_main" : query_string + "&style=" + STYLE_EMBEDDED + "&c=1",
+            "embedded_aux" : query_string + "&style=" + STYLE_EMBEDDED_RIGHT + "&c=1",
+        };
     }
 }
 

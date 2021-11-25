@@ -956,7 +956,7 @@ const StateManager = require("./state_manager");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
         var query_string = input_parameter_wrapper.toQueryString(true);
-        window.history.pushState(null, null, 'index.html' + query_string);
+        window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 
     function SetMagneticField(){
