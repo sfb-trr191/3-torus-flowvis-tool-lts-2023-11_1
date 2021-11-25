@@ -1,3 +1,6 @@
+const module_utility = require("./utility");
+const clamp = module_utility.clamp;
+
 class BinaryArray {
 
     constructor() {
@@ -47,6 +50,10 @@ class BinaryArray {
     writeValue(value, data_type){
         switch (data_type) {
             case "UI8":
+                this.writeUint8(value);
+                break;
+            case "UI8_N":
+                value = clamp(255 * value, 0, 255);
                 this.writeUint8(value);
                 break;
             case "UI16":
@@ -152,6 +159,8 @@ class BinaryArray {
         switch (data_type) {
             case "UI8":
                 return this.readUint8();
+            case "UI8_N":
+                return this.readUint8() / 255;
             case "UI16":
                 return this.readUint16();
             case "F32":

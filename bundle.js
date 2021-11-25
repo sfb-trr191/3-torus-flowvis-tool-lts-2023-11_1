@@ -2396,6 +2396,9 @@ class Aliasing {
 module.exports = Aliasing;
 },{}],9:[function(require,module,exports){
 (function (Buffer){(function (){
+const module_utility = require("./utility");
+const clamp = module_utility.clamp;
+
 class BinaryArray {
 
     constructor() {
@@ -2445,6 +2448,10 @@ class BinaryArray {
     writeValue(value, data_type){
         switch (data_type) {
             case "UI8":
+                this.writeUint8(value);
+                break;
+            case "UI8_N":
+                value = clamp(255 * value, 0, 255);
                 this.writeUint8(value);
                 break;
             case "UI16":
@@ -2550,6 +2557,8 @@ class BinaryArray {
         switch (data_type) {
             case "UI8":
                 return this.readUint8();
+            case "UI8_N":
+                return this.readUint8() / 255;
             case "UI16":
                 return this.readUint16();
             case "F32":
@@ -2623,7 +2632,7 @@ class BinaryArray {
 
 module.exports = BinaryArray;
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":3}],10:[function(require,module,exports){
+},{"./utility":1045,"buffer":3}],10:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 const AABB = require("./aabb");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
@@ -3106,7 +3115,7 @@ class CameraState {
                 this.up[2] = value;
                 break;
             default:
-                console.error("camera_state: getValueByName: Unknown name");
+                console.error("camera_state: setValueByName: Unknown name");
                 break;
         }
     }
@@ -9372,6 +9381,7 @@ class InputParameterWrapper {
             this.ui_seeds.fromSpecialData();
             this.main_camera.fromSpecialData();
             this.side_camera.fromSpecialData();
+            this.transfer_function_manager.fromSpecialData();
         }
         else{
             for (var key in this.dict_url_parameter_name_to_input_wrapper) {
@@ -9391,13 +9401,13 @@ class InputParameterWrapper {
     
             const side_camera = urlParams.get(PARAM_SIDE_CAMERA);
             this.side_camera.fromString(side_camera);
+
+            const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
+            this.transfer_function_manager.fromString(transfer_function_manager);
         }
 
         const text = urlParams.get("text");
         document.getElementById("paragraph_text").innerHTML = text;
-
-        const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
-        this.transfer_function_manager.fromString(transfer_function_manager);
 
         const style = urlParams.get(PARAM_STYLE);
         console.log("STYLE:", style)
@@ -9449,6 +9459,7 @@ class InputParameterWrapper {
             this.ui_seeds.toSpecialData();
             this.main_camera.toSpecialData();
             this.side_camera.toSpecialData();
+            this.transfer_function_manager.toSpecialData();
 
             this.state_manager.generateStateBase64(STATE_VERSION);
             params["data"] = this.state_manager.base64_url;
@@ -121485,7 +121496,8 @@ exports.state_description_dict = {
     "special" : [
         "special_data_seeds",
         "special_data_camera_main",
-        "special_data_camera_aux"
+        "special_data_camera_aux",
+        "special_data_transfer_function_manager",
     ],
     //special data
     "special_data_seeds" : new Entry("special_data_seeds", "list", "seed"),
@@ -121510,7 +121522,18 @@ exports.state_description_dict = {
         new Entry("up_x", "variable", "F32"),
         new Entry("up_y", "variable", "F32"),
         new Entry("up_z", "variable", "F32"),
-    ]
+    ],
+    "color_point" : [
+        new Entry("t", "variable", "F32"),
+        new Entry("color_r", "variable", "UI8_N"),
+        new Entry("color_g", "variable", "UI8_N"),
+        new Entry("color_b", "variable", "UI8_N"),
+    ],
+    "opacity_point" : [
+        new Entry("t", "variable", "F32"),
+        new Entry("a", "variable", "F32"),
+    ],
+    
 }
 },{"./state_description":1033}],1033:[function(require,module,exports){
 class StateDescriptionEntry {
@@ -122701,6 +122724,8 @@ const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const lerp = module_utility.lerp;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const BinaryArray = require("./binary_array");
+const getStateDescription = require("./version").getStateDescription;
 
 const TRANSFER_FUNCTION_BINS = 512;
 
@@ -122710,6 +122735,24 @@ class TransferFunctionColorPoint {
         this.r = r;
         this.g = g;
         this.b = b;
+    }
+
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "color_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "color_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
     }
 
     toString() {
@@ -122731,12 +122774,67 @@ class TransferFunctionColorPoint {
         this.g = parseInt(hex.substr(3, 2), 16) / 255
         this.b = parseInt(hex.substr(5, 2), 16) / 255
     }
+
+    getValueByName(name){
+        switch (name) {
+            case "t":
+                return this.t;
+            case "color_r":
+                return this.r;
+            case "color_g":
+                return this.g;
+            case "color_b":
+                return this.b;
+            default:
+                console.error("TransferFunctionColorPoint: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "t":
+                this.t = value;
+                break;
+            case "color_r":        
+                this.r = value;
+                break;
+            case "color_g":     
+                this.g = value;
+                break;
+            case "color_b":       
+                this.b = value;
+                break;
+            default:
+                console.error("TransferFunctionColorPoint: setValueByName: Unknown name");
+                break;
+        }
+    }
+
 }
 
 class TransferFunctionOpacityPoint {
     constructor(t, a) {
         this.t = t;
         this.a = a;
+    }
+
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "opacity_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "opacity_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
     }
 
     toString() {
@@ -122751,6 +122849,33 @@ class TransferFunctionOpacityPoint {
         this.a = split[1];
     }
 
+    getValueByName(name){
+        switch (name) {
+            case "t":
+                return this.t;
+            case "a":
+                return this.a;
+            default:
+                console.error("TransferFunctionOpacityPoint: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "t":
+                this.t = value;
+                break;
+            case "a":        
+                this.a = value;
+                break;
+            default:
+                console.error("TransferFunctionOpacityPoint: setValueByName: Unknown name");
+                break;
+        }
+    }
+
+
 }
 
 class TransferFunction {
@@ -122761,6 +122886,49 @@ class TransferFunction {
         this.list_color_points = [];//TransferFunctionColorPoint
         this.list_opacity_points = [];//TransferFunctionOpacityPoint
         this.list_colors = [];//StreamlineColor
+    }
+
+    writeToBinaryArray(binary_array){
+        binary_array.writeUint16(this.list_opacity_points.length);
+        for (var i = 0; i < this.list_opacity_points.length; i++) {
+            this.list_opacity_points[i].writeToBinaryArray(binary_array);
+        }
+        binary_array.writeUint16(this.list_color_points.length);
+        for (var i = 0; i < this.list_color_points.length; i++) {
+            this.list_color_points[i].writeToBinaryArray(binary_array);
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        this.readOpacitiesFromBinaryArray(binary_array);
+        this.readColorsFromBinaryArray(binary_array);
+        this.fillBins();
+    }
+
+    readOpacitiesFromBinaryArray(binary_array){
+        var list_length = binary_array.readUint16();
+        while (list_length > this.list_opacity_points.length) {
+            this.addOpacityPoint(0, 0);
+        }
+        while (this.list_opacity_points.length > list_length) {
+            this.removeLastOpacityPoint();
+        }
+        for (var i = 0; i < list_length; i++) {
+            this.list_opacity_points[i].readFromBinaryArray(binary_array);
+        }
+    }
+
+    readColorsFromBinaryArray(binary_array){
+        var list_length = binary_array.readUint16();
+        while (list_length > this.list_color_points.length) {
+            this.addColorPoint(0, 0);
+        }
+        while (this.list_color_points.length > list_length) {
+            this.removeLastColorPoint();
+        }
+        for (var i = 0; i < list_length; i++) {
+            this.list_color_points[i].readFromBinaryArray(binary_array);
+        }
     }
 
     toString() {
@@ -122943,6 +123111,28 @@ class TransferFunctionManager {
         this.dirty = false;
     }
 
+    toSpecialData(){          
+        //getStateDescriptionDict(STATE_VERSION);
+        
+        var binary_array = new BinaryArray();
+        binary_array.writeUint16(this.transfer_function_list.length);
+        for (var i = 0; i < this.transfer_function_list.length; i++) {
+            this.transfer_function_list[i].writeToBinaryArray(binary_array);   
+        }
+        binary_array.resizeToContent();
+        console.log(binary_array);
+        window["special_data_transfer_function_manager"] = binary_array;  
+    }
+
+    fromSpecialData() {
+        var binary_array = window["special_data_transfer_function_manager"];
+        binary_array.begin();
+        var list_length = binary_array.readUint16();
+        for(var i=0; i<list_length; i++){
+            this.transfer_function_list[i].readFromBinaryArray(binary_array);
+        }
+    }
+
     fromString(s) {
         console.log("from string TransferFunctionManager ", s);
         if (s === null)
@@ -123100,7 +123290,7 @@ class TransferFunctionManager {
 }
 
 module.exports = TransferFunctionManager;
-},{"./data_types":19,"./utility":1045,"gl-matrix":58}],1042:[function(require,module,exports){
+},{"./binary_array":9,"./data_types":19,"./utility":1045,"./version":1046,"gl-matrix":58}],1042:[function(require,module,exports){
 
 class UISelectedCameraIndicator{
 
@@ -123444,7 +123634,7 @@ class UISeed {
                 this.node_input_c.value = rgbToHex(r, g, b);
                 break;
             default:
-                console.error("ui_seeds: getValueByName: Unknown name");
+                console.error("ui_seeds: setValueByName: Unknown name");
                 break;
         }
     }

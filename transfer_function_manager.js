@@ -3,6 +3,8 @@ const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const lerp = module_utility.lerp;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const BinaryArray = require("./binary_array");
+const getStateDescription = require("./version").getStateDescription;
 
 const TRANSFER_FUNCTION_BINS = 512;
 
@@ -12,6 +14,24 @@ class TransferFunctionColorPoint {
         this.r = r;
         this.g = g;
         this.b = b;
+    }
+
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "color_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "color_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
     }
 
     toString() {
@@ -33,12 +53,67 @@ class TransferFunctionColorPoint {
         this.g = parseInt(hex.substr(3, 2), 16) / 255
         this.b = parseInt(hex.substr(5, 2), 16) / 255
     }
+
+    getValueByName(name){
+        switch (name) {
+            case "t":
+                return this.t;
+            case "color_r":
+                return this.r;
+            case "color_g":
+                return this.g;
+            case "color_b":
+                return this.b;
+            default:
+                console.error("TransferFunctionColorPoint: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "t":
+                this.t = value;
+                break;
+            case "color_r":        
+                this.r = value;
+                break;
+            case "color_g":     
+                this.g = value;
+                break;
+            case "color_b":       
+                this.b = value;
+                break;
+            default:
+                console.error("TransferFunctionColorPoint: setValueByName: Unknown name");
+                break;
+        }
+    }
+
 }
 
 class TransferFunctionOpacityPoint {
     constructor(t, a) {
         this.t = t;
         this.a = a;
+    }
+
+    writeToBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "opacity_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = this.getValueByName(list[i].name);
+            binary_array.writeValue(value, list[i].data_type);            
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        var list = getStateDescription(STATE_VERSION, "opacity_point");
+        console.log(list);
+        for(var i=0; i<list.length; i++){
+            var value = binary_array.readValue(list[i].data_type);
+            this.setValueByName(list[i].name, value);
+        }
     }
 
     toString() {
@@ -53,6 +128,33 @@ class TransferFunctionOpacityPoint {
         this.a = split[1];
     }
 
+    getValueByName(name){
+        switch (name) {
+            case "t":
+                return this.t;
+            case "a":
+                return this.a;
+            default:
+                console.error("TransferFunctionOpacityPoint: getValueByName: Unknown name");
+                return null;
+        }
+    }
+
+    setValueByName(name, value){
+        switch (name) {
+            case "t":
+                this.t = value;
+                break;
+            case "a":        
+                this.a = value;
+                break;
+            default:
+                console.error("TransferFunctionOpacityPoint: setValueByName: Unknown name");
+                break;
+        }
+    }
+
+
 }
 
 class TransferFunction {
@@ -63,6 +165,49 @@ class TransferFunction {
         this.list_color_points = [];//TransferFunctionColorPoint
         this.list_opacity_points = [];//TransferFunctionOpacityPoint
         this.list_colors = [];//StreamlineColor
+    }
+
+    writeToBinaryArray(binary_array){
+        binary_array.writeUint16(this.list_opacity_points.length);
+        for (var i = 0; i < this.list_opacity_points.length; i++) {
+            this.list_opacity_points[i].writeToBinaryArray(binary_array);
+        }
+        binary_array.writeUint16(this.list_color_points.length);
+        for (var i = 0; i < this.list_color_points.length; i++) {
+            this.list_color_points[i].writeToBinaryArray(binary_array);
+        }
+    }
+
+    readFromBinaryArray(binary_array){
+        this.readOpacitiesFromBinaryArray(binary_array);
+        this.readColorsFromBinaryArray(binary_array);
+        this.fillBins();
+    }
+
+    readOpacitiesFromBinaryArray(binary_array){
+        var list_length = binary_array.readUint16();
+        while (list_length > this.list_opacity_points.length) {
+            this.addOpacityPoint(0, 0);
+        }
+        while (this.list_opacity_points.length > list_length) {
+            this.removeLastOpacityPoint();
+        }
+        for (var i = 0; i < list_length; i++) {
+            this.list_opacity_points[i].readFromBinaryArray(binary_array);
+        }
+    }
+
+    readColorsFromBinaryArray(binary_array){
+        var list_length = binary_array.readUint16();
+        while (list_length > this.list_color_points.length) {
+            this.addColorPoint(0, 0);
+        }
+        while (this.list_color_points.length > list_length) {
+            this.removeLastColorPoint();
+        }
+        for (var i = 0; i < list_length; i++) {
+            this.list_color_points[i].readFromBinaryArray(binary_array);
+        }
     }
 
     toString() {
@@ -243,6 +388,28 @@ class TransferFunctionManager {
         this.Concatenate();
         this.UpdateToUI(0);
         this.dirty = false;
+    }
+
+    toSpecialData(){          
+        //getStateDescriptionDict(STATE_VERSION);
+        
+        var binary_array = new BinaryArray();
+        binary_array.writeUint16(this.transfer_function_list.length);
+        for (var i = 0; i < this.transfer_function_list.length; i++) {
+            this.transfer_function_list[i].writeToBinaryArray(binary_array);   
+        }
+        binary_array.resizeToContent();
+        console.log(binary_array);
+        window["special_data_transfer_function_manager"] = binary_array;  
+    }
+
+    fromSpecialData() {
+        var binary_array = window["special_data_transfer_function_manager"];
+        binary_array.begin();
+        var list_length = binary_array.readUint16();
+        for(var i=0; i<list_length; i++){
+            this.transfer_function_list[i].readFromBinaryArray(binary_array);
+        }
     }
 
     fromString(s) {

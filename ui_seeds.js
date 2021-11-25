@@ -228,7 +228,7 @@ class UISeed {
                 this.node_input_c.value = rgbToHex(r, g, b);
                 break;
             default:
-                console.error("ui_seeds: getValueByName: Unknown name");
+                console.error("ui_seeds: setValueByName: Unknown name");
                 break;
         }
     }

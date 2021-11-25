@@ -183,7 +183,7 @@ class CameraState {
                 this.up[2] = value;
                 break;
             default:
-                console.error("camera_state: getValueByName: Unknown name");
+                console.error("camera_state: setValueByName: Unknown name");
                 break;
         }
     }

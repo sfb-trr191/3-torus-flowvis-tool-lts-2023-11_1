@@ -100,7 +100,8 @@ exports.state_description_dict = {
     "special" : [
         "special_data_seeds",
         "special_data_camera_main",
-        "special_data_camera_aux"
+        "special_data_camera_aux",
+        "special_data_transfer_function_manager",
     ],
     //special data
     "special_data_seeds" : new Entry("special_data_seeds", "list", "seed"),
@@ -125,5 +126,16 @@ exports.state_description_dict = {
         new Entry("up_x", "variable", "F32"),
         new Entry("up_y", "variable", "F32"),
         new Entry("up_z", "variable", "F32"),
-    ]
+    ],
+    "color_point" : [
+        new Entry("t", "variable", "F32"),
+        new Entry("color_r", "variable", "UI8_N"),
+        new Entry("color_g", "variable", "UI8_N"),
+        new Entry("color_b", "variable", "UI8_N"),
+    ],
+    "opacity_point" : [
+        new Entry("t", "variable", "F32"),
+        new Entry("a", "variable", "F32"),
+    ],
+    
 }
