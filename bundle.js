@@ -9446,8 +9446,8 @@ class InputParameterWrapper {
         const style = urlParams.get(PARAM_STYLE);
         console.log("STYLE:", style)
 
-        const thumbnail_url = urlParams.get(PARAM_THUMBNAIL);
-        const thumbnail_url_right = urlParams.get(PARAM_THUMBNAIL_RIGHT);
+        const thumbnail_url = window["input_thumbnail"].value;
+        const thumbnail_url_right = window["input_thumbnail_right"].value;
 
         var url = thumbnail_url;
         if(style == STYLE_EMBEDDED_RIGHT){
