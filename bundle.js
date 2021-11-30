@@ -7776,7 +7776,6 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
-const { zeros } = require("mathjs");
 
 ; (function () {
     "use strict"
@@ -8900,7 +8899,7 @@ const { zeros } = require("mathjs");
     }
 
 })();
-},{"./aliasing":8,"./camera":11,"./canvas_wrapper":12,"./canvas_wrapper_transfer_function":13,"./const":15,"./data_conversion":17,"./export":22,"./ftle_manager":23,"./global_data":25,"./hide_manager":26,"./input_changed_manager":28,"./input_manager":29,"./input_parameter_wrapper":30,"./lights":31,"./mouse_manager":33,"./object_manager":1006,"./shader/f_shader_average.glsl":1012,"./shader/f_shader_compute_flow_map_slice.glsl":1013,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1014,"./shader/f_shader_compute_ftle_normals.glsl":1015,"./shader/f_shader_copy.glsl":1016,"./shader/f_shader_flow_map_slice.glsl":1017,"./shader/f_shader_placeholder.glsl":1018,"./shader/f_shader_raytracing.glsl":1019,"./shader/f_shader_raytracing_preprocessor.glsl":1020,"./shader/f_shader_resampling.glsl":1021,"./shader/f_shader_sum.glsl":1022,"./shader/f_shader_transfer_function.glsl":1023,"./shader/f_shader_transfer_function_points.glsl":1024,"./shader/v_shader_raytracing.glsl":1025,"./shader/v_shader_resampling.glsl":1026,"./shader/v_shader_transfer_function_points.glsl":1027,"./shader_manager":1030,"./state_manager":1034,"./streamline_context":1035,"./tab_manager":1037,"./transfer_function_manager":1041,"./ui_left_tool_bar":1042,"./ui_seeds":1043,"./ui_transfer_functions":1044,"./utility":1045,"./version":1046,"./webgl":1047,"gl-matrix":58,"mathjs":913,"ml-matrix":994}],28:[function(require,module,exports){
+},{"./aliasing":8,"./camera":11,"./canvas_wrapper":12,"./canvas_wrapper_transfer_function":13,"./const":15,"./data_conversion":17,"./export":22,"./ftle_manager":23,"./global_data":25,"./hide_manager":26,"./input_changed_manager":28,"./input_manager":29,"./input_parameter_wrapper":30,"./lights":31,"./mouse_manager":33,"./object_manager":1006,"./shader/f_shader_average.glsl":1012,"./shader/f_shader_compute_flow_map_slice.glsl":1013,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1014,"./shader/f_shader_compute_ftle_normals.glsl":1015,"./shader/f_shader_copy.glsl":1016,"./shader/f_shader_flow_map_slice.glsl":1017,"./shader/f_shader_placeholder.glsl":1018,"./shader/f_shader_raytracing.glsl":1019,"./shader/f_shader_raytracing_preprocessor.glsl":1020,"./shader/f_shader_resampling.glsl":1021,"./shader/f_shader_sum.glsl":1022,"./shader/f_shader_transfer_function.glsl":1023,"./shader/f_shader_transfer_function_points.glsl":1024,"./shader/v_shader_raytracing.glsl":1025,"./shader/v_shader_resampling.glsl":1026,"./shader/v_shader_transfer_function_points.glsl":1027,"./shader_manager":1030,"./state_manager":1034,"./streamline_context":1035,"./tab_manager":1037,"./transfer_function_manager":1041,"./ui_left_tool_bar":1042,"./ui_seeds":1043,"./ui_transfer_functions":1044,"./utility":1045,"./version":1046,"./webgl":1047,"gl-matrix":58,"ml-matrix":994}],28:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{

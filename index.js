@@ -62,7 +62,6 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
-const { zeros } = require("mathjs");
 
 ; (function () {
     "use strict"
