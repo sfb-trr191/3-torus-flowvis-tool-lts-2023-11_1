@@ -237,7 +237,12 @@ class InputParameterWrapper {
             this.side_camera.fromString(side_camera);
 
             const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
-            this.transfer_function_manager.fromString(transfer_function_manager);
+            this.transfer_function_manager.fromString(transfer_function_manager);  
+
+            window["URL_VERSION_YEAR"] = parseInt(urlParams.get("v_y"));
+            window["URL_VERSION_MONTH"] = parseInt(urlParams.get("v_m"));
+            window["URL_VERSION_NUMBER"] = parseInt(urlParams.get("v_n"));
+            window["URL_STATE_VERSION"] = parseInt(urlParams.get("v_s"));
         }
 
         const text = urlParams.get("text");
@@ -312,6 +317,11 @@ class InputParameterWrapper {
             params[PARAM_CAMERA] = this.main_camera.toString();
             params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
             params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+
+            params["v_y"] = window["VERSION_YEAR"];
+            params["v_m"] = window["VERSION_MONTH"];
+            params["v_n"] = window["VERSION_NUMBER"];
+            params["v_s"] = window["STATE_VERSION"];
         }
         /*
         params["text"] = `

@@ -62,6 +62,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+const { zeros } = require("mathjs");
 
 ; (function () {
     "use strict"
@@ -301,6 +302,7 @@ const StateManager = require("./state_manager");
 
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
+        UpdateVersionString();
         onChangedDrawMode();
         onChangedCameraControl();
         OnSelectedTransferFunction();
@@ -959,6 +961,60 @@ const StateManager = require("./state_manager");
         var use_data_array = document.getElementById("checkbox_url_data_array").checked;
         var query_string = input_parameter_wrapper.toQueryString(use_data_array);
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
+    }
+
+    function GetVersionStringURL(){
+        return window["URL_VERSION_YEAR"] + "." + 
+        window["URL_VERSION_MONTH"] + "-" + 
+        window["URL_VERSION_NUMBER"] + "S" + 
+        window["URL_STATE_VERSION"];
+    }
+
+    function GetVersionStringCurrent(){
+        return window["VERSION_YEAR"] + "." + 
+        window["VERSION_MONTH"] + "-" + 
+        window["VERSION_NUMBER"] + "S" + 
+        window["STATE_VERSION"];
+    }
+
+    function UpdateVersionString(){
+
+        var string_new_version = "";
+        var string_upgrade_version = "";
+        var url_without_query = window.location.toString().replace(window.location.search, "");
+        var upgrade_url = window.location.toString().replace(url_without_query, URL_RELEASE);
+        if(url_without_query.includes("-lts-")){
+            string_new_version = "<span style='color: red'>A new version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
+            string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +
+                "<span style='color: red'>.</span>";
+        }
+        else if(url_without_query.includes("christian-lang")){
+            string_new_version = "<span style='color: red'>This is the development version. The release version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
+            string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +
+                "<span style='color: red'>.</span>";
+        }
+        else if(url_without_query.includes("localhost")){
+            string_new_version = "<span style='color: red'>This is the local version. The release version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
+            string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +
+                "<span style='color: red'>.</span>";
+        }
+
+        var string_url = GetVersionStringURL();            
+
+        var string_current = GetVersionStringCurrent();
+
+        var string_compare = "Version: " + string_current + ". ";
+
+        if(string_url !== string_current){
+            string_compare = "This savestate was created with version: " + 
+            string_url + " " +
+            "and is currently running on version: " +
+            string_current + ". ";
+        }
+
+        document.getElementById("paragraph_version_string").innerHTML = 
+        string_compare +
+        string_new_version + string_upgrade_version;
     }
 
     function SetMagneticField(){

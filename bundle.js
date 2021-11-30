@@ -5712,6 +5712,8 @@ class ComputeWrapper {
 module.exports = ComputeWrapper;
 },{"./render_texture":1009}],15:[function(require,module,exports){
 (function (global){(function (){
+global.URL_RELEASE = "https://sfb-trr191.github.io/3-torus-flowvis-tool/index.html";
+
 global.FIXED_LENGTH_RANDOM_SEED_POSITION = 4;
 
 global.DRAW_MODE_NONE = 0;
@@ -7774,6 +7776,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+const { zeros } = require("mathjs");
 
 ; (function () {
     "use strict"
@@ -8013,6 +8016,7 @@ const StateManager = require("./state_manager");
 
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
+        UpdateVersionString();
         onChangedDrawMode();
         onChangedCameraControl();
         OnSelectedTransferFunction();
@@ -8673,6 +8677,60 @@ const StateManager = require("./state_manager");
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 
+    function GetVersionStringURL(){
+        return window["URL_VERSION_YEAR"] + "." + 
+        window["URL_VERSION_MONTH"] + "-" + 
+        window["URL_VERSION_NUMBER"] + "S" + 
+        window["URL_STATE_VERSION"];
+    }
+
+    function GetVersionStringCurrent(){
+        return window["VERSION_YEAR"] + "." + 
+        window["VERSION_MONTH"] + "-" + 
+        window["VERSION_NUMBER"] + "S" + 
+        window["STATE_VERSION"];
+    }
+
+    function UpdateVersionString(){
+
+        var string_new_version = "";
+        var string_upgrade_version = "";
+        var url_without_query = window.location.toString().replace(window.location.search, "");
+        var upgrade_url = window.location.toString().replace(url_without_query, URL_RELEASE);
+        if(url_without_query.includes("-lts-")){
+            string_new_version = "<span style='color: red'>A new version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
+            string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +
+                "<span style='color: red'>.</span>";
+        }
+        else if(url_without_query.includes("christian-lang")){
+            string_new_version = "<span style='color: red'>This is the development version. The release version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
+            string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +
+                "<span style='color: red'>.</span>";
+        }
+        else if(url_without_query.includes("localhost")){
+            string_new_version = "<span style='color: red'>This is the local version. The release version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
+            string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +
+                "<span style='color: red'>.</span>";
+        }
+
+        var string_url = GetVersionStringURL();            
+
+        var string_current = GetVersionStringCurrent();
+
+        var string_compare = "Version: " + string_current + ". ";
+
+        if(string_url !== string_current){
+            string_compare = "This savestate was created with version: " + 
+            string_url + " " +
+            "and is currently running on version: " +
+            string_current + ". ";
+        }
+
+        document.getElementById("paragraph_version_string").innerHTML = 
+        string_compare +
+        string_new_version + string_upgrade_version;
+    }
+
     function SetMagneticField(){
         document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
         document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
@@ -8842,7 +8900,7 @@ const StateManager = require("./state_manager");
     }
 
 })();
-},{"./aliasing":8,"./camera":11,"./canvas_wrapper":12,"./canvas_wrapper_transfer_function":13,"./const":15,"./data_conversion":17,"./export":22,"./ftle_manager":23,"./global_data":25,"./hide_manager":26,"./input_changed_manager":28,"./input_manager":29,"./input_parameter_wrapper":30,"./lights":31,"./mouse_manager":33,"./object_manager":1006,"./shader/f_shader_average.glsl":1012,"./shader/f_shader_compute_flow_map_slice.glsl":1013,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1014,"./shader/f_shader_compute_ftle_normals.glsl":1015,"./shader/f_shader_copy.glsl":1016,"./shader/f_shader_flow_map_slice.glsl":1017,"./shader/f_shader_placeholder.glsl":1018,"./shader/f_shader_raytracing.glsl":1019,"./shader/f_shader_raytracing_preprocessor.glsl":1020,"./shader/f_shader_resampling.glsl":1021,"./shader/f_shader_sum.glsl":1022,"./shader/f_shader_transfer_function.glsl":1023,"./shader/f_shader_transfer_function_points.glsl":1024,"./shader/v_shader_raytracing.glsl":1025,"./shader/v_shader_resampling.glsl":1026,"./shader/v_shader_transfer_function_points.glsl":1027,"./shader_manager":1030,"./state_manager":1034,"./streamline_context":1035,"./tab_manager":1037,"./transfer_function_manager":1041,"./ui_left_tool_bar":1042,"./ui_seeds":1043,"./ui_transfer_functions":1044,"./utility":1045,"./version":1046,"./webgl":1047,"gl-matrix":58,"ml-matrix":994}],28:[function(require,module,exports){
+},{"./aliasing":8,"./camera":11,"./canvas_wrapper":12,"./canvas_wrapper_transfer_function":13,"./const":15,"./data_conversion":17,"./export":22,"./ftle_manager":23,"./global_data":25,"./hide_manager":26,"./input_changed_manager":28,"./input_manager":29,"./input_parameter_wrapper":30,"./lights":31,"./mouse_manager":33,"./object_manager":1006,"./shader/f_shader_average.glsl":1012,"./shader/f_shader_compute_flow_map_slice.glsl":1013,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1014,"./shader/f_shader_compute_ftle_normals.glsl":1015,"./shader/f_shader_copy.glsl":1016,"./shader/f_shader_flow_map_slice.glsl":1017,"./shader/f_shader_placeholder.glsl":1018,"./shader/f_shader_raytracing.glsl":1019,"./shader/f_shader_raytracing_preprocessor.glsl":1020,"./shader/f_shader_resampling.glsl":1021,"./shader/f_shader_sum.glsl":1022,"./shader/f_shader_transfer_function.glsl":1023,"./shader/f_shader_transfer_function_points.glsl":1024,"./shader/v_shader_raytracing.glsl":1025,"./shader/v_shader_resampling.glsl":1026,"./shader/v_shader_transfer_function_points.glsl":1027,"./shader_manager":1030,"./state_manager":1034,"./streamline_context":1035,"./tab_manager":1037,"./transfer_function_manager":1041,"./ui_left_tool_bar":1042,"./ui_seeds":1043,"./ui_transfer_functions":1044,"./utility":1045,"./version":1046,"./webgl":1047,"gl-matrix":58,"mathjs":913,"ml-matrix":994}],28:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -9440,7 +9498,12 @@ class InputParameterWrapper {
             this.side_camera.fromString(side_camera);
 
             const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
-            this.transfer_function_manager.fromString(transfer_function_manager);
+            this.transfer_function_manager.fromString(transfer_function_manager);  
+
+            window["URL_VERSION_YEAR"] = parseInt(urlParams.get("v_y"));
+            window["URL_VERSION_MONTH"] = parseInt(urlParams.get("v_m"));
+            window["URL_VERSION_NUMBER"] = parseInt(urlParams.get("v_n"));
+            window["URL_STATE_VERSION"] = parseInt(urlParams.get("v_s"));
         }
 
         const text = urlParams.get("text");
@@ -9515,6 +9578,11 @@ class InputParameterWrapper {
             params[PARAM_CAMERA] = this.main_camera.toString();
             params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
             params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+
+            params["v_y"] = window["VERSION_YEAR"];
+            params["v_m"] = window["VERSION_MONTH"];
+            params["v_n"] = window["VERSION_NUMBER"];
+            params["v_s"] = window["STATE_VERSION"];
         }
         /*
         params["text"] = `
