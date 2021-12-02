@@ -62,6 +62,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
 ; (function () {
     "use strict"
@@ -302,6 +303,7 @@ const StateManager = require("./state_manager");
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
         UpdateVersionString();
+        RedirectVersion();
         onChangedDrawMode();
         onChangedCameraControl();
         OnSelectedTransferFunction();
@@ -962,16 +964,42 @@ const StateManager = require("./state_manager");
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 
-    function GetVersionStringURL(){
-        return window["URL_VERSION_YEAR"] + "." + 
-        window["URL_VERSION_MONTH"] + "-" + 
+    function RedirectVersion(){
+        console.log("RedirectVersion");
+        var key = GetShortVersionStringURL();
+        if(key in VERSION_REDIRECTION_DICT){
+            console.log("Redirect: redirection found for key:", key);
+            var url = VERSION_REDIRECTION_DICT[key];
+            console.log("Redirect: redirect to:", url);
+            var url_without_query = window.location.toString().replace(window.location.search, "");
+            var redirection_url = window.location.toString().replace(url_without_query, url);
+            console.log("Redirect: redirect to:", redirection_url);            
+            window.location.href = redirection_url; 
+        }
+        else{
+            console.log("Redirect: no redirection found for key:", key);
+        }
+    }
+
+    //used for redirection
+    function GetShortVersionStringURL(){
+        return window["URL_VERSION_YEAR"] + "-" + 
+        window["URL_VERSION_MONTH"] + "." + 
+        window["URL_VERSION_NUMBER"];
+    }
+
+    //extended version used for display
+    function GetCompleteVersionStringURL(){
+        return window["URL_VERSION_YEAR"] + "-" + 
+        window["URL_VERSION_MONTH"] + "." + 
         window["URL_VERSION_NUMBER"] + "S" + 
         window["URL_STATE_VERSION"];
     }
 
-    function GetVersionStringCurrent(){
-        return window["VERSION_YEAR"] + "." + 
-        window["VERSION_MONTH"] + "-" + 
+    //extended version used for display
+    function GetCompleteVersionStringCurrent(){
+        return window["VERSION_YEAR"] + "-" + 
+        window["VERSION_MONTH"] + "." + 
         window["VERSION_NUMBER"] + "S" + 
         window["STATE_VERSION"];
     }
@@ -998,9 +1026,9 @@ const StateManager = require("./state_manager");
                 "<span style='color: red'>.</span>";
         }
 
-        var string_url = GetVersionStringURL();            
+        var string_url = GetCompleteVersionStringURL();            
 
-        var string_current = GetVersionStringCurrent();
+        var string_current = GetCompleteVersionStringCurrent();
 
         var string_compare = "Version: " + string_current + ". ";
 

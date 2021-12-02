@@ -4921,7 +4921,7 @@ class CanvasWrapper {
 }
 
 module.exports = CanvasWrapper;
-},{"./dummy_quad":21,"./render_wrapper":1010,"./shader_flags":1029,"./shader_uniforms":1031,"./webgl":1047}],13:[function(require,module,exports){
+},{"./dummy_quad":21,"./render_wrapper":1010,"./shader_flags":1029,"./shader_uniforms":1031,"./webgl":1048}],13:[function(require,module,exports){
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
@@ -5679,7 +5679,7 @@ class CanvasWrapperTransferFunction {
 }
 
 module.exports = CanvasWrapperTransferFunction;
-},{"./dummy_quad":21,"./render_wrapper":1010,"./shader_uniforms":1031,"./utility":1045,"./webgl":1047}],14:[function(require,module,exports){
+},{"./dummy_quad":21,"./render_wrapper":1010,"./shader_uniforms":1031,"./utility":1045,"./webgl":1048}],14:[function(require,module,exports){
 const RenderTexture = require("./render_texture");
 
 class ComputeWrapper {
@@ -7212,7 +7212,7 @@ class FTLEManager {
 }
 
 module.exports = FTLEManager;
-},{"./compute_wraper":14,"./data_textures":18,"./dummy_quad":21,"./shader_uniforms":1031,"./utility":1045,"./webgl":1047,"ml-matrix":994}],24:[function(require,module,exports){
+},{"./compute_wraper":14,"./data_textures":18,"./dummy_quad":21,"./shader_uniforms":1031,"./utility":1045,"./webgl":1048,"ml-matrix":994}],24:[function(require,module,exports){
 const glMatrix = require("gl-matrix");
 
 vec3_add_scalar = function (out, a, s) {
@@ -7776,6 +7776,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
 ; (function () {
     "use strict"
@@ -8016,6 +8017,7 @@ const StateManager = require("./state_manager");
         input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
         UpdateVersionString();
+        RedirectVersion();
         onChangedDrawMode();
         onChangedCameraControl();
         OnSelectedTransferFunction();
@@ -8676,16 +8678,42 @@ const StateManager = require("./state_manager");
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 
-    function GetVersionStringURL(){
-        return window["URL_VERSION_YEAR"] + "." + 
-        window["URL_VERSION_MONTH"] + "-" + 
+    function RedirectVersion(){
+        console.log("RedirectVersion");
+        var key = GetShortVersionStringURL();
+        if(key in VERSION_REDIRECTION_DICT){
+            console.log("Redirect: redirection found for key:", key);
+            var url = VERSION_REDIRECTION_DICT[key];
+            console.log("Redirect: redirect to:", url);
+            var url_without_query = window.location.toString().replace(window.location.search, "");
+            var redirection_url = window.location.toString().replace(url_without_query, url);
+            console.log("Redirect: redirect to:", redirection_url);            
+            window.location.href = redirection_url; 
+        }
+        else{
+            console.log("Redirect: no redirection found for key:", key);
+        }
+    }
+
+    //used for redirection
+    function GetShortVersionStringURL(){
+        return window["URL_VERSION_YEAR"] + "-" + 
+        window["URL_VERSION_MONTH"] + "." + 
+        window["URL_VERSION_NUMBER"];
+    }
+
+    //extended version used for display
+    function GetCompleteVersionStringURL(){
+        return window["URL_VERSION_YEAR"] + "-" + 
+        window["URL_VERSION_MONTH"] + "." + 
         window["URL_VERSION_NUMBER"] + "S" + 
         window["URL_STATE_VERSION"];
     }
 
-    function GetVersionStringCurrent(){
-        return window["VERSION_YEAR"] + "." + 
-        window["VERSION_MONTH"] + "-" + 
+    //extended version used for display
+    function GetCompleteVersionStringCurrent(){
+        return window["VERSION_YEAR"] + "-" + 
+        window["VERSION_MONTH"] + "." + 
         window["VERSION_NUMBER"] + "S" + 
         window["STATE_VERSION"];
     }
@@ -8712,9 +8740,9 @@ const StateManager = require("./state_manager");
                 "<span style='color: red'>.</span>";
         }
 
-        var string_url = GetVersionStringURL();            
+        var string_url = GetCompleteVersionStringURL();            
 
-        var string_current = GetVersionStringCurrent();
+        var string_current = GetCompleteVersionStringCurrent();
 
         var string_compare = "Version: " + string_current + ". ";
 
@@ -8899,7 +8927,7 @@ const StateManager = require("./state_manager");
     }
 
 })();
-},{"./aliasing":8,"./camera":11,"./canvas_wrapper":12,"./canvas_wrapper_transfer_function":13,"./const":15,"./data_conversion":17,"./export":22,"./ftle_manager":23,"./global_data":25,"./hide_manager":26,"./input_changed_manager":28,"./input_manager":29,"./input_parameter_wrapper":30,"./lights":31,"./mouse_manager":33,"./object_manager":1006,"./shader/f_shader_average.glsl":1012,"./shader/f_shader_compute_flow_map_slice.glsl":1013,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1014,"./shader/f_shader_compute_ftle_normals.glsl":1015,"./shader/f_shader_copy.glsl":1016,"./shader/f_shader_flow_map_slice.glsl":1017,"./shader/f_shader_placeholder.glsl":1018,"./shader/f_shader_raytracing.glsl":1019,"./shader/f_shader_raytracing_preprocessor.glsl":1020,"./shader/f_shader_resampling.glsl":1021,"./shader/f_shader_sum.glsl":1022,"./shader/f_shader_transfer_function.glsl":1023,"./shader/f_shader_transfer_function_points.glsl":1024,"./shader/v_shader_raytracing.glsl":1025,"./shader/v_shader_resampling.glsl":1026,"./shader/v_shader_transfer_function_points.glsl":1027,"./shader_manager":1030,"./state_manager":1034,"./streamline_context":1035,"./tab_manager":1037,"./transfer_function_manager":1041,"./ui_left_tool_bar":1042,"./ui_seeds":1043,"./ui_transfer_functions":1044,"./utility":1045,"./version":1046,"./webgl":1047,"gl-matrix":58,"ml-matrix":994}],28:[function(require,module,exports){
+},{"./aliasing":8,"./camera":11,"./canvas_wrapper":12,"./canvas_wrapper_transfer_function":13,"./const":15,"./data_conversion":17,"./export":22,"./ftle_manager":23,"./global_data":25,"./hide_manager":26,"./input_changed_manager":28,"./input_manager":29,"./input_parameter_wrapper":30,"./lights":31,"./mouse_manager":33,"./object_manager":1006,"./shader/f_shader_average.glsl":1012,"./shader/f_shader_compute_flow_map_slice.glsl":1013,"./shader/f_shader_compute_flowmap_finite_differences.glsl":1014,"./shader/f_shader_compute_ftle_normals.glsl":1015,"./shader/f_shader_copy.glsl":1016,"./shader/f_shader_flow_map_slice.glsl":1017,"./shader/f_shader_placeholder.glsl":1018,"./shader/f_shader_raytracing.glsl":1019,"./shader/f_shader_raytracing_preprocessor.glsl":1020,"./shader/f_shader_resampling.glsl":1021,"./shader/f_shader_sum.glsl":1022,"./shader/f_shader_transfer_function.glsl":1023,"./shader/f_shader_transfer_function_points.glsl":1024,"./shader/v_shader_raytracing.glsl":1025,"./shader/v_shader_resampling.glsl":1026,"./shader/v_shader_transfer_function_points.glsl":1027,"./shader_manager":1030,"./state_manager":1034,"./streamline_context":1035,"./tab_manager":1037,"./transfer_function_manager":1041,"./ui_left_tool_bar":1042,"./ui_seeds":1043,"./ui_transfer_functions":1044,"./utility":1045,"./version":1046,"./version_redirection_dict":1047,"./webgl":1048,"gl-matrix":58,"ml-matrix":994}],28:[function(require,module,exports){
 //const GROUP_NAME_CALCULATE = require("./const");
 
 class InputChangedGroup{
@@ -124585,6 +124613,10 @@ exports.getWriteValueConversion = function(state_version, value_conversion_name)
 }
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./state_description/1":1032}],1047:[function(require,module,exports){
+exports.VERSION_REDIRECTION_DICT = {
+    "1337-1.1" : "https://christian-lang-git.github.io/reeb-vector-fields-web/index.html" //test entry, redirects to development version
+}
+},{}],1048:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
