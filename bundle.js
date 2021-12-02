@@ -8680,6 +8680,13 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function RedirectVersion(){
         console.log("RedirectVersion");
+        var version_url = GetCompleteVersionStringURL();
+        var version_current = GetCompleteVersionStringCurrent();
+        if(version_url === version_current){
+            console.log("Redirect: version identical", version_url);
+            return;
+        }
+
         var key = GetShortVersionStringURL();
         if(key in VERSION_REDIRECTION_DICT){
             console.log("Redirect: redirection found for key:", key);
