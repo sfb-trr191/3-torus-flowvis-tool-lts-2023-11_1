@@ -9460,7 +9460,8 @@ class InputParameterWrapper {
         console.log("fromURL:", window.location.search);
         const urlParams = new URLSearchParams(window.location.search);
 
-        const complete = urlParams.has("c") || window.location.search.length < 1;
+        const no_search = window.location.search.length < 1;
+        const complete = urlParams.has("c") || no_search;
         if(!complete){
             window.alert("Error: Incomplete URL.\nIf you clicked on a link in a PDF, try using a different PDF viewer.");
         }
@@ -9476,6 +9477,9 @@ class InputParameterWrapper {
             this.main_camera.fromSpecialData();
             this.side_camera.fromSpecialData();
             this.transfer_function_manager.fromSpecialData();
+        }
+        else if(no_search){
+            //do nothing
         }
         else{
             for (var key in this.dict_url_parameter_name_to_input_wrapper) {
@@ -9499,10 +9503,20 @@ class InputParameterWrapper {
             const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
             this.transfer_function_manager.fromString(transfer_function_manager);  
 
-            window["URL_VERSION_YEAR"] = parseInt(urlParams.get("v_y"));
-            window["URL_VERSION_MONTH"] = parseInt(urlParams.get("v_m"));
-            window["URL_VERSION_NUMBER"] = parseInt(urlParams.get("v_n"));
-            window["URL_STATE_VERSION"] = parseInt(urlParams.get("v_s"));
+            var f1 = urlParams.has("v_y");
+            var f2 = urlParams.has("v_m");
+            var f3 = urlParams.has("v_n");
+            var f4 = urlParams.has("v_s");
+            if(f1 && f2 && f3 && f4){
+                window["URL_VERSION_YEAR"] = parseInt(urlParams.get("v_y"));
+                window["URL_VERSION_MONTH"] = parseInt(urlParams.get("v_m"));
+                window["URL_VERSION_NUMBER"] = parseInt(urlParams.get("v_n"));
+                window["URL_STATE_VERSION"] = parseInt(urlParams.get("v_s"));
+            }
+            else{
+                console.error("missing version");
+                stop_script;
+            }
         }
 
         const text = urlParams.get("text");
