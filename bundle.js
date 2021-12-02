@@ -8680,21 +8680,21 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function RedirectVersion(){
         console.log("RedirectVersion");
-        var version_url = GetCompleteVersionStringURL();
-        var version_current = GetCompleteVersionStringCurrent();
-        if(version_url === version_current){
-            console.log("Redirect: version identical", version_url);
-            return;
-        }
 
         var key = GetShortVersionStringURL();
         if(key in VERSION_REDIRECTION_DICT){
             console.log("Redirect: redirection found for key:", key);
             var url = VERSION_REDIRECTION_DICT[key];
-            console.log("Redirect: redirect to:", url);
             var url_without_query = window.location.toString().replace(window.location.search, "");
             var redirection_url = window.location.toString().replace(url_without_query, url);
-            console.log("Redirect: redirect to:", redirection_url);            
+
+            console.log("Redirect: url:", url);
+            console.log("Redirect: url_without_query:", url_without_query);
+            if(url === url_without_query){
+                console.log("Redirect: already at destination", url);
+                return;
+            }  
+            console.log("Redirect: redirect to:", redirection_url);  
             window.location.href = redirection_url; 
         }
         else{
