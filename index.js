@@ -967,6 +967,11 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function RedirectVersion(){
         console.log("RedirectVersion");
 
+        var upgrade = window["global_is_upgrade"];
+        if(upgrade){
+            return;
+        }
+
         var key = GetShortVersionStringURL();
         if(key in VERSION_REDIRECTION_DICT){
             console.log("Redirect: redirection found for key:", key);
@@ -1017,6 +1022,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var string_upgrade_version = "";
         var url_without_query = window.location.toString().replace(window.location.search, "");
         var upgrade_url = window.location.toString().replace(url_without_query, URL_RELEASE);
+        var upgrade_url = upgrade_url.replace("&c=1", "&upgrade=1&c=1");
         if(url_without_query.includes("-lts-")){
             string_new_version = "<span style='color: red'>A new version is available </span> <a href='" + URL_RELEASE + "'>here</a>";
             string_upgrade_version = "<span style='color: red'>. You can try to transfer the state </span> <a href='" + upgrade_url + "'>here</a>" +

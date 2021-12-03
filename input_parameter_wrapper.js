@@ -206,6 +206,9 @@ class InputParameterWrapper {
             window.alert("Error: Incomplete URL.\nIf you clicked on a link in a PDF, try using a different PDF viewer.");
         }
 
+        const upgrade = urlParams.has("upgrade");        
+        window["global_is_upgrade"] = upgrade;
+
         var use_data_array = urlParams.has("data");
         document.getElementById("checkbox_url_data_array").checked = use_data_array;
         if(use_data_array){
