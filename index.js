@@ -959,7 +959,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         console.log("UpdateURL");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
-        var use_data_array = document.getElementById("checkbox_url_data_array").checked;
+        //var use_data_array = document.getElementById("checkbox_url_data_array").checked;
+        var use_data_array = false;
         var query_string = input_parameter_wrapper.toQueryString(use_data_array);
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }

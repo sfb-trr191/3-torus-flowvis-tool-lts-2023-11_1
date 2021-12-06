@@ -8673,7 +8673,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         console.log("UpdateURL");
         main_camera.saveCurrentState();
         side_camera.saveCurrentState();
-        var use_data_array = document.getElementById("checkbox_url_data_array").checked;
+        //var use_data_array = document.getElementById("checkbox_url_data_array").checked;
+        var use_data_array = false;
         var query_string = input_parameter_wrapper.toQueryString(use_data_array);
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
@@ -9511,7 +9512,7 @@ class InputParameterWrapper {
         window["global_is_upgrade"] = upgrade;
 
         var use_data_array = urlParams.has("data");
-        document.getElementById("checkbox_url_data_array").checked = use_data_array;
+        //document.getElementById("checkbox_url_data_array").checked = use_data_array;
         if(use_data_array){
             const data = urlParams.get("data");
             this.state_manager.base64_url = data;

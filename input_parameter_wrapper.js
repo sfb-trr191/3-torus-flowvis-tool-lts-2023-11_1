@@ -210,7 +210,7 @@ class InputParameterWrapper {
         window["global_is_upgrade"] = upgrade;
 
         var use_data_array = urlParams.has("data");
-        document.getElementById("checkbox_url_data_array").checked = use_data_array;
+        //document.getElementById("checkbox_url_data_array").checked = use_data_array;
         if(use_data_array){
             const data = urlParams.get("data");
             this.state_manager.base64_url = data;
