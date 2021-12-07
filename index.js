@@ -1092,7 +1092,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
                 document.getElementById("list_warning_index").className = class_name;*/
 
         class_name = "hidden";
-        if (canvas_wrapper_main.isRenderingIncomplete()) {
+        if (canvas_wrapper_main.isRenderingIncomplete() || canvas_wrapper_side.isRenderingIncomplete()) {
             class_name = "warning";
             warning_counter += 1;
         }
@@ -1109,8 +1109,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
                 document.getElementById("list_warning_thumbnail_url").className = class_name;*/
 
         var text = document.getElementById("input_thumbnail").value
+        var text2 = document.getElementById("input_thumbnail_right").value
         class_name = "hidden";
-        if (text == "") {
+        if (text == "" || text2 == "") {
             class_name = "warning";
             warning_counter += 1;
         }

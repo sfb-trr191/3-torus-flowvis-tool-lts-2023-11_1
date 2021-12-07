@@ -8806,7 +8806,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
                 document.getElementById("list_warning_index").className = class_name;*/
 
         class_name = "hidden";
-        if (canvas_wrapper_main.isRenderingIncomplete()) {
+        if (canvas_wrapper_main.isRenderingIncomplete() || canvas_wrapper_side.isRenderingIncomplete()) {
             class_name = "warning";
             warning_counter += 1;
         }
@@ -8823,8 +8823,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
                 document.getElementById("list_warning_thumbnail_url").className = class_name;*/
 
         var text = document.getElementById("input_thumbnail").value
+        var text2 = document.getElementById("input_thumbnail_right").value
         class_name = "hidden";
-        if (text == "") {
+        if (text == "" || text2 == "") {
             class_name = "warning";
             warning_counter += 1;
         }
@@ -124584,7 +124585,7 @@ const state_description_dict_1 = require("./state_description/1").state_descript
 //ON_RELEASE: CHANGE EVERY RELEASE
 global.VERSION_YEAR = 2021;
 global.VERSION_MONTH = 12;
-global.VERSION_NUMBER = 1;
+global.VERSION_NUMBER = 2;
 //ON_RELEASE: INCREMENT IF STATE DATA DESCRIPTION CHANGES
 global.STATE_VERSION = 1;
 

@@ -314,6 +314,12 @@ legend {
 
 .warning_text{
     color: rgb(255, 0, 0);
+    text-align: justify;
+}
+
+.warning_li{
+    color: rgb(255, 0, 0);
+    text-align: left;
 }
 
 .warning_title{
