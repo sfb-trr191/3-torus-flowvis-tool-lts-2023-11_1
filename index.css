@@ -254,6 +254,10 @@ legend {
     display: none;
 }
 
+#image_thumbnail_right {
+    display: none;
+}
+
 /* Style the tab */
 
 .tab {

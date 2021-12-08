@@ -4,11 +4,26 @@ canvas {
     display: none;
 }
 
+#side_canvas{
+    display: none;
+}
+
 #image_thumbnail
 {
     display: block;
     width: 1280px;
     height: 720px;
+    margin: auto;
+    padding: 0;
+    border: none;
+    background-color: black; 
+}
+
+#image_thumbnail_right
+{
+    display: block;
+    width: 512px;
+    height: 384px;
     margin: auto;
     padding: 0;
     border: none;

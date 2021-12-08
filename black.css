@@ -131,3 +131,8 @@ fieldset {
 {
     display: none;
 }
+
+#image_thumbnail_right
+{
+    display: none;
+}

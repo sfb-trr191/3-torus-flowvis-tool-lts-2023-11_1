@@ -9585,6 +9585,11 @@ class InputParameterWrapper {
         if (!invalid_thumbnail)
             document.getElementById("image_thumbnail").src = url;
 
+        var url = thumbnail_url_right;
+        var invalid_thumbnail = url === null || url === "";
+        if (!invalid_thumbnail)
+            document.getElementById("image_thumbnail_right").src = url;  
+
         switch (style) {
             case STYLE_DEFAULT:
                 setCSS("embedded_thumbnail_default.css");
@@ -124585,7 +124590,7 @@ const state_description_dict_1 = require("./state_description/1").state_descript
 //ON_RELEASE: CHANGE EVERY RELEASE
 global.VERSION_YEAR = 2021;
 global.VERSION_MONTH = 12;
-global.VERSION_NUMBER = 3;
+global.VERSION_NUMBER = 4;
 //ON_RELEASE: INCREMENT IF STATE DATA DESCRIPTION CHANGES
 global.STATE_VERSION = 1;
 

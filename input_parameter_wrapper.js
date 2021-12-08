@@ -282,6 +282,11 @@ class InputParameterWrapper {
         if (!invalid_thumbnail)
             document.getElementById("image_thumbnail").src = url;
 
+        var url = thumbnail_url_right;
+        var invalid_thumbnail = url === null || url === "";
+        if (!invalid_thumbnail)
+            document.getElementById("image_thumbnail_right").src = url;  
+
         switch (style) {
             case STYLE_DEFAULT:
                 setCSS("embedded_thumbnail_default.css");
