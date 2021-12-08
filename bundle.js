@@ -6680,7 +6680,7 @@ exports.Export = function(input_parameter_wrapper) {
     var file_name_right = document.getElementById("input_thumbnail_name_right").value;
 
     
-    var query_string = input_parameter_wrapper.toQueryString(true);
+    var query_string = input_parameter_wrapper.toQueryString(false);
     console.log(query_string["default"]);
 
     //direct loading for latex
@@ -124585,7 +124585,7 @@ const state_description_dict_1 = require("./state_description/1").state_descript
 //ON_RELEASE: CHANGE EVERY RELEASE
 global.VERSION_YEAR = 2021;
 global.VERSION_MONTH = 12;
-global.VERSION_NUMBER = 2;
+global.VERSION_NUMBER = 3;
 //ON_RELEASE: INCREMENT IF STATE DATA DESCRIPTION CHANGES
 global.STATE_VERSION = 1;
 
