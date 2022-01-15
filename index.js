@@ -996,25 +996,41 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     //used for redirection
     function GetShortVersionStringURL(){
-        return window["URL_VERSION_YEAR"] + "-" + 
-        window["URL_VERSION_MONTH"] + "." + 
-        window["URL_VERSION_NUMBER"];
+        var year = window["URL_VERSION_YEAR"];
+        var month = window["URL_VERSION_MONTH"];
+        var number = window["URL_VERSION_NUMBER"];
+        return GetShortVersionString(year, month, number);
     }
+    
+    function GetShortVersionString(year, month, number){   
+        month = month.toString();
+        month = month.length == 1 ? "0" + month : month;
+        return year + "-" + month + "." + number;  
+    }
+    
 
     //extended version used for display
     function GetCompleteVersionStringURL(){
-        return window["URL_VERSION_YEAR"] + "-" + 
-        window["URL_VERSION_MONTH"] + "." + 
-        window["URL_VERSION_NUMBER"] + "S" + 
-        window["URL_STATE_VERSION"];
+        var year = window["URL_VERSION_YEAR"];
+        var month = window["URL_VERSION_MONTH"];
+        var number = window["URL_VERSION_NUMBER"];
+        var state = window["URL_STATE_VERSION"];
+        return GetCompleteVersionString(year, month, number, state);
     }
 
     //extended version used for display
     function GetCompleteVersionStringCurrent(){
-        return window["VERSION_YEAR"] + "-" + 
-        window["VERSION_MONTH"] + "." + 
-        window["VERSION_NUMBER"] + "S" + 
-        window["STATE_VERSION"];
+        var year = window["VERSION_YEAR"];
+        var month = window["VERSION_MONTH"];
+        var number = window["VERSION_NUMBER"];
+        var state = window["STATE_VERSION"];
+        return GetCompleteVersionString(year, month, number, state);
+    }
+
+    function GetCompleteVersionString(year, month, number, state){        
+        month = month.toString();
+        month = month.length == 1 ? "0" + month : month;
+        return year + "-" + month + "." + number + "S" + state;
     }
 
     function UpdateVersionString(){

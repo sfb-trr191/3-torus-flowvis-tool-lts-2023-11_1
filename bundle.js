@@ -8710,25 +8710,41 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     //used for redirection
     function GetShortVersionStringURL(){
-        return window["URL_VERSION_YEAR"] + "-" + 
-        window["URL_VERSION_MONTH"] + "." + 
-        window["URL_VERSION_NUMBER"];
+        var year = window["URL_VERSION_YEAR"];
+        var month = window["URL_VERSION_MONTH"];
+        var number = window["URL_VERSION_NUMBER"];
+        return GetShortVersionString(year, month, number);
     }
+    
+    function GetShortVersionString(year, month, number){   
+        month = month.toString();
+        month = month.length == 1 ? "0" + month : month;
+        return year + "-" + month + "." + number;  
+    }
+    
 
     //extended version used for display
     function GetCompleteVersionStringURL(){
-        return window["URL_VERSION_YEAR"] + "-" + 
-        window["URL_VERSION_MONTH"] + "." + 
-        window["URL_VERSION_NUMBER"] + "S" + 
-        window["URL_STATE_VERSION"];
+        var year = window["URL_VERSION_YEAR"];
+        var month = window["URL_VERSION_MONTH"];
+        var number = window["URL_VERSION_NUMBER"];
+        var state = window["URL_STATE_VERSION"];
+        return GetCompleteVersionString(year, month, number, state);
     }
 
     //extended version used for display
     function GetCompleteVersionStringCurrent(){
-        return window["VERSION_YEAR"] + "-" + 
-        window["VERSION_MONTH"] + "." + 
-        window["VERSION_NUMBER"] + "S" + 
-        window["STATE_VERSION"];
+        var year = window["VERSION_YEAR"];
+        var month = window["VERSION_MONTH"];
+        var number = window["VERSION_NUMBER"];
+        var state = window["STATE_VERSION"];
+        return GetCompleteVersionString(year, month, number, state);
+    }
+
+    function GetCompleteVersionString(year, month, number, state){        
+        month = month.toString();
+        month = month.length == 1 ? "0" + month : month;
+        return year + "-" + month + "." + number + "S" + state;
     }
 
     function UpdateVersionString(){
@@ -124588,9 +124604,9 @@ exports.regexIntToFloat = function(input_string) {
 const state_description_dict_1 = require("./state_description/1").state_description_dict;
 
 //ON_RELEASE: CHANGE EVERY RELEASE
-global.VERSION_YEAR = 2021;
-global.VERSION_MONTH = 12;
-global.VERSION_NUMBER = 4;
+global.VERSION_YEAR = 2022;
+global.VERSION_MONTH = 1;
+global.VERSION_NUMBER = 1;
 //ON_RELEASE: INCREMENT IF STATE DATA DESCRIPTION CHANGES
 global.STATE_VERSION = 1;
 
@@ -124637,7 +124653,7 @@ exports.getWriteValueConversion = function(state_version, value_conversion_name)
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./state_description/1":1032}],1047:[function(require,module,exports){
 exports.VERSION_REDIRECTION_DICT = {
-    "1337-1.1" : "https://christian-lang-git.github.io/reeb-vector-fields-web/index.html" //test entry, redirects to development version
+    "1337-01.1" : "https://christian-lang-git.github.io/reeb-vector-fields-web/index.html" //test entry, redirects to development version
 }
 },{}],1048:[function(require,module,exports){
 exports.getRenderingContext = function(canvas) {
