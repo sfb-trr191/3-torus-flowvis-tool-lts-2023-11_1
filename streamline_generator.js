@@ -36,7 +36,12 @@ class StreamlineGenerator {
 
     GenerateSeedsFromUI() {
         console.log("GenerateSeedsFromUI");
-        this.seeds = this.p_ui_seeds.createPointList();
+        //this.seeds = this.p_ui_seeds.createPointList();
+        this.seeds_object = this.p_ui_seeds.createPointList(this.space);
+        this.seeds = this.seeds_object.point_list;
+        this.seed_signums = this.seeds_object.seed_signums;
+        console.log("seeds");
+        console.log(this.seeds);
     }    
 
     SetRulesTorus() {
@@ -68,32 +73,93 @@ class StreamlineGenerator {
         this.shader_rule_z_neg_z = "z+1";	//if z>1 : z=___
     }
 
+    SetRules2Plus2D(){
+        
+        //rules
+        this.shader_rule_x_pos_x = "x-1";	        //if x>1 : x=___
+        this.shader_rule_x_pos_y = "y";		        //if x>1 : y=___
+        this.shader_rule_x_pos_v_x = "v_x";	        //if x>1 : v_x=___
+        this.shader_rule_x_pos_v_y = "v_y";	        //if x>1 : v_y=___
+
+        this.shader_rule_y_pos_x = "x";	            //if y>1 : x=___
+        this.shader_rule_y_pos_y = "y-1";		    //if y>1 : y=___
+        this.shader_rule_y_pos_v_x = "v_x";	        //if y>1 : v_x=___
+        this.shader_rule_y_pos_v_y = "v_y";	        //if y>1 : v_y=___
+
+        this.shader_rule_v_x_pos_x = "x";	        //if v_x>1 : x=___
+        this.shader_rule_v_x_pos_y = "y";		    //if v_x>1 : y=___
+        this.shader_rule_v_x_pos_v_x = "v_x-1";	    //if v_x>1 : v_x=___
+        this.shader_rule_v_x_pos_v_y = "v_y";	    //if v_x>1 : v_y=___
+
+        this.shader_rule_v_y_pos_x = "x";	        //if v_y>1 : x=___
+        this.shader_rule_v_y_pos_y = "y";		    //if v_y>1 : y=___
+        this.shader_rule_v_y_pos_v_x = "v_x";	    //if v_y>1 : v_x=___
+        this.shader_rule_v_y_pos_v_y = "v_y-1";	    //if v_y>1 : v_y=___
+
+        //inverted rules
+        this.shader_rule_x_neg_x = "x+1";	        //if x<1 : x=___
+        this.shader_rule_x_neg_y = "y";		        //if x<1 : y=___
+        this.shader_rule_x_neg_v_x = "v_x";	        //if x<1 : v_x=___
+        this.shader_rule_x_neg_v_y = "v_y";	        //if x<1 : v_y=___
+
+        this.shader_rule_y_neg_x = "x";	            //if y<1 : x=___
+        this.shader_rule_y_neg_y = "y+1";		    //if y<1 : y=___
+        this.shader_rule_y_neg_v_x = "v_x";	        //if y<1 : v_x=___
+        this.shader_rule_y_neg_v_y = "v_y";	        //if y<1 : v_y=___
+
+        this.shader_rule_v_x_neg_x = "x";	        //if v_x<1 : x=___
+        this.shader_rule_v_x_neg_y = "y";		    //if v_x<1 : y=___
+        this.shader_rule_v_x_neg_v_x = "v_x+1";	    //if v_x<1 : v_x=___
+        this.shader_rule_v_x_neg_v_y = "v_y";	    //if v_x<1 : v_y=___
+
+        this.shader_rule_v_y_neg_x = "x";	        //if v_y<1 : x=___
+        this.shader_rule_v_y_neg_y = "y";		    //if v_y<1 : y=___
+        this.shader_rule_v_y_neg_v_x = "v_x";	    //if v_y<1 : v_x=___
+        this.shader_rule_v_y_neg_v_y = "v_y+1";	    //if v_y<1 : v_y=___
+    }
+
     CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
         var t_start = performance.now();
 
-        raw_data.initialize(this.seeds, this.num_points_per_streamline);
+        raw_data.initialize(this.seeds, this.seed_signums, this.num_points_per_streamline);
 
-        for (var i = 0; i < this.seeds.length; i++) {
-            this.CalculateRawStreamline(i, raw_data);
+        switch (this.space) {
+            case SPACE_3_TORUS:
+                for (var i = 0; i < this.seeds.length; i++) {
+                    this.CalculateRawStreamline3Torus(i, raw_data);
+                }
+                break;
+            case SPACE_2_PLUS_2D:
+                for (var i = 0; i < this.seeds.length; i++) {
+                    this.CalculateRawStreamline2Plus2D(i, raw_data);
+                }
+                //raw_data.SwapComponents_0123_2301();
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
         }
+
         console.log("CalculateRawStreamlines completed");
 
         var t_stop = performance.now();
         console.log("Performance: calculated raw streamlines in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
-    CalculateRawStreamline(seed_index, raw_data) {
-        console.log("CalculateRawStreamline: ", seed_index);
+    CalculateRawStreamline3Torus(seed_index, raw_data) {
+        console.log("CalculateRawStreamline3Torus: ", seed_index);
 
         var startIndex = seed_index * this.num_points_per_streamline;
         var total_points = raw_data.num_points;
         var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
-        var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        var signum = positionData.flag;
 
         var f_start = this.f(startPosition, signum);
-        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], signum);
+        raw_data.data[startIndex].flag = signum;
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
         var previousPosition = startPosition;
         console.log("startIndex: ", startIndex);
         console.log("positionData: ", positionData);
@@ -171,16 +237,17 @@ class StreamlineGenerator {
 
             var terminate = false;
             if (this.check_bounds) {
-                var outOfBounds = this.CheckOutOfBounds(currentPosition);
+                var outOfBounds = this.CheckOutOfBounds3(currentPosition);
                 if (outOfBounds) {
                     flag = 3;//end of polyline
                     //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
 
                     if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
-                        var movedPosition = this.MoveOutOfBounds(currentPosition);
+                        var movedPosition = this.MoveOutOfBounds3(currentPosition);
                         var f_movedPosition = this.f(movedPosition, signum);
                         var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
-                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], 1);;//1 or -1 for start
                         raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
                         raw_data.data[currentIndex + 1].time = time_current;
                         raw_data.data[currentIndex + 1].velocity = v_movedPosition;
@@ -193,15 +260,149 @@ class StreamlineGenerator {
             }
 
 
-            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], flag);
+            raw_data.data[currentIndex].flag = flag;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], 1);
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
 
             //previousPosition = currentPosition;
             if (terminate)
                 break;
+
         }
     }
+
+    CalculateRawStreamline2Plus2D(seed_index, raw_data) {
+        console.log("CalculateRawStreamline2Plus2D: ", seed_index, "check bounds:", this.check_bounds);
+
+        var startIndex = seed_index * this.num_points_per_streamline;
+        var total_points = raw_data.num_points;
+        var positionData = raw_data.data[startIndex];
+        var startPosition = glMatrix.vec4.fromValues(positionData.position[0], positionData.position[1], positionData.position[2], positionData.position[3]);
+        //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        var signum = positionData.flag;
+
+        var f_start = this.g(startPosition, signum);
+        raw_data.data[startIndex].flag = signum;
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);//TODO
+        raw_data.data[startIndex].position = glMatrix.vec4.fromValues(startPosition[0], startPosition[1], startPosition[2], startPosition[3]);
+        var previousPosition = startPosition;
+        console.log("startIndex: ", startIndex);
+        console.log("positionData: ", positionData);
+        console.log("startPosition: ", startPosition);
+        console.log("previousPosition: ", previousPosition);
+
+        //var currentPosition = glMatrix.vec4.create();
+        var currentPosition = glMatrix.vec4.fromValues(startPosition[0], startPosition[1], startPosition[2], startPosition[3]);
+        var k1 = glMatrix.vec4.create();
+        var k2 = glMatrix.vec4.create();
+        var k3 = glMatrix.vec4.create();
+        var k4 = glMatrix.vec4.create();
+        var k1_2 = glMatrix.vec4.create();// k1_2 = k1/2
+        var k2_2 = glMatrix.vec4.create();// k2_2 = k2/2
+        var k1_6 = glMatrix.vec4.create();// k1_6 = k1/6
+        var k2_3 = glMatrix.vec4.create();// k2_3 = k2/3
+        var k3_3 = glMatrix.vec4.create();// k3_3 = k3/3
+        var k4_6 = glMatrix.vec4.create();// k4_6 = k4/6
+        var previous_plus_k1_2 = glMatrix.vec4.create();// previousPosition + k1/2
+        var previous_plus_k2_2 = glMatrix.vec4.create();// previousPosition + k2/2
+        var previous_plus_k3 = glMatrix.vec4.create();// previousPosition + k3
+        for (var i = 1; i < this.num_points_per_streamline; i++) {
+
+            var currentIndex = startIndex + i;
+            var previousIndex = currentIndex - 1;
+            var previousVec4 = raw_data.data[previousIndex].position;
+            previousPosition = glMatrix.vec4.fromValues(previousVec4[0], previousVec4[1], previousVec4[2], previousVec4[3]);
+            //previousPosition = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
+            //console.log("i: ", i);
+            //console.log("previousPosition: ", previousPosition);
+            //console.log("this.step_size: ", this.step_size);
+
+            //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
+            glMatrix.vec4.scale(k1, this.g(previousPosition, signum), this.step_size);
+
+            //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
+            glMatrix.vec4.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
+            glMatrix.vec4.add(previous_plus_k1_2, previousPosition, k1_2);// previousPosition + k1/2            
+            glMatrix.vec4.scale(k2, this.g(previous_plus_k1_2, signum), this.step_size);
+
+            //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
+            glMatrix.vec4.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+            glMatrix.vec4.add(previous_plus_k2_2, previousPosition, k2_2);// previousPosition + k2/2     
+            glMatrix.vec4.scale(k3, this.g(previous_plus_k2_2, signum), this.step_size);
+
+            //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
+            glMatrix.vec4.add(previous_plus_k3, previousPosition, k3);// previousPosition + k3
+            glMatrix.vec4.scale(k4, this.g(previous_plus_k3, signum), this.step_size);
+
+            //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
+            glMatrix.vec4.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+            glMatrix.vec4.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+            glMatrix.vec4.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+            glMatrix.vec4.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+            glMatrix.vec4.add(currentPosition, previousPosition, k1_6);// previousPosition + k1 / 6 
+            glMatrix.vec4.add(currentPosition, currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
+            glMatrix.vec4.add(currentPosition, currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+            glMatrix.vec4.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+
+            //console.log(i, currentPosition);
+            if (this.confine_to_cube)
+                currentPosition = this.ConfineToCube(currentPosition, previousPosition);
+
+
+            var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
+            var f_previous = this.g(previousPosition, signum);
+            var f_current = this.g(currentPosition, signum);
+            var v_previous = glMatrix.vec4.length(f_previous);
+            var v_current = glMatrix.vec4.length(f_current);
+            var v_average = (v_previous + v_current) * 0.5;
+            var time_previous = raw_data.data[previousIndex].time;
+            var time_current = time_previous + (this.step_size / v_average);
+
+
+            if (i == this.num_points_per_streamline - 1)
+                flag = 3;//end of polyline
+
+            var terminate = false;
+            if (this.check_bounds) {
+                var outOfBounds = this.CheckOutOfBounds2(currentPosition);
+                if (outOfBounds) {
+                    flag = 3;//end of polyline
+                    //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
+
+                    if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
+                        var movedPosition = this.MoveOutOfBounds4(currentPosition);
+                        var f_movedPosition = this.g(movedPosition, signum);
+                        var v_movedPosition = glMatrix.vec4.length(f_movedPosition);
+                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], movedPosition[3]);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);//TODO
+                        raw_data.data[currentIndex + 1].time = time_current;
+                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
+                        i++;
+                        console.log("raw_data.data[currentIndex].position", i, raw_data.data[currentIndex].position[0] + " " + raw_data.data[currentIndex].position[1] + " " + raw_data.data[currentIndex].position[2] + " " + raw_data.data[currentIndex].position[3]);
+                        console.log("raw_data.data[currentIndex + 1].position", i, raw_data.data[currentIndex + 1].position[0] + " " + raw_data.data[currentIndex + 1].position[1] + " " + raw_data.data[currentIndex + 1].position[2] + " " + raw_data.data[currentIndex + 1].position[3]);
+                    }
+                    else {
+                        terminate = true;
+                    }
+                }
+            }
+
+            raw_data.data[currentIndex].flag = flag;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
+            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
+            raw_data.data[currentIndex].time = time_current;
+
+            //previousPosition = currentPosition;
+            if (terminate)
+                break;
+
+            console.log("currentPosition", i, currentPosition[0] + " " + currentPosition[1] + " " + currentPosition[2] + " " + currentPosition[3]);
+        }
+        
+    }
+
 
     f(vector, signum) {
         //console.log("--------------");
@@ -226,14 +427,49 @@ class StreamlineGenerator {
         return result;
     }
 
-    CheckOutOfBounds(position) {
+    g(vector, signum) {
+        //this.shader_formula_a = "x^2";
+        //this.shader_formula_b = "y^2";
+        //console.log("--------------");
+        //console.log("vector: ", vector, "test");
+        //console.log("vector0: ", vector[0]);
+        //console.log("vector1: ", vector[1]);
+        //console.log("vector2: ", vector[2]);
+        let scope = {
+            x: vector[0],
+            y: vector[1],
+            v_x: vector[2],
+            v_y: vector[3],
+        };
+        //console.log("scope: ", scope);
+        //console.log("this.shader_formula_u: ", this.shader_formula_u);
+        var u = vector[2];
+        var v = vector[3];
+        var a = math.evaluate(this.shader_formula_a, scope);
+        var b = math.evaluate(this.shader_formula_b, scope);
+        var result = glMatrix.vec4.create();
+        result[0] = u * signum;
+        result[1] = v * signum;
+        result[2] = a * signum;
+        result[3] = b * signum;
+        return result;
+    }
+
+    CheckOutOfBounds3(position) {
         for (var i = 0; i < 3; i++)
             if (position[i] > 1 || position[i] < 0)
                 return true;
         return false;
     }
 
-    MoveOutOfBounds(position) {
+    CheckOutOfBounds2(position) {
+        for (var i = 0; i < 2; i++)
+            if (position[i] > 1 || position[i] < 0)
+                return true;
+        return false;
+    }
+
+    MoveOutOfBounds3(position) {
         //user friendly variables
         var x = position[0];
         var y = position[1];
@@ -283,6 +519,80 @@ class StreamlineGenerator {
         }
 
         return glMatrix.vec3.fromValues(scope.x, scope.y, scope.z);
+    }
+
+    MoveOutOfBounds4(position) {
+        //user friendly variables
+        var x = position[0];
+        var y = position[1];
+        var v_x = position[2];
+        var v_y = position[3];
+        //additional "constant" variables for this calculation
+        var x0 = x;
+        var y0 = y;
+        var v_x0 = v_x;
+        var v_y0 = v_y;
+
+        let scope = {
+            x: x,
+            y: y,
+            v_x: v_x,
+            v_y: v_y,
+        };
+
+        if (x > 1) {
+            scope.x = math.evaluate(this.shader_rule_x_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_x_pos_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_x_pos_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_x_pos_v_y, scope);
+        }
+        else if (x < 0) {
+            scope.x = math.evaluate(this.shader_rule_x_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_x_neg_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_x_neg_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_x_neg_v_y, scope);
+        }
+
+        if (y > 1) {
+            scope.x = math.evaluate(this.shader_rule_y_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_y_pos_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_y_pos_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_y_pos_v_y, scope);
+        }
+        else if (y < 0) {
+            scope.x = math.evaluate(this.shader_rule_y_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_y_neg_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_y_neg_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_y_neg_v_y, scope);
+        }
+        /*
+        if (v_x > 1) {
+            scope.x = math.evaluate(this.shader_rule_v_x_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_x_pos_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_x_pos_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_x_pos_v_y, scope);
+        }
+        else if (v_x < 0) {
+            scope.x = math.evaluate(this.shader_rule_v_x_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_x_neg_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_x_neg_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_x_neg_v_y, scope);
+        }
+
+        if (v_y > 1) {
+            scope.x = math.evaluate(this.shader_rule_v_y_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_y_pos_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_y_pos_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_y_pos_v_y, scope);
+        }
+        else if (v_y < 0) {
+            scope.x = math.evaluate(this.shader_rule_v_y_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_y_neg_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_y_neg_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_y_neg_v_y, scope);
+        }
+        */
+        return glMatrix.vec4.fromValues(scope.x, scope.y, scope.v_x, scope.v_y);
     }
 
     //vec3 currentPosition, previousPosition

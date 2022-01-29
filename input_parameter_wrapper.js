@@ -103,10 +103,14 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_side_canvas_streamline_method", "sml");
         new InputWrapper(this, "select_side_canvas_streamline_method_projection", "smpl");
         //data
+        //data - general
+        new InputWrapper(this, "select_space", "space");
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
         new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
+        new InputWrapper(this, "input_field_equation_a", "a");
+        new InputWrapper(this, "input_field_equation_b", "b");
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);

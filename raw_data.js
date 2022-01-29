@@ -18,11 +18,15 @@ class RawData {
      * 
      * @param {string} seeds the list of seeds. each entry is a glMatrix.vec4 where the last component is the signum (at seed points flag is equal to signum)
      */
-    initialize(seeds, num_points_per_streamline) {
+    initialize(seeds, seed_signums, num_points_per_streamline) {
         console.log("initialize raw data");
+        console.log(seeds);
         this.num_seeds = seeds.length;
         this.num_points_per_streamline = num_points_per_streamline;
         this.num_points = this.num_seeds * num_points_per_streamline;
+        console.log("num_seeds: ", this.num_seeds);
+        console.log("num_points_per_streamline: ", this.num_points_per_streamline);
+        console.log("num_points: ", this.num_points);
         this.data = new Array(this.num_points);
         for (var i = 0; i < this.data.length; i++) {
             var new_entry = new RawDataEntry();
@@ -30,8 +34,10 @@ class RawData {
         }
         for (var i = 0; i < this.num_seeds; i++) {
             var index = i * num_points_per_streamline;
+            console.log("seeds[i]: ", seeds[i]);
             glMatrix.vec4.copy(this.data[index].position, seeds[i]);
-            this.data[index].u_v_w_signum[3] = seeds[i][3];
+            this.data[index].u_v_w_signum[3] = seed_signums[i];
+            this.data[index].flag = seed_signums[i];
         }
         console.log("data length: ", this.data.length);
         console.log("data: ", this.data);
@@ -42,6 +48,16 @@ class RawData {
         for (var i = 0; i < this.data.length; i++)
             this.data[i].position[3] = 1;
     }
+
+    SwapComponents_0123_2301() {
+        console.log("0x1 SwapComponents_0123_2301", this.data.length);
+        console.log("0x1 this.data[i].position[0]", this.data[0].position+"");
+        for (var i = 0; i < this.data.length; i++){
+            var pos = this.data[i].position;
+            this.data[i].position = glMatrix.vec4.fromValues(pos[2], pos[3], pos[0], pos[1]);    
+        }
+        console.log("0x1 this.data[i].position[0]", this.data[0].position+"");
+}
 
     GeneratePositionData() {
         console.log("GeneratePositionData");

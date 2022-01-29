@@ -192,7 +192,7 @@ class LODData {
             var oldFlag = 1337;
             for (var offset = 0; offset < raw_data.num_points_per_streamline; offset++) {
                 var index = startIndex + offset;
-                var flag = raw_data.data[index].position[3];
+                var flag = raw_data.data[index].flag;
                 switch (flag) {
                     case -1://new polyline other direction
                         //console.log("case -1: new polyline other direction");

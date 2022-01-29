@@ -56,7 +56,8 @@ class StreamlineContext {
         this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
+    CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
+        shader_formula_a, shader_formula_b,
         input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction,
         tube_radius_fundamental, max_radius_factor_highlight) {
         console.log("CalculateStreamlines");
@@ -65,15 +66,19 @@ class StreamlineContext {
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.ui_seeds.direction = direction;
+        this.streamline_generator.space = space;
         this.streamline_generator.direction = direction;
         this.streamline_generator.shader_formula_u = shader_formula_u;
         this.streamline_generator.shader_formula_v = shader_formula_v;
         this.streamline_generator.shader_formula_w = shader_formula_w;
+        this.streamline_generator.shader_formula_a = shader_formula_a;
+        this.streamline_generator.shader_formula_b = shader_formula_b;
         this.streamline_generator.num_points_per_streamline = input_num_points_per_streamline;
         this.streamline_generator.step_size = step_size;
         this.segment_duplicator.iterations = segment_duplicator_iterations;
 
         this.streamline_generator.SetRulesTorus();
+        this.streamline_generator.SetRules2Plus2D();
         this.streamline_generator.GenerateSeedsFromUI();
 
         var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH

@@ -246,6 +246,7 @@ class HideManager {
 
         this.group_settings = new HideGroup("select_settings_mode");
         //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
+        this.group_settings.AddInputRow("input_row_space", LEVEL_DEBUG, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);
@@ -330,6 +331,46 @@ class HideManager {
         this.mcw_export = new MultiConditionalWrapper("wrapper_button_export");
         this.mcw_export.set_condition(this.condition_tab_export)
         this.multi_consodtional_elements.push(this.mcw_export);
+
+        this.InitEquations();
+    }
+
+    InitEquations(){
+        var mcir_equation_u = new MultiConditionalInputRow("input_row_field_equation_u");
+        var condition_equation_u_space_3_torus = new ConditionRequiredValue("select_space",
+            mcir_equation_u,
+            SPACE_3_TORUS, true);
+        mcir_equation_u.set_condition(condition_equation_u_space_3_torus)
+        this.multi_consodtional_elements.push(mcir_equation_u);
+
+        var mcir_equation_v = new MultiConditionalInputRow("input_row_field_equation_v");
+        var condition_equation_v_space_3_torus = new ConditionRequiredValue("select_space",
+            mcir_equation_v,
+            SPACE_3_TORUS, true);
+        mcir_equation_v.set_condition(condition_equation_v_space_3_torus)
+        this.multi_consodtional_elements.push(mcir_equation_v);
+
+        var mcir_equation_w = new MultiConditionalInputRow("input_row_field_equation_w");
+        var condition_equation_w_space_3_torus = new ConditionRequiredValue("select_space",
+            mcir_equation_w,
+            SPACE_3_TORUS, true);
+        mcir_equation_w.set_condition(condition_equation_w_space_3_torus)
+        this.multi_consodtional_elements.push(mcir_equation_w);
+
+        var mcir_equation_a = new MultiConditionalInputRow("input_row_field_equation_a");
+        var condition_equation_a_space_2_plus_2D = new ConditionRequiredValue("select_space",
+            mcir_equation_a,
+            SPACE_2_PLUS_2D, true);
+        mcir_equation_a.set_condition(condition_equation_a_space_2_plus_2D)
+        this.multi_consodtional_elements.push(mcir_equation_a);
+
+        var mcir_equation_b = new MultiConditionalInputRow("input_row_field_equation_b");
+        var condition_equation_b_space_2_plus_2D = new ConditionRequiredValue("select_space",
+            mcir_equation_b,
+            SPACE_2_PLUS_2D, true);
+        mcir_equation_b.set_condition(condition_equation_b_space_2_plus_2D)
+        this.multi_consodtional_elements.push(mcir_equation_b);
+        
     }
 
     UpdateVisibility() {

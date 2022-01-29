@@ -398,31 +398,53 @@ class UISeeds {
         }
     }
 
-    createPointList() {
+    createPointList(space) {
         var point_list = [];
+        var seed_signums = [];
         for (var i = 0; i < this.list.length; i++) {
             var entry = this.list[i];
             var x = entry.node_input_x.value;
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
+            var v_x = Math.cos(2*Math.PI*z);
+            var v_y = - Math.sin(2*Math.PI*z);
+            //v_x = -1.25;
+            //v_y = 0.75;
+            var seed;
+            switch (space) {
+                case SPACE_3_TORUS:
+                    seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    break;
+                case SPACE_2_PLUS_2D:
+                    seed = glMatrix.vec4.fromValues(x, y, v_x, v_y);
+                    break;
+                default:
+                    console.log("Error unknonw space");
+                    break;
+            }
+
+
             switch(this.direction){
                 case DIRECTION_FORWARD:
-                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
                     point_list.push(seed);
+                    seed_signums.push(1);
                     break;
                 case DIRECTION_BACKWARD:
-                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
                     point_list.push(seed);
+                    seed_signums.push(-1);
                     break;
                 case DIRECTION_BOTH:
-                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
                     point_list.push(seed);
-                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
+                    seed_signums.push(1);
                     point_list.push(seed);
+                    seed_signums.push(-1);
                     break;
             }
         }
-        return point_list;
+        return {
+            point_list: point_list,
+            seed_signums: seed_signums,
+        };
     }
 
     getStreamlineColors() {

@@ -5735,6 +5735,9 @@ global.DIRECTION_FORWARD = 1;
 global.DIRECTION_BACKWARD = 2;
 global.DIRECTION_BOTH = 3;
 
+global.SPACE_3_TORUS = 1;
+global.SPACE_2_PLUS_2D = 2;
+
 global.STREAMLINE_CALCULATION_METHOD_BOTH = 0;
 global.STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL = 1;
 global.STREAMLINE_CALCULATION_METHOD_R3 = 2;
@@ -7613,6 +7616,7 @@ class HideManager {
 
         this.group_settings = new HideGroup("select_settings_mode");
         //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
+        this.group_settings.AddInputRow("input_row_space", LEVEL_DEBUG, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);
@@ -7697,6 +7701,46 @@ class HideManager {
         this.mcw_export = new MultiConditionalWrapper("wrapper_button_export");
         this.mcw_export.set_condition(this.condition_tab_export)
         this.multi_consodtional_elements.push(this.mcw_export);
+
+        this.InitEquations();
+    }
+
+    InitEquations(){
+        var mcir_equation_u = new MultiConditionalInputRow("input_row_field_equation_u");
+        var condition_equation_u_space_3_torus = new ConditionRequiredValue("select_space",
+            mcir_equation_u,
+            SPACE_3_TORUS, true);
+        mcir_equation_u.set_condition(condition_equation_u_space_3_torus)
+        this.multi_consodtional_elements.push(mcir_equation_u);
+
+        var mcir_equation_v = new MultiConditionalInputRow("input_row_field_equation_v");
+        var condition_equation_v_space_3_torus = new ConditionRequiredValue("select_space",
+            mcir_equation_v,
+            SPACE_3_TORUS, true);
+        mcir_equation_v.set_condition(condition_equation_v_space_3_torus)
+        this.multi_consodtional_elements.push(mcir_equation_v);
+
+        var mcir_equation_w = new MultiConditionalInputRow("input_row_field_equation_w");
+        var condition_equation_w_space_3_torus = new ConditionRequiredValue("select_space",
+            mcir_equation_w,
+            SPACE_3_TORUS, true);
+        mcir_equation_w.set_condition(condition_equation_w_space_3_torus)
+        this.multi_consodtional_elements.push(mcir_equation_w);
+
+        var mcir_equation_a = new MultiConditionalInputRow("input_row_field_equation_a");
+        var condition_equation_a_space_2_plus_2D = new ConditionRequiredValue("select_space",
+            mcir_equation_a,
+            SPACE_2_PLUS_2D, true);
+        mcir_equation_a.set_condition(condition_equation_a_space_2_plus_2D)
+        this.multi_consodtional_elements.push(mcir_equation_a);
+
+        var mcir_equation_b = new MultiConditionalInputRow("input_row_field_equation_b");
+        var condition_equation_b_space_2_plus_2D = new ConditionRequiredValue("select_space",
+            mcir_equation_b,
+            SPACE_2_PLUS_2D, true);
+        mcir_equation_b.set_condition(condition_equation_b_space_2_plus_2D)
+        this.multi_consodtional_elements.push(mcir_equation_b);
+        
     }
 
     UpdateVisibility() {
@@ -8423,9 +8467,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var shader_formula_u = document.getElementById("input_field_equation_u").value;
         var shader_formula_v = document.getElementById("input_field_equation_v").value;
         var shader_formula_w = document.getElementById("input_field_equation_w").value;
+        var shader_formula_a = document.getElementById("input_field_equation_a").value;
+        var shader_formula_b = document.getElementById("input_field_equation_b").value;
         var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
         var step_size = document.getElementById("input_step_size").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
+        var space = parseInt(document.getElementById("select_space").value);
         var direction = parseInt(document.getElementById("select_streamline_calculation_direction").value);
 
         var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
@@ -8437,8 +8484,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_main.tube_radius_outside = max_radius_factor_highlight;
         canvas_wrapper_side.tube_radius_outside = max_radius_factor_highlight;
 
-        streamline_context_static.CalculateStreamlines(gl, gl_side, streamline_calculation_method, 
-            shader_formula_u, shader_formula_v, shader_formula_w, num_points_per_streamline, step_size, 
+        streamline_context_static.CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, 
+            shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b, num_points_per_streamline, step_size, 
             segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
@@ -9422,10 +9469,14 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_side_canvas_streamline_method", "sml");
         new InputWrapper(this, "select_side_canvas_streamline_method_projection", "smpl");
         //data
+        //data - general
+        new InputWrapper(this, "select_space", "space");
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
         new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
+        new InputWrapper(this, "input_field_equation_a", "a");
+        new InputWrapper(this, "input_field_equation_b", "b");
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);
@@ -9924,7 +9975,7 @@ class LODData {
             var oldFlag = 1337;
             for (var offset = 0; offset < raw_data.num_points_per_streamline; offset++) {
                 var index = startIndex + offset;
-                var flag = raw_data.data[index].position[3];
+                var flag = raw_data.data[index].flag;
                 switch (flag) {
                     case -1://new polyline other direction
                         //console.log("case -1: new polyline other direction");
@@ -114096,11 +114147,15 @@ class RawData {
      * 
      * @param {string} seeds the list of seeds. each entry is a glMatrix.vec4 where the last component is the signum (at seed points flag is equal to signum)
      */
-    initialize(seeds, num_points_per_streamline) {
+    initialize(seeds, seed_signums, num_points_per_streamline) {
         console.log("initialize raw data");
+        console.log(seeds);
         this.num_seeds = seeds.length;
         this.num_points_per_streamline = num_points_per_streamline;
         this.num_points = this.num_seeds * num_points_per_streamline;
+        console.log("num_seeds: ", this.num_seeds);
+        console.log("num_points_per_streamline: ", this.num_points_per_streamline);
+        console.log("num_points: ", this.num_points);
         this.data = new Array(this.num_points);
         for (var i = 0; i < this.data.length; i++) {
             var new_entry = new RawDataEntry();
@@ -114108,8 +114163,10 @@ class RawData {
         }
         for (var i = 0; i < this.num_seeds; i++) {
             var index = i * num_points_per_streamline;
+            console.log("seeds[i]: ", seeds[i]);
             glMatrix.vec4.copy(this.data[index].position, seeds[i]);
-            this.data[index].u_v_w_signum[3] = seeds[i][3];
+            this.data[index].u_v_w_signum[3] = seed_signums[i];
+            this.data[index].flag = seed_signums[i];
         }
         console.log("data length: ", this.data.length);
         console.log("data: ", this.data);
@@ -114120,6 +114177,16 @@ class RawData {
         for (var i = 0; i < this.data.length; i++)
             this.data[i].position[3] = 1;
     }
+
+    SwapComponents_0123_2301() {
+        console.log("0x1 SwapComponents_0123_2301", this.data.length);
+        console.log("0x1 this.data[i].position[0]", this.data[0].position+"");
+        for (var i = 0; i < this.data.length; i++){
+            var pos = this.data[i].position;
+            this.data[i].position = glMatrix.vec4.fromValues(pos[2], pos[3], pos[0], pos[1]);    
+        }
+        console.log("0x1 this.data[i].position[0]", this.data[0].position+"");
+}
 
     GeneratePositionData() {
         console.log("GeneratePositionData");
@@ -114147,6 +114214,7 @@ class RawDataEntry {
         this.position = glMatrix.vec4.create();//using 3 components for position and 1 component for flag (at seed points flag is equal to signum)
         this.u_v_w_signum = glMatrix.vec4.create();//using 3 components for uvw and 1 component for signum
         this.time = 0.0;
+        this.flag = 0; // (at seed points flag is equal to signum)
     }
 }
 
@@ -121961,7 +122029,8 @@ class StreamlineContext {
         this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
-    CalculateStreamlines(gl, gl_side, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
+    CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
+        shader_formula_a, shader_formula_b,
         input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction,
         tube_radius_fundamental, max_radius_factor_highlight) {
         console.log("CalculateStreamlines");
@@ -121970,15 +122039,19 @@ class StreamlineContext {
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.ui_seeds.direction = direction;
+        this.streamline_generator.space = space;
         this.streamline_generator.direction = direction;
         this.streamline_generator.shader_formula_u = shader_formula_u;
         this.streamline_generator.shader_formula_v = shader_formula_v;
         this.streamline_generator.shader_formula_w = shader_formula_w;
+        this.streamline_generator.shader_formula_a = shader_formula_a;
+        this.streamline_generator.shader_formula_b = shader_formula_b;
         this.streamline_generator.num_points_per_streamline = input_num_points_per_streamline;
         this.streamline_generator.step_size = step_size;
         this.segment_duplicator.iterations = segment_duplicator_iterations;
 
         this.streamline_generator.SetRulesTorus();
+        this.streamline_generator.SetRules2Plus2D();
         this.streamline_generator.GenerateSeedsFromUI();
 
         var flag_fundamental = streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
@@ -122117,7 +122190,12 @@ class StreamlineGenerator {
 
     GenerateSeedsFromUI() {
         console.log("GenerateSeedsFromUI");
-        this.seeds = this.p_ui_seeds.createPointList();
+        //this.seeds = this.p_ui_seeds.createPointList();
+        this.seeds_object = this.p_ui_seeds.createPointList(this.space);
+        this.seeds = this.seeds_object.point_list;
+        this.seed_signums = this.seeds_object.seed_signums;
+        console.log("seeds");
+        console.log(this.seeds);
     }    
 
     SetRulesTorus() {
@@ -122149,32 +122227,93 @@ class StreamlineGenerator {
         this.shader_rule_z_neg_z = "z+1";	//if z>1 : z=___
     }
 
+    SetRules2Plus2D(){
+        
+        //rules
+        this.shader_rule_x_pos_x = "x-1";	        //if x>1 : x=___
+        this.shader_rule_x_pos_y = "y";		        //if x>1 : y=___
+        this.shader_rule_x_pos_v_x = "v_x";	        //if x>1 : v_x=___
+        this.shader_rule_x_pos_v_y = "v_y";	        //if x>1 : v_y=___
+
+        this.shader_rule_y_pos_x = "x";	            //if y>1 : x=___
+        this.shader_rule_y_pos_y = "y-1";		    //if y>1 : y=___
+        this.shader_rule_y_pos_v_x = "v_x";	        //if y>1 : v_x=___
+        this.shader_rule_y_pos_v_y = "v_y";	        //if y>1 : v_y=___
+
+        this.shader_rule_v_x_pos_x = "x";	        //if v_x>1 : x=___
+        this.shader_rule_v_x_pos_y = "y";		    //if v_x>1 : y=___
+        this.shader_rule_v_x_pos_v_x = "v_x-1";	    //if v_x>1 : v_x=___
+        this.shader_rule_v_x_pos_v_y = "v_y";	    //if v_x>1 : v_y=___
+
+        this.shader_rule_v_y_pos_x = "x";	        //if v_y>1 : x=___
+        this.shader_rule_v_y_pos_y = "y";		    //if v_y>1 : y=___
+        this.shader_rule_v_y_pos_v_x = "v_x";	    //if v_y>1 : v_x=___
+        this.shader_rule_v_y_pos_v_y = "v_y-1";	    //if v_y>1 : v_y=___
+
+        //inverted rules
+        this.shader_rule_x_neg_x = "x+1";	        //if x<1 : x=___
+        this.shader_rule_x_neg_y = "y";		        //if x<1 : y=___
+        this.shader_rule_x_neg_v_x = "v_x";	        //if x<1 : v_x=___
+        this.shader_rule_x_neg_v_y = "v_y";	        //if x<1 : v_y=___
+
+        this.shader_rule_y_neg_x = "x";	            //if y<1 : x=___
+        this.shader_rule_y_neg_y = "y+1";		    //if y<1 : y=___
+        this.shader_rule_y_neg_v_x = "v_x";	        //if y<1 : v_x=___
+        this.shader_rule_y_neg_v_y = "v_y";	        //if y<1 : v_y=___
+
+        this.shader_rule_v_x_neg_x = "x";	        //if v_x<1 : x=___
+        this.shader_rule_v_x_neg_y = "y";		    //if v_x<1 : y=___
+        this.shader_rule_v_x_neg_v_x = "v_x+1";	    //if v_x<1 : v_x=___
+        this.shader_rule_v_x_neg_v_y = "v_y";	    //if v_x<1 : v_y=___
+
+        this.shader_rule_v_y_neg_x = "x";	        //if v_y<1 : x=___
+        this.shader_rule_v_y_neg_y = "y";		    //if v_y<1 : y=___
+        this.shader_rule_v_y_neg_v_x = "v_x";	    //if v_y<1 : v_x=___
+        this.shader_rule_v_y_neg_v_y = "v_y+1";	    //if v_y<1 : v_y=___
+    }
+
     CalculateRawStreamlines(raw_data) {
         console.log("CalculateRawStreamlines");
         var t_start = performance.now();
 
-        raw_data.initialize(this.seeds, this.num_points_per_streamline);
+        raw_data.initialize(this.seeds, this.seed_signums, this.num_points_per_streamline);
 
-        for (var i = 0; i < this.seeds.length; i++) {
-            this.CalculateRawStreamline(i, raw_data);
+        switch (this.space) {
+            case SPACE_3_TORUS:
+                for (var i = 0; i < this.seeds.length; i++) {
+                    this.CalculateRawStreamline3Torus(i, raw_data);
+                }
+                break;
+            case SPACE_2_PLUS_2D:
+                for (var i = 0; i < this.seeds.length; i++) {
+                    this.CalculateRawStreamline2Plus2D(i, raw_data);
+                }
+                //raw_data.SwapComponents_0123_2301();
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
         }
+
         console.log("CalculateRawStreamlines completed");
 
         var t_stop = performance.now();
         console.log("Performance: calculated raw streamlines in: ", Math.ceil(t_stop-t_start), "ms");
     }
 
-    CalculateRawStreamline(seed_index, raw_data) {
-        console.log("CalculateRawStreamline: ", seed_index);
+    CalculateRawStreamline3Torus(seed_index, raw_data) {
+        console.log("CalculateRawStreamline3Torus: ", seed_index);
 
         var startIndex = seed_index * this.num_points_per_streamline;
         var total_points = raw_data.num_points;
         var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
-        var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        var signum = positionData.flag;
 
         var f_start = this.f(startPosition, signum);
-        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], signum);
+        raw_data.data[startIndex].flag = signum;
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
         var previousPosition = startPosition;
         console.log("startIndex: ", startIndex);
         console.log("positionData: ", positionData);
@@ -122252,16 +122391,17 @@ class StreamlineGenerator {
 
             var terminate = false;
             if (this.check_bounds) {
-                var outOfBounds = this.CheckOutOfBounds(currentPosition);
+                var outOfBounds = this.CheckOutOfBounds3(currentPosition);
                 if (outOfBounds) {
                     flag = 3;//end of polyline
                     //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
 
                     if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
-                        var movedPosition = this.MoveOutOfBounds(currentPosition);
+                        var movedPosition = this.MoveOutOfBounds3(currentPosition);
                         var f_movedPosition = this.f(movedPosition, signum);
                         var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
-                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], signum);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], 1);;//1 or -1 for start
                         raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
                         raw_data.data[currentIndex + 1].time = time_current;
                         raw_data.data[currentIndex + 1].velocity = v_movedPosition;
@@ -122274,15 +122414,149 @@ class StreamlineGenerator {
             }
 
 
-            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], flag);
+            raw_data.data[currentIndex].flag = flag;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], 1);
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
 
             //previousPosition = currentPosition;
             if (terminate)
                 break;
+
         }
     }
+
+    CalculateRawStreamline2Plus2D(seed_index, raw_data) {
+        console.log("CalculateRawStreamline2Plus2D: ", seed_index, "check bounds:", this.check_bounds);
+
+        var startIndex = seed_index * this.num_points_per_streamline;
+        var total_points = raw_data.num_points;
+        var positionData = raw_data.data[startIndex];
+        var startPosition = glMatrix.vec4.fromValues(positionData.position[0], positionData.position[1], positionData.position[2], positionData.position[3]);
+        //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        var signum = positionData.flag;
+
+        var f_start = this.g(startPosition, signum);
+        raw_data.data[startIndex].flag = signum;
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);//TODO
+        raw_data.data[startIndex].position = glMatrix.vec4.fromValues(startPosition[0], startPosition[1], startPosition[2], startPosition[3]);
+        var previousPosition = startPosition;
+        console.log("startIndex: ", startIndex);
+        console.log("positionData: ", positionData);
+        console.log("startPosition: ", startPosition);
+        console.log("previousPosition: ", previousPosition);
+
+        //var currentPosition = glMatrix.vec4.create();
+        var currentPosition = glMatrix.vec4.fromValues(startPosition[0], startPosition[1], startPosition[2], startPosition[3]);
+        var k1 = glMatrix.vec4.create();
+        var k2 = glMatrix.vec4.create();
+        var k3 = glMatrix.vec4.create();
+        var k4 = glMatrix.vec4.create();
+        var k1_2 = glMatrix.vec4.create();// k1_2 = k1/2
+        var k2_2 = glMatrix.vec4.create();// k2_2 = k2/2
+        var k1_6 = glMatrix.vec4.create();// k1_6 = k1/6
+        var k2_3 = glMatrix.vec4.create();// k2_3 = k2/3
+        var k3_3 = glMatrix.vec4.create();// k3_3 = k3/3
+        var k4_6 = glMatrix.vec4.create();// k4_6 = k4/6
+        var previous_plus_k1_2 = glMatrix.vec4.create();// previousPosition + k1/2
+        var previous_plus_k2_2 = glMatrix.vec4.create();// previousPosition + k2/2
+        var previous_plus_k3 = glMatrix.vec4.create();// previousPosition + k3
+        for (var i = 1; i < this.num_points_per_streamline; i++) {
+
+            var currentIndex = startIndex + i;
+            var previousIndex = currentIndex - 1;
+            var previousVec4 = raw_data.data[previousIndex].position;
+            previousPosition = glMatrix.vec4.fromValues(previousVec4[0], previousVec4[1], previousVec4[2], previousVec4[3]);
+            //previousPosition = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
+            //console.log("i: ", i);
+            //console.log("previousPosition: ", previousPosition);
+            //console.log("this.step_size: ", this.step_size);
+
+            //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
+            glMatrix.vec4.scale(k1, this.g(previousPosition, signum), this.step_size);
+
+            //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
+            glMatrix.vec4.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
+            glMatrix.vec4.add(previous_plus_k1_2, previousPosition, k1_2);// previousPosition + k1/2            
+            glMatrix.vec4.scale(k2, this.g(previous_plus_k1_2, signum), this.step_size);
+
+            //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
+            glMatrix.vec4.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+            glMatrix.vec4.add(previous_plus_k2_2, previousPosition, k2_2);// previousPosition + k2/2     
+            glMatrix.vec4.scale(k3, this.g(previous_plus_k2_2, signum), this.step_size);
+
+            //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
+            glMatrix.vec4.add(previous_plus_k3, previousPosition, k3);// previousPosition + k3
+            glMatrix.vec4.scale(k4, this.g(previous_plus_k3, signum), this.step_size);
+
+            //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
+            glMatrix.vec4.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+            glMatrix.vec4.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+            glMatrix.vec4.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+            glMatrix.vec4.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+            glMatrix.vec4.add(currentPosition, previousPosition, k1_6);// previousPosition + k1 / 6 
+            glMatrix.vec4.add(currentPosition, currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
+            glMatrix.vec4.add(currentPosition, currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+            glMatrix.vec4.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+
+            //console.log(i, currentPosition);
+            if (this.confine_to_cube)
+                currentPosition = this.ConfineToCube(currentPosition, previousPosition);
+
+
+            var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
+            var f_previous = this.g(previousPosition, signum);
+            var f_current = this.g(currentPosition, signum);
+            var v_previous = glMatrix.vec4.length(f_previous);
+            var v_current = glMatrix.vec4.length(f_current);
+            var v_average = (v_previous + v_current) * 0.5;
+            var time_previous = raw_data.data[previousIndex].time;
+            var time_current = time_previous + (this.step_size / v_average);
+
+
+            if (i == this.num_points_per_streamline - 1)
+                flag = 3;//end of polyline
+
+            var terminate = false;
+            if (this.check_bounds) {
+                var outOfBounds = this.CheckOutOfBounds2(currentPosition);
+                if (outOfBounds) {
+                    flag = 3;//end of polyline
+                    //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
+
+                    if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
+                        var movedPosition = this.MoveOutOfBounds4(currentPosition);
+                        var f_movedPosition = this.g(movedPosition, signum);
+                        var v_movedPosition = glMatrix.vec4.length(f_movedPosition);
+                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], movedPosition[3]);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);//TODO
+                        raw_data.data[currentIndex + 1].time = time_current;
+                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
+                        i++;
+                        console.log("raw_data.data[currentIndex].position", i, raw_data.data[currentIndex].position[0] + " " + raw_data.data[currentIndex].position[1] + " " + raw_data.data[currentIndex].position[2] + " " + raw_data.data[currentIndex].position[3]);
+                        console.log("raw_data.data[currentIndex + 1].position", i, raw_data.data[currentIndex + 1].position[0] + " " + raw_data.data[currentIndex + 1].position[1] + " " + raw_data.data[currentIndex + 1].position[2] + " " + raw_data.data[currentIndex + 1].position[3]);
+                    }
+                    else {
+                        terminate = true;
+                    }
+                }
+            }
+
+            raw_data.data[currentIndex].flag = flag;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
+            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
+            raw_data.data[currentIndex].time = time_current;
+
+            //previousPosition = currentPosition;
+            if (terminate)
+                break;
+
+            console.log("currentPosition", i, currentPosition[0] + " " + currentPosition[1] + " " + currentPosition[2] + " " + currentPosition[3]);
+        }
+        
+    }
+
 
     f(vector, signum) {
         //console.log("--------------");
@@ -122307,14 +122581,49 @@ class StreamlineGenerator {
         return result;
     }
 
-    CheckOutOfBounds(position) {
+    g(vector, signum) {
+        //this.shader_formula_a = "x^2";
+        //this.shader_formula_b = "y^2";
+        //console.log("--------------");
+        //console.log("vector: ", vector, "test");
+        //console.log("vector0: ", vector[0]);
+        //console.log("vector1: ", vector[1]);
+        //console.log("vector2: ", vector[2]);
+        let scope = {
+            x: vector[0],
+            y: vector[1],
+            v_x: vector[2],
+            v_y: vector[3],
+        };
+        //console.log("scope: ", scope);
+        //console.log("this.shader_formula_u: ", this.shader_formula_u);
+        var u = vector[2];
+        var v = vector[3];
+        var a = math.evaluate(this.shader_formula_a, scope);
+        var b = math.evaluate(this.shader_formula_b, scope);
+        var result = glMatrix.vec4.create();
+        result[0] = u * signum;
+        result[1] = v * signum;
+        result[2] = a * signum;
+        result[3] = b * signum;
+        return result;
+    }
+
+    CheckOutOfBounds3(position) {
         for (var i = 0; i < 3; i++)
             if (position[i] > 1 || position[i] < 0)
                 return true;
         return false;
     }
 
-    MoveOutOfBounds(position) {
+    CheckOutOfBounds2(position) {
+        for (var i = 0; i < 2; i++)
+            if (position[i] > 1 || position[i] < 0)
+                return true;
+        return false;
+    }
+
+    MoveOutOfBounds3(position) {
         //user friendly variables
         var x = position[0];
         var y = position[1];
@@ -122364,6 +122673,80 @@ class StreamlineGenerator {
         }
 
         return glMatrix.vec3.fromValues(scope.x, scope.y, scope.z);
+    }
+
+    MoveOutOfBounds4(position) {
+        //user friendly variables
+        var x = position[0];
+        var y = position[1];
+        var v_x = position[2];
+        var v_y = position[3];
+        //additional "constant" variables for this calculation
+        var x0 = x;
+        var y0 = y;
+        var v_x0 = v_x;
+        var v_y0 = v_y;
+
+        let scope = {
+            x: x,
+            y: y,
+            v_x: v_x,
+            v_y: v_y,
+        };
+
+        if (x > 1) {
+            scope.x = math.evaluate(this.shader_rule_x_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_x_pos_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_x_pos_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_x_pos_v_y, scope);
+        }
+        else if (x < 0) {
+            scope.x = math.evaluate(this.shader_rule_x_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_x_neg_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_x_neg_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_x_neg_v_y, scope);
+        }
+
+        if (y > 1) {
+            scope.x = math.evaluate(this.shader_rule_y_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_y_pos_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_y_pos_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_y_pos_v_y, scope);
+        }
+        else if (y < 0) {
+            scope.x = math.evaluate(this.shader_rule_y_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_y_neg_y, scope);
+            //scope.v_x = math.evaluate(this.shader_rule_y_neg_v_x, scope);
+            //scope.v_y = math.evaluate(this.shader_rule_y_neg_v_y, scope);
+        }
+        /*
+        if (v_x > 1) {
+            scope.x = math.evaluate(this.shader_rule_v_x_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_x_pos_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_x_pos_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_x_pos_v_y, scope);
+        }
+        else if (v_x < 0) {
+            scope.x = math.evaluate(this.shader_rule_v_x_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_x_neg_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_x_neg_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_x_neg_v_y, scope);
+        }
+
+        if (v_y > 1) {
+            scope.x = math.evaluate(this.shader_rule_v_y_pos_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_y_pos_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_y_pos_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_y_pos_v_y, scope);
+        }
+        else if (v_y < 0) {
+            scope.x = math.evaluate(this.shader_rule_v_y_neg_x, scope);
+            scope.y = math.evaluate(this.shader_rule_v_y_neg_y, scope);
+            scope.v_x = math.evaluate(this.shader_rule_v_y_neg_v_x, scope);
+            scope.v_y = math.evaluate(this.shader_rule_v_y_neg_v_y, scope);
+        }
+        */
+        return glMatrix.vec4.fromValues(scope.x, scope.y, scope.v_x, scope.v_y);
     }
 
     //vec3 currentPosition, previousPosition
@@ -124030,31 +124413,53 @@ class UISeeds {
         }
     }
 
-    createPointList() {
+    createPointList(space) {
         var point_list = [];
+        var seed_signums = [];
         for (var i = 0; i < this.list.length; i++) {
             var entry = this.list[i];
             var x = entry.node_input_x.value;
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
+            var v_x = Math.cos(2*Math.PI*z);
+            var v_y = - Math.sin(2*Math.PI*z);
+            //v_x = -1.25;
+            //v_y = 0.75;
+            var seed;
+            switch (space) {
+                case SPACE_3_TORUS:
+                    seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    break;
+                case SPACE_2_PLUS_2D:
+                    seed = glMatrix.vec4.fromValues(x, y, v_x, v_y);
+                    break;
+                default:
+                    console.log("Error unknonw space");
+                    break;
+            }
+
+
             switch(this.direction){
                 case DIRECTION_FORWARD:
-                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
                     point_list.push(seed);
+                    seed_signums.push(1);
                     break;
                 case DIRECTION_BACKWARD:
-                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
                     point_list.push(seed);
+                    seed_signums.push(-1);
                     break;
                 case DIRECTION_BOTH:
-                    var seed = glMatrix.vec4.fromValues(x, y, z, 1);
                     point_list.push(seed);
-                    var seed = glMatrix.vec4.fromValues(x, y, z, -1);
+                    seed_signums.push(1);
                     point_list.push(seed);
+                    seed_signums.push(-1);
                     break;
             }
         }
-        return point_list;
+        return {
+            point_list: point_list,
+            seed_signums: seed_signums,
+        };
     }
 
     getStreamlineColors() {

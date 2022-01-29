@@ -302,24 +302,48 @@
                 <div id="tabcontent_data" class="tabcontent">
                     <form>
                         <fieldset class="fieldset_camera">
+                            <legend>General</legend>
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_space">
+                                    <label>space</label>
+                                    <select id="select_space" title="Select which space streamlines are calculated in.">
+                                        <option value="1">3-Torus</option>
+                                        <option value="2">2+2D</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
                             <legend>Equations</legend>
                             <div class="vertical_container">
-                                <div class="input_row">
+                                <div class="input_row" id="input_row_field_equation_u">
                                     <label>u</label>
                                     <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)" title="First component in the vector field: f(x, y, z) = (u, v, w).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                                 </div>
-                                <div class="input_row">
+                                <div class="input_row" id="input_row_field_equation_v">
                                     <label>v</label>
                                     <input id="input_field_equation_v" type="text"
                                         value="sin(2 * PI * y) + 2 * cos (2 * PI * z)" title="Second component in the vector field: f(x, y, z) = (u, v, w).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                                 </div>
-                                <div class="input_row">
+                                <div class="input_row" id="input_row_field_equation_w">
                                     <label>w</label>
                                     <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)" title="Third component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                                <div class="input_row" id="input_row_field_equation_a">
+                                    <label>a</label>
+                                    <input id="input_field_equation_a" type="text" value="x^2" title="a component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                                <div class="input_row" id="input_row_field_equation_b">
+                                    <label>b</label>
+                                    <input id="input_field_equation_b" type="text" value="y^2" title="b component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                                 </div>
