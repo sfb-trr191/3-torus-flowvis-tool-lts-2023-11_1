@@ -377,22 +377,26 @@ class UISeeds {
 
     fromString(s) {
         console.log("fromString");
-        console.log("s:", s);
+        console.log("0x2 s:", s);
         if (s === null)
             return;
-        if (!s.includes("!")) {
-            return;
-        }
-        var split = s.split("!");
+        //if (!s.includes("!")) {
+        //    return;
+        //}        
+        s = s + "!";//dummy split at end to allow 1 element lists
 
-        while (split.length > this.list.length) {
+        var split = s.split("!");
+        console.log("0x2 split:", split);
+        var real_length = split.length - 1;//excluding dummy
+
+        while (real_length > this.list.length) {
             this.addSeed();
         }
-        while (this.list.length > split.length) {
+        while (this.list.length > real_length) {
             this.removeSeed(this.list.length - 1);
         }
 
-        for (var i = 0; i < split.length; i++) {
+        for (var i = 0; i < real_length; i++) {
             console.log("i:", i, split[i]);
             this.list[i].fromString(split[i]);
         }
