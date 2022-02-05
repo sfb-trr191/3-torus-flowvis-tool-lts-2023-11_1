@@ -66,6 +66,8 @@ class StreamlineContext {
 
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.ui_seeds.direction = direction;
+        
+        this.streamline_generator.streamline_error_counter = 0;
         this.streamline_generator.space = space;
         this.streamline_generator.direction = direction;
         this.streamline_generator.shader_formula_u = shader_formula_u;

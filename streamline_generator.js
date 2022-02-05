@@ -14,6 +14,8 @@ class StreamlineGenerator {
         this.check_bounds = true;
         this.continue_at_bounds = true;
         this.tubeRadius = 0.005;
+
+        this.streamline_error_counter = 0;
     }
 
     GenerateExampleSeeds() {
@@ -394,6 +396,24 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
 
+            //terminate if nan or infinity
+            var flag_finite = this.CheckFinite(raw_data.data[currentIndex].position);
+            if(!flag_finite){
+                console.log("flag_nan ", i, raw_data.data[currentIndex].position[0] + " " + raw_data.data[currentIndex].position[1] + " " + raw_data.data[currentIndex].position[2] + " " + raw_data.data[currentIndex].position[3]);
+                console.log(raw_data.data[currentIndex-1].position[0])
+                console.log(raw_data.data[currentIndex].position[0])
+                //copy previous point with end flag
+                //the copy makes sure that we stop at a valid position
+                raw_data.data[currentIndex].flag = 3;//end of polyline
+                glMatrix.vec4.copy(raw_data.data[currentIndex].position, raw_data.data[previousIndex].position);
+                glMatrix.vec4.copy(raw_data.data[currentIndex].u_v_w_signum, raw_data.data[previousIndex].u_v_w_signum);
+                raw_data.data[currentIndex].time = raw_data.data[previousIndex].time;
+
+                terminate = true;
+                console.log("flag_nan copied", i, raw_data.data[currentIndex].position[0] + " " + raw_data.data[currentIndex].position[1] + " " + raw_data.data[currentIndex].position[2] + " " + raw_data.data[currentIndex].position[3]);
+                this.streamline_error_counter += 1;
+            }
+
             //previousPosition = currentPosition;
             if (terminate)
                 break;
@@ -401,6 +421,7 @@ class StreamlineGenerator {
             console.log("currentPosition", i, currentPosition[0] + " " + currentPosition[1] + " " + currentPosition[2] + " " + currentPosition[3]);
         }
         
+        console.log("raw_data: ", raw_data);
     }
 
 
@@ -453,6 +474,15 @@ class StreamlineGenerator {
         result[2] = a * signum;
         result[3] = b * signum;
         return result;
+    }
+
+    CheckFinite(position){
+        for(var i=0; i< position.length; i++){
+            if(!Number.isFinite(position[i])){
+                return false;
+            }
+        }
+        return true;
     }
 
     CheckOutOfBounds3(position) {
@@ -522,6 +552,7 @@ class StreamlineGenerator {
     }
 
     MoveOutOfBounds4(position) {
+        console.log("MoveOutOfBounds4: "+position[0] + ", " + position[1] + ", " + position[2] + ", " + position[3]);
         //user friendly variables
         var x = position[0];
         var y = position[1];

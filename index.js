@@ -734,6 +734,11 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         var t_stop = performance.now();
         console.log("Performance: calculated streamlines in: ", Math.ceil(t_stop-t_start), "ms");
+
+        var errors = streamline_context_static.streamline_generator.streamline_error_counter;
+        if(errors > 0){
+            alert("Warning: There were " + errors + " errors during streamline calculation. The respective streamlines are terminated where the error occured. Make sure the equations do not result in infinity or NaN values.");
+        }
     }
 
     function CalculateFTLE() {
