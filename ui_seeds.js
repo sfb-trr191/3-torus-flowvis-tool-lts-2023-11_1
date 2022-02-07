@@ -411,7 +411,7 @@ class UISeeds {
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
             var v_x = Math.cos(2*Math.PI*z);
-            var v_y = - Math.sin(2*Math.PI*z);
+            var v_y = Math.sin(2*Math.PI*z);
             //v_x = -1.25;
             //v_y = 0.75;
             var seed;
