@@ -49,6 +49,19 @@ class RawData {
             this.data[i].position[3] = 1;
     }
 
+    ConvertVeclocityToAngle() {
+        console.log("ConvertVeclocityToAngle");
+        for (var i = 0; i < this.data.length; i++)
+        {
+            //calculate angle from this.data[i].position[2] and this.data[i].position[3]
+            var angle = Math.atan2(this.data[i].position[3], this.data[i].position[2]);//TODO Math.atan2(y, x);
+            angle = angle / (2 * Math.PI)
+            angle = angle >= 0 ? angle : 1 + angle;
+            this.data[i].position[2] = angle;
+            this.data[i].position[3] = 1;
+        }
+    }
+
     SwapComponents_0123_2301() {
         console.log("0x1 SwapComponents_0123_2301", this.data.length);
         console.log("0x1 this.data[i].position[0]", this.data[0].position+"");

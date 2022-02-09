@@ -7820,6 +7820,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+//const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
 ; (function () {
@@ -7885,6 +7886,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function onStart(evt) {
         console.log("onStart");
+
+        //var tests = new Tests();
        
         window["URL_VERSION_YEAR"] = window["VERSION_YEAR"];
         window["URL_VERSION_MONTH"] = window["VERSION_MONTH"];
@@ -114183,6 +114186,19 @@ class RawData {
             this.data[i].position[3] = 1;
     }
 
+    ConvertVeclocityToAngle() {
+        console.log("ConvertVeclocityToAngle");
+        for (var i = 0; i < this.data.length; i++)
+        {
+            //calculate angle from this.data[i].position[2] and this.data[i].position[3]
+            var angle = Math.atan2(this.data[i].position[3], this.data[i].position[2]);//TODO Math.atan2(y, x);
+            angle = angle / (2 * Math.PI)
+            angle = angle >= 0 ? angle : 1 + angle;
+            this.data[i].position[2] = angle;
+            this.data[i].position[3] = 1;
+        }
+    }
+
     SwapComponents_0123_2301() {
         console.log("0x1 SwapComponents_0123_2301", this.data.length);
         console.log("0x1 this.data[i].position[0]", this.data[0].position+"");
@@ -122115,7 +122131,18 @@ class StreamlineContext {
 
         this.streamline_generator.CalculateRawStreamlines(raw_data);
         this.lod_0.ExtractMultiPolyLines(part_index);
-        raw_data.MakeDataHomogenous();
+
+        switch (this.streamline_generator.space) {
+            case SPACE_3_TORUS:
+                raw_data.MakeDataHomogenous();
+                break;
+            case SPACE_2_PLUS_2D:
+                raw_data.ConvertVeclocityToAngle();
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
 
         //reset all lods that are not calculated
         for (var i = this.highest_active_lod_index+1; i < this.lod_list.length; i++) {
@@ -125053,7 +125080,7 @@ const state_description_dict_1 = require("./state_description/1").state_descript
 //ON_RELEASE: CHANGE EVERY RELEASE
 global.VERSION_YEAR = 2022;
 global.VERSION_MONTH = 2;
-global.VERSION_NUMBER = 2;
+global.VERSION_NUMBER = 3;
 //ON_RELEASE: INCREMENT IF STATE DATA DESCRIPTION CHANGES
 global.STATE_VERSION = 1;
 

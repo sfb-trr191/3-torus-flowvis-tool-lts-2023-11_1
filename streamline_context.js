@@ -137,7 +137,18 @@ class StreamlineContext {
 
         this.streamline_generator.CalculateRawStreamlines(raw_data);
         this.lod_0.ExtractMultiPolyLines(part_index);
-        raw_data.MakeDataHomogenous();
+
+        switch (this.streamline_generator.space) {
+            case SPACE_3_TORUS:
+                raw_data.MakeDataHomogenous();
+                break;
+            case SPACE_2_PLUS_2D:
+                raw_data.ConvertVeclocityToAngle();
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
 
         //reset all lods that are not calculated
         for (var i = this.highest_active_lod_index+1; i < this.lod_list.length; i++) {

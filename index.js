@@ -62,6 +62,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+//const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
 ; (function () {
@@ -127,6 +128,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function onStart(evt) {
         console.log("onStart");
+
+        //var tests = new Tests();
        
         window["URL_VERSION_YEAR"] = window["VERSION_YEAR"];
         window["URL_VERSION_MONTH"] = window["VERSION_MONTH"];
