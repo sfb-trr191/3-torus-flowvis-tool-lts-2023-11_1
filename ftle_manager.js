@@ -149,20 +149,27 @@ class FTLEManager {
     ReplaceComputeFlowMapSliceShader(gl) {
         console.log("ReplaceComputeFlowMapSliceShader");
         console.log(gl);
+        var space = this.p_streamline_generator.space;
         var shader_formula_u = this.p_streamline_generator.shader_formula_u;
         var shader_formula_v = this.p_streamline_generator.shader_formula_v;
         var shader_formula_w = this.p_streamline_generator.shader_formula_w;
+        var shader_formula_a = this.p_streamline_generator.shader_formula_a;
+        var shader_formula_b = this.p_streamline_generator.shader_formula_b;
 
         var shader_formula_u_float = regexIntToFloat(shader_formula_u);
         var shader_formula_v_float = regexIntToFloat(shader_formula_v);
         var shader_formula_w_float = regexIntToFloat(shader_formula_w);
+        var shader_formula_a_float = regexIntToFloat(shader_formula_a);
+        var shader_formula_b_float = regexIntToFloat(shader_formula_b);
         console.log("shader_formula_u: ", shader_formula_u_float);
         console.log("shader_formula_v: ", shader_formula_v_float);
         console.log("shader_formula_w: ", shader_formula_w_float);
+        console.log("shader_formula_a: ", shader_formula_a_float);
+        console.log("shader_formula_b: ", shader_formula_b_float);
 
         this.program_compute_flowmap_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING,
-            this.p_shader_manager.GetShaderComputeFlowMapSlice(shader_formula_u_float, shader_formula_v_float, shader_formula_w_float));
+            this.p_shader_manager.GetShaderComputeFlowMapSlice(space, shader_formula_u_float, shader_formula_v_float, shader_formula_w_float, shader_formula_a_float, shader_formula_b_float));
         this.location_compute_flowmap_slice = new UniformLocationsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.shader_uniforms_compute_flowmap_slice = this.loadShaderUniformsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");

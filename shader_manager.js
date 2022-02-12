@@ -61,11 +61,24 @@ class ShaderManager {
         return code;
     }
 
-    GetShaderComputeFlowMapSlice(shader_formula_u, shader_formula_v, shader_formula_w){
-        var code = F_SHADER_COMPUTE_FLOW_MAP_SLICE;
+    GetShaderComputeFlowMapSlice(space, shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b){
+        var code;
+        switch (space) {
+            case SPACE_3_TORUS:
+                code = F_SHADER_COMPUTE_FLOW_MAP_SLICE;
+                break;
+            case SPACE_2_PLUS_2D:
+                code = F_SHADER_COMPUTE_FLOW_MAP_SLICE_AB;
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
         code = code.replace("shader_formula_u", shader_formula_u);
         code = code.replace("shader_formula_v", shader_formula_v);
         code = code.replace("shader_formula_w", shader_formula_w);
+        code = code.replace("shader_formula_a", shader_formula_a);
+        code = code.replace("shader_formula_b", shader_formula_b);
         return code;  
     }
 
