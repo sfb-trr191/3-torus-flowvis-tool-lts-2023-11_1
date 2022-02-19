@@ -62,6 +62,15 @@ class RawData {
         }
     }
 
+    CopyAngleIntoPosition() {
+        console.log("CopyAngleIntoPosition");
+        for (var i = 0; i < this.data.length; i++)
+        {
+            this.data[i].position[2] = this.data[i].angle;
+            this.data[i].position[3] = 1;
+        }
+    }
+
     SwapComponents_0123_2301() {
         console.log("0x1 SwapComponents_0123_2301", this.data.length);
         console.log("0x1 this.data[i].position[0]", this.data[0].position+"");

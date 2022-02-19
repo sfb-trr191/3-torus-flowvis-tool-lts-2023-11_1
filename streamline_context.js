@@ -143,7 +143,7 @@ class StreamlineContext {
                 raw_data.MakeDataHomogenous();
                 break;
             case SPACE_2_PLUS_2D:
-                raw_data.ConvertVeclocityToAngle();
+                raw_data.CopyAngleIntoPosition();
                 break;
             default:
                 console.log("Error unknonw space");

@@ -288,6 +288,7 @@ class StreamlineGenerator {
         raw_data.data[startIndex].flag = signum;
         raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);//TODO
         raw_data.data[startIndex].position = glMatrix.vec4.fromValues(startPosition[0], startPosition[1], startPosition[2], startPosition[3]);
+        raw_data.data[startIndex].CalculateAngleFromPosition_3_2();
         var previousPosition = startPosition;
         console.log("startIndex: ", startIndex);
         console.log("positionData: ", positionData);
@@ -361,29 +362,37 @@ class StreamlineGenerator {
             var time_previous = raw_data.data[previousIndex].time;
             var time_current = time_previous + (this.step_size / v_average);
 
+            //set values of current index
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
+            raw_data.data[currentIndex].CalculateAngleFromPosition_3_2();
+            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
+            raw_data.data[currentIndex].time = time_current;
+
+            //check if angle is jumping --> must start new line
+            var flag_angle_jumping = raw_data.data[currentIndex].IsAngleJumping(raw_data.data[previousIndex]);
+            if(flag_angle_jumping){       
+                flag = 3;//end of polyline     
+                console.log("angle jumping: ", flag_angle_jumping, raw_data.data[previousIndex].angle, raw_data.data[currentIndex].angle);    
+                if(raw_data.data[currentIndex].angle > 0.5){
+                    raw_data.data[currentIndex].angle -= 1;
+                }else{
+                    raw_data.data[currentIndex].angle += 1;
+                }
+            }
 
             if (i == this.num_points_per_streamline - 1)
                 flag = 3;//end of polyline
 
             var terminate = false;
+            var flag_move_new_point = false;
             if (this.check_bounds) {
                 var outOfBounds = this.CheckOutOfBounds2(currentPosition);
                 if (outOfBounds) {
                     flag = 3;//end of polyline
                     //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
 
-                    if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
-                        var movedPosition = this.MoveOutOfBounds4(currentPosition);
-                        var f_movedPosition = this.g(movedPosition, signum);
-                        var v_movedPosition = glMatrix.vec4.length(f_movedPosition);
-                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
-                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], movedPosition[3]);;//1 or -1 for start
-                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);//TODO
-                        raw_data.data[currentIndex + 1].time = time_current;
-                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
-                        i++;
-                        console.log("raw_data.data[currentIndex].position", i, raw_data.data[currentIndex].position[0] + " " + raw_data.data[currentIndex].position[1] + " " + raw_data.data[currentIndex].position[2] + " " + raw_data.data[currentIndex].position[3]);
-                        console.log("raw_data.data[currentIndex + 1].position", i, raw_data.data[currentIndex + 1].position[0] + " " + raw_data.data[currentIndex + 1].position[1] + " " + raw_data.data[currentIndex + 1].position[2] + " " + raw_data.data[currentIndex + 1].position[3]);
+                    if (this.continue_at_bounds) {
+                        flag_move_new_point = true;
                     }
                     else {
                         terminate = true;
@@ -391,10 +400,30 @@ class StreamlineGenerator {
                 }
             }
 
+            //set correct flag of current index
+            //default is 2 (normal point)
+            //changed to 3 if last point of line or out of bounds
             raw_data.data[currentIndex].flag = flag;
-            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
-            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
-            raw_data.data[currentIndex].time = time_current;
+
+            var flag_make_new_point = flag_move_new_point || flag_angle_jumping;
+            if(flag_make_new_point && i < this.num_points_per_streamline - 2){
+                var newPosition = glMatrix.vec4.create();
+                glMatrix.vec4.copy(newPosition, currentPosition);
+                if(flag_move_new_point){
+                    newPosition = this.MoveOutOfBounds4(currentPosition);
+                }
+                var f_newPosition = this.g(newPosition, signum);
+                var v_newPosition = glMatrix.vec4.length(f_newPosition);
+                raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
+                raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(newPosition[0], newPosition[1], newPosition[2], newPosition[3]);;//1 or -1 for start
+                raw_data.data[currentIndex + 1].CalculateAngleFromPosition_3_2();
+                raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_newPosition[0], f_newPosition[1], f_newPosition[2], signum);//TODO
+                raw_data.data[currentIndex + 1].time = time_current;
+                raw_data.data[currentIndex + 1].velocity = v_newPosition;
+                i++;
+                console.log("raw_data.data[currentIndex].position", i, raw_data.data[currentIndex].position[0] + " " + raw_data.data[currentIndex].position[1] + " " + raw_data.data[currentIndex].position[2] + " " + raw_data.data[currentIndex].position[3]);
+                console.log("raw_data.data[currentIndex + 1].position", i, raw_data.data[currentIndex + 1].position[0] + " " + raw_data.data[currentIndex + 1].position[1] + " " + raw_data.data[currentIndex + 1].position[2] + " " + raw_data.data[currentIndex + 1].position[3]);
+            }
 
             //terminate if nan or infinity
             var flag_finite = this.CheckFinite(raw_data.data[currentIndex].position);
