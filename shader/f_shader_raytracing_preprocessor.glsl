@@ -259,6 +259,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 Ray GenerateRay(float x_offset, float y_offset);
 Ray GenerateRayWithPixelOffset(float x_offset, float y_offset);
 GL_CameraData GetActiveCamera();
+vec3 RepositionIntoFundamentalDomain(vec3 position);
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube);
@@ -590,10 +591,31 @@ GL_CameraData GetActiveCamera()
 	return active_camera;
 }
 
+vec3 RepositionIntoFundamentalDomain(vec3 position)
+{
+	vec3 new_position = vec3(position[0],position[1],position[2]);
+	if(projection_index >= 0)
+	{
+		for (int i = 0; i < 3; i++) {
+			if (i != projection_index) {			
+				if (new_position[i] > 1.0) {
+					float change = floor(abs(new_position[i]));
+					new_position[i] -= change;
+				}
+				else if (new_position[i] < 0.0) {
+					float change = ceil(abs(new_position[i]));
+					new_position[i] += change;
+				}			
+			}
+		}
+	}
+	return new_position;
+}
+
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {			
 	Ray variableRay;
-	variableRay.origin = ray.origin;
+	variableRay.origin = RepositionIntoFundamentalDomain(ray.origin);
 	variableRay.direction = ray.direction;
 	variableRay.dir_inv = ray.dir_inv;
 	variableRay.rayDistance = 0.0;

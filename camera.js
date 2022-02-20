@@ -1056,6 +1056,7 @@ class Camera {
             if (i == projection_index) {
                 this.position[i] = Math.max(this.position[i], 0.01)
             }
+            /*
             else {
                 if (this.position[i] > 1.0) {
                     var change = Math.floor( Math.abs(this.position[i]))
@@ -1066,6 +1067,7 @@ class Camera {
                     this.position[i] += change;
                 }
             }
+            */
         }
     }
 
