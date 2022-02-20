@@ -43,9 +43,10 @@ uniform int start_index_float_cylinder;
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
 bool GetTextureCoordinates(bool is_forward, inout vec3 coordinates);
 bool GetPointer(bool is_forward, inout ivec3 pointer);
+vec4 BlendColorOverBackground(vec4 col_RGBA, vec4 background);
 vec4 GetTextureColor(bool is_forward, int transfer_function_index);
 vec4 GetNormalColor(bool is_forward);
-vec3 GetScalarColor(int index, int transfer_function_index);
+vec4 GetScalarColor(int index, int transfer_function_index);
 ivec3 GetIndex3D(int global_index);
 void RenderColorBar(int transfer_function_index, int color_bar_min_x, int color_bar_max_x);
 
@@ -73,17 +74,23 @@ void main()
 {
     int transfer_function_index_first = transfer_function_index;
     bool allow_color_bar = true;
-
-    if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD)
-        outputColor = GetTextureColor(true, transfer_function_index);
+    outputColor = vec4(1,1,1,1);
+    if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD){
+        vec4 col_RGBA = GetTextureColor(true, transfer_function_index);
+        outputColor = BlendColorOverBackground(col_RGBA, outputColor);
+    }
     else if (draw_slice_mode == DRAW_SLICE_MODE_BACKWARD){
         transfer_function_index_first = transfer_function_index_backward;
-        outputColor = GetTextureColor(false, transfer_function_index_backward);
+        vec4 col_RGBA = GetTextureColor(false, transfer_function_index_backward);
+        outputColor = BlendColorOverBackground(col_RGBA, outputColor);
     }
-    else if (draw_slice_mode == DRAW_SLICE_MODE_COMBINED){
+    else if (draw_slice_mode == DRAW_SLICE_MODE_COMBINED){        
         vec4 col_forward = GetTextureColor(true, transfer_function_index);
         vec4 col_backward = GetTextureColor(false, transfer_function_index_backward);
-        outputColor = (col_forward + col_backward) * 0.5;
+        //outputColor = (col_forward + col_backward) * 0.5;
+        vec4 outputColor_forward = BlendColorOverBackground(col_forward, outputColor);
+        vec4 outputColor_backward = BlendColorOverBackground(col_backward, outputColor);
+        outputColor = (outputColor_forward + outputColor_backward) * 0.5;
     }
     else if(draw_slice_mode == DRAW_SLICE_MODE_FORWARD_NORMAL){
         outputColor = GetNormalColor(true);
@@ -125,11 +132,21 @@ void RenderColorBar(int transfer_function_index, int color_bar_min_x, int color_
                 float scalar = (float(y) - float(color_bar_min_y_inside)) / (float(color_bar_max_y_inside) - float(color_bar_min_y_inside));
                 int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * scalar);
                 bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-                outputColor = vec4(GetScalarColor(bin, transfer_function_index),1);
+                vec4 col_RGBA = GetScalarColor(bin, transfer_function_index);
+                outputColor = BlendColorOverBackground(col_RGBA, outputColor);
                 return;
             }
         }
     }
+}
+
+vec4 BlendColorOverBackground(vec4 col_RGBA, vec4 background)
+{
+    float alpha_A = col_RGBA[3];
+    vec3 col_A = vec3(col_RGBA[0], col_RGBA[1], col_RGBA[2]); 
+    vec3 col_B = vec3(background[0], background[1], background[2]);   
+    vec3 col_C = alpha_A * col_A + (1.0-alpha_A) * col_B; 
+    return vec4(col_C,1);
 }
 
 vec4 GetTextureColor(bool is_forward, int transfer_function_index)
@@ -155,7 +172,7 @@ vec4 GetTextureColor(bool is_forward, int transfer_function_index)
     float t = (scalar - min_scalar) / (max_scalar - min_scalar);
     int bin = int(floor(0.5 + float(TRANSFER_FUNCTION_LAST_BIN) * t));
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
-    return vec4(GetScalarColor(bin, transfer_function_index),1);
+    return GetScalarColor(bin, transfer_function_index);
 }
 
 vec4 GetNormalColor(bool is_forward)
@@ -270,15 +287,16 @@ ivec3 GetIndex3D(int global_index)
   return ivec3(x,y,z);
 }
 
-vec3 GetScalarColor(int index, int transfer_function_index)
+vec4 GetScalarColor(int index, int transfer_function_index)
 {
-	ivec3 pointer = GetIndex3D(start_index_float_scalar_color 
+    ivec3 pointer = GetIndex3D(start_index_float_scalar_color 
         + transfer_function_index * TRANSFER_FUNCTION_BINS * STREAMLINE_COLOR_FLOAT_COUNT
         + index * STREAMLINE_COLOR_FLOAT_COUNT);
-	vec3 color = vec3(
+	vec4 color = vec4(
 		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
-		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(3,0,0), 0).r
 	);
 	return color;
 }
