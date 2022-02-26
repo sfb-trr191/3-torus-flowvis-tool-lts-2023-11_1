@@ -546,6 +546,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             console.log("onClickAddSeed");
             AddSeed();
         });
+        document.getElementById("button_add_multi_seed").addEventListener("click", function () {
+            console.log("onClickAddMultiSeed");
+            AddMultiSeed();
+        });
     }
 
     function addOnClickRandomizeSeedPositions() {
@@ -768,6 +772,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         console.log("UpdateRenderSettings");
         settings_changed = true;
 
+        ui_seeds.UpdateChanges();
+
         transfer_function_manager.UpdateFromUI();
         canvas_wrapper_transfer_function.transfer_function_changed = true;
 
@@ -939,6 +945,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function AddSeed() {
         console.log("AddSeed");
         ui_seeds.addSeed();
+    }
+
+    function AddMultiSeed() {
+        console.log("AddMultiSeed");
+        ui_seeds.addMultiSeed();
+        ui_seeds.UpdateChanges();
     }
 
     function RandomizeSeedPositions() {
