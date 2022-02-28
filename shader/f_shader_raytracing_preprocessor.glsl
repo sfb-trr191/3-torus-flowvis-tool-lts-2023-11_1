@@ -1574,7 +1574,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
                     return vec3(1,1,1);
                 }
             }
-		    int index = hit.multiPolyID % 8;
+		    int index = hit.multiPolyID;
             return GetStreamlineColor(index);
         }
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR)
