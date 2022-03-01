@@ -65,6 +65,17 @@ class UISeed {
                 this.randomizeColor();
             });
             this.node.appendChild(this.node_random_col);
+
+            this.node_button = document.createElement("button");
+            this.node_button.innerHTML = "x";
+            this.node_button.type = "button";
+            this.node_button.id = "button_delete_this_seed";
+            this.node_button.title = "Remove this seed.";
+            this.node_button.addEventListener("click", (event) => {
+                console.log("this.index: ", event.target.id, this.index);
+                this.ui_seeds.removeSeed(this.index);
+            });
+            this.node.appendChild(this.node_button);
         }
         else{
             this.node_space_1 = document.createElement("label");
@@ -74,18 +85,11 @@ class UISeed {
             this.node_space_2 = document.createElement("label");
             this.node_space_2.innerHTML = "";
             this.node.appendChild(this.node_space_2);
-        }
 
-        this.node_button = document.createElement("button");
-        this.node_button.innerHTML = "x";
-        this.node_button.type = "button";
-        this.node_button.id = "button_delete_this_seed";
-        this.node_button.title = "Remove this seed.";
-        this.node_button.addEventListener("click", (event) => {
-            console.log("this.index: ", event.target.id, this.index);
-            this.ui_seeds.removeSeed(this.index);
-        });
-        this.node.appendChild(this.node_button);
+            this.node_space_3 = document.createElement("label");
+            this.node_space_3.innerHTML = "";
+            this.node.appendChild(this.node_space_3);
+        }
 
         this.randomizePosition();
         this.randomizeColor();
