@@ -313,37 +313,26 @@ class UIMultiSeed {
 
         this.randomizePosition();
         this.randomizeColor();
-        /*
+    }
 
+    toString() {
+        var s = this.node_input_x.value + "~"
+            + this.node_input_y.value + "~"
+            + this.node_input_z.value + "~"
+            + this.node_input_count.value + "~"
+            + this.node_input_c1.value + "~"
+            + this.node_input_c2.value;
+        return s;
+    }
 
-
-
-        this.node_random = document.createElement("button");
-        this.node_random.innerHTML = "";
-        this.node_random.type = "button";
-        this.node_random.id = "button_randomize_this_seed_position";
-        this.node_random.title = "Randomize position of this seed.";
-        this.node_random.addEventListener("click", (event) => {
-            console.log("this.index: ", event.target.id, this.index);
-            this.randomizePosition();
-        });
-        this.node.appendChild(this.node_random);
-
-        this.node_random_col = document.createElement("button");
-        this.node_random_col.innerHTML = "";
-        this.node_random_col.type = "button";
-        this.node_random_col.id = "button_randomize_this_seed_color";
-        this.node_random_col.title = "Randomize color of this seed.";
-        this.node_random_col.addEventListener("click", (event) => {
-            console.log("this.index: ", event.target.id, this.index);
-            this.randomizeColor();
-        });
-        this.node.appendChild(this.node_random_col);
-
-
-
-
-        */
+    fromString(s) {
+        var split = s.split("~");
+        this.node_input_x.value = split[0];
+        this.node_input_y.value = split[1];
+        this.node_input_z.value = split[2];
+        this.node_input_count.value = split[3];
+        this.node_input_c1.value = split[4];
+        this.node_input_c2.value = split[5];
     }
 
     updateIndex(new_index) {
@@ -606,14 +595,37 @@ class UISeeds {
                 s += "!"
             s += this.list[i].toString();
         }
+
+        s += ";"
+
+        for (var i = 0; i < this.list_multi_seeds.length; i++) {
+            if (i > 0)
+                s += "!"
+            s += this.list_multi_seeds[i].toString();
+        }
+
         console.log("0x2 toString s:", s);
         return s;
     }
 
     fromString(s) {
-        console.log("fromString");
+        console.log("0x2 fromString");
         console.log("0x2 s:", s);
-        if (s === null || s.length == 0){
+        if (s === null){
+            s = "";
+        }  
+        s += ";"
+        console.log("0x2 s:", s);
+        var split = s.split(";");
+        console.log("0x2 split:", split);
+        this.fromString_seeds(split[0]);
+        this.fromString_multi_seeds(split[1]);
+        this.UpdateChanges();
+    }
+
+    fromString_seeds(s){
+        console.log("0x2 fromString_seeds:", s);
+        if (s.length == 0){
             while (this.list.length > 0) {
                 this.removeSeed(this.list.length - 1);
             }
@@ -635,6 +647,33 @@ class UISeeds {
         for (var i = 0; i < real_length; i++) {
             console.log("i:", i, split[i]);
             this.list[i].fromString(split[i]);
+        }
+    }
+
+    fromString_multi_seeds(s){
+        console.log("0x2 fromString_multi_seeds:", s);
+        if (s.length == 0){
+            while (this.list_multi_seeds.length > 0) {
+                this.removeMultiSeedSeed(this.list_multi_seeds.length - 1);
+            }
+            return;
+        }      
+        s = s + "!";//dummy split at end to allow 1 element lists
+
+        var split = s.split("!");
+        console.log("0x2 split:", split);
+        var real_length = split.length - 1;//excluding dummy
+
+        while (real_length > this.list_multi_seeds.length) {
+            this.addMultiSeed();
+        }
+        while (this.list_multi_seeds.length > real_length) {
+            this.removeMultiSeed(this.list.length - 1);
+        }
+
+        for (var i = 0; i < real_length; i++) {
+            console.log("i:", i, split[i]);
+            this.list_multi_seeds[i].fromString(split[i]);
         }
     }
 
