@@ -606,17 +606,19 @@ class UISeeds {
                 s += "!"
             s += this.list[i].toString();
         }
+        console.log("0x2 toString s:", s);
         return s;
     }
 
     fromString(s) {
         console.log("fromString");
         console.log("0x2 s:", s);
-        if (s === null)
+        if (s === null || s.length == 0){
+            while (this.list.length > 0) {
+                this.removeSeed(this.list.length - 1);
+            }
             return;
-        //if (!s.includes("!")) {
-        //    return;
-        //}        
+        }      
         s = s + "!";//dummy split at end to allow 1 element lists
 
         var split = s.split("!");
