@@ -312,6 +312,10 @@ class HideManager {
         this.multi_consodtional_elements.push(this.mcw_calculate_ftle);
         */
 
+        this.mcw_add_multi_seed = new MultiConditionalWrapper("wrapper_button_add_multi_seed");
+        this.mcw_add_multi_seed.set_condition(this.condition_tab_data)
+        this.multi_consodtional_elements.push(this.mcw_add_multi_seed);
+
         this.mcw_add_seed = new MultiConditionalWrapper("wrapper_button_add_seed");
         this.mcw_add_seed.set_condition(this.condition_tab_data)
         this.multi_consodtional_elements.push(this.mcw_add_seed);

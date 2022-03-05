@@ -415,6 +415,10 @@ legend {
     background-image: url("icons/add_position.png");
 }
 
+#button_add_multi_seed{
+    background-image: url("icons/add_positions.png");
+}
+
 #button_randomize_seed_positions{
     background-image: url("icons/random_position.png");
 }
@@ -489,14 +493,28 @@ legend {
 
 .horizontal_div_seed {
     display: inline-grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 68px 68px 32px;
+    grid-template-columns: 32px 1fr 1fr 1fr 1fr 68px 68px 32px;
     column-gap: 4px;
     gap: 4px;
 }
 
 .horizontal_div_multi_seed {
     display: inline-grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 68px 68px 32px;
+    grid-template-columns: 32px 1fr 1fr 1fr 1fr 68px 68px 32px;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_multi_seed_header {
+    display: inline-grid;
+    grid-template-columns: 32px 1fr 68px 32px;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_multi_seed_vec3 {
+    display: inline-grid;
+    grid-template-columns: 200px 1fr 1fr 1fr;
     column-gap: 4px;
     gap: 4px;
 }
@@ -527,6 +545,16 @@ legend {
     width: 68px;
     margin: 0px 0px 0px 0px;
     padding: 0;
+}
+
+.vertical_container_test{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 0px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
+    gap: 4px; 
 }
 
 

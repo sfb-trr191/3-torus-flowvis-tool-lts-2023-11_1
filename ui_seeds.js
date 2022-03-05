@@ -101,15 +101,15 @@ class UISeed {
     }
 
     randomizePosition() {
-        this.node_input_x.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-        this.node_input_y.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-        this.node_input_z.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_x.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_y.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_z.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
     }
 
     randomizeColor() {
-        var r = Math.round(this.ui_seeds.rng_positions() * 255);
-        var g = Math.round(this.ui_seeds.rng_positions() * 255);
-        var b = Math.round(this.ui_seeds.rng_positions() * 255);
+        var r = Math.round(this.ui_seeds.rng_autoseed() * 255);
+        var g = Math.round(this.ui_seeds.rng_autoseed() * 255);
+        var b = Math.round(this.ui_seeds.rng_autoseed() * 255);
         this.node_input_c.value = rgbToHex(r, g, b);
     }
 
@@ -256,48 +256,68 @@ class UIMultiSeed {
     constructor(ui_seeds, index) {
         this.ui_seeds = ui_seeds;
         this.index = index;
-        this.node = document.createElement("div");
-        this.node.className = "horizontal_div_multi_seed";
+
+        this.node = document.createElement("fieldset");
+        this.node.className = "fieldset_camera";
+
+        this.node_vertical = document.createElement("div");
+        this.node_vertical.className = "vertical_container_test";     
+        this.node.appendChild(this.node_vertical);  
+
+        this.node_header = document.createElement("div");
+        this.node_header.className = "horizontal_div_multi_seed_header";        
+        this.node_vertical.appendChild(this.node_header);
+
+        this.className_node_row_random_number = "horizontal_div_multi_seed_vec3";     
+        this.node_row_random_number = document.createElement("div");
+        this.node_row_random_number.className = this.className_node_row_random_number;        
+        this.node_vertical.appendChild(this.node_row_random_number);
+
+        this.className_node_row_point = "horizontal_div_multi_seed_vec3";    
+        this.node_row_point = document.createElement("div");
+        this.node_row_point.className = this.className_node_row_point;        
+        this.node_vertical.appendChild(this.node_row_point);
+
+        this.className_node_row_point2 = "horizontal_div_multi_seed_vec3";    
+        this.node_row_point2 = document.createElement("div");
+        this.node_row_point2.className = this.className_node_row_point2;        
+        this.node_vertical.appendChild(this.node_row_point2);
+
+        this.node_row_two_colors = document.createElement("div");
+        this.node_row_two_colors.className = "horizontal_div_multi_seed_vec3";        
+        this.node_vertical.appendChild(this.node_row_two_colors);
+        
+
+        //HEADER
+
 
         this.node_label = document.createElement("label");
         this.node_label.innerHTML = index;
-        this.node.appendChild(this.node_label);
-
-        this.node_input_x = document.createElement("input");
-        this.node_input_x.type = "text";
-        this.node_input_x.value = "0.5";
-        this.node_input_x.title = "x component of the seed position. \n    - Must be between 0 and 1.";
-        this.node.appendChild(this.node_input_x);
-
-        this.node_input_y = document.createElement("input");
-        this.node_input_y.type = "text";
-        this.node_input_y.value = "0.5";
-        this.node_input_y.title = "y component of the seed position. \n    - Must be between 0 and 1.";
-        this.node.appendChild(this.node_input_y);
-
-        this.node_input_z = document.createElement("input");
-        this.node_input_z.type = "text";
-        this.node_input_z.value = "0.5";
-        this.node_input_z.title = "z component of the seed position. \n    - Must be between 0 and 1.";
-        this.node.appendChild(this.node_input_z);
-
-        this.node_input_c1 = document.createElement("input");
-        this.node_input_c1.type = "color";
-        this.node_input_c1.value = "#00FF00";
-        this.node_input_c1.title = "First color of the Multi Seed. \n    - (Linear interpolation)";
-        this.node.appendChild(this.node_input_c1);
-
-        this.node_input_c2 = document.createElement("input");
-        this.node_input_c2.type = "color";
-        this.node_input_c2.value = "#00FF00";
-        this.node_input_c2.title = "Last color of the Multi Seed. \n    - (Linear interpolation)";
-        this.node.appendChild(this.node_input_c2);
+        this.node_header.appendChild(this.node_label);
+        
+        this.node_input_select = document.createElement("select");
+        this.node_option_random = document.createElement("option");
+        this.node_option_random.value = MULTI_SEED_MODE_RANDOM
+        this.node_option_random.innerText = "Random";
+        this.node_input_select.appendChild(this.node_option_random);
+        this.node_option_line = document.createElement("option");
+        this.node_option_line.value = MULTI_SEED_MODE_LINE
+        this.node_option_line.innerText = "Line";
+        this.node_input_select.appendChild(this.node_option_line);        
+        this.node_option_fixed_point = document.createElement("option");
+        this.node_option_fixed_point.value = MULTI_SEED_MODE_FIXED_POINT
+        this.node_option_fixed_point.innerText = "Fixed Point (2+2D)";
+        this.node_input_select.appendChild(this.node_option_fixed_point);
+        this.node_input_select.addEventListener("change", (event) => {
+            this.OnChangedMode();
+        });
+        this.node_header.appendChild(this.node_input_select);
 
         this.node_input_count = document.createElement("input");
         this.node_input_count.type = "text";
         this.node_input_count.value = "4";
         this.node_input_count.title = "Number of seeds.";
-        this.node.appendChild(this.node_input_count);
+        this.node_header.appendChild(this.node_input_count);
 
         this.node_button = document.createElement("button");
         this.node_button.innerHTML = "x";
@@ -309,30 +329,190 @@ class UIMultiSeed {
             this.ui_seeds.removeMultiSeed(this.index);
             this.ui_seeds.UpdateChanges();
         });
-        this.node.appendChild(this.node_button);
+        this.node_header.appendChild(this.node_button);
+
+
+        //ROW RANDOM NUMBER
+        
+        this.node_row_random_number_label = document.createElement("label");
+        this.node_row_random_number_label.innerHTML = "random number init.";
+        this.node_row_random_number.appendChild(this.node_row_random_number_label);
+
+        this.node_input_random_number = document.createElement("input");
+        this.node_input_random_number.type = "text";
+        this.node_input_random_number.value = "0";
+        this.node_input_random_number.title = "Determines the reproducible sequence generated by the Pseudo Random Number generator.";
+        this.node_row_random_number.appendChild(this.node_input_random_number);
+
+        //ROW POINT
+
+        this.node_row_point_label = document.createElement("label");
+        this.node_row_point_label.innerHTML = "position";
+        this.node_row_point.appendChild(this.node_row_point_label);
+
+        this.node_input_x = document.createElement("input");
+        this.node_input_x.type = "text";
+        this.node_input_x.value = "0.5";
+        this.node_input_x.title = "x component of the seed position. \n    - Must be between 0 and 1.";
+        this.node_row_point.appendChild(this.node_input_x);
+
+        this.node_input_y = document.createElement("input");
+        this.node_input_y.type = "text";
+        this.node_input_y.value = "0.5";
+        this.node_input_y.title = "y component of the seed position. \n    - Must be between 0 and 1.";
+        this.node_row_point.appendChild(this.node_input_y);
+
+        this.node_input_z = document.createElement("input");
+        this.node_input_z.type = "text";
+        this.node_input_z.value = "0.5";
+        this.node_input_z.title = "z component of the seed position. \n    - Must be between 0 and 1.";
+        this.node_row_point.appendChild(this.node_input_z);
+
+        //ROW POINT 2
+
+        this.node_row_point2_label = document.createElement("label");
+        this.node_row_point2_label.innerHTML = "position";
+        this.node_row_point2.appendChild(this.node_row_point2_label);
+
+        this.node_input_point2_x = document.createElement("input");
+        this.node_input_point2_x.type = "text";
+        this.node_input_point2_x.value = "0.5";
+        this.node_input_point2_x.title = "x component of the seed position. \n    - Must be between 0 and 1.";
+        this.node_row_point2.appendChild(this.node_input_point2_x);
+
+        this.node_input_point2_y = document.createElement("input");
+        this.node_input_point2_y.type = "text";
+        this.node_input_point2_y.value = "0.5";
+        this.node_input_point2_y.title = "y component of the seed position. \n    - Must be between 0 and 1.";
+        this.node_row_point2.appendChild(this.node_input_point2_y);
+
+        this.node_input_point2_z = document.createElement("input");
+        this.node_input_point2_z.type = "text";
+        this.node_input_point2_z.value = "0.5";
+        this.node_input_point2_z.title = "z component of the seed position. \n    - Must be between 0 and 1.";
+        this.node_row_point2.appendChild(this.node_input_point2_z);
+
+
+        // ROW TWO COLORS
+
+        this.node_row_two_colors_label = document.createElement("label");
+        this.node_row_two_colors_label.innerHTML = "colors";
+        this.node_row_two_colors.appendChild(this.node_row_two_colors_label);
+
+        this.node_input_c1 = document.createElement("input");
+        this.node_input_c1.type = "color";
+        this.node_input_c1.value = "#00FF00";
+        this.node_input_c1.title = "First color of the Multi Seed. \n    - (Linear interpolation)";
+        this.node_row_two_colors.appendChild(this.node_input_c1);
+
+        this.node_input_c2 = document.createElement("input");
+        this.node_input_c2.type = "color";
+        this.node_input_c2.value = "#00FF00";
+        this.node_input_c2.title = "Last color of the Multi Seed. \n    - (Linear interpolation)";
+        this.node_row_two_colors.appendChild(this.node_input_c2);
 
         this.randomizePosition();
         this.randomizeColor();
+        this.randomizeRandomNumber();
+        this.OnChangedMode();
     }
 
     toString() {
-        var s = this.node_input_x.value + "~"
-            + this.node_input_y.value + "~"
-            + this.node_input_z.value + "~"
-            + this.node_input_count.value + "~"
-            + this.node_input_c1.value + "~"
-            + this.node_input_c2.value;
-        return s;
+        var mode = parseInt(this.node_input_select.value);
+        switch(mode){
+            case MULTI_SEED_MODE_RANDOM:
+                var s = this.node_input_select.value + "~"
+                + this.node_input_count.value + "~"
+                + this.node_input_random_number.value + "~"
+                + this.node_input_c1.value + "~"
+                + this.node_input_c2.value;
+                return s;
+            case MULTI_SEED_MODE_FIXED_POINT:
+                var s = this.node_input_select.value + "~"
+                + this.node_input_count.value + "~"
+                + this.node_input_x.value + "~"
+                + this.node_input_y.value + "~"
+                + this.node_input_z.value + "~"
+                + this.node_input_c1.value + "~"
+                + this.node_input_c2.value;
+                return s;
+            case MULTI_SEED_MODE_LINE:
+                this.node_row_random_number.className = "hidden";
+                this.node_row_point.className = this.className_node_row_point;
+                this.node_row_point2.className = this.className_node_row_point2;
+                var s = this.node_input_select.value + "~"
+                + this.node_input_count.value + "~"
+                + this.node_input_x.value + "~"
+                + this.node_input_y.value + "~"
+                + this.node_input_z.value + "~"
+                + this.node_input_point2_x.value + "~"
+                + this.node_input_point2_y.value + "~"
+                + this.node_input_point2_z.value + "~"
+                + this.node_input_c1.value + "~"
+                + this.node_input_c2.value;
+                return s;
+            default:
+                return "";
+        }
     }
 
     fromString(s) {
         var split = s.split("~");
-        this.node_input_x.value = split[0];
-        this.node_input_y.value = split[1];
-        this.node_input_z.value = split[2];
-        this.node_input_count.value = split[3];
-        this.node_input_c1.value = split[4];
-        this.node_input_c2.value = split[5];
+        this.node_input_select.value = split[0];
+        var mode = parseInt(this.node_input_select.value);
+        switch(mode){
+            case MULTI_SEED_MODE_RANDOM:
+                this.node_input_count.value = split[1];
+                this.node_input_random_number.value = split[2];
+                this.node_input_c1.value = split[3];
+                this.node_input_c2.value = split[4];
+                break;
+            case MULTI_SEED_MODE_FIXED_POINT:
+                this.node_input_count.value = split[1];
+                this.node_input_x.value = split[2];
+                this.node_input_y.value = split[3];
+                this.node_input_z.value = split[4];
+                this.node_input_c1.value = split[5];
+                this.node_input_c2.value = split[6];
+                break;
+            case MULTI_SEED_MODE_LINE:
+                this.node_input_count.value = split[1];
+                this.node_input_x.value = split[2];
+                this.node_input_y.value = split[3];
+                this.node_input_z.value = split[4];
+                this.node_input_point2_x.value = split[5];
+                this.node_input_point2_y.value = split[6];
+                this.node_input_point2_z.value = split[7];
+                this.node_input_c1.value = split[8];
+                this.node_input_c2.value = split[9];
+                break;
+            default:
+                break;
+        }
+        this.OnChangedMode();
+    }
+
+    OnChangedMode(){
+        console.log("OnChangedMode: ", this.node_input_select.value);
+        var mode = parseInt(this.node_input_select.value);
+        switch(mode){
+            case MULTI_SEED_MODE_RANDOM:
+                this.node_row_random_number.className = this.className_node_row_random_number;
+                this.node_row_point.className = "hidden";
+                this.node_row_point2.className = "hidden";
+                console.log("OnChangedMode: hidden");
+                break;
+            case MULTI_SEED_MODE_FIXED_POINT:
+                this.node_row_random_number.className = "hidden";
+                this.node_row_point.className = this.className_node_row_point;
+                this.node_row_point2.className = "hidden";
+                break;
+            case MULTI_SEED_MODE_LINE:
+                this.node_row_random_number.className = "hidden";
+                this.node_row_point.className = this.className_node_row_point;
+                this.node_row_point2.className = this.className_node_row_point2;
+                break;
+        }
     }
 
     updateIndex(new_index) {
@@ -341,20 +521,27 @@ class UIMultiSeed {
     }
 
     randomizePosition() {
-        this.node_input_x.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-        this.node_input_y.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-        this.node_input_z.value = this.ui_seeds.rng_positions().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_x.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_y.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_z.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_point2_x.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_point2_y.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_point2_z.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
     }
 
     randomizeColor() {
-        var r = Math.round(this.ui_seeds.rng_positions() * 255);
-        var g = Math.round(this.ui_seeds.rng_positions() * 255);
-        var b = Math.round(this.ui_seeds.rng_positions() * 255);
+        var r = Math.round(this.ui_seeds.rng_autoseed() * 255);
+        var g = Math.round(this.ui_seeds.rng_autoseed() * 255);
+        var b = Math.round(this.ui_seeds.rng_autoseed() * 255);
         this.node_input_c1.value = rgbToHex(r, g, b);
-        var r = Math.round(this.ui_seeds.rng_positions() * 255);
-        var g = Math.round(this.ui_seeds.rng_positions() * 255);
-        var b = Math.round(this.ui_seeds.rng_positions() * 255);
+        var r = Math.round(this.ui_seeds.rng_autoseed() * 255);
+        var g = Math.round(this.ui_seeds.rng_autoseed() * 255);
+        var b = Math.round(this.ui_seeds.rng_autoseed() * 255);
         this.node_input_c2.value = rgbToHex(r, g, b);
+    }
+
+    randomizeRandomNumber(){
+        this.node_input_random_number.value = Math.round(this.ui_seeds.rng_autoseed()*1000000);
     }
 
     getColorVector(local_index) {
@@ -428,9 +615,8 @@ class UISeeds {
         this.list = [];
         this.list_multi_seeds = [];
         this.list_phantom_seeds = [];
-        this.rng_positions = seedrandom();
+        this.rng_autoseed = seedrandom();
         this.direction = DIRECTION_FORWARD;
-        //this.rng_positions_seed_string = 'hello.';
     }
 
     generateDefaultSeeds() {
@@ -543,18 +729,6 @@ class UISeeds {
             this.list[i].randomizeColor(i);
         }
     }
-
-
-
-    /*
-    randomizePosition(seed_string) {
-        this.rng_positions = new Math.seedrandom(seed_string);
-        this.rng_positions_seed_string = seed_string;
-        for (var i = 0; i < this.list.length; i++) {
-            this.list[i].randomizePosition(i);
-        }
-    }
-    */
     
     toSpecialData(){          
         //getStateDescriptionDict(STATE_VERSION);
@@ -831,6 +1005,8 @@ class UISeeds {
         for (var i = 0; i < this.list_multi_seeds.length; i++) {
             var multi_seed = this.list_multi_seeds[i];
             var count = parseInt(multi_seed.node_input_count.value);
+            var rng_seed = multi_seed.node_input_random_number.value;
+            var rng = seedrandom(rng_seed);
             
             for (var j = 0; j < count; j++){
                 var phantom_seed = this.list_phantom_seeds[phantom_index];
@@ -838,21 +1014,35 @@ class UISeeds {
                 var col = multi_seed.getColorVector256(j);
                 phantom_seed.node_input_c.value = rgbToHex(col[0], col[1], col[2]);
 
-                if(true){
-                    //fixed position, multiple directions
-                    phantom_seed.node_input_x.value = multi_seed.node_input_x.value
-                    phantom_seed.node_input_y.value = multi_seed.node_input_y.value
-                    var t = j / count;
-                    var z = parseFloat(multi_seed.node_input_z.value) + module_utility.lerp(0, 1, t);
-                    console.log("z", z);
-                    z -= floor(z) 
-                    phantom_seed.node_input_z.value = z.toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                }
-                else{  
-                    //fixed direction, multiple positions                  
-                    phantom_seed.node_input_x.value = multi_seed.node_input_x.value
-                    phantom_seed.node_input_y.value = multi_seed.node_input_y.value
-                    phantom_seed.node_input_z.value = multi_seed.node_input_z.value
+                var mode = parseInt(multi_seed.node_input_select.value);
+                switch(mode){
+                    case MULTI_SEED_MODE_RANDOM:
+                        phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        break;
+                    case MULTI_SEED_MODE_FIXED_POINT:
+                        //fixed position, multiple directions
+                        phantom_seed.node_input_x.value = multi_seed.node_input_x.value
+                        phantom_seed.node_input_y.value = multi_seed.node_input_y.value
+                        var t = j / count;
+                        var z = parseFloat(multi_seed.node_input_z.value) + module_utility.lerp(0, 1, t);
+                        console.log("z", z);
+                        z -= floor(z) 
+                        phantom_seed.node_input_z.value = z.toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        break;
+                    case MULTI_SEED_MODE_LINE:
+                        var t = j / (count-1);
+                        var x1 = parseFloat(multi_seed.node_input_x.value);
+                        var x2 = parseFloat(multi_seed.node_input_point2_x.value);
+                        var y1 = parseFloat(multi_seed.node_input_y.value);
+                        var y2 = parseFloat(multi_seed.node_input_point2_y.value);
+                        var z1 = parseFloat(multi_seed.node_input_z.value);
+                        var z2 = parseFloat(multi_seed.node_input_point2_z.value);
+                        phantom_seed.node_input_x.value = module_utility.lerp(x1, x2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        phantom_seed.node_input_y.value = module_utility.lerp(y1, y2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        phantom_seed.node_input_z.value = module_utility.lerp(z1, z2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        break;
                 }
                 
                 console.log("phantom_seed:", phantom_seed, col);
