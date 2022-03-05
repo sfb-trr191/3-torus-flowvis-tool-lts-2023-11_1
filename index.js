@@ -1031,6 +1031,17 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         month = month.length == 1 ? "0" + month : month;
         return year + "-" + month + "." + number;  
     }
+
+    function GetShortVersionIntURL(){
+        var year = window["URL_VERSION_YEAR"];
+        var month = window["URL_VERSION_MONTH"];
+        var number = window["URL_VERSION_NUMBER"];
+        return GetShortVersionInt(year, month, number);
+    }
+
+    function GetShortVersionInt(year, month, number){   
+        return 100000*year + 1000*month + number;  
+    }
     
 
     //extended version used for display
