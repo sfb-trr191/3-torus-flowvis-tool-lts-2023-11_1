@@ -268,6 +268,11 @@ class UIMultiSeed {
         this.node_header.className = "horizontal_div_multi_seed_header";        
         this.node_vertical.appendChild(this.node_header);
 
+        this.className_node_row_axis = "horizontal_div_multi_seed_vec3";    
+        this.node_row_axis = document.createElement("div");
+        this.node_row_axis.className = this.className_node_row_axis;        
+        this.node_vertical.appendChild(this.node_row_axis);
+
         this.className_node_row_random_number = "horizontal_div_multi_seed_vec3";     
         this.node_row_random_number = document.createElement("div");
         this.node_row_random_number.className = this.className_node_row_random_number;        
@@ -308,6 +313,10 @@ class UIMultiSeed {
         this.node_option_fixed_point.value = MULTI_SEED_MODE_FIXED_POINT
         this.node_option_fixed_point.innerText = "Fixed Point (2+2D)";
         this.node_input_select.appendChild(this.node_option_fixed_point);
+        this.node_option_aligned_plane_random = document.createElement("option");
+        this.node_option_aligned_plane_random.value = MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM
+        this.node_option_aligned_plane_random.innerText = "Aligned Plane Random";
+        this.node_input_select.appendChild(this.node_option_aligned_plane_random);
         this.node_input_select.addEventListener("change", (event) => {
             this.OnChangedMode();
         });
@@ -331,6 +340,33 @@ class UIMultiSeed {
         });
         this.node_header.appendChild(this.node_button);
 
+
+        //ROW AXIS
+        
+        this.node_row_axis_label = document.createElement("label");
+        this.node_row_axis_label.innerHTML = "axis";
+        this.node_row_axis.appendChild(this.node_row_axis_label);
+
+        this.node_input_select_axis = document.createElement("select");
+        this.node_option_axis_x = document.createElement("option");
+        this.node_option_axis_x.value = 0;
+        this.node_option_axis_x.innerText = "x";
+        this.node_input_select_axis.appendChild(this.node_option_axis_x);
+        this.node_option_axis_y = document.createElement("option");
+        this.node_option_axis_y.value = 1;
+        this.node_option_axis_y.innerText = "y";
+        this.node_input_select_axis.appendChild(this.node_option_axis_y);
+        this.node_option_axis_z = document.createElement("option");
+        this.node_option_axis_z.value = 2;
+        this.node_option_axis_z.innerText = "z";
+        this.node_input_select_axis.appendChild(this.node_option_axis_z);
+        this.node_row_axis.appendChild(this.node_input_select_axis);
+
+        this.node_input_axis_value = document.createElement("input");
+        this.node_input_axis_value.type = "text";
+        this.node_input_axis_value.value = "0.5";
+        this.node_input_axis_value.title = "The fixed x, y, or z value (depending on the selected axis).";
+        this.node_row_axis.appendChild(this.node_input_axis_value);
 
         //ROW RANDOM NUMBER
         
@@ -451,6 +487,15 @@ class UIMultiSeed {
                 + this.node_input_c1.value + "~"
                 + this.node_input_c2.value;
                 return s;
+            case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                var s = this.node_input_select.value + "~"
+                + this.node_input_count.value + "~"
+                + this.node_input_select_axis.value + "~"
+                + this.node_input_axis_value.value + "~"
+                + this.node_input_random_number.value + "~"
+                + this.node_input_c1.value + "~"
+                + this.node_input_c2.value;
+                return s;
             default:
                 return "";
         }
@@ -460,15 +505,14 @@ class UIMultiSeed {
         var split = s.split("~");
         this.node_input_select.value = split[0];
         var mode = parseInt(this.node_input_select.value);
+        this.node_input_count.value = split[1];
         switch(mode){
             case MULTI_SEED_MODE_RANDOM:
-                this.node_input_count.value = split[1];
                 this.node_input_random_number.value = split[2];
                 this.node_input_c1.value = split[3];
                 this.node_input_c2.value = split[4];
                 break;
             case MULTI_SEED_MODE_FIXED_POINT:
-                this.node_input_count.value = split[1];
                 this.node_input_x.value = split[2];
                 this.node_input_y.value = split[3];
                 this.node_input_z.value = split[4];
@@ -476,7 +520,6 @@ class UIMultiSeed {
                 this.node_input_c2.value = split[6];
                 break;
             case MULTI_SEED_MODE_LINE:
-                this.node_input_count.value = split[1];
                 this.node_input_x.value = split[2];
                 this.node_input_y.value = split[3];
                 this.node_input_z.value = split[4];
@@ -485,6 +528,13 @@ class UIMultiSeed {
                 this.node_input_point2_z.value = split[7];
                 this.node_input_c1.value = split[8];
                 this.node_input_c2.value = split[9];
+                break;
+            case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                this.node_input_select_axis.value = split[2];
+                this.node_input_axis_value.value = split[3];
+                this.node_input_random_number.value = split[4];
+                this.node_input_c1.value = split[5];
+                this.node_input_c2.value = split[6];
                 break;
             default:
                 break;
@@ -497,20 +547,28 @@ class UIMultiSeed {
         var mode = parseInt(this.node_input_select.value);
         switch(mode){
             case MULTI_SEED_MODE_RANDOM:
+                this.node_row_axis.className = "hidden";
                 this.node_row_random_number.className = this.className_node_row_random_number;
                 this.node_row_point.className = "hidden";
                 this.node_row_point2.className = "hidden";
-                console.log("OnChangedMode: hidden");
                 break;
             case MULTI_SEED_MODE_FIXED_POINT:
+                this.node_row_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
                 this.node_row_point.className = this.className_node_row_point;
                 this.node_row_point2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_LINE:
+                this.node_row_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
                 this.node_row_point.className = this.className_node_row_point;
                 this.node_row_point2.className = this.className_node_row_point2;
+                break;
+            case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                this.node_row_axis.className = this.className_node_row_axis;
+                this.node_row_random_number.className = this.className_node_row_random_number;
+                this.node_row_point.className = "hidden";
+                this.node_row_point2.className = "hidden";
                 break;
         }
     }
@@ -1042,6 +1100,27 @@ class UISeeds {
                         phantom_seed.node_input_x.value = module_utility.lerp(x1, x2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
                         phantom_seed.node_input_y.value = module_utility.lerp(y1, y2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
                         phantom_seed.node_input_z.value = module_utility.lerp(z1, z2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        break;
+                    case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                        var axis = parseInt(multi_seed.node_input_select_axis.value);
+                        var axis_value = parseFloat(multi_seed.node_input_axis_value.value).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);                        
+                        switch(axis){
+                            case 0:
+                                phantom_seed.node_input_x.value = axis_value;
+                                phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                break;
+                            case 1:
+                                phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_y.value = axis_value;
+                                phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                break;
+                            case 2:
+                                phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_z.value = axis_value;
+                                break;
+                        }
                         break;
                 }
                 
