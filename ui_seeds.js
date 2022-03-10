@@ -273,6 +273,11 @@ class UIMultiSeed {
         this.node_row_axis.className = this.className_node_row_axis;        
         this.node_vertical.appendChild(this.node_row_axis);
 
+        this.className_node_row_count_per_axis = "horizontal_div_multi_seed_vec3";    
+        this.node_row_count_per_axis = document.createElement("div");
+        this.node_row_count_per_axis.className = this.className_node_row_count_per_axis;        
+        this.node_vertical.appendChild(this.node_row_count_per_axis);
+
         this.className_node_row_random_number = "horizontal_div_multi_seed_vec3";     
         this.node_row_random_number = document.createElement("div");
         this.node_row_random_number.className = this.className_node_row_random_number;        
@@ -288,9 +293,15 @@ class UIMultiSeed {
         this.node_row_point2.className = this.className_node_row_point2;        
         this.node_vertical.appendChild(this.node_row_point2);
 
+        this.className_node_row_two_colors = "horizontal_div_multi_seed_vec3";    
         this.node_row_two_colors = document.createElement("div");
-        this.node_row_two_colors.className = "horizontal_div_multi_seed_vec3";        
+        this.node_row_two_colors.className = this.className_node_row_two_colors;        
         this.node_vertical.appendChild(this.node_row_two_colors);
+
+        this.className_node_row_two_colors2 = "horizontal_div_multi_seed_vec3";    
+        this.node_row_two_colors2 = document.createElement("div");
+        this.node_row_two_colors2.className = this.className_node_row_two_colors2;        
+        this.node_vertical.appendChild(this.node_row_two_colors2);
         
 
         //HEADER
@@ -317,6 +328,11 @@ class UIMultiSeed {
         this.node_option_aligned_plane_random.value = MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM
         this.node_option_aligned_plane_random.innerText = "Aligned Plane Random";
         this.node_input_select.appendChild(this.node_option_aligned_plane_random);
+        this.node_option_aligned_plane_grid = document.createElement("option");
+        this.node_option_aligned_plane_grid.value = MULTI_SEED_MODE_ALIGNED_PLANE_GRID
+        this.node_option_aligned_plane_grid.innerText = "Aligned Plane Grid";
+        this.node_input_select.appendChild(this.node_option_aligned_plane_grid);
+        
         this.node_input_select.addEventListener("change", (event) => {
             this.OnChangedMode();
         });
@@ -367,6 +383,17 @@ class UIMultiSeed {
         this.node_input_axis_value.value = "0.5";
         this.node_input_axis_value.title = "The fixed x, y, or z value (depending on the selected axis).";
         this.node_row_axis.appendChild(this.node_input_axis_value);
+
+        //ROW COUNT PER AXIS        
+        this.node_row_count_per_axis_label = document.createElement("label");
+        this.node_row_count_per_axis_label.innerHTML = "count per axis";
+        this.node_row_count_per_axis.appendChild(this.node_row_count_per_axis_label);
+
+        this.node_input_count_per_axis= document.createElement("input");
+        this.node_input_count_per_axis.type = "text";
+        this.node_input_count_per_axis.value = "3";
+        this.node_input_count_per_axis.title = "The number of seeds per axis.";
+        this.node_row_count_per_axis.appendChild(this.node_input_count_per_axis);
 
         //ROW RANDOM NUMBER
         
@@ -447,6 +474,27 @@ class UIMultiSeed {
         this.node_input_c2.title = "Last color of the Multi Seed. \n    - (Linear interpolation)";
         this.node_row_two_colors.appendChild(this.node_input_c2);
 
+        // ROW TWO COLORS
+
+        this.node_row_two_colors2_label = document.createElement("label");
+        this.node_row_two_colors2_label.innerHTML = "";
+        this.node_row_two_colors2.appendChild(this.node_row_two_colors2_label);
+
+        this.node_input_c3 = document.createElement("input");
+        this.node_input_c3.type = "color";
+        this.node_input_c3.value = "#00FF00";
+        this.node_input_c3.title = "First color of the Multi Seed. \n    - (Linear interpolation)";
+        this.node_row_two_colors2.appendChild(this.node_input_c3);
+
+        this.node_input_c4 = document.createElement("input");
+        this.node_input_c4.type = "color";
+        this.node_input_c4.value = "#00FF00";
+        this.node_input_c4.title = "Last color of the Multi Seed. \n    - (Linear interpolation)";
+        this.node_row_two_colors2.appendChild(this.node_input_c4);
+
+
+        
+
         this.randomizePosition();
         this.randomizeColor();
         this.randomizeRandomNumber();
@@ -495,6 +543,18 @@ class UIMultiSeed {
                 + this.node_input_random_number.value + "~"
                 + this.node_input_c1.value + "~"
                 + this.node_input_c2.value;
+                return s;                
+            case MULTI_SEED_MODE_ALIGNED_PLANE_GRID:
+                var s = this.node_input_select.value + "~"
+                + this.node_input_count.value + "~"
+                + this.node_input_select_axis.value + "~"
+                + this.node_input_axis_value.value + "~"
+                + this.node_input_count_per_axis.value + "~"
+                + this.node_input_c1.value + "~"
+                + this.node_input_c2.value + "~"
+                + this.node_input_c3.value + "~"
+                + this.node_input_c4.value;
+                //TODO
                 return s;
             default:
                 return "";
@@ -536,6 +596,15 @@ class UIMultiSeed {
                 this.node_input_c1.value = split[5];
                 this.node_input_c2.value = split[6];
                 break;
+            case MULTI_SEED_MODE_ALIGNED_PLANE_GRID:
+                this.node_input_select_axis.value = split[2];
+                this.node_input_axis_value.value = split[3];
+                this.node_input_count_per_axis.value = split[4];
+                this.node_input_c1.value = split[5];
+                this.node_input_c2.value = split[6];
+                this.node_input_c3.value = split[7];
+                this.node_input_c4.value = split[8];
+                break;
             default:
                 break;
         }
@@ -551,25 +620,56 @@ class UIMultiSeed {
                 this.node_row_random_number.className = this.className_node_row_random_number;
                 this.node_row_point.className = "hidden";
                 this.node_row_point2.className = "hidden";
+                this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_FIXED_POINT:
                 this.node_row_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
                 this.node_row_point.className = this.className_node_row_point;
                 this.node_row_point2.className = "hidden";
+                this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_LINE:
                 this.node_row_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
                 this.node_row_point.className = this.className_node_row_point;
                 this.node_row_point2.className = this.className_node_row_point2;
+                this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
                 this.node_row_axis.className = this.className_node_row_axis;
                 this.node_row_random_number.className = this.className_node_row_random_number;
                 this.node_row_point.className = "hidden";
                 this.node_row_point2.className = "hidden";
+                this.node_row_two_colors2.className = "hidden";
                 break;
+            case MULTI_SEED_MODE_ALIGNED_PLANE_GRID:
+                this.node_row_axis.className = this.className_node_row_axis;
+                this.node_row_count_per_axis.className = this.className_node_row_count_per_axis;
+                this.node_row_random_number.className = "hidden";
+                this.node_row_point.className = "hidden";
+                this.node_row_point2.className = "hidden";
+                this.node_row_two_colors2.className = this.className_node_row_two_colors2;
+                break;
+        }
+    }
+
+    IsGrid2D(){
+        var mode = parseInt(this.node_input_select.value);
+        switch(mode){            
+            case MULTI_SEED_MODE_ALIGNED_PLANE_GRID:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    GetCount(){        
+        if(this.IsGrid2D()){
+            var count_per_axis = parseInt(this.node_input_count_per_axis.value);
+            return count_per_axis * count_per_axis;
+        }else{
+            return parseInt(this.node_input_count.value);
         }
     }
 
@@ -658,6 +758,64 @@ class UIMultiSeed {
         var b = floor(module_utility.lerp(b1, b2, t));
         //console.log(`red: ${r}, green: ${g}, blue: ${b}`)
         console.log("lerp", t, r, g, b)
+
+        return glMatrix.vec3.fromValues(r, g, b);
+    }
+
+    getColorVector256_2D(local_index_a, local_index_b) {
+        //get col 1
+        var hex = this.node_input_c1.value;
+        //console.log("hex1: ", hex);
+        const r1 = parseInt(hex.substr(1, 2), 16)
+        const g1 = parseInt(hex.substr(3, 2), 16)
+        const b1 = parseInt(hex.substr(5, 2), 16)
+        //console.log(`red: ${r1}, green: ${g1}, blue: ${b1}`)
+
+        //get col 2
+        var hex = this.node_input_c2.value;
+        //console.log("hex2: ", hex);
+        const r2 = parseInt(hex.substr(1, 2), 16)
+        const g2 = parseInt(hex.substr(3, 2), 16)
+        const b2 = parseInt(hex.substr(5, 2), 16)
+        //console.log(`red: ${r2}, green: ${g2}, blue: ${b2}`)
+
+        //get col 3
+        var hex = this.node_input_c3.value;
+        //console.log("hex2: ", hex);
+        const r3 = parseInt(hex.substr(1, 2), 16)
+        const g3 = parseInt(hex.substr(3, 2), 16)
+        const b3 = parseInt(hex.substr(5, 2), 16)
+        //console.log(`red: ${r2}, green: ${g2}, blue: ${b2}`)
+
+        //get col 4
+        var hex = this.node_input_c4.value;
+        //console.log("hex2: ", hex);
+        const r4 = parseInt(hex.substr(1, 2), 16)
+        const g4 = parseInt(hex.substr(3, 2), 16)
+        const b4 = parseInt(hex.substr(5, 2), 16)
+        //console.log(`red: ${r2}, green: ${g2}, blue: ${b2}`)
+
+        //get percentage
+        var count_per_axis = parseInt(this.node_input_count_per_axis.value);
+        var t_a = local_index_a / (count_per_axis-1);
+        var t_b = local_index_b / (count_per_axis-1);
+
+        var r_a1 = module_utility.lerp(r1, r2, t_a);
+        var g_a1 = module_utility.lerp(g1, g2, t_a);
+        var b_a1 = module_utility.lerp(b1, b2, t_a);
+
+        var r_a2 = module_utility.lerp(r3, r4, t_a);
+        var g_a2 = module_utility.lerp(g3, g4, t_a);
+        var b_a2 = module_utility.lerp(b3, b4, t_a);
+
+        //var r = floor(module_utility.lerp(r_a1, r_a2, t_b));
+        //var g = floor(module_utility.lerp(g_a1, g_a2, t_b));
+        //var b = floor(module_utility.lerp(b_a1, b_a2, t_b));
+        var r = floor(module_utility.lerp(r_a2, r_a1, t_b));
+        var g = floor(module_utility.lerp(g_a2, g_a1, t_b));
+        var b = floor(module_utility.lerp(b_a2, b_a1, t_b));
+        //console.log(`red: ${r}, green: ${g}, blue: ${b}`)
+        console.log("lerp", t_a, t_b, r, g, b);
 
         return glMatrix.vec3.fromValues(r, g, b);
     }
@@ -1046,7 +1204,7 @@ class UISeeds {
         //count num required seeds
         for (var i = 0; i < this.list_multi_seeds.length; i++) {
             var multi_seed = this.list_multi_seeds[i];
-            var count = parseInt(multi_seed.node_input_count.value);
+            var count = multi_seed.GetCount();
             total_count += count;
             console.log("multi seed:", multi_seed.index, count);
         }
@@ -1066,69 +1224,126 @@ class UISeeds {
             var rng_seed = multi_seed.node_input_random_number.value;
             var rng = seedrandom(rng_seed);
             
-            for (var j = 0; j < count; j++){
+            var mode = parseInt(multi_seed.node_input_select.value);
+            var is_grid_based = multi_seed.IsGrid2D();
+            if(is_grid_based){
+                phantom_index = this.UpdatePhantomSeeds_GridBased(multi_seed, mode, rng, phantom_index);
+            }else{
+                phantom_index = this.UpdatePhantomSeeds_NonGridBased(count, multi_seed, mode, rng, phantom_index);
+            }
+
+
+            console.log("multi seed:", multi_seed.index, count);
+        }
+    }
+
+    UpdatePhantomSeeds_NonGridBased(count, multi_seed, mode, rng, phantom_index){
+        for (var j = 0; j < count; j++){
+            var phantom_seed = this.list_phantom_seeds[phantom_index];
+
+            var col = multi_seed.getColorVector256(j);
+            phantom_seed.node_input_c.value = rgbToHex(col[0], col[1], col[2]);
+
+            switch(mode){
+                case MULTI_SEED_MODE_RANDOM:
+                    phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    break;
+                case MULTI_SEED_MODE_FIXED_POINT:
+                    //fixed position, multiple directions
+                    phantom_seed.node_input_x.value = multi_seed.node_input_x.value
+                    phantom_seed.node_input_y.value = multi_seed.node_input_y.value
+                    var t = j / count;
+                    var z = parseFloat(multi_seed.node_input_z.value) + module_utility.lerp(0, 1, t);
+                    console.log("z", z);
+                    z -= floor(z) 
+                    phantom_seed.node_input_z.value = z.toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    break;
+                case MULTI_SEED_MODE_LINE:
+                    var t = j / (count-1);
+                    var x1 = parseFloat(multi_seed.node_input_x.value);
+                    var x2 = parseFloat(multi_seed.node_input_point2_x.value);
+                    var y1 = parseFloat(multi_seed.node_input_y.value);
+                    var y2 = parseFloat(multi_seed.node_input_point2_y.value);
+                    var z1 = parseFloat(multi_seed.node_input_z.value);
+                    var z2 = parseFloat(multi_seed.node_input_point2_z.value);
+                    phantom_seed.node_input_x.value = module_utility.lerp(x1, x2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    phantom_seed.node_input_y.value = module_utility.lerp(y1, y2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    phantom_seed.node_input_z.value = module_utility.lerp(z1, z2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                    break;
+                case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                    var axis = parseInt(multi_seed.node_input_select_axis.value);
+                    var axis_value = parseFloat(multi_seed.node_input_axis_value.value).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);                        
+                    switch(axis){
+                        case 0:
+                            phantom_seed.node_input_x.value = axis_value;
+                            phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                            phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                            break;
+                        case 1:
+                            phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                            phantom_seed.node_input_y.value = axis_value;
+                            phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                            break;
+                        case 2:
+                            phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                            phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                            phantom_seed.node_input_z.value = axis_value;
+                            break;
+                    }
+                    break;
+            }
+            
+            console.log("phantom_seed:", phantom_seed, col);
+            phantom_index += 1;
+        }
+        return phantom_index;
+    }
+
+    UpdatePhantomSeeds_GridBased(multi_seed, mode, rng, phantom_index){
+        var count_per_axis = parseInt(multi_seed.node_input_count_per_axis.value);
+        var count = count_per_axis * count_per_axis;
+        for (var a = 0; a < count_per_axis; a++){
+            for (var b = 0; b < count_per_axis; b++){
                 var phantom_seed = this.list_phantom_seeds[phantom_index];
 
-                var col = multi_seed.getColorVector256(j);
+                var col = multi_seed.getColorVector256_2D(a, b);
                 phantom_seed.node_input_c.value = rgbToHex(col[0], col[1], col[2]);
 
-                var mode = parseInt(multi_seed.node_input_select.value);
+                var dist = 1/(count_per_axis);
+    
                 switch(mode){
-                    case MULTI_SEED_MODE_RANDOM:
-                        phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        break;
-                    case MULTI_SEED_MODE_FIXED_POINT:
-                        //fixed position, multiple directions
-                        phantom_seed.node_input_x.value = multi_seed.node_input_x.value
-                        phantom_seed.node_input_y.value = multi_seed.node_input_y.value
-                        var t = j / count;
-                        var z = parseFloat(multi_seed.node_input_z.value) + module_utility.lerp(0, 1, t);
-                        console.log("z", z);
-                        z -= floor(z) 
-                        phantom_seed.node_input_z.value = z.toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        break;
-                    case MULTI_SEED_MODE_LINE:
-                        var t = j / (count-1);
-                        var x1 = parseFloat(multi_seed.node_input_x.value);
-                        var x2 = parseFloat(multi_seed.node_input_point2_x.value);
-                        var y1 = parseFloat(multi_seed.node_input_y.value);
-                        var y2 = parseFloat(multi_seed.node_input_point2_y.value);
-                        var z1 = parseFloat(multi_seed.node_input_z.value);
-                        var z2 = parseFloat(multi_seed.node_input_point2_z.value);
-                        phantom_seed.node_input_x.value = module_utility.lerp(x1, x2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        phantom_seed.node_input_y.value = module_utility.lerp(y1, y2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        phantom_seed.node_input_z.value = module_utility.lerp(z1, z2, t).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                        break;
-                    case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                    case MULTI_SEED_MODE_ALIGNED_PLANE_GRID:
                         var axis = parseInt(multi_seed.node_input_select_axis.value);
-                        var axis_value = parseFloat(multi_seed.node_input_axis_value.value).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);                        
+                        var axis_value = parseFloat(multi_seed.node_input_axis_value.value).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        var a_value = (0.5*dist + a*dist).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                        var b_value = (0.5*dist + b*dist).toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
                         switch(axis){
                             case 0:
                                 phantom_seed.node_input_x.value = axis_value;
-                                phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                                phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_y.value = a_value;
+                                phantom_seed.node_input_z.value = b_value;
                                 break;
                             case 1:
-                                phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_x.value = a_value;
                                 phantom_seed.node_input_y.value = axis_value;
-                                phantom_seed.node_input_z.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_z.value = b_value;
                                 break;
                             case 2:
-                                phantom_seed.node_input_x.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
-                                phantom_seed.node_input_y.value = rng.quick().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+                                phantom_seed.node_input_x.value = a_value;
+                                phantom_seed.node_input_y.value = b_value;
                                 phantom_seed.node_input_z.value = axis_value;
                                 break;
                         }
                         break;
                 }
-                
                 console.log("phantom_seed:", phantom_seed, col);
                 phantom_index += 1;
-            }
-            console.log("multi seed:", multi_seed.index, count);
+            }           
+
         }
+        return phantom_index;
     }
 
     UpdateChanges(){        
