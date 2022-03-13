@@ -836,6 +836,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_main.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
 
         canvas_wrapper_main.streamline_method = document.getElementById("checkbox_show_streamlines_main").checked ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
+        canvas_wrapper_main.seed_visualization_mode = document.getElementById("checkbox_show_seeds_main").checked ? SEED_VISUALIZATION_MODE_INSTANCE : SEED_VISUALIZATION_MODE_NONE;
 
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
@@ -887,6 +888,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_side.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
         canvas_wrapper_side.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
+
+        
+        canvas_wrapper_side.seed_visualization_mode = parseInt(document.getElementById("select_seed_mode_side").value);
+
 
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
         canvas_wrapper_side.max_iteration_count = 1;

@@ -1,7 +1,7 @@
 const DataUnit = require("./data_unit");
 const DataContainer = require("./data_container");
 const {DataTextures, DataTexture3D_RGBA, DataTexture3D_R} = require("./data_textures");
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 
 class GlobalData {
 
@@ -20,10 +20,12 @@ class GlobalData {
         this.data_container_streamline_color = new DataContainer("streamline_color", new StreamlineColor());
         this.data_container_scalar_color = new DataContainer("scalar_color", new StreamlineColor());
         this.data_container_cylinders = new DataContainer("cylinders", new Cylinder());
+        this.data_container_seeds = new DataContainer("seeds", new StreamlineSeed());
         this.data_unit.registerDataCollection(this.data_container_dir_lights);
         this.data_unit.registerDataCollection(this.data_container_streamline_color);
         this.data_unit.registerDataCollection(this.data_container_scalar_color);
         this.data_unit.registerDataCollection(this.data_container_cylinders);
+        this.data_unit.registerDataCollection(this.data_container_seeds);
         //---end region: data unit  
 
         this.data_textures = new DataTextures(gl, this.data_unit);
@@ -37,6 +39,7 @@ class GlobalData {
         this.data_container_streamline_color.data = this.p_ui_seeds.getStreamlineColors();
         this.data_container_scalar_color.data = this.p_transfer_function_manager.GetConcatenatedTransferfunctionColorList();
         this.data_container_cylinders.data = this.p_object_manager.cylinders;
+        this.data_container_seeds.data = this.p_ui_seeds.visual_seeds;
         this.data_unit.generateArrays();
         console.log("UpdateDataUnit completed");
     }
@@ -79,13 +82,19 @@ class GlobalData {
         shader_uniforms.setUniform("start_index_int_streamline_color", this.data_unit.getIntStart("streamline_color"));
         shader_uniforms.setUniform("start_index_int_scalar_color", this.data_unit.getIntStart("scalar_color"));
         shader_uniforms.setUniform("start_index_int_cylinder", this.data_unit.getIntStart("cylinders"));
+        shader_uniforms.setUniform("start_index_int_seeds", this.data_unit.getIntStart("seeds"));
 
         shader_uniforms.setUniform("start_index_float_dir_lights", this.data_unit.getFloatStart("dir_lights"));
         shader_uniforms.setUniform("start_index_float_streamline_color", this.data_unit.getFloatStart("streamline_color"));
         shader_uniforms.setUniform("start_index_float_scalar_color", this.data_unit.getFloatStart("scalar_color"));
         shader_uniforms.setUniform("start_index_float_cylinder", this.data_unit.getFloatStart("cylinders"));
+        shader_uniforms.setUniform("start_index_float_seeds", this.data_unit.getFloatStart("seeds"));
 
         shader_uniforms.updateUniforms();
+    }
+
+    GetNumVisualSeeds(){
+        return this.data_container_seeds.data.length;
     }
 }
 

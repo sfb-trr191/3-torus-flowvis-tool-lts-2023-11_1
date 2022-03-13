@@ -281,6 +281,8 @@ class CanvasWrapperTransferFunction {
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
         program_shader_uniforms.print();
         return program_shader_uniforms;

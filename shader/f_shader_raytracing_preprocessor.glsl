@@ -140,6 +140,7 @@ const int TYPE_NONE = 0;//Used in tree for non leaves or in hitInfo if no object
 const int TYPE_STREAMLINE_SEGMENT = 1;
 const int TYPE_CLICKED_SPHERE = 2;
 const int TYPE_GL_CYLINDER = 3;
+const int TYPE_SEED = 4;
 
 const int FOG_NONE = 0;
 const int FOG_LINEAR = 1;
@@ -164,6 +165,9 @@ const int PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
 //                 START UNIFORMS
 //
 ////////////////////////////////////////////////////////////////////
+
+uniform int num_visual_seeds;
+uniform int visualize_seeds_mode;
 
 uniform float color_r;
 uniform sampler3D texture_float;
@@ -269,6 +273,7 @@ vec3 MoveOutOfBounds(vec3 position);
 vec3 MoveOutOfBoundsProjection(vec3 position);
 bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
+bool IntersectGLAABB(Sphere sphere, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit);
 void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
 void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
@@ -292,6 +297,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
 void HandleInside_Sphere(int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
 
+void IntersectSeeds(Ray ray, float maxRayDistance, inout HitInformation hit);
 void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
 void IntersectAxesCornerAABB(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube, int corner_index);
@@ -321,6 +327,7 @@ GL_TreeNode GetNode(int index, int part_index);
 GL_AABB GetAABB(int index, int part_index);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
+vec3 GetStreamlineSeedPosition(int index);
 vec4 GetScalarColor(int index, int transfer_function_index);
 GL_Cylinder GetCylinder(int index);
 
@@ -697,6 +704,12 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
     }
 #endif
+
+#ifdef SHOW_SEEDS_ONCE
+    {
+		IntersectSeeds(ray, maxRayDistance, hit_outside);
+    }
+#endif
 }
 
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
@@ -799,6 +812,11 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
     }
 #endif
 
+#ifdef SHOW_SEEDS_INSTANCE
+    {
+		IntersectSeeds(ray, maxRayDistance, hit);
+    }
+#endif
 /*
 	if(show_main_camera_axes)
 	{
@@ -1020,6 +1038,15 @@ bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout 
 	float radius = cylinder.radius;
 	aabb.min = min(cylinder.position_a, cylinder.position_b) + vec4(-radius, -radius, -radius, 0);
 	aabb.max = max(cylinder.position_a, cylinder.position_b) + vec4(radius, radius, radius, 0);
+    return IntersectGLAABB(aabb, r, ray_local_cutoff, tmin, tmax);
+}
+
+bool IntersectGLAABB(Sphere sphere, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax) {    
+	GL_AABB aabb;
+	float radius = sphere.radius;
+	vec4 position = vec4(sphere.center, 0);
+	aabb.min = position + vec4(-radius, -radius, -radius, 0);
+	aabb.max = position + vec4(radius, radius, radius, 0);
     return IntersectGLAABB(aabb, r, ray_local_cutoff, tmin, tmax);
 }
 
@@ -1594,6 +1621,10 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
         }
         
 	}
+	if(hit.hitType == TYPE_SEED){
+		int index = hit.multiPolyID;
+        return GetStreamlineColor(index);
+	}
 	
 	return objectColor;
 }
@@ -2005,6 +2036,34 @@ void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff
             //IntersectSphereAxis(check_bounds, ray, ray_local_cutoff, sphere, hit, TYPE_GL_CYLINDER, pos_b, col, pos_b, col, pos_b, col);
         }
     }
+}
+
+
+void IntersectSeeds(Ray ray, float maxRayDistance, inout HitInformation hit){
+	bool check_bounds = false;
+	float ray_local_cutoff = maxRayDistance;
+	bool copy = false;
+	int type = TYPE_SEED; 
+	float velocity = 0.0;
+	float cost = 0.0;
+
+	float tube_radius = GetTubeRadius(PART_INDEX_OUTSIDE);
+
+	Sphere sphere;
+	sphere.radius = tube_radius * 1.5;
+
+	for (int i=0; i<num_visual_seeds; i++){
+		sphere.center = GetStreamlineSeedPosition(i);	
+		int multiPolyID = i; 
+
+		float tmin;
+		float tmax;
+		bool hitAABB = IntersectGLAABB(sphere, ray, maxRayDistance, tmin, tmax);
+		if(hitAABB)
+		{
+			IntersectSphere(PART_INDEX_OUTSIDE, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
+		}		
+	}	
 }
 
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube){
@@ -2515,6 +2574,8 @@ const int DIR_LIGHT_FLOAT_COUNT = 16;
 const int DIR_LIGHT_INT_COUNT = 0;
 const int STREAMLINE_COLOR_FLOAT_COUNT = 4;
 const int STREAMLINE_COLOR_INT_COUNT = 0;
+const int STREAMLINE_SEED_FLOAT_COUNT = 4;
+const int STREAMLINE_SEED_INT_COUNT = 0;
 const int CYLINDER_FLOAT_COUNT = 64;
 const int CYLINDER_INT_COUNT = 0;
 
@@ -2544,6 +2605,8 @@ uniform int start_index_int_scalar_color;
 uniform int start_index_float_scalar_color;
 uniform int start_index_int_cylinder;
 uniform int start_index_float_cylinder;
+uniform int start_index_int_seeds;
+uniform int start_index_float_seeds;
 
 //TEXTURE
 const int tex_n_x = 512;
@@ -2751,6 +2814,19 @@ vec3 GetStreamlineColor(int index)
 		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
 	);
 	return color;
+}
+
+vec3 GetStreamlineSeedPosition(int index)
+{
+	ivec3 pointer = GetIndex3D(start_index_float_seeds + index * STREAMLINE_SEED_FLOAT_COUNT);
+	vec3 position = vec3(
+		texelFetch(texture_float_global, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float_global, pointer+ivec3(2,0,0), 0).r
+	);
+	if(projection_index >=0)
+        position[projection_index] = 0.0;
+	return position;
 }
 
 vec4 GetScalarColor(int index, int transfer_function_index)

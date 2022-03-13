@@ -7,7 +7,7 @@ class ShaderFlags {
         tube_radius_factor, tube_radius_factor_projection, tube_radius_factor_projection_highlight, 
         show_bounding_box, show_bounding_box_projection,
         streamline_method, streamline_method_projection, 
-        volume_rendering_mode, show_movable_axes, cut_at_cube_faces, handle_inside){
+        volume_rendering_mode, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode){
 
         this.changed = true;
         this.show_movable_axes = show_movable_axes;
@@ -76,6 +76,20 @@ class ShaderFlags {
 
         this.tube_radius_active = tube_radius_fundamental * this.tube_radius_factor_active;
         this.tube_radius_active_outside = tube_radius_fundamental * this.tube_radius_factor_active_outside;
+
+        this.seed_visualization_mode = seed_visualization_mode;
+        this.show_seeds_instance = false;
+        this.show_seeds_once = false;
+        switch (seed_visualization_mode) {   
+            case SEED_VISUALIZATION_MODE_ONCE:
+                this.show_seeds_once = true;
+                break;
+            case SEED_VISUALIZATION_MODE_INSTANCE:
+                this.show_seeds_instance = true;
+                break;     
+            default:
+                break;
+        }
     }
 
 

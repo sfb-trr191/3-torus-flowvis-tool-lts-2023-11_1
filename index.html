@@ -578,6 +578,22 @@ The actual tube radius is the tube radius from the 'Data' tab multiplied by this
                             <legend>Streamline Shading</legend>
                             <div class="vertical_container">
                                 <div class="input_row">
+                                    <label>show seeds</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_show_seeds_main" type="checkbox" value="true"
+                                            title="This parameter decides whether to show seeds in the left canvas.">
+                                        <select id="select_seed_mode_side" title="
+This parameter decides how the seeds should be visualized in the right canvas.
+    -none: seeds are not visualized.
+    -once: seeds are visualized once in the fundamental domain.
+    -instance: seeds are visualized in each instance of the fundamental domain.">
+                                            <option value="0">none</option>
+                                            <option value="1">once</option>
+                                            <option value="2">instance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="input_row">
                                     <label>show streamlines</label>
                                     <div class="horizontal_div_2">
                                         <input id="checkbox_show_streamlines_main" type="checkbox" value="true"

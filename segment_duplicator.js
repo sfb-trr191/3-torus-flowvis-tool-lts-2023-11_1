@@ -2,7 +2,7 @@ const glMatrix = require("gl-matrix");
 const math = require("mathjs");
 const AABB = require("./aabb");
 const RawDataEntry = require("./raw_data_entry");
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 
 class SegmentDuplicator {
 

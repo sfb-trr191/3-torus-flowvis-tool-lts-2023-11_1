@@ -2,7 +2,7 @@ const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const lerp = module_utility.lerp;
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 const BinaryArray = require("./binary_array");
 const getStateDescription = require("./version").getStateDescription;
 

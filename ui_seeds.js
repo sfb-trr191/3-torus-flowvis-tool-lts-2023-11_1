@@ -2,7 +2,7 @@ const glMatrix = require("gl-matrix");
 const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 const BinaryArray = require("./binary_array");
 const { floor } = require("mathjs");
 const getStateDescription = require("./version").getStateDescription;
@@ -1069,16 +1069,16 @@ class UISeeds {
 
     createPointList(space) {
         var point_list = [];
+        var visual_seeds = [];
         var seed_signums = [];
-        this.createPointListSeeds(space, point_list, seed_signums);
-        this.createPointListPhantomSeeds(space, point_list, seed_signums);
-        return {
-            point_list: point_list,
-            seed_signums: seed_signums,
-        };
+        this.createPointListSeeds(space, point_list, visual_seeds, seed_signums);
+        this.createPointListPhantomSeeds(space, point_list, visual_seeds, seed_signums);
+        this.point_list = point_list;
+        this.seed_signums = seed_signums;
+        this.visual_seeds = visual_seeds;
     }
 
-    createPointListSeeds(space, point_list, seed_signums){
+    createPointListSeeds(space, point_list, visual_seeds, seed_signums){
         for (var i = 0; i < this.list.length; i++) {
             var entry = this.list[i];
             var x = entry.node_input_x.value;
@@ -1088,6 +1088,10 @@ class UISeeds {
             var v_y = Math.sin(2*Math.PI*z);
             //v_x = -1.25;
             //v_y = 0.75;
+            var visual_seed = new StreamlineSeed();
+            visual_seed.position = glMatrix.vec3.fromValues(x, y, z);
+            visual_seeds.push(visual_seed);
+
             var seed;
             switch (space) {
                 case SPACE_3_TORUS:
@@ -1121,7 +1125,7 @@ class UISeeds {
         }
     }
 
-    createPointListPhantomSeeds(space, point_list, seed_signums){
+    createPointListPhantomSeeds(space, point_list, visual_seeds, seed_signums){
         for (var i = 0; i < this.list_phantom_seeds.length; i++) {
             var entry = this.list_phantom_seeds[i];
             var x = entry.node_input_x.value;
@@ -1131,6 +1135,10 @@ class UISeeds {
             var v_y = Math.sin(2*Math.PI*z);
             //v_x = -1.25;
             //v_y = 0.75;
+            var visual_seed = new StreamlineSeed();
+            visual_seed.position = glMatrix.vec3.fromValues(x, y, z);
+            visual_seeds.push(visual_seed);
+
             var seed;
             switch (space) {
                 case SPACE_3_TORUS:
@@ -1348,6 +1356,7 @@ class UISeeds {
 
     UpdateChanges(){        
         this.UpdatePhantomSeeds();
+        this.createPointList();
     }
 }
 /*

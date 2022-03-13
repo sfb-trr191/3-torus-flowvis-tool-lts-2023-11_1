@@ -18,6 +18,8 @@ var DIR_LIGHT_FLOAT_COUNT = 16;
 var DIR_LIGHT_INT_COUNT = 0;
 var STREAMLINE_COLOR_FLOAT_COUNT = 4;
 var STREAMLINE_COLOR_INT_COUNT = 0;
+var STREAMLINE_SEED_FLOAT_COUNT = 4;
+var STREAMLINE_SEED_INT_COUNT = 0;
 var CYLINDER_FLOAT_COUNT = 64;
 var CYLINDER_INT_COUNT = 0;
 
@@ -230,6 +232,33 @@ class StreamlineColor {
     }
 }
 
+class StreamlineSeed {
+
+    //integer based
+    //float based
+    position = glMatrix.vec3.create();
+
+    constructor() { }
+
+    print() {
+        console.log("position: " + this.position);
+    }
+
+    getFloatCount() {
+        return STREAMLINE_SEED_FLOAT_COUNT;
+    }
+
+    getIntCount() {
+        return STREAMLINE_SEED_INT_COUNT;
+    }
+
+    writeToArrays(arrayf, arrayi, start_index_f, start_index_i) {
+        for (var i = 0; i < 3; i++) {
+            arrayf[start_index_f + i] = this.position[i];
+        }
+    }
+}
+
 class Cylinder {
 
     //integer based
@@ -289,4 +318,4 @@ class Cylinder {
     }
 }
 
-module.exports = { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder }
+module.exports = { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder }

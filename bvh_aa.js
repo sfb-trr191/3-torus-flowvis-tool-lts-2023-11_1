@@ -1,6 +1,6 @@
 const glMatrix = require("gl-matrix");
 const AABB = require("./aabb");
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 const module_utility = require("./utility");
 const GetIndexInList = module_utility.GetIndexInList;
 

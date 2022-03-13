@@ -8,6 +8,8 @@ const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 class UniformLocationsRayTracing {
     constructor(gl, program, name) {
         console.log("UniformLocationsRayTracing: ", name)
+        this.location_num_visual_seeds = gl.getUniformLocation(program, "num_visual_seeds");
+
         this.location_color_r = gl.getUniformLocation(program, "color_r");
         this.location_texture_float = gl.getUniformLocation(program, "texture_float");
         this.location_texture_int = gl.getUniformLocation(program, "texture_int");
@@ -173,6 +175,7 @@ class CanvasWrapper {
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
         this.max_volume_distance = 0;// 0=same as limited_max_distance
+        this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
 
 
         this.last_shader_formula_scalar = "";
@@ -378,7 +381,8 @@ class CanvasWrapper {
             this.volume_rendering_mode,
             this.show_movable_axes,
             this.cut_at_cube_faces,
-            this.handle_inside);
+            this.handle_inside,
+            this.seed_visualization_mode);
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
@@ -466,6 +470,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
         gl.uniform1i(this.location_raytracing.location_max_iteration_count, max_iteration_count);
+
+        gl.uniform1i(this.location_raytracing.location_num_visual_seeds, this.global_data.GetNumVisualSeeds());
+        
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
@@ -673,6 +680,8 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
         program_shader_uniforms.print();
         return program_shader_uniforms;
@@ -700,6 +709,8 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
         program_shader_uniforms.print();
         return program_shader_uniforms;
@@ -715,6 +726,8 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_scalar_color", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_int_cylinder", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_cylinder", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
+        program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
         program_shader_uniforms.print();
         return program_shader_uniforms;

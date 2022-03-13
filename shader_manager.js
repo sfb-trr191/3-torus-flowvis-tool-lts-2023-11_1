@@ -55,6 +55,10 @@ class ShaderManager {
             defines += "\n#define CUT_AT_CUBE_FACES";
         if(shader_flags.handle_inside)
             defines += "\n#define HANDLE_INSIDE";
+        if(shader_flags.show_seeds_once)
+            defines += "\n#define SHOW_SEEDS_ONCE";
+        if(shader_flags.show_seeds_instance)
+            defines += "\n#define SHOW_SEEDS_INSTANCE";
         
         code = code.replace("$defines$", defines);
         console.log(code);
@@ -104,7 +108,11 @@ class ShaderManager {
         if(shader_flags.cut_at_cube_faces)
             key += ";CUT_AT_CUBE_FACES"     
         if(shader_flags.handle_inside)
-            key += ";HANDLE_INSIDE"          
+            key += ";HANDLE_INSIDE"     
+        if(shader_flags.show_seeds_once)
+            key += ";SHOW_SEEDS_ONCE"     
+        if(shader_flags.show_seeds_instance)
+            key += ";SHOW_SEEDS_INSTANCE"        
         return key;
     }
 

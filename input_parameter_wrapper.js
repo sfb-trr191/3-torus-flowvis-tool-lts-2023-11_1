@@ -142,7 +142,9 @@ class InputParameterWrapper {
         //settings - projection
         new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");     
         new InputWrapper(this, "input_tube_radius_factor_projection_highlight", "trfph");   
-        //settings - streamline shading
+        //settings - streamline shading      
+        new InputWrapper(this, "checkbox_show_seeds_main", "sel");
+        new InputWrapper(this, "select_seed_mode_side", "ser");
         new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");
         new InputWrapper(this, "input_formula_scalar", "fs");

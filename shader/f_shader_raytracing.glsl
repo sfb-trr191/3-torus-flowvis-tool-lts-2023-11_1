@@ -2518,6 +2518,8 @@ uniform int start_index_int_scalar_color;
 uniform int start_index_float_scalar_color;
 uniform int start_index_int_cylinder;
 uniform int start_index_float_cylinder;
+uniform int start_index_int_seeds;
+uniform int start_index_float_seeds;
 
 //TEXTURE
 const int tex_n_x = 512;

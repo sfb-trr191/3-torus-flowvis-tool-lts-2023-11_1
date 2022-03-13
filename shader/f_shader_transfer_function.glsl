@@ -28,6 +28,8 @@ uniform int start_index_int_scalar_color;
 uniform int start_index_float_scalar_color;
 uniform int start_index_int_cylinder;
 uniform int start_index_float_cylinder;
+uniform int start_index_int_seeds;
+uniform int start_index_float_seeds;
 
 vec4 GetScalarColor(int index, int transfer_function_index);
 ivec3 GetIndex3D(int global_index);

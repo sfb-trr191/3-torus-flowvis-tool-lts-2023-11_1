@@ -1,5 +1,5 @@
 const RawDataEntry = require("./raw_data_entry");
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 const glMatrix = require("gl-matrix");
 
 /**

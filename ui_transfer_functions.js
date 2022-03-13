@@ -3,7 +3,7 @@ const seedrandom = require("seedrandom");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const lerpHex = module_utility.lerpHex;
-const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Cylinder } = require("./data_types");
+const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 
 class UITransferFunctionOpacityPoint {
     constructor(ui_transfer_functions, index) {
