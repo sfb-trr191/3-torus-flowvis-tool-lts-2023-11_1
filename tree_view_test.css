@@ -1,0 +1,42 @@
+.layout_main_horizontal {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+input {
+    border:1px solid rgb(118, 118, 118);
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: 0.2em;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 72px 600px 1fr;
+    grid-template-rows: 1fr;
+    gap: 4px;
+    height: 100%;
+}
+
+html {
+    height: 100%;
+    padding: 0%;
+    margin: 0%;
+}
+   
+body {
+    height: 100%;
+    padding: 0%;
+    margin: 0%;
+}
+
+.box{
+    background-color: aqua;
+    padding: 0%;
+    margin: 0%;
+}
+

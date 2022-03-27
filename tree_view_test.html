@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Tree-View Test</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="layout_edit_mode.css" rel="stylesheet" type="text/css" />
+    <!--<link href="tree_view.css" rel="stylesheet" type="text/css" />-->
+    <!--<script src="bundle.js" type="text/javascript"> </script>-->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_32x32.png">
+</head>
+
+<body>
+    <div class="grid">
+        <div id="grid_item_tools" class="box">
+            <fieldset class="group">
+                <legend>Tools</legend>
+            </fieldset>
+        </div>
+        <div id="grid_item_tree" class="box">
+            <fieldset class="group_scroll">
+                <legend>Tree View</legend>
+                <div class="vertical_container" id="container_tree_view_nodes">                    
+                </div>
+            </fieldset>
+        </div>
+        <div id="grid_item_properties" class="box">
+            <fieldset class="group">
+                <legend>Properties</legend>
+            </fieldset>
+        </div>
+        <div id="grid_item_main_view" class="box">
+            <fieldset class="group">
+                <legend>Main View</legend>
+            </fieldset>
+        </div>
+        <div id="grid_item_aux_view" class="box">
+            <fieldset class="group">
+                <legend>Aux View</legend>
+            </fieldset>
+        </div>
+    </div>
+    <script src="./tree_view.js"></script>
+    <script>
+        new TreeView();
+    </script>
+    
+</body>
+
+</html>
