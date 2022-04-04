@@ -1,7 +1,9 @@
 class TreeViewNode {
-    constructor(tree_view, name, has_eye) {
+    constructor(tree_view, name, group_id, has_eye) {
         this.tree_view = tree_view;
         this.name = name;
+        this.group_id = group_id;
+        this.linked_group_node = document.getElementById(group_id);
         this.has_eye = has_eye;
         this.level = 0;
         this.parent = null;
@@ -19,7 +21,7 @@ class TreeViewNode {
         this.node_header.className = "tree_view_header";
         this.node.appendChild(this.node_header);
         this.node_header.addEventListener("click", (event) => {
-            this.onSelect();
+            this.onHeaderClicked(event);
         });
 
         this.node_header_content = document.createElement("div");
@@ -38,23 +40,26 @@ class TreeViewNode {
 
             this.node_header_content_button_visibility.addEventListener("click", (event) => {
                 this.toggleEnabled();
+                event.stopPropagation();
             });
         }
         else{
             this.node_header_content_spacing_no_eye = document.createElement("label");
             this.node_header_content_spacing_no_eye.innerText = "";
-            this.node_header_content.appendChild(this.node_header_content_spacing_no_eye);   
+            this.node_header_content.appendChild(this.node_header_content_spacing_no_eye);  
 
         }
 
         this.node_header_content_spacing = document.createElement("label");
         this.node_header_content_spacing.innerText = "";
+        //this.node_header_content_spacing.className = "label_no_select";
         this.node_header_content.appendChild(this.node_header_content_spacing);   
 
         this.node_header_content_button_children = document.createElement("button");
         this.node_header_content.appendChild(this.node_header_content_button_children);   
         this.node_header_content_button_children.addEventListener("click", (event) => {
             this.toggleCollapse();
+            event.stopPropagation();
         });
 
         this.node_header_content_name = document.createElement("label");
@@ -168,53 +173,107 @@ class TreeViewNode {
         
     }
 
-    onSelect(){
-        this.tree_view.deselect();
-        this.selected = true;
+    updateLinkedGroup(){     
+        if(this.selected){
+            this.linked_group_node.className = "group_properties";
+        }
+        else{
+            this.linked_group_node.className = "hidden";
+        }   
+    }
+
+    onHeaderClicked(event){
+        var ctrl_pressed = event.getModifierState("Control");
+        var shift_pressed = event.getModifierState("Shift");
+        if(shift_pressed){
+            if(!ctrl_pressed){
+                this.tree_view.deselect();
+            }
+            this.selectWithAllChildren();
+        }
+        else if(ctrl_pressed){
+            this.toggleSelected();
+        }
+        else{         
+            var toggle_state = !this.selected;   
+            this.tree_view.deselect();
+            this.selected = toggle_state;
+        }
         this.tree_view.updateHeaderClass();
+        this.tree_view.updateLinkedGroup();
+        this.tree_view.updatePropertiesHelp();
+    }
+
+    toggleSelected(){
+        this.selected = !this.selected;
+    }
+
+    selectWithAllChildren(){
+        this.selected = true;
+        var stack = [];
+        for(var i=0; i<this.list_children.length; i++){
+            stack.push(this.list_children[i]);
+        }
+        while(stack.length > 0){            
+            var node = stack.pop();
+            node.selected = true;
+            for(var i=0; i<node.list_children.length; i++){
+                stack.push(node.list_children[i]);
+            }
+        }
+        
+        this.tree_view.updateHeaderClass();
+        this.tree_view.updateLinkedGroup();
     }
 }
 
 class TreeView{
     constructor() {
         this.element = document.getElementById("container_tree_view_nodes");
+        this.node_help_properties = document.getElementById("help_properties");
         this.list_nodes = [];
         this.generateNodes();
         this.updateCollapseState();
+        this.updateLinkedGroup();
+        this.updatePropertiesHelp();
     }
 
     generateNodes() {
         var EYE = true;
         var NO_EYE = false;
 
-        var node_root = this.generateNode(this, "Root", NO_EYE);
-        var node_data = this.generateNode(this, "Data", NO_EYE);
-        var node_equations = this.generateNode(this, "Equations", NO_EYE);
-        var node_streamline_calculation = this.generateNode(this, "Streamline Calculation", NO_EYE);
-        var node_ftle_calculation = this.generateNode(this, "FTLE Calculation", NO_EYE);
-        var node_lights = this.generateNode(this, "Lights", NO_EYE);
+        var node_root = this.generateNode(this, "Root", "group_properties_root", NO_EYE);
+        var node_data = this.generateNode(this, "Data", "group_properties_root_data", NO_EYE);
+        var node_equations = this.generateNode(this, "Equations", "group_properties_root_data_equations", NO_EYE);
+        var node_streamline_calculation = this.generateNode(this, "Streamline Calculation", "group_properties_root_data_streamline_calculation", NO_EYE);
+        var node_ftle_calculation = this.generateNode(this, "FTLE Calculation", "group_properties_root_data_ftle_calculation", NO_EYE);
+        var node_lighting = this.generateNode(this, "Lighting", "group_properties_root_lighting", NO_EYE);
+        var node_transfer_functions = this.generateNode(this, "Transfer Functions", "group_properties_root_transfer_functions", NO_EYE);
 
-        var node_main_scene = this.generateNode(this, "Main View", NO_EYE);
-        var node_main_camera = this.generateNode(this, "Camera", NO_EYE);
-        var node_main_visual_objects = this.generateNode(this, "Visual Objects", EYE);
-        var node_main_streamlines = this.generateNode(this, "Streamlines", EYE);
-        var node_main_ftle = this.generateNode(this, "FTLE Volume", EYE);
-        var node_main_indicators = this.generateNode(this, "Indicators", EYE);
-        var node_main_bounding_axes = this.generateNode(this, "Bounding Axes", EYE);
-        var node_main_top_right_axes = this.generateNode(this, "Top Right Axes", EYE);
-        var node_main_clicked_position = this.generateNode(this, "Clicked Position", EYE);
-        var node_main_seeds = this.generateNode(this, "Seeds", EYE);
+        var node_main_scene = this.generateNode(this, "Main View", "group_properties_root_main_view", NO_EYE);
+        var node_main_camera = this.generateNode(this, "Camera", "group_properties_root_main_view_camera", NO_EYE);
+        var node_main_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_main_view_visual_objects", EYE);
+        var node_main_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_main_view_visual_objects_streamlines", EYE);
+        var node_main_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_main_view_visual_objects_ftle_volume", EYE);
+        var node_main_indicators = this.generateNode(this, "Indicators", "group_properties_root_main_view_visual_objects_indicators", EYE);
+        var node_main_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_main_view_visual_objects_indicators_bounding_axes", EYE);
+        var node_main_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_main_view_visual_objects_indicators_top_right_axes", EYE);
+        var node_main_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_main_view_visual_objects_indicators_clicked_position", EYE);
+        var node_main_seeds = this.generateNode(this, "Seeds", "group_properties_root_main_view_visual_objects_indicators_seeds", EYE);
 
-        var node_aux_scene = this.generateNode(this, "Aux View", NO_EYE);
-        var node_aux_camera = this.generateNode(this, "Camera", NO_EYE);
-        var node_aux_visual_objects = this.generateNode(this, "Visual Objects", EYE);
-        var node_aux_streamlines = this.generateNode(this, "Streamlines", EYE);
-        var node_aux_ftle = this.generateNode(this, "FTLE Volume", EYE);
-        var node_aux_indicators = this.generateNode(this, "Indicators", EYE);
-        var node_aux_bounding_axes = this.generateNode(this, "Bounding Axes", EYE);
-        var node_aux_top_right_axes = this.generateNode(this, "Top Right Axes", EYE);
-        var node_aux_clicked_position = this.generateNode(this, "Clicked Position", EYE);
-        var node_aux_seeds = this.generateNode(this, "Seeds", EYE);        
+        var node_aux_scene = this.generateNode(this, "Aux View", "group_properties_root_aux_view", NO_EYE);
+        var node_aux_camera = this.generateNode(this, "Camera", "group_properties_root_aux_view_camera", NO_EYE);
+        var node_aux_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_aux_view_visual_objects", EYE);
+        var node_aux_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_aux_view_visual_objects_streamlines", EYE);
+        var node_aux_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_aux_view_visual_objects_ftle_volume", EYE);
+        var node_aux_indicators = this.generateNode(this, "Indicators", "group_properties_root_aux_view_visual_objects_indicators", EYE);
+        var node_aux_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes", EYE);
+        var node_aux_origin_axes = this.generateNode(this, "Origin Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes_origin_axes", EYE);
+        var node_aux_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_aux_view_visual_objects_indicators_top_right_axes", EYE);
+        var node_aux_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_aux_view_visual_objects_indicators_clicked_position", EYE);
+        var node_aux_seeds = this.generateNode(this, "Seeds", "group_properties_root_aux_view_visual_objects_indicators_seeds", EYE);        
+
+        var node_todo = this.generateNode(this, "Todo", "group_properties_root_todo", NO_EYE);
 
         this.element.appendChild(node_root.node);
 
@@ -222,7 +281,8 @@ class TreeView{
         node_data.addChild(node_equations);
         node_data.addChild(node_streamline_calculation);
         node_data.addChild(node_ftle_calculation);
-        node_root.addChild(node_lights);
+        node_root.addChild(node_lighting);
+        node_root.addChild(node_transfer_functions);        
         node_root.addChild(node_main_scene);        
         node_main_scene.addChild(node_main_camera);
         node_main_scene.addChild(node_main_visual_objects);
@@ -240,15 +300,17 @@ class TreeView{
         node_aux_visual_objects.addChild(node_aux_ftle);
         node_aux_visual_objects.addChild(node_aux_indicators);
         node_aux_indicators.addChild(node_aux_bounding_axes);
+        node_aux_bounding_axes.addChild(node_aux_origin_axes);        
         node_aux_indicators.addChild(node_aux_top_right_axes);
         node_aux_indicators.addChild(node_aux_clicked_position);
         node_aux_indicators.addChild(node_aux_seeds);
+        node_root.addChild(node_todo);  
         
         
     }  
 
-    generateNode(tree_view, name, has_eye){
-        var node = new TreeViewNode(tree_view, name, has_eye);
+    generateNode(tree_view, name, group_id, has_eye){
+        var node = new TreeViewNode(tree_view, name, group_id, has_eye);
         this.list_nodes.push(node);
         return node;
     }
@@ -271,9 +333,26 @@ class TreeView{
         }
     }
 
+    updateLinkedGroup(){
+        for(var i=0; i<this.list_nodes.length; i++){
+            this.list_nodes[i].updateLinkedGroup();
+        }
+    }
+
+    updatePropertiesHelp(){
+        for(var i=0; i<this.list_nodes.length; i++){
+            if(this.list_nodes[i].selected){
+                this.node_help_properties.className = "hidden";
+                return;
+            }
+        }
+        this.node_help_properties.className = "shown";
+    }
+
     deselect(){
         for(var i=0; i<this.list_nodes.length; i++){
             this.list_nodes[i].selected = false;
+            this.list_nodes[i].updateLinkedGroup();
         }
     }
 }

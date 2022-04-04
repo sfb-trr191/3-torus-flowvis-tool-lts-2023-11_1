@@ -1,0 +1,380 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>3-Torus FlowVis Tool</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="black.css" rel="stylesheet" type="text/css" />
+    <link href="shared.css" rel="stylesheet" type="text/css" />
+    <script src="bundle.js" type="text/javascript"> </script>
+    <link href="cookies-eu-banner.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_32x32.png">
+</head>
+
+<body>
+    <div id="wrapper_transparent_overlay" class="wrapper">
+        <div id="transparent_overlay"></div>
+    </div>
+    <div id="wrapper_dialog_javascript" class="wrapper">
+        <div class="dialog_progress">
+            <h3>Error</h3>
+            Activate javascript.
+        </div>
+    </div>
+    <div id="wrapper_dialog_calculating" class="hidden">
+        <div class="dialog_progress">
+            <h3>Calculating...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_prepare_left_shader" class="hidden">
+        <div class="dialog_progress">
+            <h3>Preparing shaders (1/2)...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_prepare_right_shader" class="hidden">
+        <div class="dialog_progress">
+            <h3>Preparing shaders (2/2)...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_wait_for_shader" class="hidden">
+        <div class="dialog_progress">
+            <h3>Waiting for shaders...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+
+    <div id="cookies-eu-banner" style="display: none;">
+        By continuing to visit this site, you accept the use of cookies by Google Analytics for statistical purposes.
+        <a href="./read-more.html" id="cookies-eu-more">Read more</a>
+        <button id="cookies-eu-reject">Reject</button>
+        <button id="cookies-eu-accept">Accept</button>
+    </div>
+    <div class="container">
+        <div class="column column-one">
+            <img id="image_thumbnail" src="green720p.png">
+            <canvas id="main_canvas" tabindex="1">Your browser does not seem to support
+                HTML5 canvas.</canvas>
+            <p id="fps_display">FPS</p>
+            <!--<p id="message_display">activate javascript to see the content</p>-->
+            <fieldset class="toolbar">
+                <div class="container">
+                    <button type="button" id="button_update_camera" title="Update cameras from input fields"></button>
+                    <button type="button" class="camera_unselected" id="button_select_camera_left"
+                        title="Select main camera"></button>
+                    <button type="button" class="camera_unselected" id="button_select_camera_right"
+                        title="Select auxiliary camera"></button>
+                    <button type="button" id="button_camera_Yneg_Zpos_Xpos" title="Set the orientation of the selected camera to:
+    - right: y-
+    - up: z+
+    - forward: x+"></button>
+                    <button type="button" id="button_camera_Ypos_Zpos_Xneg" title="Set the orientation of the selected camera to:
+    - right: y+
+    - up: z+
+    - forward: x-"></button>
+
+
+                    <button type="button" id="button_camera_Xpos_Zpos_Ypos" title="Set the orientation of the selected camera to:
+    - right: x+
+    - up: z+
+    - forward: y+"></button>
+                    <button type="button" id="button_camera_Xneg_Zpos_Yneg" title="Set the orientation of the selected camera to:
+    - right: x-
+    - up: z+
+    - forward: y-"></button>
+
+
+
+                    <button type="button" id="button_camera_Xneg_Ypos_Zpos" title="Set the orientation of the selected camera to:
+    - right: x-
+    - up: y+
+    - forward: z+"></button>
+                    <button type="button" id="button_camera_Xpos_Ypos_Zneg" title="Set the orientation of the selected camera to:
+    - right: x+
+    - up: y+
+    - forward: z-"></button>
+                    <button type="button" id="button_focus_center" 
+                    title="Set the focus point of the selected camera to the center of the unit cube."></button>
+                </div>
+            </fieldset>
+            <div id="wrapper_version_string">
+                <p id="paragraph_version_string">This is a test</p>
+            </div>
+            <div id="wrapper_debug_string" class="hidden">
+                <p>tick: <strong>0</strong> - frame: <strong>0</strong> - fps: <strong>0</strong></p>
+            </div>
+
+        </div>
+        <div class="column column-two">
+            <div class="show" id="show_side_canvas">
+                <img id="image_thumbnail_right" src="green512x384.png">
+                <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
+                    HTML5 canvas.</canvas>
+            </div>
+            <div class="horizontal_container" id="container_select_mode">
+                <select id="select_side_mode" title="Select what is shown in the right canvas.
+    - 2D FTLE slice: (warning: possibly unintuitive axes)">
+                    <option value="0">hide canvas</option>
+                    <!--DRAW_MODE_NONE-->
+                    <option value="1">3D fundamental domain</option>
+                    <!--DRAW_MODE_DEFAULT-->
+                    <option selected value="3">2D projection</option>
+                    <!--DRAW_MODE_PROJECTION-->
+                    <option value="2">2D FTLE slice</option>
+                    <!--DRAW_MODE_FTLE_SLICE-->
+                </select>
+                <div class="show" id="show_projection_index">
+                    <select id="select_projection_index"
+                        title="Select the projection. Origin is bottom left of each square.">
+                        <option value="2">z=0 (horizontal: x vertical: y)</option>
+                        <option value="0">x=0 (horizontal: y vertical: z)</option>
+                        <option value="1">y=0 (horizontal: z vertical: x)</option>
+                    </select>
+                </div>
+                <div class="show" id="show_slice_axes_order" title="Select the slice direction.">
+                    <select id="select_slice_axes_order">
+                        <option value="0">horizontal: x vertical: y</option>
+                        <option value="1">horizontal: x vertical: z</option>
+                        <option value="2">horizontal: z vertical: y</option>
+                    </select>
+                </div>
+                <div class="show" id="show_side_canvas_streamline_method">
+                    <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
+    - fundamental domain + R³: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R³: streamlines leave the fundamental domain and are shown in R³
+    - none: streamlines are not shown">
+                        <option value="3">fundamental domain + R³</option>
+                        <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                        <option value="1">fundamental domain</option>
+                        <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                        <option value="2">R³</option>
+                        <!--STREAMLINE_DRAW_METHOD_R3-->
+                        <option value="0">none</option>
+                        <!--STREAMLINE_DRAW_METHOD_NONE-->
+                    </select>
+                </div>
+                <div class="show" id="show_side_canvas_streamline_method_projection">
+                    <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
+    - fundamental domain + R²: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R²: streamlines leave the fundamental domain and are shown in R²
+    - none: streamlines are not shown">
+                        <option value="3">fundamental domain + R²</option>
+                        <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                        <option value="1">fundamental domain</option>
+                        <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                        <option value="2">R²</option>
+                        <!--STREAMLINE_DRAW_METHOD_R3-->
+                        <option value="0">none</option>
+                        <!--STREAMLINE_DRAW_METHOD_NONE-->
+                    </select>
+                </div>
+            </div>
+            <div class="tab">
+                <button id="button_tab_data" class="tablink" title="Data"></button>
+                <button id="button_tab_ftle" class="tablink" title="FTLE data"></button>
+                <button id="button_tab_settings" class="tablink" title="Settings"></button>
+                <button id="button_tab_transfer_function" class="tablink" title="Transfer function"></button>
+                <!--
+                <button id="button_tab_information" class="tablink" title="information"></button>
+                <button id="button_tab_edit" class="tablink" title="edit information"></button>
+                -->
+                <button id="button_tab_export" class="tablink" title="Export"></button>
+                <button id="button_tab_help" class="tablink" title="Help"></button>
+            </div>
+            <fieldset class="toolbar">
+                <div class="container">
+                    <div id="wrapper_button_request_data">
+                        <button type="button" class="button_visible" id="button_request_data"
+                            title="Calculate streamlines"></button>
+                    </div>
+                    <div id="wrapper_button_calculate_ftle">
+                        <button type="button" id="button_calculate_ftle" title="Calculate FTLE"></button>
+                    </div>
+                    <button type="button" id="button_data_update_render_settings"
+                        title="Update render settings"></button>
+                    <button type="button" id="button_update_url" title="Update URL"></button>
+                    <div id="wrapper_button_add_multi_seed">
+                        <button type="button" id="button_add_multi_seed" title="Add multi seed"></button>
+                    </div>
+                    <div id="wrapper_button_add_seed">
+                        <button type="button" id="button_add_seed" title="Add seed"></button>
+                    </div>
+                    <div id="wrapper_button_randomize_seed_positions">
+                        <button type="button" id="button_randomize_seed_positions"
+                            title="Randomize all seed positions"></button>
+                    </div>
+                    <div id="wrapper_button_randomize_seed_colors">
+                        <button type="button" id="button_randomize_seed_colors"
+                            title="Randomize all seed colors"></button>
+                    </div>
+                    <div id="wrapper_button_set_magnetic_field">
+                        <button type="button" id="button_set_magnetic_field" title="Set equations to magnetic field:
+    u = cos(2 * PI * z)
+    v = sin(2 * PI * z)
+    w remains unchanged."></button>
+                    </div>
+                    <div id="wrapper_button_export">
+                        <button type="button" id="button_export" title="Export and download"></button>
+                    </div>
+                </div>
+            </fieldset class="fieldset_camera">
+            <div class="multi_tab">
+                <div id="tabcontent_settings" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>General</legend>
+                            <div class="vertical_container">
+                                <button type="button" id="button_render_settings">update render settings</button>
+
+                                <!--                                                   
+                                <div class="input_row">
+                                    <label>url data array</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_url_data_array" type="checkbox" value="false"
+                                            title="This parameter decides whether to use a data array for url generation.">
+                                        <label></label>
+                                    </div>
+                                </div>
+                                -->
+                            </div>
+                        </fieldset>
+
+                    </form>
+                </div>
+                <!--
+                <div id="tabcontent_information" class="tabcontent">
+    
+                </div>
+                <div id="tabcontent_edit" class="tabcontent">
+    
+                </div>
+                -->
+                <div id="tabcontent_export" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>Export</legend>
+                            <div class="grid_container">
+                                <label>thumbnail URL main</label>
+                                <input id="input_thumbnail" type="text" value="">
+                                <label>thumbnail URL aux.</label>
+                                <input id="input_thumbnail_right" type="text" value="">
+                                <label>latex thumbnail dir</label>
+                                <input id="input_thumbnail_directory" type="text" value="images/">
+                                <label>latex thumbnail file main</label>
+                                <input id="input_thumbnail_name" type="text" value="thumbnail_main">
+                                <label>latex thumbnail file aux.</label>
+                                <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">
+                                <label>selected tab</label>
+                                <select id="select_tab">
+                                    <option value="tab_data">data</option>
+                                    <option value="tab_ftle">ftle</option>
+                                    <option value="tab_settings">settings</option>
+                                    <!--
+                                    <option value="tab_information">information</option>
+                                    <option value="tab_edit">edit</option>
+                                    -->
+                                    <option value="tab_transfer_function">transfer function</option>
+                                    <option value="tab_export">export</option>
+                                    <option value="tab_help">help</option>
+                                </select>
+                            </div>
+                        </fieldset>
+                        <!--
+                        <div id="h_export_warnings" class="warning">
+                            <h3>Warnings</h3>
+                            <ul>
+                                <li id="list_warning_p" class="list_entry">For high quality thumbnails it is recommended to
+                                    deactivate panning mode
+                                    by clicking into the canvas and pressing "p".</li>
+                                <li id="list_warning_index" class="list_entry">For high quality thumbnails it is recommended
+                                    to wait until the
+                                    progress bar at the bottom of the image disappears. This requires that the mouse is
+                                    inside
+                                    the canvas.</li>
+                                <li id="list_warning_thumbnail_url" class="list_entry">It is recommended to set a thumbnail
+                                    URL before export. If
+                                    you do not know the URL yet, e.g. because you plan to upload the thumbnail to a server
+                                    where
+                                    you can not choose the URL of the uploaded image, you can leave it blank for now,
+                                    export,
+                                    upload the thumbnail, insert the URL of the uploaded thumbnail and export again.</li>
+                            </ul>
+                        </div>
+                        -->
+                        <div id="warning_p" class="warning">
+                            <h3 class="warning_title">Warning</h3>
+                            <p class="warning_text">
+                                For high quality thumbnails it is recommended to deactivate panning mode
+                                by clicking into the canvas and pressing "p".
+                            </p>
+                        </div>
+                        <div id="warning_index" class="warning">
+                            <h3 class="warning_title">Warning</h3>
+                            <p class="warning_text">
+                                For high quality thumbnails it is recommended to wait until the
+                                progress bars at the bottom of both images disappear. This requires that the mouse is
+                                inside the canvas.
+                            </p>
+                        </div>
+                        <div id="warning_thumbnail_url" class="warning">
+                            <h3 class="warning_title">Warning</h3>
+                            <p class="warning_text">
+                                It is recommended to set the thumbnail
+                                URLs before export. If
+                                you do not know the URLs yet, e.g. because you plan to upload the thumbnails to a server
+                                where
+                                you can not choose the URLs of the uploaded images, you can leave them blank for now and:
+                                <ol>
+                                    <li class="warning_li">export, in order to obtain the thumbnails,
+                                    <li class="warning_li">upload the thumbnails,
+                                    <li class="warning_li">insert the URLs of the uploaded thumbnails in the fields above,
+                                    <li class="warning_li">export again, to obtain the correct files.
+                                </ol>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+                <div id="tabcontent_help" class="tabcontent">
+                    <div>
+                        <h1><a href="https://www.youtube.com/playlist?list=PLcq0uuvY663lQCRBkjrdAaMeyZQ-QZ4zb">Video Tutorials</a></h1>
+                    </div>
+                    <div>
+                        <h1><a href="https://sfb-trr191.github.io/3-torus-flowvis-tool-tutorial/examples.html">Examples</a></h1>
+                    </div>
+                    <div>
+                        <h3><a href="http://www.mi.uni-koeln.de/CRC-TRR191/">CRC/TRR 191</a></h3>
+                    </div>
+                    <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
+                            href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <p id="paragraph_text">text</p>
+        <!--
+        <input type="file" id="input">
+        -->
+    </div>
+    <script src="./cookies-eu-banner.js"></script>
+    <script>
+        new CookiesEuBanner(function () {
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-37237135-6', 'auto');
+            ga('send', 'pageview');
+        });
+    </script>
+</body>
+
+</html>

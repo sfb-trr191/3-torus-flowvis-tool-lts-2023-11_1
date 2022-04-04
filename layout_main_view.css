@@ -1,0 +1,32 @@
+@import url("layout_base.css");
+
+.grid {
+    display: grid;
+    gap: 4px;
+    height: 100%;
+    grid-template-columns: 72px 1fr;
+    grid-template-rows:  1fr;
+    grid-template-areas: "a b";
+}
+
+#grid_item_tools {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#grid_item_tree {
+    display: none;
+}
+
+#grid_item_properties {
+    display: none;
+}
+
+#grid_item_main_view {
+    grid-column: 2; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 1;    /* same concept, but for rows */
+}
+
+#grid_item_aux_view {
+    display: none;
+}
