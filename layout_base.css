@@ -224,7 +224,15 @@ legend {
     background-color: transparent;
 }
 
+#invisible_container{
+    display:none
+}
+
 .hidden{
+    display:none
+}
+
+.display_none{
     display: none;
 }
 
@@ -241,6 +249,26 @@ legend {
     position: relative;
     margin: 4px 4px 4px 4px;
     padding: 4px 4px 4px 4px;
+    gap: 4px; 
+}
+
+.group_properties_content{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 4px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
+    gap: 4px; 
+}
+
+.group_properties_children{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 4px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
     gap: 4px; 
 }
 
@@ -287,4 +315,5 @@ legend {
 
 .span_style_properties_legend_path{
     color: rgb(179, 179, 179);
+    display: none;
 }

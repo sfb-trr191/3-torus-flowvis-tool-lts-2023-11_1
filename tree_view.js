@@ -4,6 +4,9 @@ class TreeViewNode {
         this.name = name;
         this.group_id = group_id;
         this.linked_group_node = document.getElementById(group_id);
+        this.linked_children_container_node = this.linked_group_node.querySelector(".group_properties_children");
+        this.linked_content_container_node = this.linked_group_node.querySelector(".group_properties_content");        
+        this.container_properties_node = document.getElementById("container_properties");
         this.has_eye = has_eye;
         this.level = 0;
         this.parent = null;
@@ -176,6 +179,31 @@ class TreeViewNode {
     updateLinkedGroup(){     
         if(this.selected){
             this.linked_group_node.className = "group_properties";
+            //only for the root node: always append directly to container
+            if(this.parent === null){
+                this.container_properties_node.appendChild(this.linked_group_node);
+            }
+            //all non root nodes: append to either parent or directly to container
+            else{
+                if(this.parent.selected){
+                    this.parent.linked_children_container_node.appendChild(this.linked_group_node);
+                }else{
+                    this.container_properties_node.appendChild(this.linked_group_node);
+                }
+            }
+            //show/hide content container
+            if(this.hasVisibleContent()){
+                this.linked_content_container_node.className = "group_properties_content";
+            }else{                
+                this.linked_content_container_node.className = "hidden";
+            }
+            //show/hide children container
+            if(this.hasSelectedChildren()){
+                this.linked_children_container_node.className = "group_properties_children";
+            }else{                
+                this.linked_children_container_node.className = "hidden";
+            }
+
         }
         else{
             this.linked_group_node.className = "hidden";
@@ -225,10 +253,27 @@ class TreeViewNode {
         this.tree_view.updateHeaderClass();
         this.tree_view.updateLinkedGroup();
     }
+
+    hasSelectedChildren(){
+        for(var i=0; i<this.list_children.length; i++){
+            if(this.list_children[i].selected)
+                return true;            
+        }
+        return false;
+    }
+
+    hasVisibleContent(){        
+        for(var i=0; i<this.linked_content_container_node.children.length; i++){
+            if(this.linked_content_container_node.children[i].className !== "hidden")
+                return true;            
+        }
+        return false; 
+    }
 }
 
 class TreeView{
     constructor() {
+        this.invisible_container = document.getElementById("invisible_container");
         this.element = document.getElementById("container_tree_view_nodes");
         this.node_help_properties = document.getElementById("help_properties");
         this.list_nodes = [];
@@ -333,7 +378,10 @@ class TreeView{
         }
     }
 
-    updateLinkedGroup(){
+    updateLinkedGroup(){        
+        for(var i=0; i<this.list_nodes.length; i++){
+            this.invisible_container.appendChild(this.list_nodes[i].linked_group_node);
+        }
         for(var i=0; i<this.list_nodes.length; i++){
             this.list_nodes[i].updateLinkedGroup();
         }
@@ -352,7 +400,7 @@ class TreeView{
     deselect(){
         for(var i=0; i<this.list_nodes.length; i++){
             this.list_nodes[i].selected = false;
-            this.list_nodes[i].updateLinkedGroup();
         }
+        this.updateLinkedGroup();
     }
 }

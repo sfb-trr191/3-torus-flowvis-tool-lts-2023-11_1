@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>New</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="dynamic.css" rel="stylesheet" type="text/css" />
+    <!--<link href="tree_view.css" rel="stylesheet" type="text/css" />-->
+    <!--<script src="bundle.js" type="text/javascript"> </script>-->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_32x32.png">
+</head>
+
+<body>
+    <div class="grid">
+        <div id="grid_item" class="box">
+            <fieldset id="group_Buttons" class="group">
+                <legend>Buttons</legend>  
+                <button id="button_move">move</button>
+            </fieldset>
+            <fieldset id="group_A" class="group">
+                <legend>A</legend>    
+                <div class="children" id="node_children_a">
+                    <button id="button_1">1</button>
+                </div>            
+            </fieldset>
+            <fieldset id="group_B" class="group">
+                <legend>B</legend>                
+                <div class="children" id="node_children_b">
+                    <button id="button_2">2</button>
+                </div>   
+            </fieldset>
+        </div>   
+    </div>
+    <script src="./test_dynamic.js"></script>
+    <script>
+        new Dynamic();
+    </script>
+    
+</body>
+
+</html>
