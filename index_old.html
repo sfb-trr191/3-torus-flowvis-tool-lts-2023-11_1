@@ -1,0 +1,1113 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>3-Torus FlowVis Tool</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="black.css" rel="stylesheet" type="text/css" />
+    <link href="shared.css" rel="stylesheet" type="text/css" />
+    <script src="bundle.js" type="text/javascript"> </script>
+    <link href="cookies-eu-banner.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_32x32.png">
+</head>
+
+<body>
+    <div id="wrapper_transparent_overlay" class="wrapper">
+        <div id="transparent_overlay"></div>
+    </div>
+    <div id="wrapper_dialog_javascript" class="wrapper">
+        <div class="dialog_progress">
+            <h3>Error</h3>
+            Activate javascript.
+        </div>
+    </div>
+    <div id="wrapper_dialog_calculating" class="hidden">
+        <div class="dialog_progress">
+            <h3>Calculating...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_prepare_left_shader" class="hidden">
+        <div class="dialog_progress">
+            <h3>Preparing shaders (1/2)...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_prepare_right_shader" class="hidden">
+        <div class="dialog_progress">
+            <h3>Preparing shaders (2/2)...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_wait_for_shader" class="hidden">
+        <div class="dialog_progress">
+            <h3>Waiting for shaders...</h3>
+            This can take a few seconds.
+        </div>
+    </div>
+
+    <div id="cookies-eu-banner" style="display: none;">
+        By continuing to visit this site, you accept the use of cookies by Google Analytics for statistical purposes.
+        <a href="./read-more.html" id="cookies-eu-more">Read more</a>
+        <button id="cookies-eu-reject">Reject</button>
+        <button id="cookies-eu-accept">Accept</button>
+    </div>
+    <div class="container">
+        <div class="column column-one">
+            <img id="image_thumbnail" src="green720p.png">
+            <canvas id="main_canvas" tabindex="1">Your browser does not seem to support
+                HTML5 canvas.</canvas>
+            <p id="fps_display">FPS</p>
+            <!--<p id="message_display">activate javascript to see the content</p>-->
+            <fieldset class="toolbar">
+                <div class="container">
+                    <button type="button" id="button_update_camera" title="Update cameras from input fields"></button>
+                    <button type="button" class="camera_unselected" id="button_select_camera_left"
+                        title="Select main camera"></button>
+                    <button type="button" class="camera_unselected" id="button_select_camera_right"
+                        title="Select auxiliary camera"></button>
+                    <button type="button" id="button_camera_Yneg_Zpos_Xpos" title="Set the orientation of the selected camera to:
+    - right: y-
+    - up: z+
+    - forward: x+"></button>
+                    <button type="button" id="button_camera_Ypos_Zpos_Xneg" title="Set the orientation of the selected camera to:
+    - right: y+
+    - up: z+
+    - forward: x-"></button>
+
+
+                    <button type="button" id="button_camera_Xpos_Zpos_Ypos" title="Set the orientation of the selected camera to:
+    - right: x+
+    - up: z+
+    - forward: y+"></button>
+                    <button type="button" id="button_camera_Xneg_Zpos_Yneg" title="Set the orientation of the selected camera to:
+    - right: x-
+    - up: z+
+    - forward: y-"></button>
+
+
+
+                    <button type="button" id="button_camera_Xneg_Ypos_Zpos" title="Set the orientation of the selected camera to:
+    - right: x-
+    - up: y+
+    - forward: z+"></button>
+                    <button type="button" id="button_camera_Xpos_Ypos_Zneg" title="Set the orientation of the selected camera to:
+    - right: x+
+    - up: y+
+    - forward: z-"></button>
+                    <button type="button" id="button_focus_center" 
+                    title="Set the focus point of the selected camera to the center of the unit cube."></button>
+                </div>
+            </fieldset>
+            <div class="container" id="container_bottom_left">
+                <fieldset class="fieldset_camera">
+                    <legend>Main Camera</legend>
+                    <div class="grid_container">
+                        <label>position</label>
+                        <div id="div_input_camera_position" class="horizontal_div_3">
+                            <input id="input_camera_position_x" type="text" value="0.5"
+                                title="x component of the position.">
+                            <input id="input_camera_position_y" type="text" value="0.5"
+                                title="y component of the position.">
+                            <input id="input_camera_position_z" type="text" value="0.5"
+                                title="z component of the position.">
+                        </div>
+                        <label>forward</label>
+                        <div id="div_input_camera_forward" class="horizontal_div_3">
+                            <input id="input_camera_forward_x" type="text" value="0.0" title="x component of the forward vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_camera_forward_y" type="text" value="1.0" title="y component of the forward vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_camera_forward_z" type="text" value="0.0" title="z component of the forward vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                        </div>
+                        <label>up</label>
+                        <div id="div_input_camera_up" class="horizontal_div_3">
+                            <input id="input_camera_up_x" type="text" value="0.0" title="x component of the up vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_camera_up_y" type="text" value="0.0" title="y component of the up vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_camera_up_z" type="text" value="1.0" title="z component of the up vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="fieldset_camera">
+                    <legend>Auxiliary Camera</legend>
+                    <div class="grid_container">
+                        <label>position</label>
+                        <div id="div_input_side_camera_position" class="horizontal_div_3">
+                            <input id="input_side_camera_position_x" type="text" value="0.5"
+                                title="x component of the position.">
+                            <input id="input_side_camera_position_y" type="text" value="0.5"
+                                title="y component of the position.">
+                            <input id="input_side_camera_position_z" type="text" value="0.5"
+                                title="z component of the position.">
+                        </div>
+                        <label>forward</label>
+                        <div id="div_input_side_camera_forward" class="horizontal_div_3">
+                            <input id="input_side_camera_forward_x" type="text" value="0.0" title="x component of the forward vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_side_camera_forward_y" type="text" value="1.0" title="y component of the forward vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_side_camera_forward_z" type="text" value="0.0" title="z component of the forward vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                        </div>
+                        <label>up</label>
+                        <div id="div_input_side_camera_up" class="horizontal_div_3">
+                            <input id="input_side_camera_up_x" type="text" value="0.0" title="x component of the up vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_side_camera_up_y" type="text" value="0.0" title="y component of the up vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                            <input id="input_side_camera_up_z" type="text" value="1.0" title="z component of the up vector.
+    - Must be normalized.
+    - Forward and up vector must be orthogonal.">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div id="wrapper_version_string">
+                <p id="paragraph_version_string">This is a test</p>
+            </div>
+            <div id="wrapper_debug_string" class="hidden">
+                <p>tick: <strong>0</strong> - frame: <strong>0</strong> - fps: <strong>0</strong></p>
+            </div>
+
+        </div>
+        <div class="column column-two">
+            <div class="show" id="show_side_canvas">
+                <img id="image_thumbnail_right" src="green512x384.png">
+                <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
+                    HTML5 canvas.</canvas>
+            </div>
+            <div class="horizontal_container" id="container_select_mode">
+                <select id="select_side_mode" title="Select what is shown in the right canvas.
+    - 2D FTLE slice: (warning: possibly unintuitive axes)">
+                    <option value="0">hide canvas</option>
+                    <!--DRAW_MODE_NONE-->
+                    <option value="1">3D fundamental domain</option>
+                    <!--DRAW_MODE_DEFAULT-->
+                    <option selected value="3">2D projection</option>
+                    <!--DRAW_MODE_PROJECTION-->
+                    <option value="2">2D FTLE slice</option>
+                    <!--DRAW_MODE_FTLE_SLICE-->
+                </select>
+                <div class="show" id="show_projection_index">
+                    <select id="select_projection_index"
+                        title="Select the projection. Origin is bottom left of each square.">
+                        <option value="2">z=0 (horizontal: x vertical: y)</option>
+                        <option value="0">x=0 (horizontal: y vertical: z)</option>
+                        <option value="1">y=0 (horizontal: z vertical: x)</option>
+                    </select>
+                </div>
+                <div class="show" id="show_slice_axes_order" title="Select the slice direction.">
+                    <select id="select_slice_axes_order">
+                        <option value="0">horizontal: x vertical: y</option>
+                        <option value="1">horizontal: x vertical: z</option>
+                        <option value="2">horizontal: z vertical: y</option>
+                    </select>
+                </div>
+                <div class="show" id="show_side_canvas_streamline_method">
+                    <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
+    - fundamental domain + R³: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R³: streamlines leave the fundamental domain and are shown in R³
+    - none: streamlines are not shown">
+                        <option value="3">fundamental domain + R³</option>
+                        <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                        <option value="1">fundamental domain</option>
+                        <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                        <option value="2">R³</option>
+                        <!--STREAMLINE_DRAW_METHOD_R3-->
+                        <option value="0">none</option>
+                        <!--STREAMLINE_DRAW_METHOD_NONE-->
+                    </select>
+                </div>
+                <div class="show" id="show_side_canvas_streamline_method_projection">
+                    <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
+    - fundamental domain + R²: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R²: streamlines leave the fundamental domain and are shown in R²
+    - none: streamlines are not shown">
+                        <option value="3">fundamental domain + R²</option>
+                        <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                        <option value="1">fundamental domain</option>
+                        <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                        <option value="2">R²</option>
+                        <!--STREAMLINE_DRAW_METHOD_R3-->
+                        <option value="0">none</option>
+                        <!--STREAMLINE_DRAW_METHOD_NONE-->
+                    </select>
+                </div>
+            </div>
+            <div class="tab">
+                <button id="button_tab_data" class="tablink" title="Data"></button>
+                <button id="button_tab_ftle" class="tablink" title="FTLE data"></button>
+                <button id="button_tab_settings" class="tablink" title="Settings"></button>
+                <button id="button_tab_transfer_function" class="tablink" title="Transfer function"></button>
+                <!--
+                <button id="button_tab_information" class="tablink" title="information"></button>
+                <button id="button_tab_edit" class="tablink" title="edit information"></button>
+                -->
+                <button id="button_tab_export" class="tablink" title="Export"></button>
+                <button id="button_tab_help" class="tablink" title="Help"></button>
+            </div>
+            <fieldset class="toolbar">
+                <div class="container">
+                    <div id="wrapper_button_request_data">
+                        <button type="button" class="button_visible" id="button_request_data"
+                            title="Calculate streamlines"></button>
+                    </div>
+                    <div id="wrapper_button_calculate_ftle">
+                        <button type="button" id="button_calculate_ftle" title="Calculate FTLE"></button>
+                    </div>
+                    <button type="button" id="button_data_update_render_settings"
+                        title="Update render settings"></button>
+                    <button type="button" id="button_update_url" title="Update URL"></button>
+                    <div id="wrapper_button_add_multi_seed">
+                        <button type="button" id="button_add_multi_seed" title="Add multi seed"></button>
+                    </div>
+                    <div id="wrapper_button_add_seed">
+                        <button type="button" id="button_add_seed" title="Add seed"></button>
+                    </div>
+                    <div id="wrapper_button_randomize_seed_positions">
+                        <button type="button" id="button_randomize_seed_positions"
+                            title="Randomize all seed positions"></button>
+                    </div>
+                    <div id="wrapper_button_randomize_seed_colors">
+                        <button type="button" id="button_randomize_seed_colors"
+                            title="Randomize all seed colors"></button>
+                    </div>
+                    <div id="wrapper_button_set_magnetic_field">
+                        <button type="button" id="button_set_magnetic_field" title="Set equations to magnetic field:
+    u = cos(2 * PI * z)
+    v = sin(2 * PI * z)
+    w remains unchanged."></button>
+                    </div>
+                    <div id="wrapper_button_export">
+                        <button type="button" id="button_export" title="Export and download"></button>
+                    </div>
+                </div>
+            </fieldset class="fieldset_camera">
+            <div class="multi_tab">
+                <div id="tabcontent_data" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>General</legend>
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_space">
+                                    <label>space</label>
+                                    <select id="select_space" title="Select which space streamlines are calculated in.">
+                                        <option value="1">3-Torus</option>
+                                        <option value="2">2+2D</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Equations</legend>
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_field_equation_u">
+                                    <label>u</label>
+                                    <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)" title="First component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                                <div class="input_row" id="input_row_field_equation_v">
+                                    <label>v</label>
+                                    <input id="input_field_equation_v" type="text"
+                                        value="sin(2 * PI * y) + 2 * cos (2 * PI * z)" title="Second component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                                <div class="input_row" id="input_row_field_equation_w">
+                                    <label>w</label>
+                                    <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)" title="Third component in the vector field: f(x, y, z) = (u, v, w).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                                <div class="input_row" id="input_row_field_equation_a">
+                                    <label>a</label>
+                                    <input id="input_field_equation_a" type="text" value="x^2" title="a component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                                <div class="input_row" id="input_row_field_equation_b">
+                                    <label>b</label>
+                                    <input id="input_field_equation_b" type="text" value="y^2" title="b component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
+    - Make sure that the field is periodic in [0, 1].
+    - Explicitely use operators, e.g. 2*x instead of 2x.">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Streamline Parameters</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>parameter set</label>
+                                    <select id="select_data_paramaters_mode" title="Select which parameters are shown.">
+                                        <option value="0">basic</option>
+                                        <option value="1">intermediate</option>
+                                        <option value="2">advanced</option>
+                                        <option value="3">debug</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>calculation method</label>
+                                    <select id="select_streamline_calculation_method" title="Streamline calculation method:
+    - fundamental domain + R³: all features are supported, but calculation takes longer.
+    - fundamental domain: required for the left canvas.
+    - R³: required for showing streamlines calculated in R³ (right canvas only). 
+        Allows showing streamlines outside of the fundamental domain 
+        and highlighting in the projection view.">
+                                        <option value="0">fundamental domain + R³</option>
+                                        <option value="1">fundamental domain</option>
+                                        <option value="2">R³</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>direction</label>
+                                    <select id="select_streamline_calculation_direction" title="Streamline integration direction.">
+                                        <option value="1">forward</option>
+                                        <option value="2">backward</option>
+                                        <option selected value="3">both</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>points per streamline</label>
+                                    <input id="input_num_points_per_streamline" type="text" value="500"
+                                        title="The number of points allocated for each streamline.">
+                                </div>
+                                <div class="input_row" id="input_row_data_step_size">
+                                    <label>step size</label>
+                                    <input id="input_step_size" type="text" value="0.0125"
+                                        title="The step size parameter of RK4 (4th order Runge-Kutta method).">
+                                </div>
+                                <div class="input_row" id="input_row_tube_radius_fundamental">
+                                    <label>tube radius</label>
+                                    <input id="input_tube_radius_fundamental" type="text" value="0.005"
+                                        title="The radius of the streamlines. To allow changing the radius without recalculating the streamlines, this value is then multiplied by the radius factor found in the settings tab.">
+                                </div>
+                                <div class="input_row" id="input_row_max_radius_factor_highlight"
+                                    title="The maximum radius factor for highlights. In projection mode, the streamlines in R² can have a larger radius for highlighting purposes.">
+                                    <label>max factor highlight</label>
+                                    <input id="input_max_radius_factor_highlight" type="text" value="5.0">
+                                </div>
+                                <div class="input_row" id="input_row_duplicator_iterations">
+                                    <label>duplicator iterations</label>
+                                    <input id="segment_duplicator_iterations" type="text" value="1"
+                                        title="This is a debug setting and should not be changed from the deault value: 1.">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Seeds</legend>
+                            <div class="vertical_container" id="fieldset_seeds">
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Multi Seeds</legend>
+                            <div class="vertical_container" id="fieldset_multi_seeds">
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Generated Seeds</legend>
+                            <div class="vertical_container" id="fieldset_phantom_seeds">
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="tabcontent_ftle" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>Slice</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>index</label>
+                                    <div class="slide_container">
+                                        <input type="range" min="0" max="99" value="49" class="slider"
+                                            id="slide_slice_index" title="The active slice.">
+                                    </div>
+                                </div>
+                                <div class="input_row">
+                                    <label>animate</label>
+                                    <input id="checkbox_animate_slice_index" type="checkbox" value="true" checked="true"
+                                        title="Animation of the slice index:
+    - checked: the slices are shown consecutively.
+    - unchecked: only one slice is shown.">
+                                </div>
+                                <div class="input_row">
+                                    <label>interpolate</label>
+                                    <input id="checkbox_ftle_slice_interpolate" type="checkbox" value="true" checked="true"
+                                        title="Interpolation method:
+    - checked: use bilinear interpolation
+    - unchecked: use nearest value">
+                                </div>
+                                <div class="input_row">
+                                    <label>draw mode</label>
+                                    <select id="select_slice_mode" title="Controls what is shown in the active slice:
+    - combined: forward + backward FTLE
+    - forward: forward FTLE
+    - backward: backward FTLE
+    - forward normal: the normal (=normalized gradient) of the forward FTLE.
+        x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.
+    - backward normal: the normal (=normalized gradient) of the backward FTLE
+        x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.">
+                                        <option value="0">combined</option>
+                                        <option value="1">forward</option>
+                                        <option value="2">backward</option>
+                                        <option value="3">forward normal</option>
+                                        <option value="4">backward normal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Resolution</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>x</label>
+                                    <input id="input_ftle_dim_x" type="text" value="100"
+                                        title="Resolution of the grid in x direction.">
+                                </div>
+                                <div class="input_row">
+                                    <label>y</label>
+                                    <input id="input_ftle_dim_y" type="text" value="100"
+                                        title="Resolution of the grid in y direction.">
+                                </div>
+                                <div class="input_row">
+                                    <label>z</label>
+                                    <input id="input_ftle_dim_z" type="text" value="100"
+                                        title="Resolution of the grid in z direction.">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Parameters</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>advection time</label>
+                                    <input id="input_ftle_advection_time" type="text" value="0.5"
+                                        title="Numerical integration of each streamline of the flow map continues until the advection time is reached.">
+                                </div>
+                                <div class="input_row">
+                                    <label>step size</label>
+                                    <input id="input_ftle_step_size" type="text" value="0.0125"
+                                        title="Step size used for numerical integration of the flow map.">
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="tabcontent_settings" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>General</legend>
+                            <div class="vertical_container">
+                                <button type="button" id="button_render_settings">update render settings</button>
+                                <div class="input_row">
+                                    <label>settings</label>
+                                    <select id="select_settings_mode" title="Select which settings are shown.">
+                                        <option value="0">basic</option>
+                                        <option value="1">intermediate</option>
+                                        <option value="2">advanced</option>
+                                        <option value="3">debug</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>max distance</label>
+                                    <div id="div_input_max_distance" class="horizontal_div_2">
+                                        <input id="input_max_ray_distance" type="text" value="100"
+                                            title="An upper limit maximum distance for intersection tests.">
+                                        <input class="input_readonly" id="input_limited_max_ray_distance" type="text"
+                                            value="100" readonly
+                                            title="The actual maximum distance for intersection tests. Can be smaller than the upper limit depending on fog.">
+                                    </div>
+                                </div>
+                                <div class="input_row">
+                                    <label>tube radius factor</label>
+                                    <input id="input_tube_radius_factor" type="text" value="1.0" title="This parameter influences streamlines in 3D space.
+The actual tube radius is the tube radius from the 'Data' tab multiplied by this radius factor.
+    - Must be between 0 and 1.
+    - Smaller values result in lower performance.">
+                                </div>             
+                                <!--                                                   
+                                <div class="input_row">
+                                    <label>url data array</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_url_data_array" type="checkbox" value="false"
+                                            title="This parameter decides whether to use a data array for url generation.">
+                                        <label></label>
+                                    </div>
+                                </div>
+                                -->
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Projection</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>tube radius factor</label>
+                                    <input id="input_tube_radius_factor_projection" type="text" value="1.0" title="This parameter influences streamlines in projection mode.
+The actual tube radius is the tube radius from the 'Data' tab multiplied by this radius factor.
+    - Must be between 0 and 1.
+    - Smaller values result in lower performance.">
+                                </div>
+                                <div class="input_row" id="input_row_tube_radius_factor_projection_highlight">
+                                    <label>radius factor highlight</label>
+                                    <input id="input_tube_radius_factor_projection_highlight" type="text" value="2.5" title="This parameter influences only the R² streamlines in projection mode.
+The actual tube radius is the tube radius from the 'Data' tab multiplied by this radius factor.
+    - Must be between 0 and 'max factor highlight' from the 'Data' tab.
+    - Smaller values result in lower performance.">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Streamline Shading</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>show seeds</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_show_seeds_main" type="checkbox" value="true"
+                                            title="This parameter decides whether to show seeds in the left canvas.">
+                                        <select id="select_seed_mode_side" title="
+This parameter decides how the seeds should be visualized in the right canvas.
+    -none: seeds are not visualized.
+    -once: seeds are visualized once in the fundamental domain.
+    -instance: seeds are visualized in each instance of the fundamental domain.">
+                                            <option value="0">none</option>
+                                            <option value="1">once</option>
+                                            <option value="2">instance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="input_row">
+                                    <label>show streamlines</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_show_streamlines_main" type="checkbox" value="true"
+                                            checked="true" title="This parameter decides whether to show streamlines in the left canvas.
+To control whether streamlines should be shown in the right canvas, use the checkbox directly below the right canvas.">
+                                        <label></label>
+                                    </div>
+                                </div>
+                                <div class="input_row">
+                                    <label>shading mode</label>
+                                    <select id="select_shading_mode_streamlines" title="This parameter decides the color of streamlines.
+    -id: each streamline uses its own color specified under 'Seeds' in the 'Data' tab.
+    -scalar field: the streamlines are colored based on position and the scalar field specified below.">
+                                        <!-- -FTLE: the streamlines are colored based on position and the scalar field specified below"> -->
+                                        <option value="0">id</option>
+                                        <option value="1">scalar field</option>
+                                        <!-- <option value="2">FTLE</option> -->
+                                    </select>
+                                </div>
+                                <div class="input_row" id="input_row_formula_scalar">
+                                    <label>scalar field</label>
+                                    <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)"
+                                        title="The scalar field used for coloring the streamlines.">
+                                </div>
+                                <div class="input_row" id="input_row_scalar_field_debug">
+                                    <label>scalar field debug</label>
+                                    <input id="input_formula_scalar_float" class="input_readonly" type="text" value=""
+                                        readonly title="Field used for debugging.
+The automatically corrected scalar field used for coloring the streamlines.">
+                                </div>
+                                <div class="input_row" id="input_row_scalar_range">
+                                    <label>scalar range</label>
+                                    <div id="div_buttons_rng" class="horizontal_div_2">
+                                        <input id="input_min_scalar" type="text" value="-1.0"
+                                            title="The minimum value of the scalar field.">
+                                        <input id="input_max_scalar" type="text" value="1.0"
+                                            title="The maximum value of the scalar field.">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Fog</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>fog type</label>
+                                    <select id="select_fog_type" title="The fog type used.
+    - exponential: the recommended fog type when using fog: t = exp(-d), 
+        where d is the intersection distance multiplied by the fog density
+        and t is used for linear interpolate between white and the color obtained at the intersection.
+    - squared exponential: t = exp(-d*d)
+    - linear: t = (max_distance - intersection_distance)/(max_distance)
+    - none: no fog is used.">
+                                        <option value="2">exponential</option>
+                                        <option value="3">squared exponential</option>
+                                        <option value="1">linear</option>
+                                        <option value="0">none</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>fog density</label>
+                                    <input id="input_fog_density" type="text" value="0.01" title="Parameter used by exponential and squared exponential fog.
+    - High density leads to reduced view distance.">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Axes</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>show top right axes</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_show_movable_axes_main" type="checkbox" value="true"
+                                            checked="true"
+                                            title="Show small axes at the top right corner of the left canvas.">
+                                        <input id="checkbox_show_movable_axes_side" type="checkbox" value="true"
+                                            title="Show small axes at the top right corner of the right canvas.">
+                                    </div>
+                                </div>
+                                <div class="input_row">
+                                    <label>show bounding axes</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="checkbox_show_bounding_axes_main" type="checkbox" value="true"
+                                            title="Show axes in 3D space of the left canvas.">
+                                        <input id="checkbox_show_bounding_axes_side" type="checkbox" value="true"
+                                            checked="true" title="Show axes in 3D space of the right canvas.">
+                                    </div>
+                                </div>
+                                <div class="input_row" id="input_row_bounding_axes_length">
+                                    <label>length</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="input_cube_axes_length_main" type="text" value="0.5"
+                                            title="Length of axes in the left canvas.">
+                                        <input id="input_cube_axes_length_side" type="text" value="0.1"
+                                            title="Length of axes in the right canvas.">
+                                    </div>
+                                </div>
+                                <div class="input_row" id="input_row_bounding_axes_radius">
+                                    <label>radius</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="input_cube_axes_radius_main" type="text" value="0.01"
+                                            title="Radius of axes in the left canvas.">
+                                        <input id="input_cube_axes_radius_side" type="text" value="0.01"
+                                            title="Radius of axes in the right canvas.">
+                                    </div>
+                                </div>
+                                <div class="input_row" id="input_row_emphasize_origin_axes">
+                                    <label>emphasize origin axes</label>
+                                    <div class="horizontal_div_2">
+                                        <label></label>
+                                        <input id="checkbox_show_origin_axes_side" type="checkbox" value="true"
+                                            checked="true" title="Emphasize the origin axes by allowing separate settings for length and radius.
+    - Right canvas only.">
+                                    </div>
+                                </div>
+                                <div class="input_row" id="input_row_bounding_axes_origin_length">
+                                    <label>length</label>
+                                    <div class="horizontal_div_2">
+                                        <label></label>
+                                        <input id="input_cube_axes_origin_length_side" type="text" value="0.9" title="Length of origin axes.
+    - Right canvas only.">
+                                    </div>
+                                </div>
+                                <div class="input_row" id="input_row_bounding_axes_origin_radius">
+                                    <label>radius</label>
+                                    <div class="horizontal_div_2">
+                                        <label></label>
+                                        <input id="input_cube_axes_origin_radius_side" type="text" value="0.01" title="Radius of origin axes.
+    - Right canvas only.">
+                                    </div>
+                                </div>
+                                <div class="input_row">
+                                    <label>projection bounding axes</label>
+                                    <div class="horizontal_div_2">
+                                        <label></label>
+                                        <input id="checkbox_show_bounding_axes_projection_side" type="checkbox" value="true"
+                                            checked="true" title="Show single color axes in projection mode.
+    - Right canvas only.">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Volume Rendering</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>show</label>
+                                    <div class="horizontal_div_2">
+                                        <select id="select_show_volume_main"
+                                            title="Show FTLE volume rendering in the left canvas.">
+                                            <option value="0">none</option>
+                                            <option value="1">both</option>
+                                            <option value="2">forward</option>
+                                            <option value="3">backward</option>
+                                        </select>
+                                        <select id="select_show_volume_side"
+                                            title="Show FTLE volume rendering in the right canvas.">
+                                            <option value="0">none</option>
+                                            <option value="1">both</option>
+                                            <option value="2">forward</option>
+                                            <option value="3">backward</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="input_row" id="input_row_volume_rendering_max_distance">
+                                    <label>max distance</label>
+                                    <input id="input_volume_rendering_max_distance" type="text" value="0" title="Maximum distance of volume rendering.
+    - Volume rendering will not continue beyond the maximum distance specified by 'Settings.General.max distance'.
+    - A value of 0 means that no additional limit is used and 'Settings.General.max distance' is used instead.
+    - Reduce to improve performance.">
+                                </div>
+                                <div class="input_row" id="input_row_volume_rendering_distance_between_points">
+                                    <label>sample distance</label>
+                                    <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
+                                        title="Distance between each sample.">
+                                </div>
+                                <div class="input_row" id="input_row_volume_rendering_termination_opacity">
+                                    <label>termination opacity</label>
+                                    <input id="input_volume_rendering_termination_opacity" type="text" value="0.99"
+                                        title="Opacity threshold where volume rendering is stopped.">
+                                </div>
+                                <div class="input_row" id="input_row_volume_rendering_opacity_factor">
+                                    <label>opacity factor</label>
+                                    <input id="input_volume_rendering_opacity_factor" type="text" value="1.0"
+                                        title="Experimental.">
+                                </div>
+    
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Quality</legend>
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_still_resolution_factor">
+                                    <label>idle resolution factor</label>
+                                    <input id="input_still_resolution_factor" type="text" value="1.0" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
+    - This value is used while the camera is NOT in panning mode.
+    - Panning mode is active while the left mouse button is down.
+    - Panning mode can be forced by pressing 'p' after clicking in the canvas.
+    - A lower resolution factor can greatly improve the performance.">
+                                </div>
+                                <div class="input_row" id="input_row_panning_resolution_factor">
+                                    <label>panning resolution factor</label>
+                                    <input id="input_panning_resolution_factor" type="text" value="0.5" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
+    - This value is used while the camera is in panning mode.
+    - Panning mode is active while the left mouse button is down.
+    - Panning mode can be forced by pressing 'p' after clicking in the canvas.
+    - A lower resolution factor can greatly improve the performance.">
+                                </div>
+                                <div class="input_row" id="input_row_lod_still">
+                                    <label>LOD idle</label>
+                                    <select id="select_lod_still" title="The level of detail of the streamlines.
+    - This value is used while the camera is NOT in panning mode.
+    - Quality in descending order: raw, high, medium, low.">
+                                        <option value="0">raw</option>
+                                        <option value="1">high</option>
+                                        <option value="2">medium</option>
+                                        <option value="3">low</option>
+                                    </select>
+                                </div>
+                                <div class="input_row" id="input_row_lod_panning">
+                                    <label>LOD panning</label>
+                                    <select id="select_lod_panning" title="The level of detail of the streamlines.
+    - This value is used while the camera is in panning mode.
+    - Quality in descending order: raw, high, medium, low.">
+                                        <option value="0">raw</option>
+                                        <option value="1">high</option>
+                                        <option value="2">medium</option>
+                                        <option value="3">low</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Cameras</legend>
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_camera_control_3d">
+                                    <label>control type</label>
+                                    <div class="horizontal_div_2">
+                                        <select id="select_camera_control_3d_left" title="The camera control used in the left view.
+    - Trackball: camera rotates around a focus point in front of the camera.
+    - Rotate around camera: camera rotates around camera position.">
+                                            <option selected value="1">Trackball</option>
+                                            <!--<option value="3">Trackball 2</option>-->
+                                            <!--<option value="4">Trackball test</option>-->
+                                            <option value="2">Rotate around camera</option>
+                                        </select>
+                                        <select id="select_camera_control_3d_right"
+                                            title="The camera control used in the right view.
+    - Trackball: camera rotates around a focus point in front of the camera.
+    - Rotate around camera: camera rotates around camera position.">
+                                            <option selected value="1">Trackball</option>
+                                            <!--<option value="3">Trackball 2</option>-->
+                                            <!--<option value="4">Trackball test</option>-->
+                                            <option value="2">Rotate around camera</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Trackball</legend>
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_trackball_rotation_sensitivity">
+                                    <label>rotation sensitivity</label>
+                                    <input id="input_trackball_rotation_sensitivity" type="text" value="2.0" title="
+Sensitivity when rotating the camera. This value is multiplied by the angle obtained from the mouse movement.">
+                                </div>
+                                <div class="input_row" id="input_row_trackball_translation_sensitivity">
+                                    <label>translation sensitivity</label>
+                                    <input id="input_trackball_translation_sensitivity" type="text" value="1.0" title="
+Sensitivity when moving the camera. This value is multiplied by the pixel difference from the mouse movement.">
+                                </div>
+                                <div class="input_row" id="input_row_trackball_wheel_sensitivity">
+                                    <label>wheel sensitivity</label>
+                                    <input id="input_trackball_wheel_sensitivity" type="text" value="0.001" title="
+Sensitivity when using the mouse wheel to move forward / backward.">
+                                </div>
+                                <div class="input_row" id="input_row_trackball_focus_distance">
+                                    <label>focus distance</label>
+                                    <div class="horizontal_div_2">
+                                        <input id="input_trackball_focus_distance_left" type="text" value="0.5"
+                                            title="Distance of the focus point from the camera in the left canvas.">
+                                        <input id="input_trackball_focus_distance_right" type="text" value="1.5"
+                                            title="Distance of the focus point from the camera in the right canvas.">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="tabcontent_transfer_function" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>Visual Editor</legend>
+                            <div class="vertical_container">
+                                <canvas id="transfer_function_canvas" tabindex="3"></canvas>
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>General</legend>
+                            <div class="vertical_container">
+                                <div class="input_row">
+                                    <label>transfer function</label>
+                                    <select id="select_transfer_function_id" title="The transfer function to edit.">
+                                        <option value="0">Black Body Radiation</option>
+                                        <option value="1">Green Linear</option>
+                                        <option value="2">Cool to Warm</option>
+                                        <option value="3">White to Blue</option>
+                                        <option value="4">White to Red</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>scalar</label>
+                                    <select id="select_transfer_function_index_scalar" title="The transfer function used to color streamlines based on a scalar field
+    if 'Settings.Streamline Shading.shading mode' is set to 'scalar field'.">
+                                        <option value="0">Black Body Radiation</option>
+                                        <option value="1">Green Linear</option>
+                                        <option value="2">Cool to Warm</option>
+                                        <option value="3">White to Blue</option>
+                                        <option value="4">White to Red</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>forward</label>
+                                    <select id="select_transfer_function_index_ftle_forward"
+                                        title="The transfer function used for the forward FTLE field.">
+                                        <option value="0">Black Body Radiation</option>
+                                        <option value="1">Green Linear</option>
+                                        <option value="2">Cool to Warm</option>
+                                        <option value="3">White to Blue</option>
+                                        <option selected value="4">White to Red</option>
+                                    </select>
+                                </div>
+                                <div class="input_row">
+                                    <label>backward</label>
+                                    <select id="select_transfer_function_index_ftle_backward"
+                                        title="The transfer function used for the backward FTLE field.">
+                                        <option value="0">Black Body Radiation</option>
+                                        <option value="1">Green Linear</option>
+                                        <option value="2">Cool to Warm</option>
+                                        <option selected value="3">White to Blue</option>
+                                        <option value="4">White to Red</option>
+                                    </select>
+                                </div>
+                                <!--
+                                <div class="input_row">
+                                    <label>edit mode</label>
+                                    <select id="select_transfer_function_mode">
+                                        <option value="0">edit color</option>
+                                        <option value="1">edit opacity</option>
+                                    </select>
+                                </div>
+                                -->
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Colors</legend>
+                            <div class="vertical_container" id="container_transfer_function_colors">
+                                <!--
+                                <div class="horizontal_div_tranfer_function_color">
+                                    <label>0</label>
+                                    <input type="text" value="0.5">
+                                    <input type="color" value="#FF0000">
+                                    <button type="button">x</button>
+                                </div>
+                                -->
+                            </div>
+                        </fieldset>
+                        <fieldset class="fieldset_camera">
+                            <legend>Opacities</legend>
+                            <div class="vertical_container" id="container_transfer_function_opacities">
+                                <!--
+                                <div class="vertical_container" id="fieldset_transfer_function_opacities">
+                                    <div class="horizontal_div_tranfer_function_opacity">
+                                        <label>0</label>
+                                        <input type="text" value="0.5">
+                                        <input type="text" value="0.5">
+                                        <button type="button">x</button>
+                                    </div>
+                                </div>
+                                -->
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <!--
+                <div id="tabcontent_information" class="tabcontent">
+    
+                </div>
+                <div id="tabcontent_edit" class="tabcontent">
+    
+                </div>
+                -->
+                <div id="tabcontent_export" class="tabcontent">
+                    <form>
+                        <fieldset class="fieldset_camera">
+                            <legend>Export</legend>
+                            <div class="grid_container">
+                                <label>thumbnail URL main</label>
+                                <input id="input_thumbnail" type="text" value="">
+                                <label>thumbnail URL aux.</label>
+                                <input id="input_thumbnail_right" type="text" value="">
+                                <label>latex thumbnail dir</label>
+                                <input id="input_thumbnail_directory" type="text" value="images/">
+                                <label>latex thumbnail file main</label>
+                                <input id="input_thumbnail_name" type="text" value="thumbnail_main">
+                                <label>latex thumbnail file aux.</label>
+                                <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">
+                                <label>selected tab</label>
+                                <select id="select_tab">
+                                    <option value="tab_data">data</option>
+                                    <option value="tab_ftle">ftle</option>
+                                    <option value="tab_settings">settings</option>
+                                    <!--
+                                    <option value="tab_information">information</option>
+                                    <option value="tab_edit">edit</option>
+                                    -->
+                                    <option value="tab_transfer_function">transfer function</option>
+                                    <option value="tab_export">export</option>
+                                    <option value="tab_help">help</option>
+                                </select>
+                            </div>
+                        </fieldset>
+                        <!--
+                        <div id="h_export_warnings" class="warning">
+                            <h3>Warnings</h3>
+                            <ul>
+                                <li id="list_warning_p" class="list_entry">For high quality thumbnails it is recommended to
+                                    deactivate panning mode
+                                    by clicking into the canvas and pressing "p".</li>
+                                <li id="list_warning_index" class="list_entry">For high quality thumbnails it is recommended
+                                    to wait until the
+                                    progress bar at the bottom of the image disappears. This requires that the mouse is
+                                    inside
+                                    the canvas.</li>
+                                <li id="list_warning_thumbnail_url" class="list_entry">It is recommended to set a thumbnail
+                                    URL before export. If
+                                    you do not know the URL yet, e.g. because you plan to upload the thumbnail to a server
+                                    where
+                                    you can not choose the URL of the uploaded image, you can leave it blank for now,
+                                    export,
+                                    upload the thumbnail, insert the URL of the uploaded thumbnail and export again.</li>
+                            </ul>
+                        </div>
+                        -->
+                        <div id="warning_p" class="warning">
+                            <h3 class="warning_title">Warning</h3>
+                            <p class="warning_text">
+                                For high quality thumbnails it is recommended to deactivate panning mode
+                                by clicking into the canvas and pressing "p".
+                            </p>
+                        </div>
+                        <div id="warning_index" class="warning">
+                            <h3 class="warning_title">Warning</h3>
+                            <p class="warning_text">
+                                For high quality thumbnails it is recommended to wait until the
+                                progress bars at the bottom of both images disappear. This requires that the mouse is
+                                inside the canvas.
+                            </p>
+                        </div>
+                        <div id="warning_thumbnail_url" class="warning">
+                            <h3 class="warning_title">Warning</h3>
+                            <p class="warning_text">
+                                It is recommended to set the thumbnail
+                                URLs before export. If
+                                you do not know the URLs yet, e.g. because you plan to upload the thumbnails to a server
+                                where
+                                you can not choose the URLs of the uploaded images, you can leave them blank for now and:
+                                <ol>
+                                    <li class="warning_li">export, in order to obtain the thumbnails,
+                                    <li class="warning_li">upload the thumbnails,
+                                    <li class="warning_li">insert the URLs of the uploaded thumbnails in the fields above,
+                                    <li class="warning_li">export again, to obtain the correct files.
+                                </ol>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+                <div id="tabcontent_help" class="tabcontent">
+                    <div>
+                        <h1><a href="https://www.youtube.com/playlist?list=PLcq0uuvY663lQCRBkjrdAaMeyZQ-QZ4zb">Video Tutorials</a></h1>
+                    </div>
+                    <div>
+                        <h1><a href="https://sfb-trr191.github.io/3-torus-flowvis-tool-tutorial/examples.html">Examples</a></h1>
+                    </div>
+                    <div>
+                        <h3><a href="http://www.mi.uni-koeln.de/CRC-TRR191/">CRC/TRR 191</a></h3>
+                    </div>
+                    <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
+                            href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <p id="paragraph_text">text</p>
+        <!--
+        <input type="file" id="input">
+        -->
+    </div>
+    <script src="./cookies-eu-banner.js"></script>
+    <script>
+        new CookiesEuBanner(function () {
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-37237135-6', 'auto');
+            ga('send', 'pageview');
+        });
+    </script>
+</body>
+
+</html>
