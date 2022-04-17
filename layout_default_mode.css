@@ -5,10 +5,11 @@
     gap: 4px;
     height: 100%;
     grid-template-columns: 72px 1.4fr 0.8fr;
-    grid-template-rows:  minmax(0, 1.1fr) minmax(0, 0.6fr) minmax(0, 0.8fr);
+    grid-template-rows:  minmax(0, 1.1fr) minmax(0, 0.6fr) minmax(0, 0.8fr) 16px;
     grid-template-areas: "a b d"
                          "a b e"
-                         "a c e";
+                         "a c e"
+                         "f f f";
 }
 
 #grid_item_tools {
@@ -34,4 +35,11 @@
 #grid_item_aux_view {
     grid-column: 3; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
     grid-row: 1;    /* same concept, but for rows */
+}
+
+#grid_item_version {
+    grid-column: 1 / 4; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 4;    /* same concept, but for rows */
+    margin: 0;
+    padding: 0;
 }

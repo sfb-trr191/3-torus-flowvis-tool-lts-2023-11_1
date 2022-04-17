@@ -14,6 +14,7 @@
 
 <body>
     <div id="invisible_container">
+        <p id="fps_display">FPS</p>
 
     </div>
     
@@ -58,7 +59,7 @@
     </div>
 
     <div class="grid">
-        <div id="grid_item_tools" class="box">
+        <div id="grid_item_tools" class="grid_item">
             <fieldset id="group_tools">
                 <legend>Tools</legend>       
                 <fieldset id="subgroup_toolbar_layouts">
@@ -172,14 +173,14 @@
 
             </fieldset>
         </div>
-        <div id="grid_item_tree" class="box">
+        <div id="grid_item_tree" class="grid_item">
             <fieldset class="group_scroll">
                 <legend>Tree View</legend>
                 <div class="vertical_container" id="container_tree_view_nodes">                    
                 </div>
             </fieldset>
         </div>
-        <div id="grid_item_properties" class="box">
+        <div id="grid_item_properties" class="grid_item">
             <fieldset class="group_scroll">
                 <legend>Properties</legend>
                 <div class="vertical_container" id="container_properties">  
@@ -1386,19 +1387,28 @@
                 </div>
             </fieldset>
         </div>
-        <div id="grid_item_main_view" class="box">
+        <div id="grid_item_main_view" class="grid_item">
             <fieldset class="group">
                 <legend>Main View</legend>
-                <canvas id="main_canvas" tabindex="1">Your browser does not seem to support
-                    HTML5 canvas.</canvas>
+                <div class="canvas_wrapper">
+                    <canvas id="main_canvas" tabindex="1">Your browser does not seem to support
+                        HTML5 canvas.</canvas>
+                </div>                
             </fieldset>
         </div>
-        <div id="grid_item_aux_view" class="box">
+        <div id="grid_item_aux_view" class="grid_item">
             <fieldset class="group">
                 <legend>Aux View</legend>
-                <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
-                    HTML5 canvas.</canvas>
+                <div class="canvas_wrapper">
+                    <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
+                        HTML5 canvas.</canvas>
+                </div>   
             </fieldset>
+        </div>
+        <div id="grid_item_version" class="grid_item">
+            <div id="wrapper_version_string">
+                <p id="paragraph_version_string">This is a test</p>
+            </div>
         </div>
     </div>
     <div>
@@ -1407,13 +1417,9 @@
         <input type="file" id="input">
         -->
     </div>
-    <div id="wrapper_version_string">
-        <p id="paragraph_version_string">This is a test</p>
-    </div>
     <div id="wrapper_debug_string" class="hidden">
         <p>tick: <strong>0</strong> - frame: <strong>0</strong> - fps: <strong>0</strong></p>
     </div>
-    <p id="fps_display">FPS</p>
     <script src="./tree_view.js"></script>
     <script src="./ui_tools.js"></script>
     <script>

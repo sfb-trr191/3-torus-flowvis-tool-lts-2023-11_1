@@ -397,6 +397,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var deltaTime = (time_now - time_last_tick) / 1000;
         var deltaTimeDraw = (time_now - time_last_draw) / 1000;
 
+        updateViewSizes();
+
         if(sheduled_task == TASK_CALCULATE_STREAMLINES){
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
             document.getElementById("wrapper_transparent_overlay").className = "wrapper";
@@ -482,6 +484,11 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         time_last_tick = time_now;
         requestAnimationFrame(on_update);
 
+    }
+
+    function updateViewSizes(){
+
+        console.log(main_canvas.offsetWidth, "x", main_canvas.offsetHeight);
     }
 
     var buffer;
