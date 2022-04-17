@@ -4,7 +4,6 @@ html {
     padding: 4px 4px 4px 4px;
     margin: 0%;
     overflow: hidden;
-    background-color: blue;
     box-sizing: border-box;
 }
    
@@ -13,7 +12,6 @@ body {
     padding: 0%;
     margin: 0%;
     overflow: hidden;
-    background-color: aqua;
     box-sizing: border-box;
 }
 
@@ -328,7 +326,6 @@ legend {
 }
 
 .subgroup_toolbar{
-    background-color: aqua;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -339,7 +336,6 @@ legend {
 }
 
 #group_tools{
-    background-color: orange;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -349,7 +345,6 @@ legend {
 }
 
 #subgroup_toolbar_layouts{
-    background-color: green;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
