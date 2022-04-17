@@ -317,3 +317,58 @@ legend {
     color: rgb(179, 179, 179);
     display: none;
 }
+
+.group {
+    margin: 0%;
+    padding: 8px 0px 0px 0px;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.subgroup_toolbar{
+    background-color: aqua;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 4px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
+    gap: 4px; 
+}
+
+#group_tools{
+    background-color: orange;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    gap: 4px;   
+}
+
+#subgroup_toolbar_layouts{
+    background-color: green;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 4px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
+    gap: 4px; 
+}
+
+.dialog_progress {
+    background: #444;
+    color: #fff;
+    padding: 6px;
+    text-align: center;
+    z-index: 1002;
+
+    position:absolute;
+    top:50%;
+    left:50%;
+    overflow:auto;
+    width:400px;
+    height:100px;
+    margin-left:-200px;
+    margin-top:-50px;
+}

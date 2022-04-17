@@ -332,7 +332,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function on_fully_loaded() {
         console.log("on_fully_loaded");
-        setCSS(input_parameter_wrapper.css_loaded);
+        //setCSS(input_parameter_wrapper.css_loaded);
         //message_display.innerHTML = "";
     }
 

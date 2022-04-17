@@ -293,6 +293,7 @@ class InputParameterWrapper {
         if (!invalid_thumbnail)
             document.getElementById("image_thumbnail_right").src = url;  
 
+        /*
         switch (style) {
             case STYLE_DEFAULT:
                 setCSS("embedded_thumbnail_default.css");
@@ -311,12 +312,13 @@ class InputParameterWrapper {
                 this.css_loaded = "index.css";
                 break;
         }
+        */
 
         var tab = urlParams.get(PARAM_TAB_MAIN);
         var invalid_tab = tab === null || tab === "";
         if (invalid_tab)
             tab = "tab_data";
-        this.tab_manager.selectTab("tab_group_main", tab);
+        //this.tab_manager.selectTab("tab_group_main", tab);
     }
 
     toQueryString(use_data_array) {

@@ -378,12 +378,14 @@ class HideManager {
     }
 
     UpdateVisibility() {
+        /*
         for (var i = 0; i < this.groups.length; i++) {
             this.groups[i].UpdateVisibility();
         }
         for (var i = 0; i < this.multi_consodtional_elements.length; i++) {
             this.multi_consodtional_elements[i].UpdateVisibility();
         }
+        */
     }
 }
 
