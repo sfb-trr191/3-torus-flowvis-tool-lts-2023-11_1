@@ -488,7 +488,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function updateViewSizes(){
 
-        console.log(main_canvas.offsetWidth, "x", main_canvas.offsetHeight);
+        //console.log(main_canvas.offsetWidth, "x", main_canvas.offsetHeight);
+        //canvas_wrapper_main
     }
 
     var buffer;

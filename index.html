@@ -5,7 +5,10 @@
     <title>New</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="layout_edit_mode.css" rel="stylesheet" type="text/css" />
+    <link href="css/layout_edit_mode.css" rel="stylesheet" type="text/css" />
+    <link href="css/buttons.css" rel="stylesheet" type="text/css" />
+    <link href="css/transfer_function.css" rel="stylesheet" type="text/css" />
+    <link href="css/streamline_calculation.css" rel="stylesheet" type="text/css" />
     <!--<link href="tree_view.css" rel="stylesheet" type="text/css" />-->
     <!--<script src="bundle.js" type="text/javascript"> </script>-->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon_32x32.png">
@@ -15,6 +18,18 @@
 <body>
     <div id="invisible_container">
         <p id="fps_display">FPS</p>
+        <div class="tab">
+            <button id="button_tab_data" class="tablink" title="Data"></button>
+            <button id="button_tab_ftle" class="tablink" title="FTLE data"></button>
+            <button id="button_tab_settings" class="tablink" title="Settings"></button>
+            <button id="button_tab_transfer_function" class="tablink" title="Transfer function"></button>
+            <!--
+            <button id="button_tab_information" class="tablink" title="information"></button>
+            <button id="button_tab_edit" class="tablink" title="edit information"></button>
+            -->
+            <button id="button_tab_export" class="tablink" title="Export"></button>
+            <button id="button_tab_help" class="tablink" title="Help"></button>
+        </div>
 
     </div>
     
@@ -62,7 +77,7 @@
         <div id="grid_item_tools" class="grid_item">
             <fieldset id="group_tools">
                 <legend>Tools</legend>       
-                <fieldset id="subgroup_toolbar_layouts">
+                <fieldset class="subgroup_toolbar">
                     <div id="wrapper_button_layout_default_mode">
                         <button type="button" id="button_layout_default_mode" class="tools_button"
                             title="Switch to Default Mode"></button>
@@ -157,19 +172,6 @@
                 </fieldset>
 
                 <button type="button" id="button_render_settings">update render settings</button>
-
-                <div class="tab">
-                    <button id="button_tab_data" class="tablink" title="Data"></button>
-                    <button id="button_tab_ftle" class="tablink" title="FTLE data"></button>
-                    <button id="button_tab_settings" class="tablink" title="Settings"></button>
-                    <button id="button_tab_transfer_function" class="tablink" title="Transfer function"></button>
-                    <!--
-                    <button id="button_tab_information" class="tablink" title="information"></button>
-                    <button id="button_tab_edit" class="tablink" title="edit information"></button>
-                    -->
-                    <button id="button_tab_export" class="tablink" title="Export"></button>
-                    <button id="button_tab_help" class="tablink" title="Help"></button>
-                </div>
 
             </fieldset>
         </div>

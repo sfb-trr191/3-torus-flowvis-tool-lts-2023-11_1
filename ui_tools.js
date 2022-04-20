@@ -23,19 +23,19 @@ class UiTools{
     }
 
     loadLayoutDefaultMode(){
-        this.setCSS("layout_default_mode.css");
+        this.setCSS("css/layout_default_mode.css");
     }
 
     loadLayoutEditMode(){
-        this.setCSS("layout_edit_mode.css");
+        this.setCSS("css/layout_edit_mode.css");
     }
 
     loadLayoutMainView(){
-        this.setCSS("layout_main_view.css");
+        this.setCSS("css/layout_main_view.css");
     }
 
     loadLayoutAuxView(){
-        this.setCSS("layout_aux_view.css");
+        this.setCSS("css/layout_aux_view.css");
     }
 
     setCSS(value){

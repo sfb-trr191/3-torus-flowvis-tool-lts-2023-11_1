@@ -256,6 +256,9 @@ class CanvasWrapper {
     }
 
     UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor) {
+        this.still_resolution_factor = still_resolution_factor;
+        this.panning_resolution_factor = panning_resolution_factor;
+        /*
         var width_still = Math.round(this.camera.width_original * still_resolution_factor);
         var height_still = Math.round(this.camera.height_original * still_resolution_factor);
         var width_panning = Math.round(this.camera.width_original * panning_resolution_factor);
@@ -278,10 +281,50 @@ class CanvasWrapper {
             this.render_wrapper_raytracing_panning_right.resize(gl, width_panning, height_panning);
             this.camera.SetCorrectResolution();
         }
+        */
+    }
 
+    AutoUpdateResolution(gl){
+        //var width = this.canvas.offsetWidth;
+        //var height = this.canvas.offsetHeight;
+
+        var width = this.canvas.clientWidth;
+        var height = this.canvas.clientHeight;
+        
+        this.canvas_width = width;
+        this.canvas_height = height;
+
+        var width_still = Math.round(width * this.still_resolution_factor);
+        var height_still = Math.round(height * this.still_resolution_factor);
+        var width_panning = Math.round(width * this.panning_resolution_factor);
+        var height_panning = Math.round(height * this.panning_resolution_factor);
+
+        var changed = (width_still != this.camera.width_still) || (height_still != this.camera.height_still);
+        if (changed) {
+            console.log("12345", width, "x", height);
+            this.camera.width_still = width_still;
+            this.camera.height_still = height_still;
+            this.render_wrapper_raytracing_still_left.resize(gl, width_still, height_still);
+            this.render_wrapper_raytracing_still_right.resize(gl, width_still, height_still);
+            this.camera.SetCorrectResolution();
+            this.camera.changed = true;
+        }
+
+        var changed = (width_panning != this.camera.width_panning) || (height_panning != this.camera.height_panning);
+        if (changed) {
+            console.log(width, "x", height);
+            this.camera.width_panning = width_panning;
+            this.camera.height_panning = height_panning;
+            this.render_wrapper_raytracing_panning_left.resize(gl, width_panning, height_panning);
+            this.render_wrapper_raytracing_panning_right.resize(gl, width_panning, height_panning);
+            this.camera.SetCorrectResolution();
+            this.camera.changed = true;
+        }
     }
 
     draw(gl, data_changed, settings_changed) {
+        this.AutoUpdateResolution(gl);
+
         if (this.camera.changed || data_changed || settings_changed)
             this.aliasing_index = 0;
 
@@ -297,7 +340,7 @@ class CanvasWrapper {
             var continue_drawing = this.camera.mouse_in_canvas || this.camera.panning;
             if(!continue_drawing)
                 return;
-        }
+        }        
 
         //console.log("aliasing_index: ", this.aliasing_index, "panning:", this.camera.panning);
         //console.log("offset_x: ", this.aliasing.offset_x[this.aliasing_index]);
@@ -467,6 +510,7 @@ class CanvasWrapper {
         gl.useProgram(this.program_raytracing);
         this.camera.WriteToUniform(gl, this.program_raytracing, "active_camera");
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
+        console.log("drawTextureRaytracing draw size", this.camera.width, "x", this.camera.height);
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
         gl.uniform1i(this.location_raytracing.location_max_iteration_count, max_iteration_count);
@@ -585,14 +629,19 @@ class CanvasWrapper {
     drawResampling(gl, render_wrapper) {
         var show_progressbar = this.isRenderingIncomplete();
         var progress = this.aliasing_index / (this.aliasing.num_rays_per_pixel - 1);
+        //console.log("drawResampling draw size", this.canvas_width, "x", this.canvas_height);
+        console.log("drawResampling draw size", this.canvas.width, "x", this.canvas.height);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, this.canvas_width, this.canvas_height);
+        //gl.viewport(0, 0, this.canvas_width, this.canvas_height);
+        gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         gl.useProgram(this.program_resampling);
         gl.uniform1f(this.location_resampling.location_show_progressbar, show_progressbar);
         gl.uniform1f(this.location_resampling.location_progress, progress);
-        gl.uniform1i(this.location_resampling.location_width, this.canvas_width);
-        gl.uniform1i(this.location_resampling.location_height, this.canvas_height);
+        //gl.uniform1i(this.location_resampling.location_width, this.canvas_width);
+        //gl.uniform1i(this.location_resampling.location_height, this.canvas_height);
+        gl.uniform1i(this.location_resampling.location_width, this.canvas.width);
+        gl.uniform1i(this.location_resampling.location_height, this.canvas.height);
         gl.uniform1i(this.location_resampling.location_render_color_bar, this.ShouldRenderColorBar());
 
         gl.activeTexture(gl.TEXTURE0);

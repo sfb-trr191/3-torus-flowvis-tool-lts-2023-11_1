@@ -1,0 +1,44 @@
+@import url("layout_base.css");
+
+.grid {
+    display: grid;
+    gap: 4px;
+    height: 100%;
+    grid-template-columns: max-content 0.4fr 0.8fr 1fr;
+    grid-template-rows:  minmax(0, 1fr) minmax(0, 1fr) 16px;
+    grid-template-areas: "a b c d"
+                         "a b c e"
+                         "f f f f";
+}
+
+#grid_item_tools {
+    grid-column: 1; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 1 / 3;    /* same concept, but for rows */
+}
+
+#grid_item_tree {
+    grid-column: 2; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 1 / 3;    /* same concept, but for rows */
+}
+
+#grid_item_properties {
+    grid-column: 3; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 1 / 3;    /* same concept, but for rows */
+}
+
+#grid_item_main_view {
+    grid-column: 4; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 1;    /* same concept, but for rows */
+}
+
+#grid_item_aux_view {
+    grid-column: 4; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 2;    /* same concept, but for rows */
+}
+
+#grid_item_version {
+    grid-column: 1 / 5; /* span from grid column line 1 to 3 (i.e., span 2 columns) */
+    grid-row: 3;    /* same concept, but for rows */
+    margin: 0;
+    padding: 0;
+}

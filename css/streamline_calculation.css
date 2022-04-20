@@ -1,0 +1,106 @@
+.horizontal_div_seed input {
+    min-width: 75px;
+    height: 100%;
+}
+
+.horizontal_div_multi_seed input {
+    min-width: 50px;
+    height: 100%;
+}
+
+#fieldset_seeds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+#fieldset_multi_seeds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.horizontal_div_seed {
+    display: inline-grid;
+    grid-template-columns: 32px 1fr 1fr 1fr 1fr 68px 68px 32px;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_multi_seed {
+    display: inline-grid;
+    grid-template-columns: 32px 1fr 1fr 1fr 1fr 68px 68px 32px;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_multi_seed_header {
+    display: inline-grid;
+    grid-template-columns: 32px 1fr 68px 32px;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+.horizontal_div_multi_seed_vec3 {
+    display: inline-grid;
+    grid-template-columns: 200px 1fr 1fr 1fr;
+    column-gap: 4px;
+    gap: 4px;
+}
+
+#fieldset_seeds button {
+    float: left;
+    cursor: pointer;
+    transition: 0.3s;
+    background-repeat: no-repeat;
+    background-position-x: 0px;
+    background-position-y: 0px;
+    background-size: 64px 32px;
+    height: 36px;  
+    width: 68px;
+    margin: 0px 0px 0px 0px;
+    padding: 0;
+}
+
+#fieldset_multi_seeds button {
+    float: left;
+    cursor: pointer;
+    transition: 0.3s;
+    background-repeat: no-repeat;
+    background-position-x: 0px;
+    background-position-y: 0px;
+    background-size: 64px 32px;
+    height: 36px;  
+    width: 68px;
+    margin: 0px 0px 0px 0px;
+    padding: 0;
+}
+
+.vertical_container_test{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    position: relative;
+    margin: 0px 4px 4px 4px;
+    padding: 0px 0px 0px 0px;
+    gap: 4px; 
+}
+
+
+#fieldset_seeds #button_delete_this_seed{
+    width: 32px;
+    height: 32px;
+}
+
+#fieldset_multi_seeds #button_delete_this_multi_seed{
+    width: 32px;
+    height: 32px;
+}
+
+#fieldset_seeds #button_randomize_this_seed_position{
+    background-image: url("../icons/random_position_horizontal.png");
+}
+
+#fieldset_seeds #button_randomize_this_seed_color{
+    background-image: url("../icons/random_color_horizontal.png");
+}
