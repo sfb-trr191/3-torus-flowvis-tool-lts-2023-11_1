@@ -295,6 +295,8 @@ class TreeView{
         var node_lighting = this.generateNode(this, "Lighting", "group_properties_root_lighting", NO_EYE);
         var node_transfer_functions = this.generateNode(this, "Transfer Functions", "group_properties_root_transfer_functions", NO_EYE);
 
+        var node_view = this.generateNode(this, "View", "group_properties_root_view", NO_EYE);
+
         var node_main_scene = this.generateNode(this, "Main View", "group_properties_root_main_view", NO_EYE);
         var node_main_camera = this.generateNode(this, "Camera", "group_properties_root_main_view_camera", NO_EYE);
         var node_main_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_main_view_visual_objects", EYE);
@@ -326,9 +328,10 @@ class TreeView{
         node_data.addChild(node_equations);
         node_data.addChild(node_streamline_calculation);
         node_data.addChild(node_ftle_calculation);
-        node_root.addChild(node_lighting);
-        node_root.addChild(node_transfer_functions);        
-        node_root.addChild(node_main_scene);        
+        node_root.addChild(node_view);      
+        node_view.addChild(node_lighting);
+        node_view.addChild(node_transfer_functions);   
+        node_view.addChild(node_main_scene);        
         node_main_scene.addChild(node_main_camera);
         node_main_scene.addChild(node_main_visual_objects);
         node_main_visual_objects.addChild(node_main_streamlines);
@@ -338,7 +341,7 @@ class TreeView{
         node_main_indicators.addChild(node_main_top_right_axes);
         node_main_indicators.addChild(node_main_clicked_position);
         node_main_indicators.addChild(node_main_seeds);
-        node_root.addChild(node_aux_scene);  
+        node_view.addChild(node_aux_scene);      
         node_aux_scene.addChild(node_aux_camera);
         node_aux_scene.addChild(node_aux_visual_objects);
         node_aux_visual_objects.addChild(node_aux_streamlines);

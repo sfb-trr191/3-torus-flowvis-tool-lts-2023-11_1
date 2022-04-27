@@ -492,6 +492,225 @@
                         
                     </fieldset>
 
+                    <fieldset class="group_properties" id="group_properties_root_view">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">View</span>
+                            <span class="span_style_properties_legend_path">[Root/View]</span>
+                        </legend>  
+                        <div class="group_properties_content">
+                            <fieldset class="subgroup_properties">
+                                <legend>Streamline Shading</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>show seeds</label>
+                                        <div class="horizontal_div_2">
+                                            <input id="checkbox_show_seeds_main" type="checkbox" value="true"
+                                                title="This parameter decides whether to show seeds in the left canvas.">
+                                            <select id="select_seed_mode_side" title="
+    This parameter decides how the seeds should be visualized in the right canvas.
+        -none: seeds are not visualized.
+        -once: seeds are visualized once in the fundamental domain.
+        -instance: seeds are visualized in each instance of the fundamental domain.">
+                                                <option value="0">none</option>
+                                                <option value="1">once</option>
+                                                <option value="2">instance</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>show streamlines</label>
+                                        <div class="horizontal_div_2">
+                                            <input id="checkbox_show_streamlines_main" type="checkbox" value="true"
+                                                checked="true" title="This parameter decides whether to show streamlines in the left canvas.
+    To control whether streamlines should be shown in the right canvas, use the checkbox directly below the right canvas.">
+                                            <label></label>
+                                        </div>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>shading mode</label>
+                                        <select id="select_shading_mode_streamlines" title="This parameter decides the color of streamlines.
+        -id: each streamline uses its own color specified under 'Seeds' in the 'Data' tab.
+        -scalar field: the streamlines are colored based on position and the scalar field specified below.">
+                                            <!-- -FTLE: the streamlines are colored based on position and the scalar field specified below"> -->
+                                            <option value="0">id</option>
+                                            <option value="1">scalar field</option>
+                                            <!-- <option value="2">FTLE</option> -->
+                                        </select>
+                                    </div>
+                                    <div class="input_row" id="input_row_formula_scalar">
+                                        <label>scalar field</label>
+                                        <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)"
+                                            title="The scalar field used for coloring the streamlines.">
+                                    </div>
+                                    <div class="input_row" id="input_row_scalar_field_debug">
+                                        <label>scalar field debug</label>
+                                        <input id="input_formula_scalar_float" class="input_readonly" type="text" value=""
+                                            readonly title="Field used for debugging.
+    The automatically corrected scalar field used for coloring the streamlines.">
+                                    </div>
+                                    <div class="input_row" id="input_row_scalar_range">
+                                        <label>scalar range</label>
+                                        <div id="div_buttons_rng" class="horizontal_div_2">
+                                            <input id="input_min_scalar" type="text" value="-1.0"
+                                                title="The minimum value of the scalar field.">
+                                            <input id="input_max_scalar" type="text" value="1.0"
+                                                title="The maximum value of the scalar field.">
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset> 
+                            <fieldset class="subgroup_properties">
+                                <legend>Volume Rendering</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>show</label>
+                                        <div class="horizontal_div_2">
+                                            <select id="select_show_volume_main"
+                                                title="Show FTLE volume rendering in the left canvas.">
+                                                <option value="0">none</option>
+                                                <option value="1">both</option>
+                                                <option value="2">forward</option>
+                                                <option value="3">backward</option>
+                                            </select>
+                                            <select id="select_show_volume_side"
+                                                title="Show FTLE volume rendering in the right canvas.">
+                                                <option value="0">none</option>
+                                                <option value="1">both</option>
+                                                <option value="2">forward</option>
+                                                <option value="3">backward</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_max_distance">
+                                        <label>max distance</label>
+                                        <input id="input_volume_rendering_max_distance" type="text" value="0" title="Maximum distance of volume rendering.
+        - Volume rendering will not continue beyond the maximum distance specified by 'Settings.General.max distance'.
+        - A value of 0 means that no additional limit is used and 'Settings.General.max distance' is used instead.
+        - Reduce to improve performance.">
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_distance_between_points">
+                                        <label>sample distance</label>
+                                        <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
+                                            title="Distance between each sample.">
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_termination_opacity">
+                                        <label>termination opacity</label>
+                                        <input id="input_volume_rendering_termination_opacity" type="text" value="0.99"
+                                            title="Opacity threshold where volume rendering is stopped.">
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_opacity_factor">
+                                        <label>opacity factor</label>
+                                        <input id="input_volume_rendering_opacity_factor" type="text" value="1.0"
+                                            title="Experimental.">
+                                    </div>
+        
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Fog</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>fog type</label>
+                                        <select id="select_fog_type" title="The fog type used.
+        - exponential: the recommended fog type when using fog: t = exp(-d), 
+            where d is the intersection distance multiplied by the fog density
+            and t is used for linear interpolate between white and the color obtained at the intersection.
+        - squared exponential: t = exp(-d*d)
+        - linear: t = (max_distance - intersection_distance)/(max_distance)
+        - none: no fog is used.">
+                                            <option value="2">exponential</option>
+                                            <option value="3">squared exponential</option>
+                                            <option value="1">linear</option>
+                                            <option value="0">none</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>fog density</label>
+                                        <input id="input_fog_density" type="text" value="0.01" title="Parameter used by exponential and squared exponential fog.
+        - High density leads to reduced view distance.">
+                                    </div>
+                                </div>
+                            </fieldset>
+    
+                            <fieldset class="subgroup_properties">
+                                <legend>Quality</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row" id="input_row_still_resolution_factor">
+                                        <label>idle resolution factor</label>
+                                        <input id="input_still_resolution_factor" type="text" value="1.0" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
+        - This value is used while the camera is NOT in panning mode.
+        - Panning mode is active while the left mouse button is down.
+        - Panning mode can be forced by pressing 'p' after clicking in the canvas.
+        - A lower resolution factor can greatly improve the performance.">
+                                    </div>
+                                    <div class="input_row" id="input_row_panning_resolution_factor">
+                                        <label>panning resolution factor</label>
+                                        <input id="input_panning_resolution_factor" type="text" value="0.5" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
+        - This value is used while the camera is in panning mode.
+        - Panning mode is active while the left mouse button is down.
+        - Panning mode can be forced by pressing 'p' after clicking in the canvas.
+        - A lower resolution factor can greatly improve the performance.">
+                                    </div>
+                                    <div class="input_row" id="input_row_lod_still">
+                                        <label>LOD idle</label>
+                                        <select id="select_lod_still" title="The level of detail of the streamlines.
+        - This value is used while the camera is NOT in panning mode.
+        - Quality in descending order: raw, high, medium, low.">
+                                            <option value="0">raw</option>
+                                            <option value="1">high</option>
+                                            <option value="2">medium</option>
+                                            <option value="3">low</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row" id="input_row_lod_panning">
+                                        <label>LOD panning</label>
+                                        <select id="select_lod_panning" title="The level of detail of the streamlines.
+        - This value is used while the camera is in panning mode.
+        - Quality in descending order: raw, high, medium, low.">
+                                            <option value="0">raw</option>
+                                            <option value="1">high</option>
+                                            <option value="2">medium</option>
+                                            <option value="3">low</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset class="subgroup_properties">
+                                <legend>Trackball</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row" id="input_row_trackball_rotation_sensitivity">
+                                        <label>rotation sensitivity</label>
+                                        <input id="input_trackball_rotation_sensitivity" type="text" value="2.0" title="
+    Sensitivity when rotating the camera. This value is multiplied by the angle obtained from the mouse movement.">
+                                    </div>
+                                    <div class="input_row" id="input_row_trackball_translation_sensitivity">
+                                        <label>translation sensitivity</label>
+                                        <input id="input_trackball_translation_sensitivity" type="text" value="1.0" title="
+    Sensitivity when moving the camera. This value is multiplied by the pixel difference from the mouse movement.">
+                                    </div>
+                                    <div class="input_row" id="input_row_trackball_wheel_sensitivity">
+                                        <label>wheel sensitivity</label>
+                                        <input id="input_trackball_wheel_sensitivity" type="text" value="0.001" title="
+    Sensitivity when using the mouse wheel to move forward / backward.">
+                                    </div>
+                                    <div class="input_row" id="input_row_trackball_focus_distance">
+                                        <label>focus distance</label>
+                                        <div class="horizontal_div_2">
+                                            <input id="input_trackball_focus_distance_left" type="text" value="0.5"
+                                                title="Distance of the focus point from the camera in the left canvas.">
+                                            <input id="input_trackball_focus_distance_right" type="text" value="1.5"
+                                                title="Distance of the focus point from the camera in the right canvas.">
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>    
+                        </div>    
+                        <div class="group_properties_children">
+
+                        </div>    
+                    </fieldset>
+
                     <fieldset class="group_properties" id="group_properties_root_main_view">
                         <legend> 
                             <span class="span_style_properties_legend_name">Main View</span>
@@ -702,7 +921,114 @@
                             <span class="span_style_properties_legend_path">[Root/Aux View]</span>
                         </legend>  
                         <div class="group_properties_content">
+                            <div class="input_row" id="input_row_bounding_axes_radius">
+                                <label>Content</label>
+                                <select id="select_side_mode" title="Select what is shown in the right canvas.
+                                - 2D FTLE slice: (warning: possibly unintuitive axes)">
+                                                <option value="0">hide canvas</option>
+                                                <!--DRAW_MODE_NONE-->
+                                                <option value="1">3D fundamental domain</option>
+                                                <!--DRAW_MODE_DEFAULT-->
+                                                <option selected value="3">2D projection</option>
+                                                <!--DRAW_MODE_PROJECTION-->
+                                                <option value="2">2D FTLE slice</option>
+                                                <!--DRAW_MODE_FTLE_SLICE-->
+                                </select>
+                            </div>
+                            <fieldset class="subgroup_properties">
+                                <legend>selects</legend>
 
+                                            <div class="show" id="show_projection_index">
+                                                <select id="select_projection_index"
+                                                    title="Select the projection. Origin is bottom left of each square.">
+                                                    <option value="2">z=0 (horizontal: x vertical: y)</option>
+                                                    <option value="0">x=0 (horizontal: y vertical: z)</option>
+                                                    <option value="1">y=0 (horizontal: z vertical: x)</option>
+                                                </select>
+                                            </div>
+                                            <div class="show" id="show_slice_axes_order" title="Select the slice direction.">
+                                                <select id="select_slice_axes_order">
+                                                    <option value="0">horizontal: x vertical: y</option>
+                                                    <option value="1">horizontal: x vertical: z</option>
+                                                    <option value="2">horizontal: z vertical: y</option>
+                                                </select>
+                                            </div>
+                                            <div class="show" id="show_side_canvas_streamline_method">
+                                                <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
+                                - fundamental domain + R³: combines the two methods below
+                                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+                                - R³: streamlines leave the fundamental domain and are shown in R³
+                                - none: streamlines are not shown">
+                                                    <option value="3">fundamental domain + R³</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                                                    <option value="1">fundamental domain</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                                                    <option value="2">R³</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_R3-->
+                                                    <option value="0">none</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_NONE-->
+                                                </select>
+                                            </div>
+                                            <div class="show" id="show_side_canvas_streamline_method_projection">
+                                                <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
+                                - fundamental domain + R²: combines the two methods below
+                                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+                                - R²: streamlines leave the fundamental domain and are shown in R²
+                                - none: streamlines are not shown">
+                                                    <option value="3">fundamental domain + R²</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                                                    <option value="1">fundamental domain</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                                                    <option value="2">R²</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_R3-->
+                                                    <option value="0">none</option>
+                                                    <!--STREAMLINE_DRAW_METHOD_NONE-->
+                                                </select>
+                                            </div>
+                            </fieldset>
+                            <fieldset class="subgroup_properties">
+                                <legend>Slice</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>index</label>
+                                        <div class="slide_container">
+                                            <input type="range" min="0" max="99" value="49" class="slider"
+                                                id="slide_slice_index" title="The active slice.">
+                                        </div>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>animate</label>
+                                        <input id="checkbox_animate_slice_index" type="checkbox" value="true" checked="true"
+                                            title="Animation of the slice index:
+        - checked: the slices are shown consecutively.
+        - unchecked: only one slice is shown.">
+                                    </div>
+                                    <div class="input_row">
+                                        <label>interpolate</label>
+                                        <input id="checkbox_ftle_slice_interpolate" type="checkbox" value="true" checked="true"
+                                            title="Interpolation method:
+        - checked: use bilinear interpolation
+        - unchecked: use nearest value">
+                                    </div>
+                                    <div class="input_row">
+                                        <label>draw mode</label>
+                                        <select id="select_slice_mode" title="Controls what is shown in the active slice:
+        - combined: forward + backward FTLE
+        - forward: forward FTLE
+        - backward: backward FTLE
+        - forward normal: the normal (=normalized gradient) of the forward FTLE.
+            x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.
+        - backward normal: the normal (=normalized gradient) of the backward FTLE
+            x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.">
+                                            <option value="0">combined</option>
+                                            <option value="1">forward</option>
+                                            <option value="2">backward</option>
+                                            <option value="3">forward normal</option>
+                                            <option value="4">backward normal</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>    
                         <div class="group_properties_children">
 
@@ -958,93 +1284,9 @@
                             <span class="span_style_properties_legend_path"></span>
                         </legend>  
                         <div class="group_properties_content">
-                            <fieldset class="subgroup_properties">
-                                <legend>Streamline Shading</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>show seeds</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="checkbox_show_seeds_main" type="checkbox" value="true"
-                                                title="This parameter decides whether to show seeds in the left canvas.">
-                                            <select id="select_seed_mode_side" title="
-    This parameter decides how the seeds should be visualized in the right canvas.
-        -none: seeds are not visualized.
-        -once: seeds are visualized once in the fundamental domain.
-        -instance: seeds are visualized in each instance of the fundamental domain.">
-                                                <option value="0">none</option>
-                                                <option value="1">once</option>
-                                                <option value="2">instance</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>show streamlines</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="checkbox_show_streamlines_main" type="checkbox" value="true"
-                                                checked="true" title="This parameter decides whether to show streamlines in the left canvas.
-    To control whether streamlines should be shown in the right canvas, use the checkbox directly below the right canvas.">
-                                            <label></label>
-                                        </div>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>shading mode</label>
-                                        <select id="select_shading_mode_streamlines" title="This parameter decides the color of streamlines.
-        -id: each streamline uses its own color specified under 'Seeds' in the 'Data' tab.
-        -scalar field: the streamlines are colored based on position and the scalar field specified below.">
-                                            <!-- -FTLE: the streamlines are colored based on position and the scalar field specified below"> -->
-                                            <option value="0">id</option>
-                                            <option value="1">scalar field</option>
-                                            <!-- <option value="2">FTLE</option> -->
-                                        </select>
-                                    </div>
-                                    <div class="input_row" id="input_row_formula_scalar">
-                                        <label>scalar field</label>
-                                        <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)"
-                                            title="The scalar field used for coloring the streamlines.">
-                                    </div>
-                                    <div class="input_row" id="input_row_scalar_field_debug">
-                                        <label>scalar field debug</label>
-                                        <input id="input_formula_scalar_float" class="input_readonly" type="text" value=""
-                                            readonly title="Field used for debugging.
-    The automatically corrected scalar field used for coloring the streamlines.">
-                                    </div>
-                                    <div class="input_row" id="input_row_scalar_range">
-                                        <label>scalar range</label>
-                                        <div id="div_buttons_rng" class="horizontal_div_2">
-                                            <input id="input_min_scalar" type="text" value="-1.0"
-                                                title="The minimum value of the scalar field.">
-                                            <input id="input_max_scalar" type="text" value="1.0"
-                                                title="The maximum value of the scalar field.">
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>     
+                                
     
-                            <fieldset class="subgroup_properties">
-                                <legend>Fog</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>fog type</label>
-                                        <select id="select_fog_type" title="The fog type used.
-        - exponential: the recommended fog type when using fog: t = exp(-d), 
-            where d is the intersection distance multiplied by the fog density
-            and t is used for linear interpolate between white and the color obtained at the intersection.
-        - squared exponential: t = exp(-d*d)
-        - linear: t = (max_distance - intersection_distance)/(max_distance)
-        - none: no fog is used.">
-                                            <option value="2">exponential</option>
-                                            <option value="3">squared exponential</option>
-                                            <option value="1">linear</option>
-                                            <option value="0">none</option>
-                                        </select>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>fog density</label>
-                                        <input id="input_fog_density" type="text" value="0.01" title="Parameter used by exponential and squared exponential fog.
-        - High density leads to reduced view distance.">
-                                    </div>
-                                </div>
-                            </fieldset>
+
     
                             <fieldset class="subgroup_properties">
                                 <legend>Axes</legend>
@@ -1079,236 +1321,8 @@
                                     </div>
                                 </div>
                             </fieldset>
-    
-                            <fieldset class="subgroup_properties">
-                                <legend>Volume Rendering</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>show</label>
-                                        <div class="horizontal_div_2">
-                                            <select id="select_show_volume_main"
-                                                title="Show FTLE volume rendering in the left canvas.">
-                                                <option value="0">none</option>
-                                                <option value="1">both</option>
-                                                <option value="2">forward</option>
-                                                <option value="3">backward</option>
-                                            </select>
-                                            <select id="select_show_volume_side"
-                                                title="Show FTLE volume rendering in the right canvas.">
-                                                <option value="0">none</option>
-                                                <option value="1">both</option>
-                                                <option value="2">forward</option>
-                                                <option value="3">backward</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="input_row" id="input_row_volume_rendering_max_distance">
-                                        <label>max distance</label>
-                                        <input id="input_volume_rendering_max_distance" type="text" value="0" title="Maximum distance of volume rendering.
-        - Volume rendering will not continue beyond the maximum distance specified by 'Settings.General.max distance'.
-        - A value of 0 means that no additional limit is used and 'Settings.General.max distance' is used instead.
-        - Reduce to improve performance.">
-                                    </div>
-                                    <div class="input_row" id="input_row_volume_rendering_distance_between_points">
-                                        <label>sample distance</label>
-                                        <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
-                                            title="Distance between each sample.">
-                                    </div>
-                                    <div class="input_row" id="input_row_volume_rendering_termination_opacity">
-                                        <label>termination opacity</label>
-                                        <input id="input_volume_rendering_termination_opacity" type="text" value="0.99"
-                                            title="Opacity threshold where volume rendering is stopped.">
-                                    </div>
-                                    <div class="input_row" id="input_row_volume_rendering_opacity_factor">
-                                        <label>opacity factor</label>
-                                        <input id="input_volume_rendering_opacity_factor" type="text" value="1.0"
-                                            title="Experimental.">
-                                    </div>
-        
-                                </div>
-                            </fieldset>
-    
-                            <fieldset class="subgroup_properties">
-                                <legend>Quality</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row" id="input_row_still_resolution_factor">
-                                        <label>idle resolution factor</label>
-                                        <input id="input_still_resolution_factor" type="text" value="1.0" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
-        - This value is used while the camera is NOT in panning mode.
-        - Panning mode is active while the left mouse button is down.
-        - Panning mode can be forced by pressing 'p' after clicking in the canvas.
-        - A lower resolution factor can greatly improve the performance.">
-                                    </div>
-                                    <div class="input_row" id="input_row_panning_resolution_factor">
-                                        <label>panning resolution factor</label>
-                                        <input id="input_panning_resolution_factor" type="text" value="0.5" title="The resolution used to generate the image is the canvas resolution multiplied by this factor.
-        - This value is used while the camera is in panning mode.
-        - Panning mode is active while the left mouse button is down.
-        - Panning mode can be forced by pressing 'p' after clicking in the canvas.
-        - A lower resolution factor can greatly improve the performance.">
-                                    </div>
-                                    <div class="input_row" id="input_row_lod_still">
-                                        <label>LOD idle</label>
-                                        <select id="select_lod_still" title="The level of detail of the streamlines.
-        - This value is used while the camera is NOT in panning mode.
-        - Quality in descending order: raw, high, medium, low.">
-                                            <option value="0">raw</option>
-                                            <option value="1">high</option>
-                                            <option value="2">medium</option>
-                                            <option value="3">low</option>
-                                        </select>
-                                    </div>
-                                    <div class="input_row" id="input_row_lod_panning">
-                                        <label>LOD panning</label>
-                                        <select id="select_lod_panning" title="The level of detail of the streamlines.
-        - This value is used while the camera is in panning mode.
-        - Quality in descending order: raw, high, medium, low.">
-                                            <option value="0">raw</option>
-                                            <option value="1">high</option>
-                                            <option value="2">medium</option>
-                                            <option value="3">low</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </fieldset>
-    
-    
-    
-                            <fieldset class="subgroup_properties">
-                                <legend>Trackball</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row" id="input_row_trackball_rotation_sensitivity">
-                                        <label>rotation sensitivity</label>
-                                        <input id="input_trackball_rotation_sensitivity" type="text" value="2.0" title="
-    Sensitivity when rotating the camera. This value is multiplied by the angle obtained from the mouse movement.">
-                                    </div>
-                                    <div class="input_row" id="input_row_trackball_translation_sensitivity">
-                                        <label>translation sensitivity</label>
-                                        <input id="input_trackball_translation_sensitivity" type="text" value="1.0" title="
-    Sensitivity when moving the camera. This value is multiplied by the pixel difference from the mouse movement.">
-                                    </div>
-                                    <div class="input_row" id="input_row_trackball_wheel_sensitivity">
-                                        <label>wheel sensitivity</label>
-                                        <input id="input_trackball_wheel_sensitivity" type="text" value="0.001" title="
-    Sensitivity when using the mouse wheel to move forward / backward.">
-                                    </div>
-                                    <div class="input_row" id="input_row_trackball_focus_distance">
-                                        <label>focus distance</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="input_trackball_focus_distance_left" type="text" value="0.5"
-                                                title="Distance of the focus point from the camera in the left canvas.">
-                                            <input id="input_trackball_focus_distance_right" type="text" value="1.5"
-                                                title="Distance of the focus point from the camera in the right canvas.">
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>    
-                            
-                            <fieldset class="subgroup_properties">
-                                <legend>Slice</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>index</label>
-                                        <div class="slide_container">
-                                            <input type="range" min="0" max="99" value="49" class="slider"
-                                                id="slide_slice_index" title="The active slice.">
-                                        </div>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>animate</label>
-                                        <input id="checkbox_animate_slice_index" type="checkbox" value="true" checked="true"
-                                            title="Animation of the slice index:
-        - checked: the slices are shown consecutively.
-        - unchecked: only one slice is shown.">
-                                    </div>
-                                    <div class="input_row">
-                                        <label>interpolate</label>
-                                        <input id="checkbox_ftle_slice_interpolate" type="checkbox" value="true" checked="true"
-                                            title="Interpolation method:
-        - checked: use bilinear interpolation
-        - unchecked: use nearest value">
-                                    </div>
-                                    <div class="input_row">
-                                        <label>draw mode</label>
-                                        <select id="select_slice_mode" title="Controls what is shown in the active slice:
-        - combined: forward + backward FTLE
-        - forward: forward FTLE
-        - backward: backward FTLE
-        - forward normal: the normal (=normalized gradient) of the forward FTLE.
-            x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.
-        - backward normal: the normal (=normalized gradient) of the backward FTLE
-            x, y, z are each mapped from [-1,1] to [0,1] and used as r, g, b components of the color.">
-                                            <option value="0">combined</option>
-                                            <option value="1">forward</option>
-                                            <option value="2">backward</option>
-                                            <option value="3">forward normal</option>
-                                            <option value="4">backward normal</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </fieldset>
+              
 
-                            <fieldset class="subgroup_properties">
-                                <legend>selects</legend>
-                                <select id="select_side_mode" title="Select what is shown in the right canvas.
-                                - 2D FTLE slice: (warning: possibly unintuitive axes)">
-                                                <option value="0">hide canvas</option>
-                                                <!--DRAW_MODE_NONE-->
-                                                <option value="1">3D fundamental domain</option>
-                                                <!--DRAW_MODE_DEFAULT-->
-                                                <option selected value="3">2D projection</option>
-                                                <!--DRAW_MODE_PROJECTION-->
-                                                <option value="2">2D FTLE slice</option>
-                                                <!--DRAW_MODE_FTLE_SLICE-->
-                                            </select>
-                                            <div class="show" id="show_projection_index">
-                                                <select id="select_projection_index"
-                                                    title="Select the projection. Origin is bottom left of each square.">
-                                                    <option value="2">z=0 (horizontal: x vertical: y)</option>
-                                                    <option value="0">x=0 (horizontal: y vertical: z)</option>
-                                                    <option value="1">y=0 (horizontal: z vertical: x)</option>
-                                                </select>
-                                            </div>
-                                            <div class="show" id="show_slice_axes_order" title="Select the slice direction.">
-                                                <select id="select_slice_axes_order">
-                                                    <option value="0">horizontal: x vertical: y</option>
-                                                    <option value="1">horizontal: x vertical: z</option>
-                                                    <option value="2">horizontal: z vertical: y</option>
-                                                </select>
-                                            </div>
-                                            <div class="show" id="show_side_canvas_streamline_method">
-                                                <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
-                                - fundamental domain + R³: combines the two methods below
-                                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
-                                - R³: streamlines leave the fundamental domain and are shown in R³
-                                - none: streamlines are not shown">
-                                                    <option value="3">fundamental domain + R³</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
-                                                    <option value="1">fundamental domain</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
-                                                    <option value="2">R³</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_R3-->
-                                                    <option value="0">none</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_NONE-->
-                                                </select>
-                                            </div>
-                                            <div class="show" id="show_side_canvas_streamline_method_projection">
-                                                <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
-                                - fundamental domain + R²: combines the two methods below
-                                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
-                                - R²: streamlines leave the fundamental domain and are shown in R²
-                                - none: streamlines are not shown">
-                                                    <option value="3">fundamental domain + R²</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
-                                                    <option value="1">fundamental domain</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
-                                                    <option value="2">R²</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_R3-->
-                                                    <option value="0">none</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_NONE-->
-                                                </select>
-                                            </div>
-                            </fieldset>
 
                             <fieldset class="subgroup_properties">
                                 <legend>Export</legend>

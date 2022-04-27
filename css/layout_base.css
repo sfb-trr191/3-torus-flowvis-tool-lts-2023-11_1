@@ -134,7 +134,7 @@ legend {
 
 .tree_view_header_content5{
     display: grid;
-    grid-template-columns: 16px 72px 16px 1fr;
+    grid-template-columns: 16px 80px 16px 1fr;
     grid-template-rows: 1fr; 
     gap: 2px; 
 }
@@ -142,6 +142,20 @@ legend {
 .tree_view_header_content5_leaf{
     display: grid;
     grid-template-columns: 16px 64px 16px 1fr;
+    grid-template-rows: 1fr; 
+    gap: 2px; 
+}
+
+.tree_view_header_content6{
+    display: grid;
+    grid-template-columns: 16px 96px 16px 1fr;
+    grid-template-rows: 1fr; 
+    gap: 2px; 
+}
+
+.tree_view_header_content6_leaf{
+    display: grid;
+    grid-template-columns: 16px 80px 16px 1fr;
     grid-template-rows: 1fr; 
     gap: 2px; 
 }
