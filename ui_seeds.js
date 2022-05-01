@@ -617,6 +617,7 @@ class UIMultiSeed {
         switch(mode){
             case MULTI_SEED_MODE_RANDOM:
                 this.node_row_axis.className = "hidden";
+                this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = this.className_node_row_random_number;
                 this.node_row_point.className = "hidden";
                 this.node_row_point2.className = "hidden";
@@ -624,6 +625,7 @@ class UIMultiSeed {
                 break;
             case MULTI_SEED_MODE_FIXED_POINT:
                 this.node_row_axis.className = "hidden";
+                this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
                 this.node_row_point.className = this.className_node_row_point;
                 this.node_row_point2.className = "hidden";
@@ -631,6 +633,7 @@ class UIMultiSeed {
                 break;
             case MULTI_SEED_MODE_LINE:
                 this.node_row_axis.className = "hidden";
+                this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
                 this.node_row_point.className = this.className_node_row_point;
                 this.node_row_point2.className = this.className_node_row_point2;
@@ -638,6 +641,7 @@ class UIMultiSeed {
                 break;
             case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
                 this.node_row_axis.className = this.className_node_row_axis;
+                this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = this.className_node_row_random_number;
                 this.node_row_point.className = "hidden";
                 this.node_row_point2.className = "hidden";
