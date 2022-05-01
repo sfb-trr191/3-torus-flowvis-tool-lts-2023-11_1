@@ -61,6 +61,7 @@ global.SHADING_MODE_STREAMLINES_ID = 0;
 global.SHADING_MODE_STREAMLINES_SCALAR = 1;
 global.SHADING_MODE_STREAMLINES_FTLE = 2;
 
+global.PARAM_EYE = "eye";
 global.PARAM_SEEDS = "s";
 global.PARAM_CAMERA = "mc";
 global.PARAM_SIDE_CAMERA = "sc";

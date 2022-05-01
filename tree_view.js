@@ -1,5 +1,5 @@
 class TreeViewNode {
-    constructor(tree_view, name, group_id, has_eye) {
+    constructor(tree_view, name, group_id, has_eye, eye_index) {
         this.tree_view = tree_view;
         this.name = name;
         this.group_id = group_id;
@@ -8,6 +8,7 @@ class TreeViewNode {
         this.linked_content_container_node = this.linked_group_node.querySelector(".group_properties_content");        
         this.container_properties_node = document.getElementById("container_properties");
         this.has_eye = has_eye;
+        this.eye_index = eye_index;
         this.level = 0;
         this.parent = null;
         this.list_children = [];
@@ -277,50 +278,53 @@ class TreeView{
         this.element = document.getElementById("container_tree_view_nodes");
         this.node_help_properties = document.getElementById("help_properties");
         this.list_nodes = [];
+        this.dict_eye_id_to_node = {};
         this.generateNodes();
         this.updateCollapseState();
         this.updateLinkedGroup();
         this.updatePropertiesHelp();
+
+        console.log("this.dict_eye_id_to_node", this.dict_eye_id_to_node);
     }
 
     generateNodes() {
         var EYE = true;
         var NO_EYE = false;
 
-        var node_root = this.generateNode(this, "Root", "group_properties_root", NO_EYE);
-        var node_data = this.generateNode(this, "Data", "group_properties_root_data", NO_EYE);
-        var node_equations = this.generateNode(this, "Equations", "group_properties_root_data_equations", NO_EYE);
-        var node_streamline_calculation = this.generateNode(this, "Streamline Calculation", "group_properties_root_data_streamline_calculation", NO_EYE);
-        var node_ftle_calculation = this.generateNode(this, "FTLE Calculation", "group_properties_root_data_ftle_calculation", NO_EYE);
-        var node_lighting = this.generateNode(this, "Lighting", "group_properties_root_lighting", NO_EYE);
-        var node_transfer_functions = this.generateNode(this, "Transfer Functions", "group_properties_root_transfer_functions", NO_EYE);
+        var node_root = this.generateNode(this, "Root", "group_properties_root", NO_EYE, null);
+        var node_data = this.generateNode(this, "Data", "group_properties_root_data", NO_EYE, null);
+        var node_equations = this.generateNode(this, "Equations", "group_properties_root_data_equations", NO_EYE, null);
+        var node_streamline_calculation = this.generateNode(this, "Streamline Calculation", "group_properties_root_data_streamline_calculation", NO_EYE, null);
+        var node_ftle_calculation = this.generateNode(this, "FTLE Calculation", "group_properties_root_data_ftle_calculation", NO_EYE, null);
+        var node_lighting = this.generateNode(this, "Lighting", "group_properties_root_lighting", NO_EYE, null);
+        var node_transfer_functions = this.generateNode(this, "Transfer Functions", "group_properties_root_transfer_functions", NO_EYE, null);
 
-        var node_view = this.generateNode(this, "View", "group_properties_root_view", NO_EYE);
+        var node_view = this.generateNode(this, "View", "group_properties_root_view", NO_EYE, null);
 
-        var node_main_scene = this.generateNode(this, "Main View", "group_properties_root_main_view", NO_EYE);
-        var node_main_camera = this.generateNode(this, "Camera", "group_properties_root_main_view_camera", NO_EYE);
-        var node_main_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_main_view_visual_objects", EYE);
-        var node_main_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_main_view_visual_objects_streamlines", EYE);
-        var node_main_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_main_view_visual_objects_ftle_volume", EYE);
-        var node_main_indicators = this.generateNode(this, "Indicators", "group_properties_root_main_view_visual_objects_indicators", EYE);
-        var node_main_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_main_view_visual_objects_indicators_bounding_axes", EYE);
-        var node_main_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_main_view_visual_objects_indicators_top_right_axes", EYE);
-        var node_main_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_main_view_visual_objects_indicators_clicked_position", EYE);
-        var node_main_seeds = this.generateNode(this, "Seeds", "group_properties_root_main_view_visual_objects_indicators_seeds", EYE);
+        var node_main_scene = this.generateNode(this, "Main View", "group_properties_root_main_view", NO_EYE, null);
+        var node_main_camera = this.generateNode(this, "Camera", "group_properties_root_main_view_camera", NO_EYE, null);
+        var node_main_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_main_view_visual_objects", EYE, 0);
+        var node_main_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_main_view_visual_objects_streamlines", EYE, 1);
+        var node_main_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_main_view_visual_objects_ftle_volume", EYE, 2);
+        var node_main_indicators = this.generateNode(this, "Indicators", "group_properties_root_main_view_visual_objects_indicators", EYE, 3);
+        var node_main_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_main_view_visual_objects_indicators_bounding_axes", EYE, 4);
+        var node_main_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_main_view_visual_objects_indicators_top_right_axes", EYE, 5);
+        var node_main_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_main_view_visual_objects_indicators_clicked_position", EYE, 6);
+        var node_main_seeds = this.generateNode(this, "Seeds", "group_properties_root_main_view_visual_objects_indicators_seeds", EYE, 7);
 
-        var node_aux_scene = this.generateNode(this, "Aux View", "group_properties_root_aux_view", NO_EYE);
-        var node_aux_camera = this.generateNode(this, "Camera", "group_properties_root_aux_view_camera", NO_EYE);
-        var node_aux_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_aux_view_visual_objects", EYE);
-        var node_aux_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_aux_view_visual_objects_streamlines", EYE);
-        var node_aux_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_aux_view_visual_objects_ftle_volume", EYE);
-        var node_aux_indicators = this.generateNode(this, "Indicators", "group_properties_root_aux_view_visual_objects_indicators", EYE);
-        var node_aux_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes", EYE);
-        var node_aux_origin_axes = this.generateNode(this, "Origin Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes_origin_axes", EYE);
-        var node_aux_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_aux_view_visual_objects_indicators_top_right_axes", EYE);
-        var node_aux_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_aux_view_visual_objects_indicators_clicked_position", EYE);
-        var node_aux_seeds = this.generateNode(this, "Seeds", "group_properties_root_aux_view_visual_objects_indicators_seeds", EYE);        
+        var node_aux_scene = this.generateNode(this, "Aux View", "group_properties_root_aux_view", NO_EYE, null);
+        var node_aux_camera = this.generateNode(this, "Camera", "group_properties_root_aux_view_camera", NO_EYE, null);
+        var node_aux_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_aux_view_visual_objects", EYE, 8);
+        var node_aux_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_aux_view_visual_objects_streamlines", EYE, 9);
+        var node_aux_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_aux_view_visual_objects_ftle_volume", EYE, 10);
+        var node_aux_indicators = this.generateNode(this, "Indicators", "group_properties_root_aux_view_visual_objects_indicators", EYE, 11);
+        var node_aux_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes", EYE, 12);
+        var node_aux_origin_axes = this.generateNode(this, "Origin Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes_origin_axes", EYE, 13);
+        var node_aux_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_aux_view_visual_objects_indicators_top_right_axes", EYE, 14);
+        var node_aux_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_aux_view_visual_objects_indicators_clicked_position", EYE, 15);
+        var node_aux_seeds = this.generateNode(this, "Seeds", "group_properties_root_aux_view_visual_objects_indicators_seeds", EYE, 16);        
 
-        var node_todo = this.generateNode(this, "Todo", "group_properties_root_todo", NO_EYE);
+        var node_todo = this.generateNode(this, "Todo", "group_properties_root_todo", NO_EYE, null);
 
         this.element.appendChild(node_root.node);
 
@@ -357,9 +361,11 @@ class TreeView{
         
     }  
 
-    generateNode(tree_view, name, group_id, has_eye){
-        var node = new TreeViewNode(tree_view, name, group_id, has_eye);
+    generateNode(tree_view, name, group_id, has_eye, eye_index){
+        var node = new TreeViewNode(tree_view, name, group_id, has_eye, eye_index);
         this.list_nodes.push(node);
+        if(eye_index !== null)
+            this.dict_eye_id_to_node[eye_index] = node;
         return node;
     }
 
@@ -367,6 +373,7 @@ class TreeView{
         for(var i=0; i<this.list_nodes.length; i++){
             this.list_nodes[i].updateEyeState();
         }
+        this.toString();
     }
 
     updateCollapseState(){
@@ -406,4 +413,28 @@ class TreeView{
         }
         this.updateLinkedGroup();
     }
+
+    toStringEye(){
+        var count = 0;
+        var s = "";
+        for(var key in this.dict_eye_id_to_node) {
+            count++;
+        }
+        for (var index = 0; index < count; index++) {
+            const node = this.dict_eye_id_to_node[index];
+            s += node.eye_enabled ? "1" : "0";
+        } 
+        return s;    
+    }
+
+    fromStringEye(s){
+        console.log("eye_string: ", s);
+        for (var index = 0; index < s.length; index++) {
+            const node = this.dict_eye_id_to_node[index];
+            node.eye_enabled = s[index] == "1" ? true : false;
+        }   
+        this.onEyeChanged();
+    }
 }
+
+module.exports = TreeView;

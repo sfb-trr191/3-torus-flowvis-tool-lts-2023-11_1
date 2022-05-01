@@ -84,7 +84,8 @@ class InputWrapper {
 
 class InputParameterWrapper {
 
-    constructor(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager) {
+    constructor(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager) {
+        this.tree_view = tree_view;
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
         this.side_camera = side_camera;
@@ -240,6 +241,9 @@ class InputParameterWrapper {
                 input_wrapper.setValue(value);
             }
 
+            const eye = urlParams.get(PARAM_EYE);
+            this.tree_view.fromStringEye(eye);
+
             const seeds = urlParams.get(PARAM_SEEDS);
             this.ui_seeds.fromString(seeds);
 
@@ -343,6 +347,7 @@ class InputParameterWrapper {
                     continue;
                 params[input_wrapper.url_parameter_name] = value;
             }
+            params[PARAM_EYE] = this.tree_view.toStringEye();
             params[PARAM_SEEDS] = this.ui_seeds.toString();
             params[PARAM_CAMERA] = this.main_camera.toString();
             params[PARAM_SIDE_CAMERA] = this.side_camera.toString();

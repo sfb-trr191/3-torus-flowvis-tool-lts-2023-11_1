@@ -63,6 +63,7 @@ const Export = module_export.Export;
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
+const TreeView = require("./tree_view");
 //const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
@@ -122,6 +123,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     //var message_display;
     var current_fps = 0;
 
+    var tree_view;
     var tab_manager;
     var state_manager;
     var sheduled_task = TASK_CALCULATE_STREAMLINES;
@@ -176,6 +178,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         //testWebGPU();
         //testEigenvalueDecomposition();
 
+        tree_view = new TreeView();
         tab_manager = new TabManager();
         hide_manager = new HideManager(tab_manager);
         tab_manager.Link(hide_manager);
@@ -304,7 +307,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
+        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
         input_parameter_wrapper.fromURL();
         UpdateVersionString();
         RedirectVersion();
@@ -313,6 +316,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         OnSelectedTransferFunction();
 
         hide_manager.UpdateVisibility();
+        tree_view.onEyeChanged();
 
         //message_display.innerHTML = "step 2: initializing basic shaders...";
         setTimeout(on_start_step_2, 200);
