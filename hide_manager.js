@@ -245,39 +245,30 @@ class HideManager {
         this.groups.push(this.group_data);
 
         this.group_settings = new HideGroup("select_settings_mode");
-        //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
-        this.group_settings.AddInputRow("input_row_space", LEVEL_DEBUG, false);
-        this.group_settings.AddInputRow("input_row_bounding_axes_length", LEVEL_ADVANCED, false);
-        this.group_settings.AddInputRow("input_row_bounding_axes_radius", LEVEL_ADVANCED, false);
-        this.group_settings.AddInputRow("input_row_emphasize_origin_axes", LEVEL_ADVANCED, false);
-        this.group_settings.AddInputRow("input_row_bounding_axes_origin_length", LEVEL_ADVANCED, false);
-        this.group_settings.AddInputRow("input_row_bounding_axes_origin_radius", LEVEL_ADVANCED, false);
-        this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_distance_between_points", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_termination_opacity", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_volume_rendering_opacity_factor", LEVEL_DEBUG, false);
+
         this.group_settings.AddInputRow("input_row_still_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_panning_resolution_factor", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_lod_still", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_lod_panning", LEVEL_ADVANCED, false);
+
         this.group_settings.AddInputRow("input_row_trackball_rotation_sensitivity", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_trackball_translation_sensitivity", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_trackball_wheel_sensitivity", LEVEL_ADVANCED, false);
         this.group_settings.AddInputRow("input_row_trackball_focus_distance", LEVEL_ADVANCED, false);
         this.groups.push(this.group_settings);
+        /*
+        //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection", LEVEL_INTERMEDIATE, false);
+        //this.group_settings.AddInputRow("input_row_tube_radius_factor_projection_highlight", LEVEL_INTERMEDIATE, false);
+        this.group_settings.AddInputRow("input_row_volume_rendering_max_distance", LEVEL_INTERMEDIATE, false);
+        */
 
         this.group_shading_mode = new HideGroup("select_shading_mode_streamlines");
         this.group_shading_mode.AddInputRow("input_row_formula_scalar", SHADING_MODE_STREAMLINES_SCALAR, true);
         this.group_shading_mode.AddInputRow("input_row_scalar_range", SHADING_MODE_STREAMLINES_SCALAR, true);
         this.groups.push(this.group_shading_mode);
-
-        this.group_side_canvas = new HideGroup("select_side_mode");
-        this.group_side_canvas.AddShow("show_side_canvas", 1, false);
-        this.group_side_canvas.AddShow("show_projection_index", DRAW_MODE_PROJECTION, true);
-        this.group_side_canvas.AddShow("show_slice_axes_order", DRAW_MODE_FTLE_SLICE, true);
-        this.group_side_canvas.AddShow("show_side_canvas_streamline_method", DRAW_MODE_DEFAULT, true);
-        this.group_side_canvas.AddShow("show_side_canvas_streamline_method_projection", DRAW_MODE_PROJECTION, true);
-        this.groups.push(this.group_side_canvas);
 
         //---------- special conditions ----------
 
@@ -299,18 +290,7 @@ class HideManager {
         this.condition_tab_export = new TabIsActiveCondition("tab_group_main", "tab_export", tab_manager);
         
         /*
-        this.condition_tab_data_or_ftle = new OrCondition();
-        this.condition_tab_data_or_ftle.add_condition(this.condition_tab_data)
-        this.condition_tab_data_or_ftle.add_condition(this.condition_tab_ftle)
-
-        this.mcw_calculate_streamlines = new MultiConditionalWrapper("wrapper_button_request_data");
-        this.mcw_calculate_streamlines.set_condition(this.condition_tab_data)
-        this.multi_consodtional_elements.push(this.mcw_calculate_streamlines);
-
-        this.mcw_calculate_ftle = new MultiConditionalWrapper("wrapper_button_calculate_ftle");
-        this.mcw_calculate_ftle.set_condition(this.condition_tab_data_or_ftle)
-        this.multi_consodtional_elements.push(this.mcw_calculate_ftle);
-        */
+        // BUTTONS
 
         this.mcw_add_multi_seed = new MultiConditionalWrapper("wrapper_button_add_multi_seed");
         this.mcw_add_multi_seed.set_condition(this.condition_tab_data)
@@ -335,6 +315,7 @@ class HideManager {
         this.mcw_export = new MultiConditionalWrapper("wrapper_button_export");
         this.mcw_export.set_condition(this.condition_tab_export)
         this.multi_consodtional_elements.push(this.mcw_export);
+        */
 
         this.InitEquations();
     }
@@ -377,15 +358,13 @@ class HideManager {
         
     }
 
-    UpdateVisibility() {
-        /*
+    UpdateVisibility() {        
         for (var i = 0; i < this.groups.length; i++) {
             this.groups[i].UpdateVisibility();
-        }
+        }        
         for (var i = 0; i < this.multi_consodtional_elements.length; i++) {
             this.multi_consodtional_elements[i].UpdateVisibility();
         }
-        */
     }
 }
 
