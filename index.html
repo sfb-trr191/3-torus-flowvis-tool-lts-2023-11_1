@@ -500,32 +500,7 @@
                         <div class="group_properties_content">
                             <fieldset class="subgroup_properties">
                                 <legend>Streamline Shading</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>show seeds</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="checkbox_show_seeds_main" type="checkbox" value="true"
-                                                title="This parameter decides whether to show seeds in the left canvas.">
-                                            <select id="select_seed_mode_side" title="
-    This parameter decides how the seeds should be visualized in the right canvas.
-        -none: seeds are not visualized.
-        -once: seeds are visualized once in the fundamental domain.
-        -instance: seeds are visualized in each instance of the fundamental domain.">
-                                                <option value="0">none</option>
-                                                <option value="1">once</option>
-                                                <option value="2">instance</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>show streamlines</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="checkbox_show_streamlines_main" type="checkbox" value="true"
-                                                checked="true" title="This parameter decides whether to show streamlines in the left canvas.
-    To control whether streamlines should be shown in the right canvas, use the checkbox directly below the right canvas.">
-                                            <label></label>
-                                        </div>
-                                    </div>
+                                <div class="vertical_container">                                    
                                     <div class="input_row">
                                         <label>shading mode</label>
                                         <select id="select_shading_mode_streamlines" title="This parameter decides the color of streamlines.
@@ -561,26 +536,7 @@
                             </fieldset> 
                             <fieldset class="subgroup_properties">
                                 <legend>Volume Rendering</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>show</label>
-                                        <div class="horizontal_div_2">
-                                            <select id="select_show_volume_main"
-                                                title="Show FTLE volume rendering in the left canvas.">
-                                                <option value="0">none</option>
-                                                <option value="1">both</option>
-                                                <option value="2">forward</option>
-                                                <option value="3">backward</option>
-                                            </select>
-                                            <select id="select_show_volume_side"
-                                                title="Show FTLE volume rendering in the right canvas.">
-                                                <option value="0">none</option>
-                                                <option value="1">both</option>
-                                                <option value="2">forward</option>
-                                                <option value="3">backward</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                <div class="vertical_container">                                    
                                     <div class="input_row" id="input_row_volume_rendering_max_distance">
                                         <label>max distance</label>
                                         <input id="input_volume_rendering_max_distance" type="text" value="0" title="Maximum distance of volume rendering.
@@ -833,7 +789,15 @@
                             <span class="span_style_properties_legend_path">[Root/Main View/Visual Objects/FTLE Volume]</span>
                         </legend>  
                         <div class="group_properties_content">
-
+                            <div class="input_row">
+                                <label>show</label>
+                                <select id="select_show_volume_main"
+                                    title="Show FTLE volume rendering in the left canvas.">
+                                    <option value="1">both</option>
+                                    <option value="2">forward</option>
+                                    <option value="3">backward</option>
+                                </select>
+                            </div>
                         </div>    
                         <div class="group_properties_children">
 
@@ -925,8 +889,6 @@
                                 <label>Content</label>
                                 <select id="select_side_mode" title="Select what is shown in the right canvas.
                                 - 2D FTLE slice: (warning: possibly unintuitive axes)">
-                                                <option value="0">hide canvas</option>
-                                                <!--DRAW_MODE_NONE-->
                                                 <option value="1">3D fundamental domain</option>
                                                 <!--DRAW_MODE_DEFAULT-->
                                                 <option selected value="3">2D projection</option>
@@ -936,59 +898,30 @@
                                 </select>
                             </div>
                             <fieldset class="subgroup_properties">
-                                <legend>selects</legend>
-
-                                            <div class="show" id="show_projection_index">
-                                                <select id="select_projection_index"
-                                                    title="Select the projection. Origin is bottom left of each square.">
-                                                    <option value="2">z=0 (horizontal: x vertical: y)</option>
-                                                    <option value="0">x=0 (horizontal: y vertical: z)</option>
-                                                    <option value="1">y=0 (horizontal: z vertical: x)</option>
-                                                </select>
-                                            </div>
-                                            <div class="show" id="show_slice_axes_order" title="Select the slice direction.">
-                                                <select id="select_slice_axes_order">
-                                                    <option value="0">horizontal: x vertical: y</option>
-                                                    <option value="1">horizontal: x vertical: z</option>
-                                                    <option value="2">horizontal: z vertical: y</option>
-                                                </select>
-                                            </div>
-                                            <div class="show" id="show_side_canvas_streamline_method">
-                                                <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
-                                - fundamental domain + R³: combines the two methods below
-                                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
-                                - R³: streamlines leave the fundamental domain and are shown in R³
-                                - none: streamlines are not shown">
-                                                    <option value="3">fundamental domain + R³</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
-                                                    <option value="1">fundamental domain</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
-                                                    <option value="2">R³</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_R3-->
-                                                    <option value="0">none</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_NONE-->
-                                                </select>
-                                            </div>
-                                            <div class="show" id="show_side_canvas_streamline_method_projection">
-                                                <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
-                                - fundamental domain + R²: combines the two methods below
-                                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
-                                - R²: streamlines leave the fundamental domain and are shown in R²
-                                - none: streamlines are not shown">
-                                                    <option value="3">fundamental domain + R²</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
-                                                    <option value="1">fundamental domain</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
-                                                    <option value="2">R²</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_R3-->
-                                                    <option value="0">none</option>
-                                                    <!--STREAMLINE_DRAW_METHOD_NONE-->
-                                                </select>
-                                            </div>
+                                <legend>Projection</legend>
+                                    <div class="vertical_container">  
+                                        <div class="input_row">
+                                            <label>plane</label>
+                                            <select id="select_projection_index"
+                                                title="Select the projection. Origin is bottom left of each square.">
+                                                <option value="2">z=0 (horizontal: x vertical: y)</option>
+                                                <option value="0">x=0 (horizontal: y vertical: z)</option>
+                                                <option value="1">y=0 (horizontal: z vertical: x)</option>
+                                            </select>
+                                        </div>  
+                                    </div>                         
                             </fieldset>
                             <fieldset class="subgroup_properties">
-                                <legend>Slice</legend>
-                                <div class="vertical_container">
+                                <legend>FTLE Slice</legend>
+                                <div class="vertical_container">                                    
+                                    <div class="input_row">
+                                        <label>plane</label>
+                                        <select id="select_slice_axes_order">
+                                            <option value="0">horizontal: x vertical: y</option>
+                                            <option value="1">horizontal: x vertical: z</option>
+                                            <option value="2">horizontal: z vertical: y</option>
+                                        </select>
+                                    </div>                 
                                     <div class="input_row">
                                         <label>index</label>
                                         <div class="slide_container">
@@ -1125,6 +1058,21 @@
                         </legend>  
                         <div class="group_properties_content">
                             <div class="input_row">
+                                <label>content: 3D</label>
+                                <select id="select_side_canvas_streamline_method" title="Streamlines are shown in:
+                - fundamental domain + R³: combines the two methods below
+                - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+                - R³: streamlines leave the fundamental domain and are shown in R³
+                - none: streamlines are not shown">
+                                    <option value="3">fundamental domain + R³</option>
+                                    <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                                    <option value="1">fundamental domain</option>
+                                    <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                                    <option value="2">R³</option>
+                                    <!--STREAMLINE_DRAW_METHOD_R3-->
+                                </select>
+                            </div> 
+                            <div class="input_row">
                                 <label class="label_todo_copy">tube radius factor</label>
                                 <input id="input_tube_radius_factor_aux" type="text" value="1.0" title="This parameter influences streamlines in 3D space.
     The actual tube radius is the tube radius from the 'Data' tab multiplied by this radius factor.
@@ -1134,6 +1082,21 @@
                             <fieldset class="subgroup_properties">
                                 <legend>Projection</legend>
                                 <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>content: 2D</label>
+                                        <select id="select_side_canvas_streamline_method_projection" title="Streamlines are shown in:
+    - fundamental domain + R²: combines the two methods below
+    - fundamental domain: streamlines that leave the fundamental domain are continued on the opposite site
+    - R²: streamlines leave the fundamental domain and are shown in R²
+    - none: streamlines are not shown">
+                                            <option value="3">fundamental domain + R²</option>
+                                            <!--STREAMLINE_DRAW_METHOD_BOTH-->
+                                            <option value="1">fundamental domain</option>
+                                            <!--STREAMLINE_DRAW_METHOD_FUNDAMENTAL-->
+                                            <option value="2">R²</option>
+                                            <!--STREAMLINE_DRAW_METHOD_R3-->
+                                        </select>
+                                    </div>   
                                     <div class="input_row">
                                         <label>tube radius factor</label>
                                         <input id="input_tube_radius_factor_projection" type="text" value="1.0" title="This parameter influences streamlines in projection mode.
@@ -1162,7 +1125,15 @@
                             <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/FTLE Volume]</span>
                         </legend>  
                         <div class="group_properties_content">
-
+                            <div class="input_row">
+                                <label>show</label>                                
+                                <select id="select_show_volume_side"
+                                    title="Show FTLE volume rendering in the right canvas.">
+                                    <option value="1">both</option>
+                                    <option value="2">forward</option>
+                                    <option value="3">backward</option>
+                                </select>                                
+                            </div>
                         </div>    
                         <div class="group_properties_children">
 
@@ -1208,15 +1179,6 @@
                             <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/Indicators/Bounding Axes/Origin Axes]</span>
                         </legend>  
                         <div class="group_properties_content">
-                            <div class="input_row" id="input_row_emphasize_origin_axes">
-                                <label>emphasize origin axes</label>
-                                <div class="horizontal_div_2">
-                                    <label></label>
-                                    <input id="checkbox_show_origin_axes_side" type="checkbox" value="true"
-                                        checked="true" title="Emphasize the origin axes by allowing separate settings for length and radius.
-    - Right canvas only.">
-                                </div>
-                            </div>
                             <div class="input_row" id="input_row_bounding_axes_origin_length">
                                 <label>length</label>
                                 <div class="horizontal_div_2">
@@ -1271,7 +1233,17 @@
                             <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/Indicators/Seeds]</span>
                         </legend>  
                         <div class="group_properties_content">
-
+                            <div class="input_row">
+                                <label>show</label>
+                                <select id="select_seed_mode_side" title="
+                                This parameter decides how the seeds should be visualized in the right canvas.
+    -none: seeds are not visualized.
+    -once: seeds are visualized once in the fundamental domain.
+    -instance: seeds are visualized in each instance of the fundamental domain.">
+                                                                        <option value="1">once</option>
+                                                                        <option value="2">instance</option>
+                                                                    </select>
+                            </div>
                         </div>    
                         <div class="group_properties_children">
 
@@ -1285,45 +1257,6 @@
                         </legend>  
                         <div class="group_properties_content">
                                 
-    
-
-    
-                            <fieldset class="subgroup_properties">
-                                <legend>Axes</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>show top right axes</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="checkbox_show_movable_axes_main" type="checkbox" value="true"
-                                                checked="true"
-                                                title="Show small axes at the top right corner of the left canvas.">
-                                            <input id="checkbox_show_movable_axes_side" type="checkbox" value="true"
-                                                title="Show small axes at the top right corner of the right canvas.">
-                                        </div>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>show bounding axes</label>
-                                        <div class="horizontal_div_2">
-                                            <input id="checkbox_show_bounding_axes_main" type="checkbox" value="true"
-                                                title="Show axes in 3D space of the left canvas.">
-                                            <input id="checkbox_show_bounding_axes_side" type="checkbox" value="true"
-                                                checked="true" title="Show axes in 3D space of the right canvas.">
-                                        </div>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>projection bounding axes</label>
-                                        <div class="horizontal_div_2">
-                                            <label></label>
-                                            <input id="checkbox_show_bounding_axes_projection_side" type="checkbox" value="true"
-                                                checked="true" title="Show single color axes in projection mode.
-        - Right canvas only.">
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-              
-
-
                             <fieldset class="subgroup_properties">
                                 <legend>Export</legend>
                                 <div class="grid_container">

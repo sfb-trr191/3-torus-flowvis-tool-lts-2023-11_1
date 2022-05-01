@@ -144,9 +144,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");     
         new InputWrapper(this, "input_tube_radius_factor_projection_highlight", "trfph");   
         //settings - streamline shading      
-        new InputWrapper(this, "checkbox_show_seeds_main", "sel");
         new InputWrapper(this, "select_seed_mode_side", "ser");
-        new InputWrapper(this, "checkbox_show_streamlines_main", "ssl");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");
         new InputWrapper(this, "input_formula_scalar", "fs");
         new InputWrapper(this, "input_min_scalar", "smin");
@@ -155,16 +153,10 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_fog_type", "sft");      
         new InputWrapper(this, "input_fog_density", "fd");          
         //settings - axes   
-        new InputWrapper(this, "checkbox_show_movable_axes_main", "mal");    
-        new InputWrapper(this, "checkbox_show_movable_axes_side", "mar");  
-        new InputWrapper(this, "checkbox_show_bounding_axes_main", "bal");  
-        new InputWrapper(this, "checkbox_show_bounding_axes_side", "bar");  
-        new InputWrapper(this, "checkbox_show_bounding_axes_projection_side", "barp");          
         new InputWrapper(this, "input_cube_axes_length_main", "all"); 
         new InputWrapper(this, "input_cube_axes_length_side", "alr"); 
         new InputWrapper(this, "input_cube_axes_radius_main", "arl"); 
         new InputWrapper(this, "input_cube_axes_radius_side", "arr"); 
-        new InputWrapper(this, "checkbox_show_origin_axes_side", "oas"); 
         new InputWrapper(this, "input_cube_axes_origin_length_side", "oll"); 
         new InputWrapper(this, "input_cube_axes_origin_radius_side", "olr"); 
         //settings - volume rendering

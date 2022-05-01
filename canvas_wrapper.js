@@ -123,7 +123,7 @@ class UniformLocationsFTLESlice {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, ftle_manager, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data) {
+    constructor(gl, streamline_context_static, ftle_manager, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data, tree_view) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
@@ -135,6 +135,7 @@ class CanvasWrapper {
         this.global_data = global_data;
         this.p_streamline_context_static = streamline_context_static;
         this.p_ftle_manager = ftle_manager;
+        this.tree_view = tree_view;
         this.aliasing_index = 0;
         this.max_ray_distance = 0;
         this.tube_radius_fundamental = 0.005;
@@ -466,6 +467,7 @@ class CanvasWrapper {
                 break;
         }
 
+        
         var show_volume_rendering = false;
         var show_volume_rendering_forward = false;
         var show_volume_rendering_backward = false;

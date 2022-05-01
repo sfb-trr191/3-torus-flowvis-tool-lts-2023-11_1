@@ -288,9 +288,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         aliasing = new Aliasing();
 
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, ftle_manager, CANVAS_WRAPPER_MAIN,
-            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data);
+            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data, tree_view);
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
-            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data);
+            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data, tree_view);
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
@@ -674,8 +674,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function onChangedDrawMode(){
         var draw_mode = parseInt(document.getElementById("select_side_mode").value);
         var projection_index = parseInt(document.getElementById("select_projection_index").value);
-        var streamline_method = parseInt(document.getElementById("select_side_canvas_streamline_method").value);
-        var streamline_method_projection = parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value);
+        var show_streamlines = tree_view.IsVisibleInHierarchy(9);// ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
+        var streamline_method = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method").value) : STREAMLINE_DRAW_METHOD_NONE;
+        var streamline_method_projection = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value) : STREAMLINE_DRAW_METHOD_NONE;
         canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
         shader_manager.NotifySettingsChanged();
     }
@@ -785,6 +786,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         settings_changed = true;
 
         ui_seeds.UpdateChanges();
+        onChangedDrawMode();
 
         transfer_function_manager.UpdateFromUI();
         canvas_wrapper_transfer_function.transfer_function_changed = true;
@@ -835,10 +837,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_main.cut_at_cube_faces = false;
         canvas_wrapper_main.handle_inside = false;
         canvas_wrapper_main.is_main_renderer = true;
-        canvas_wrapper_main.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_main").checked;
-        canvas_wrapper_main.show_movable_axes = document.getElementById("checkbox_show_movable_axes_main").checked;
+        canvas_wrapper_main.show_bounding_box = tree_view.IsVisibleInHierarchy(4);//document.getElementById("checkbox_show_bounding_axes_main").checked;
+        canvas_wrapper_main.show_movable_axes = tree_view.IsVisibleInHierarchy(5);//document.getElementById("checkbox_show_movable_axes_main").checked;
         canvas_wrapper_main.show_origin_axes = false;//document.getElementById("checkbox_show_origin_axes_main").checked;
-        canvas_wrapper_main.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_main").value);
+        canvas_wrapper_main.volume_rendering_mode = tree_view.IsVisibleInHierarchy(2) ? parseInt(document.getElementById("select_show_volume_main").value) : VOLUME_RENDERING_MODE_NONE;
         canvas_wrapper_main.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
         canvas_wrapper_main.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
@@ -847,8 +849,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_main.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
         canvas_wrapper_main.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
 
-        canvas_wrapper_main.streamline_method = document.getElementById("checkbox_show_streamlines_main").checked ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
-        canvas_wrapper_main.seed_visualization_mode = document.getElementById("checkbox_show_seeds_main").checked ? SEED_VISUALIZATION_MODE_INSTANCE : SEED_VISUALIZATION_MODE_NONE;
+        canvas_wrapper_main.streamline_method = tree_view.IsVisibleInHierarchy(1) ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
+        canvas_wrapper_main.seed_visualization_mode = tree_view.IsVisibleInHierarchy(7) ? SEED_VISUALIZATION_MODE_INSTANCE : SEED_VISUALIZATION_MODE_NONE;
 
         canvas_wrapper_main.CalculateLimitedMaxRayDistance();
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
@@ -887,12 +889,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.cut_at_cube_faces = true;
         canvas_wrapper_side.handle_inside = false;
         canvas_wrapper_side.is_main_renderer = false;
-        canvas_wrapper_side.show_bounding_box = document.getElementById("checkbox_show_bounding_axes_side").checked;
-        canvas_wrapper_side.show_bounding_box_projection = document.getElementById("checkbox_show_bounding_axes_projection_side").checked;
+        canvas_wrapper_side.show_bounding_box = tree_view.IsVisibleInHierarchy(12);//document.getElementById("checkbox_show_bounding_axes_side").checked;
+        canvas_wrapper_side.show_bounding_box_projection = tree_view.IsVisibleInHierarchy(12);//document.getElementById("checkbox_show_bounding_axes_projection_side").checked;
         
-        canvas_wrapper_side.show_movable_axes = document.getElementById("checkbox_show_movable_axes_side").checked;
-        canvas_wrapper_side.show_origin_axes = document.getElementById("checkbox_show_origin_axes_side").checked;
-        canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_show_volume_side").value);
+        canvas_wrapper_side.show_movable_axes = tree_view.IsVisibleInHierarchy(14);//document.getElementById("checkbox_show_movable_axes_side").checked;
+        canvas_wrapper_side.show_origin_axes = tree_view.IsVisibleInHierarchy(13);//document.getElementById("checkbox_show_origin_axes_side").checked;
+        canvas_wrapper_side.volume_rendering_mode = tree_view.IsVisibleInHierarchy(10) ? parseInt(document.getElementById("select_show_volume_side").value) : VOLUME_RENDERING_MODE_NONE;
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
         canvas_wrapper_side.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
@@ -902,7 +904,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
 
         
-        canvas_wrapper_side.seed_visualization_mode = parseInt(document.getElementById("select_seed_mode_side").value);
+        canvas_wrapper_side.seed_visualization_mode = tree_view.IsVisibleInHierarchy(16) ? parseInt(document.getElementById("select_seed_mode_side").value) : SEED_VISUALIZATION_MODE_NONE;
 
 
         canvas_wrapper_side.CalculateLimitedMaxRayDistance();
