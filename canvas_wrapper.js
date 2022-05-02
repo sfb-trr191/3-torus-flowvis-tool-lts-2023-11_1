@@ -309,6 +309,7 @@ class CanvasWrapper {
             this.render_wrapper_raytracing_still_right.resize(gl, width_still, height_still);
             this.camera.SetCorrectResolution();
             this.camera.changed = true;
+            this.aliasing_index = -1;//skip extra frames when changiong resolution
         }
 
         var changed = (width_panning != this.camera.width_panning) || (height_panning != this.camera.height_panning);
@@ -320,11 +321,19 @@ class CanvasWrapper {
             this.render_wrapper_raytracing_panning_right.resize(gl, width_panning, height_panning);
             this.camera.SetCorrectResolution();
             this.camera.changed = true;
+            this.aliasing_index = -1;//skip extra frames when changiong resolution
         }
     }
 
     draw(gl, data_changed, settings_changed) {
         this.AutoUpdateResolution(gl);
+
+        //skip extra frames when changiong resolution
+        if(this.aliasing_index < 0){
+            this.aliasing_index += 1;
+            console.log("skip: ", this.aliasing_index);
+            return;
+        }
 
         if (this.camera.changed || data_changed || settings_changed)
             this.aliasing_index = 0;
