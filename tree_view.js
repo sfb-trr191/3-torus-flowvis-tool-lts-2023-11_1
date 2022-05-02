@@ -43,6 +43,7 @@ class TreeViewNode {
             this.node_header_content.appendChild(this.node_header_content_button_visibility);     
 
             this.node_header_content_button_visibility.addEventListener("click", (event) => {
+                this.tree_view.eyes_changed = true;
                 this.toggleEnabled();
                 event.stopPropagation();
             });
@@ -279,6 +280,7 @@ class TreeView{
         this.node_help_properties = document.getElementById("help_properties");
         this.list_nodes = [];
         this.dict_eye_id_to_node = {};
+        this.eyes_changed = false;
         this.generateNodes();
         this.updateCollapseState();
         this.updateLinkedGroup();

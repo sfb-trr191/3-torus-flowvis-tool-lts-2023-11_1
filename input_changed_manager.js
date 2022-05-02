@@ -78,6 +78,7 @@ class InputChangedManager{
     }
 
     GenerateGroupCalculate(){
+        this.group_calculate.AddInput(document.getElementById("select_space"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_u"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_v"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_w"));

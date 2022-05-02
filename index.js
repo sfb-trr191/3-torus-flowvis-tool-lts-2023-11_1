@@ -404,6 +404,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         updateViewSizes();
 
+        if(tree_view.eyes_changed){
+            console.log("eyes changed");
+            tree_view.eyes_changed = false;
+            UpdateRenderSettings();
+        }
+
         if(sheduled_task == TASK_CALCULATE_STREAMLINES){
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
             document.getElementById("wrapper_transparent_overlay").className = "wrapper";
