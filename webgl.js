@@ -1,6 +1,9 @@
 exports.getRenderingContext = function(canvas) {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+    //set the canvas buffer to 1920x1080, smaller sizes are handled automatically
+    canvas.width = 1920;
+    canvas.height = 1080;
 
     var gl = canvas.getContext("webgl2", {preserveDrawingBuffer: true})
         || canvas.getContext("experimental-webgl");
@@ -11,6 +14,25 @@ exports.getRenderingContext = function(canvas) {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+    console.log("getRenderingContext", gl.drawingBufferWidth, gl.drawingBufferHeight, canvas.width, canvas.height);
+    return gl;
+}
+
+exports.getRenderingContextTransferFunction = function(canvas) {
+    //set the canvas buffer to the fixed size: 512x256
+    canvas.width = 512;
+    canvas.height = 256;
+
+    var gl = canvas.getContext("webgl2", {preserveDrawingBuffer: true})
+        || canvas.getContext("experimental-webgl");
+    if (!gl) {
+        //displayError(ERROR_ID_GET_WEB_GL_CONTEXT);
+        return null;
+    }
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    console.log("getRenderingContextTransferFunction", gl.drawingBufferWidth, gl.drawingBufferHeight, canvas.width, canvas.height);
     return gl;
 }
 

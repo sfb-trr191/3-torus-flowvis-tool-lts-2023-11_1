@@ -41,6 +41,7 @@ const InputManager = require("./input_manager");
 const MouseManager = require("./mouse_manager");
 const module_webgl = require("./webgl");
 const getRenderingContext = module_webgl.getRenderingContext;
+const getRenderingContextTransferFunction = module_webgl.getRenderingContextTransferFunction;
 const UISeeds = require("./ui_seeds");
 const UITransferFunctions = require("./ui_transfer_functions");
 const UILeftToolBar = require("./ui_left_tool_bar");
@@ -207,7 +208,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             return;
         if (!(gl_side = getRenderingContext(side_canvas)))
             return;
-        if (!(gl_transfer_function = getRenderingContext(transfer_function_canvas)))
+        if (!(gl_transfer_function = getRenderingContextTransferFunction(transfer_function_canvas)))
             return;
         console.log(gl);
         console.log(gl_side);
