@@ -6,6 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="css/layout_edit_mode.css" rel="stylesheet" type="text/css" />
+    <link href="css/dialogs.css" rel="stylesheet" type="text/css" />
     <link href="css/buttons.css" rel="stylesheet" type="text/css" />
     <link href="css/transfer_function.css" rel="stylesheet" type="text/css" />
     <link href="css/streamline_calculation.css" rel="stylesheet" type="text/css" />
@@ -64,6 +65,87 @@
         <div class="dialog_progress">
             <h3>Waiting for shaders...</h3>
             This can take a few seconds.
+        </div>
+    </div>
+    <div id="wrapper_dialog_wait_for_shader" class="wrapper">
+        <div class="dialog_export">
+            <fieldset class="group_properties" id="group_properties_export">
+                <legend>Export</legend>
+                <div class="group_properties_content">
+                    <div class="input_row">
+                        <label>thumbnail URL main</label>
+                        <input id="input_thumbnail" type="text" value="">
+                    </div>
+                    <div class="input_row">
+                        <label>thumbnail URL aux.</label>
+                        <input id="input_thumbnail_right" type="text" value="">
+                    </div>
+                    <div class="input_row">
+                        <label>latex thumbnail dir</label>
+                        <input id="input_thumbnail_directory" type="text" value="images/">
+                    </div>
+                    <div class="input_row">
+                        <label>latex thumbnail file main</label>
+                        <input id="input_thumbnail_name" type="text" value="thumbnail_main">
+                    </div>
+                    <div class="input_row">
+                        <label>latex thumbnail file aux.</label>
+                        <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">                        
+                    </div>
+                    <div class="input_row">
+                        <label>selected tab</label>
+                        <select id="select_tab">
+                            <option value="tab_data">data</option>
+                            <option value="tab_ftle">ftle</option>
+                            <option value="tab_settings">settings</option>
+                            <!--
+                            <option value="tab_information">information</option>
+                            <option value="tab_edit">edit</option>
+                            -->
+                            <option value="tab_transfer_function">transfer function</option>
+                            <option value="tab_export">export</option>
+                            <option value="tab_help">help</option>
+                        </select>
+                    </div>
+                </div>    
+                <div class="group_properties_children">
+                    <div id="warning_p" class="warning">
+                        <h3 class="warning_title">Warning</h3>
+                        <p class="warning_text">
+                            For high quality thumbnails it is recommended to deactivate panning mode
+                            by clicking into the canvas and pressing "p".
+                        </p>
+                    </div>
+                    <div id="warning_index" class="warning">
+                        <h3 class="warning_title">Warning</h3>
+                        <p class="warning_text">
+                            For high quality thumbnails it is recommended to wait until the
+                            progress bars at the bottom of both images disappear. This requires that the mouse is
+                            inside the canvas.
+                        </p>
+                    </div>
+                    <div id="warning_thumbnail_url" class="warning">
+                        <h3 class="warning_title">Warning</h3>
+                        <p class="warning_text">
+                            It is recommended to set the thumbnail
+                            URLs before export. If
+                            you do not know the URLs yet, e.g. because you plan to upload the thumbnails to a server
+                            where
+                            you can not choose the URLs of the uploaded images, you can leave them blank for now and:
+                            <ol>
+                                <li class="warning_li">export, in order to obtain the thumbnails,
+                                <li class="warning_li">upload the thumbnails,
+                                <li class="warning_li">insert the URLs of the uploaded thumbnails in the fields above,
+                                <li class="warning_li">export again, to obtain the correct files.
+                            </ol>
+                        </p>
+                    </div>
+                </div>    
+            </fieldset>
+            <fieldset class="group_properties" id="group_properties_export_buttons">
+                <button id="button_dialog_export_export">export</button>
+                <button id="button_dialog_export_cancel">cancel</button>
+            </fieldset>
         </div>
     </div>
     <div id="cookies-eu-banner" style="display: none;">
@@ -1253,65 +1335,7 @@
                         </legend>  
                         <div class="group_properties_content">
                                 
-                            <fieldset class="subgroup_properties">
-                                <legend>Export</legend>
-                                <div class="grid_container">
-                                    <label>thumbnail URL main</label>
-                                    <input id="input_thumbnail" type="text" value="">
-                                    <label>thumbnail URL aux.</label>
-                                    <input id="input_thumbnail_right" type="text" value="">
-                                    <label>latex thumbnail dir</label>
-                                    <input id="input_thumbnail_directory" type="text" value="images/">
-                                    <label>latex thumbnail file main</label>
-                                    <input id="input_thumbnail_name" type="text" value="thumbnail_main">
-                                    <label>latex thumbnail file aux.</label>
-                                    <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">
-                                    <label>selected tab</label>
-                                    <select id="select_tab">
-                                        <option value="tab_data">data</option>
-                                        <option value="tab_ftle">ftle</option>
-                                        <option value="tab_settings">settings</option>
-                                        <!--
-                                        <option value="tab_information">information</option>
-                                        <option value="tab_edit">edit</option>
-                                        -->
-                                        <option value="tab_transfer_function">transfer function</option>
-                                        <option value="tab_export">export</option>
-                                        <option value="tab_help">help</option>
-                                    </select>
-                                </div>
-                                <div id="warning_p" class="warning">
-                                    <h3 class="warning_title">Warning</h3>
-                                    <p class="warning_text">
-                                        For high quality thumbnails it is recommended to deactivate panning mode
-                                        by clicking into the canvas and pressing "p".
-                                    </p>
-                                </div>
-                                <div id="warning_index" class="warning">
-                                    <h3 class="warning_title">Warning</h3>
-                                    <p class="warning_text">
-                                        For high quality thumbnails it is recommended to wait until the
-                                        progress bars at the bottom of both images disappear. This requires that the mouse is
-                                        inside the canvas.
-                                    </p>
-                                </div>
-                                <div id="warning_thumbnail_url" class="warning">
-                                    <h3 class="warning_title">Warning</h3>
-                                    <p class="warning_text">
-                                        It is recommended to set the thumbnail
-                                        URLs before export. If
-                                        you do not know the URLs yet, e.g. because you plan to upload the thumbnails to a server
-                                        where
-                                        you can not choose the URLs of the uploaded images, you can leave them blank for now and:
-                                        <ol>
-                                            <li class="warning_li">export, in order to obtain the thumbnails,
-                                            <li class="warning_li">upload the thumbnails,
-                                            <li class="warning_li">insert the URLs of the uploaded thumbnails in the fields above,
-                                            <li class="warning_li">export again, to obtain the correct files.
-                                        </ol>
-                                    </p>
-                                </div>
-                            </fieldset>
+                            
                         </div>    
                         <div class="group_properties_children">
 
