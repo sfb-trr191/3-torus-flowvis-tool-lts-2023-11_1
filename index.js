@@ -589,10 +589,23 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickSetMagneticField() {
-        document.getElementById("button_set_magnetic_field").addEventListener("click", function () {
+        document.getElementById("button_open_dialog_load").addEventListener("click", function () {
+            document.getElementById("wrapper_dialog_load_field").className = "wrapper";
+        });
+        document.getElementById("button_dialog_load_cancel").addEventListener("click", function () {
+            document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        });
+
+        document.getElementById("fieldset_load_magnetic_field").addEventListener("click", function () {
             console.log("onClickSetMagneticField");
             SetMagneticField();
         });
+
+        document.getElementById("fieldset_load_double_pndulum").addEventListener("click", function () {
+            console.log("onClickSetMagneticField");
+            SetDoublePendulum();
+        });
+        
     }
 
     function addOnClickUpdateURL() {
@@ -603,7 +616,13 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickExport() {
-        document.getElementById("button_export").addEventListener("click", function () {
+        document.getElementById("button_open_dialog_export").addEventListener("click", function () {
+            document.getElementById("wrapper_dialog_export").className = "wrapper";
+        });
+        document.getElementById("button_dialog_export_cancel").addEventListener("click", function () {
+            document.getElementById("wrapper_dialog_export").className = "hidden";
+        });
+        document.getElementById("button_dialog_export_export").addEventListener("click", function () {
             console.log("onClickExport");
             UpdateURL();
             Export(input_parameter_wrapper);
@@ -1136,8 +1155,19 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function SetMagneticField(){
+        document.getElementById("select_space").value = "1";
         document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
         document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+
+    function SetDoublePendulum(){
+        document.getElementById("select_space").value = "2";
+        document.getElementById("input_field_equation_a").value = "sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_x*v_x - sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_y*v_y";
+        document.getElementById("input_field_equation_b").value = "-2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
     }
 
     function UpdateHiddenWarnings() {

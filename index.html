@@ -67,7 +67,7 @@
             This can take a few seconds.
         </div>
     </div>
-    <div id="wrapper_dialog_wait_for_shader" class="wrapper">
+    <div id="wrapper_dialog_export" class="hidden">
         <div class="dialog_export">
             <fieldset class="group_properties" id="group_properties_export">
                 <legend>Export</legend>
@@ -148,6 +148,40 @@
             </fieldset>
         </div>
     </div>
+    <div id="wrapper_dialog_load_field" class="hidden">
+        <div class="dialog_load_field">
+            <fieldset class="group_properties" id="group_properties_load">
+                <legend>Load</legend>
+                <div class="group_properties_content">
+                    <fieldset class="fieldset_load_example" id="fieldset_load_magnetic_field">
+                        <legend>Magnetic Field</legend>
+                        <label>Set equations to magnetic field:</label>
+                        <label>u = cos(2 * PI * z)</label>
+                        <label>v = sin(2 * PI * z)</label>
+                        <label>w remains unchanged</label>
+                    </fieldset>
+                    <fieldset class="fieldset_load_example" id="fieldset_load_double_pndulum">
+                        <legend>Double Pendulum</legend>
+                        <label>Set equations to double pendulum:</label>
+                        <label>a = sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_x*v_x - sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_y*v_y</label>
+                        <label>b = -2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y</label>
+                    </fieldset>                   
+                    <fieldset class="fieldset_load_example">
+                        <legend>Example 1</legend>
+                    </fieldset>
+                    <fieldset class="fieldset_load_example">
+                        <legend>Example 2</legend>
+                    </fieldset>
+                    <fieldset class="fieldset_load_example">
+                        <legend>Example 3</legend>
+                    </fieldset>
+                </div>   
+            </fieldset>
+            <fieldset class="group_properties" id="group_properties_load_buttons">
+                <button id="button_dialog_load_cancel">cancel</button>
+            </fieldset>
+        </div>
+    </div>
     <div id="cookies-eu-banner" style="display: none;">
         By continuing to visit this site, you accept the use of cookies by Google Analytics for statistical purposes.
         <a href="./read-more.html" id="cookies-eu-more">Read more</a>
@@ -203,14 +237,11 @@
                         <button type="button" id="button_randomize_seed_colors"
                             title="Randomize all seed colors"></button>
                     </div>
-                    <div id="wrapper_button_set_magnetic_field">
-                        <button type="button" id="button_set_magnetic_field" title="Set equations to magnetic field:
-    u = cos(2 * PI * z)
-    v = sin(2 * PI * z)
-    w remains unchanged."></button>
+                    <div id="wrapper_button_open_dialog_load">
+                        <button type="button" id="button_open_dialog_load" title="Load Common Field"></button>
                     </div>
                     <div id="wrapper_button_export">
-                        <button type="button" id="button_export" title="Export and download"></button>
+                        <button type="button" id="button_open_dialog_export" title="Export"></button>
                     </div>
                 </fieldset>
 

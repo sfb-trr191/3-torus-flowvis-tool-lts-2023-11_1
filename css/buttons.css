@@ -71,11 +71,11 @@ button {
     background-image: url("../icons/random_color.png");
 }
 
-#button_set_magnetic_field{
-    background-image: url("../icons/magnet.png");
+#button_open_dialog_load{
+    background-image: url("../icons/import.png");
 }
 
-#button_export{
+#button_open_dialog_export{
     background-image: url("../icons/export.png");
 }
 

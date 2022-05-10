@@ -3,7 +3,7 @@ const FileSaver = require("file-saver");
 
 exports.Export = function(input_parameter_wrapper) {
     console.log("Export");
-    document.getElementById("button_export").disabled = true;
+    document.getElementById("button_dialog_export_export").disabled = true;
     var zip = new JSZip();
     var dir_name = document.getElementById("input_thumbnail_directory").value;
     var file_name = document.getElementById("input_thumbnail_name").value;
@@ -45,7 +45,7 @@ exports.Export = function(input_parameter_wrapper) {
             zip.generateAsync({ type: "blob" })
                 .then(function (content) {
                     FileSaver.saveAs(content, "RVF-exported.zip");
-                    document.getElementById("button_export").disabled = false;
+                    document.getElementById("button_dialog_export_export").disabled = false;
                 });
         });  
     });  

@@ -56,3 +56,68 @@
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 0px 0px;
 }
+
+
+
+.dialog_load_field{
+    background: #444;
+    color: #fff;
+    padding: 4px 4px 16px 4px;
+    text-align: center;
+    z-index: 1002;
+
+    position:absolute;
+    top:0%;
+    left:0%;
+    width:50%;
+    height:50%;
+    margin-left:25%;
+    margin-top:12.5%;
+
+    display: grid;
+    gap: 4px; 
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto; 
+}
+
+#group_properties_load{
+
+    overflow-y: scroll;
+    
+    margin: 0px;
+    padding: 0px;
+}
+
+#group_properties_load_buttons{
+
+    margin: 0px;
+    padding: 0px;
+    height: 32px;
+    width: 100%;
+    overflow-y: none;
+
+    display: grid;
+    gap: 4px; 
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+}
+
+#button_dialog_load_cancel {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+.fieldset_load_example{
+    display: grid;
+    gap: 4px; 
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+}
+
+/* Change background color of buttons on hover */
+
+.fieldset_load_example:hover {
+    background-color: rgb(155, 155, 155);
+}
