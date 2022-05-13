@@ -17,11 +17,13 @@
     display: grid;
     gap: 4px; 
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    grid-template-rows: 1fr max-content;
     
 }
 
 #group_properties_export{
+
+    grid-template-rows: max-content 1fr;
 
     overflow-y: scroll;
     
@@ -120,4 +122,25 @@
 
 .fieldset_load_example:hover {
     background-color: rgb(155, 155, 155);
+}
+
+.warning{
+    background-color: rgb(230, 230, 230);
+    border: 3px solid rgb(255, 0, 0);
+    padding: 0px 8px 8px 8px;
+    margin-bottom: 2px;
+}
+
+.warning_text{
+    color: rgb(255, 0, 0);
+    text-align: justify;
+}
+
+.warning_li{
+    color: rgb(255, 0, 0);
+    text-align: left;
+}
+
+.warning_title{
+    color: rgb(255, 0, 0);
 }
