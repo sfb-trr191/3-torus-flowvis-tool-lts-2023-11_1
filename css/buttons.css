@@ -39,6 +39,22 @@ button {
     background-color: rgb(68, 233, 112);
 }
 
+#button_layout_default_mode{
+    background-image: url("../icons/layout_default_mode.png");
+}
+
+#button_layout_edit_mode{
+    background-image: url("../icons/layout_edit_mode.png");
+}
+
+#button_layout_main_view{
+    background-image: url("../icons/layout_main_view.png");
+}
+
+#button_layout_aux_view{
+    background-image: url("../icons/layout_aux_view.png");
+}
+
 #button_request_data{
     background-image: url("../icons/calculator.png");
 }
@@ -87,11 +103,11 @@ button {
     background-image: url("../icons/refresh_camera.png");
 }
 
-.toolbar button.camera_unselected {
+.subgroup_toolbar button.camera_unselected {
     background-image: url("../icons/camera_unselected.png");
 }
 
-.toolbar button.camera_selected {
+.subgroup_toolbar button.camera_selected {
     background-image: url("../icons/camera_selected.png");
 }
 
