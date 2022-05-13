@@ -39,6 +39,10 @@ button {
     background-color: rgb(68, 233, 112);
 }
 
+.tools_button_selected{
+    background-color: rgb(150, 150, 150);
+}
+
 #button_layout_default_mode{
     background-image: url("../icons/layout_default_mode.png");
 }

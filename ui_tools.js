@@ -24,18 +24,33 @@ class UiTools{
 
     loadLayoutDefaultMode(){
         this.setCSS("css/layout_default_mode.css");
+        this.DeselectAll();
+        this.button_layout_default_mode.className = "tools_button_selected";
     }
 
     loadLayoutEditMode(){
         this.setCSS("css/layout_edit_mode.css");
+        this.DeselectAll();
+        this.button_layout_edit_mode.className = "tools_button_selected";
     }
 
     loadLayoutMainView(){
         this.setCSS("css/layout_main_view.css");
+        this.DeselectAll();
+        this.button_layout_main_view.className = "tools_button_selected";
     }
 
     loadLayoutAuxView(){
         this.setCSS("css/layout_aux_view.css");
+        this.DeselectAll();
+        this.button_layout_aux_view.className = "tools_button_selected";
+    }
+
+    DeselectAll(){
+        this.button_layout_default_mode.className = "tools_button";
+        this.button_layout_edit_mode.className = "tools_button";
+        this.button_layout_main_view.className = "tools_button";
+        this.button_layout_aux_view.className = "tools_button";
     }
 
     setCSS(value){
