@@ -139,7 +139,9 @@ class InputParameterWrapper {
         //settings - general
         new InputWrapper(this, "select_settings_mode", "ssm");
         new InputWrapper(this, "input_max_ray_distance", "mrd");
+        new InputWrapper(this, "input_max_ray_distance_aux", "mrda");
         new InputWrapper(this, "input_tube_radius_factor", "trf");
+        new InputWrapper(this, "input_tube_radius_factor_aux", "trfa");
         //settings - projection
         new InputWrapper(this, "input_tube_radius_factor_projection", "trfp");     
         new InputWrapper(this, "input_tube_radius_factor_projection_highlight", "trfph");   

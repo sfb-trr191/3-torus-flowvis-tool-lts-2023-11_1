@@ -901,8 +901,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         //canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
         //SIDE
-        canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
-        canvas_wrapper_side.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
+        canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance_aux").value);
+        canvas_wrapper_side.tube_radius_factor = document.getElementById("input_tube_radius_factor_aux").value;
         canvas_wrapper_side.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_side.tube_radius_factor_projection_highlight = document.getElementById("input_tube_radius_factor_projection_highlight").value;
         
@@ -937,7 +937,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
         console.log("limited_max_distance", canvas_wrapper_side.limited_max_distance);
-        document.getElementById("input_limited_max_ray_distance").value = canvas_wrapper_side.limited_max_distance.toFixed(3);
+        document.getElementById("input_limited_max_ray_distance_aux").value = canvas_wrapper_side.limited_max_distance.toFixed(3);
 
         canvas_wrapper_side.lod_index_panning = document.getElementById("select_lod_panning").value;
         canvas_wrapper_side.lod_index_still = document.getElementById("select_lod_still").value;

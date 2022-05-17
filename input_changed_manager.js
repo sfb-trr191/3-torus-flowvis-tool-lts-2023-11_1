@@ -117,6 +117,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_still_resolution_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_panning_resolution_factor"));
         this.group_render_settings.AddInput(document.getElementById("input_max_ray_distance"));
+        this.group_render_settings.AddInput(document.getElementById("input_max_ray_distance_aux"));
         this.group_render_settings.AddInput(document.getElementById("select_fog_type"));
         this.group_render_settings.AddInput(document.getElementById("input_fog_density"));
         this.group_render_settings.AddInput(document.getElementById("select_shading_mode_streamlines"));
@@ -124,6 +125,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_min_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor"));
+        this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_aux"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection_highlight"));        
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
