@@ -238,7 +238,7 @@
                             title="Randomize all seed colors"></button>
                     </div>
                     <div id="wrapper_button_open_dialog_load">
-                        <button type="button" id="button_open_dialog_load" title="Load Common Field"></button>
+                        <button type="button" id="button_open_dialog_load" title="Load field template"></button>
                     </div>
                     <div id="wrapper_button_export">
                         <button type="button" id="button_open_dialog_export" title="Export"></button>
@@ -403,8 +403,8 @@
                                 <label>calculation method</label>
                                 <select id="select_streamline_calculation_method" title="Streamline calculation method:
     - fundamental domain + R³: all features are supported, but calculation takes longer.
-    - fundamental domain: required for the left canvas.
-    - R³: required for showing streamlines calculated in R³ (right canvas only). 
+    - fundamental domain: required for the main canvas.
+    - R³: required for showing streamlines calculated in R³ (aux canvas only). 
     Allows showing streamlines outside of the fundamental domain 
     and highlighting in the projection view.">
                                     <option value="0">fundamental domain + R³</option>
@@ -433,7 +433,9 @@
                             <div class="input_row" id="input_row_tube_radius_fundamental">
                                 <label>tube radius</label>
                                 <input id="input_tube_radius_fundamental" type="text" value="0.005"
-                                    title="The radius of the streamlines. To allow changing the radius without recalculating the streamlines, this value is then multiplied by the radius factor found in the settings tab.">
+                                    title="The radius of the streamlines. To allow changing the radius without recalculating the streamlines, this value is then multiplied by the radius factor found in:
+    - Streamlines [Root/View/Main View/Visual Objects/Streamlines]
+    - Streamlines [Root/View/Aux View/Visual Objects/Streamlines]">
                             </div>
                             <div class="input_row" id="input_row_max_radius_factor_highlight"
                                 title="The maximum radius factor for highlights. In projection mode, the streamlines in R² can have a larger radius for highlighting purposes.">
@@ -655,9 +657,11 @@
                                     <div class="input_row" id="input_row_volume_rendering_max_distance">
                                         <label>max distance</label>
                                         <input id="input_volume_rendering_max_distance" type="text" value="0" title="Maximum distance of volume rendering.
-        - Volume rendering will not continue beyond the maximum distance specified by 'Settings.General.max distance'.
-        - A value of 0 means that no additional limit is used and 'Settings.General.max distance' is used instead.
-        - Reduce to improve performance.">
+    - Volume rendering will not continue beyond the maximum distance specified by 'max distance' in
+        Camera [Root/View/Main View/Camera] 
+        Camera [Root/View/Aux View/Camera]
+    - A value of 0 means that no additional limit is used and 'max distance' is used instead.
+    - Reduce to improve performance.">
                                     </div>
                                     <div class="input_row" id="input_row_volume_rendering_distance_between_points">
                                         <label>sample distance</label>
@@ -887,7 +891,8 @@
                             <div class="input_row">
                                 <label class="label_todo">tube radius factor</label>
                                 <input id="input_tube_radius_factor" type="text" value="1.0" title="This parameter influences streamlines in 3D space.
-    The actual tube radius is the tube radius from the 'Data' tab multiplied by this radius factor.
+    - The actual tube radius is the 'tube radius' from Streamline Calculation [Root/Data/Streamline Calculation]
+        multiplied by this 'tube radius factor'.
     - Must be between 0 and 1.
     - Smaller values result in lower performance.">
                             </div>
@@ -907,7 +912,7 @@
                             <div class="input_row">
                                 <label>show</label>
                                 <select id="select_show_volume_main"
-                                    title="Show FTLE volume rendering in the left canvas.">
+                                    title="Which FTLE volume rendering is shown.">
                                     <option value="1">both</option>
                                     <option value="2">forward</option>
                                     <option value="3">backward</option>
@@ -1003,7 +1008,7 @@
                             <div class="input_row" id="input_row_side_mode">
                                 <label>Content</label>
                                 <select id="select_side_mode" title="Select what is shown in the right canvas.
-                                - 2D FTLE slice: (warning: possibly unintuitive axes)">
+    - 2D FTLE slice: (warning: possibly unintuitive axes)">
                                                 <option value="1">3D fundamental domain</option>
                                                 <!--DRAW_MODE_DEFAULT-->
                                                 <option selected value="3">2D projection</option>
@@ -1190,7 +1195,8 @@
                             <div class="input_row">
                                 <label class="label_todo_copy">tube radius factor</label>
                                 <input id="input_tube_radius_factor_aux" type="text" value="1.0" title="This parameter influences streamlines in 3D space.
-    The actual tube radius is the tube radius from the 'Data' tab multiplied by this radius factor.
+    - The actual tube radius is the 'tube radius' from Streamline Calculation [Root/Data/Streamline Calculation]
+        multiplied by this 'tube radius factor'.
     - Must be between 0 and 1.
     - Smaller values result in lower performance.">
                             </div>     
@@ -1243,7 +1249,7 @@
                             <div class="input_row">
                                 <label>show</label>                                
                                 <select id="select_show_volume_side"
-                                    title="Show FTLE volume rendering in the right canvas.">
+                                    title="Decides which FTLE volume rendering is shown.">
                                     <option value="1">both</option>
                                     <option value="2">forward</option>
                                     <option value="3">backward</option>
@@ -1345,8 +1351,7 @@
                             <div class="input_row">
                                 <label>show</label>
                                 <select id="select_seed_mode_side" title="
-                                This parameter decides how the seeds should be visualized in the right canvas.
-    -none: seeds are not visualized.
+Decides how the seeds should be visualized in the right canvas.
     -once: seeds are visualized once in the fundamental domain.
     -instance: seeds are visualized in each instance of the fundamental domain.">
                                                                         <option value="1">once</option>
