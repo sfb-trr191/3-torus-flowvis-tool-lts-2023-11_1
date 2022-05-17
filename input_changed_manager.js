@@ -82,6 +82,8 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_field_equation_u"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_v"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_w"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_a"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_b"));
         this.group_calculate.AddInput(document.getElementById("input_num_points_per_streamline"));
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
@@ -144,6 +146,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));       
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     
+        this.group_render_settings.AddInput(document.getElementById("select_seed_mode_side"));     
 
         this.group_render_settings.AddInput(document.getElementById("input_trackball_rotation_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_translation_sensitivity"));  
