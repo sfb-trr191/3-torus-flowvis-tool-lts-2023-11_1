@@ -9,8 +9,9 @@ exports.Export = function(input_parameter_wrapper) {
     var file_name = document.getElementById("input_thumbnail_name").value;
     var file_name_right = document.getElementById("input_thumbnail_name_right").value;
 
-    
-    var query_string = input_parameter_wrapper.toQueryString(false);
+    var use_data_array = false;
+    var is_export = true;
+    var query_string = input_parameter_wrapper.toQueryString(use_data_array, is_export);
     console.log(query_string["default"]);
 
     //direct loading for latex

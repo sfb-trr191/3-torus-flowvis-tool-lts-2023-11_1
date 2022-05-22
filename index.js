@@ -65,6 +65,7 @@ const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
 const TreeView = require("./tree_view");
+const UiTools = require("./ui_tools");
 //const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
@@ -126,6 +127,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     var tree_view;
     var tab_manager;
+    var ui_tools;
     var state_manager;
     var sheduled_task = TASK_CALCULATE_STREAMLINES;
     var fence_sync = null;//used to check if rendering completed
@@ -183,6 +185,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         tab_manager = new TabManager();
         hide_manager = new HideManager(tab_manager);
         tab_manager.Link(hide_manager);
+        ui_tools = new UiTools();
 
         main_canvas = document.getElementById("main_canvas");
         side_canvas = document.getElementById("side_canvas");
@@ -308,7 +311,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager);
+        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools);
         input_parameter_wrapper.fromURL();
         UpdateVersionString();
         RedirectVersion();
@@ -1030,7 +1033,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         side_camera.saveCurrentState();
         //var use_data_array = document.getElementById("checkbox_url_data_array").checked;
         var use_data_array = false;
-        var query_string = input_parameter_wrapper.toQueryString(use_data_array);
+        var is_export = false;
+        var query_string = input_parameter_wrapper.toQueryString(use_data_array, is_export);
         window.history.pushState(null, null, 'index.html' + query_string["default"]);
     }
 

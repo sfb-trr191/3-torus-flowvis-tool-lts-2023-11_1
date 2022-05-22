@@ -84,7 +84,7 @@ class InputWrapper {
 
 class InputParameterWrapper {
 
-    constructor(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager) {
+    constructor(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools) {
         this.tree_view = tree_view;
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
@@ -92,6 +92,7 @@ class InputParameterWrapper {
         this.transfer_function_manager = transfer_function_manager;
         this.tab_manager = tab_manager;
         this.state_manager = state_manager;
+        this.ui_tools = ui_tools;
         this.dict_url_parameter_name_to_input_wrapper = {};
         this.dict_input_element_name_to_input_wrapper = {};
 
@@ -192,7 +193,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
         new InputWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
         new InputWrapper(this, "input_thumbnail_name_right", PARAM_EXPORT_THUMBNAIL_NAME_RIGHT);
-        new InputWrapper(this, "select_tab", PARAM_TAB_MAIN);
+        new InputWrapper(this, "select_export_layout", PARAM_LAYOUT_EXPORT);
         //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
 
     }
@@ -312,14 +313,21 @@ class InputParameterWrapper {
         }
         */
 
-        var tab = urlParams.get(PARAM_TAB_MAIN);
-        var invalid_tab = tab === null || tab === "";
-        if (invalid_tab)
-            tab = "tab_data";
+        var layout = urlParams.get(PARAM_LAYOUT);
+        var layout_export = urlParams.get(PARAM_LAYOUT_EXPORT);
+        var invalid_layout = layout === null || layout === "";
+        var invalid_layout_export = layout === null || layout === "";
+        if (invalid_layout)
+            layout = this.ui_tools.getDefaultLayoutKey();
+        if (invalid_layout_export)
+            layout_export = this.ui_tools.getDefaultLayoutKey();
+        if(layout == "0")
+            layout = layout_export;
+        this.ui_tools.selectLayout(layout);
         //this.tab_manager.selectTab("tab_group_main", tab);
     }
 
-    toQueryString(use_data_array) {
+    toQueryString(use_data_array, is_export) {
         console.log("toURL");
         var params = {};
         if(use_data_array){            
@@ -346,6 +354,14 @@ class InputParameterWrapper {
             params[PARAM_CAMERA] = this.main_camera.toString();
             params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
             params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+
+            if(is_export){
+                params["lay"] = "0";//layout 0 means use the one from export
+            }else{                
+                params["lay"] = this.ui_tools.getSelectedLayoutKey();
+            }
+
+            
 
             params["v_y"] = window["VERSION_YEAR"];
             params["v_m"] = window["VERSION_MONTH"];

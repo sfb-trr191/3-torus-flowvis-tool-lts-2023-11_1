@@ -93,18 +93,12 @@
                         <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">                        
                     </div>
                     <div class="input_row">
-                        <label>selected tab</label>
-                        <select id="select_tab">
-                            <option value="tab_data">data</option>
-                            <option value="tab_ftle">ftle</option>
-                            <option value="tab_settings">settings</option>
-                            <!--
-                            <option value="tab_information">information</option>
-                            <option value="tab_edit">edit</option>
-                            -->
-                            <option value="tab_transfer_function">transfer function</option>
-                            <option value="tab_export">export</option>
-                            <option value="tab_help">help</option>
+                        <label>selected layout</label>
+                        <select id="select_export_layout">
+                            <option value="1">Default Mode</option>
+                            <option value="2">Edit Mode</option>
+                            <option value="3">Main View</option>
+                            <option value="4">Aux View</option>
                         </select>
                     </div>
                 </div>    
@@ -1430,10 +1424,6 @@ Decides how the seeds should be visualized in the right canvas.
     <div id="wrapper_debug_string" class="hidden">
         <p>tick: <strong>0</strong> - frame: <strong>0</strong> - fps: <strong>0</strong></p>
     </div>
-    <script src="./ui_tools.js"></script>
-    <script>
-        new UiTools();
-    </script>
     
 </body>
 
