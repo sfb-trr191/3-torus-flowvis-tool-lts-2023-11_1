@@ -177,6 +177,7 @@ class CanvasWrapper {
         this.transfer_function_index_ftle_backward = 4;
         this.max_volume_distance = 0;// 0=same as limited_max_distance
         this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
+        this.is_exporting = false;
 
 
         this.last_shader_formula_scalar = "";
@@ -288,12 +289,17 @@ class CanvasWrapper {
     AutoUpdateResolution(gl){
         //var width = this.canvas.offsetWidth;
         //var height = this.canvas.offsetHeight;
-
         var width = this.canvas.clientWidth;
-        var height = this.canvas.clientHeight;
-        
+        var height = this.canvas.clientHeight;        
+        this.UpdateResolution(gl, width, height);
+    }
+
+    UpdateResolution(gl, width, height){
         this.canvas_width = width;
         this.canvas_height = height;
+
+        this.canvas.width = width;
+        this.canvas.height = height;
 
         var width_still = Math.round(width * this.still_resolution_factor);
         var height_still = Math.round(height * this.still_resolution_factor);
@@ -325,9 +331,21 @@ class CanvasWrapper {
         }
     }
 
-    draw(gl, data_changed, settings_changed) {
-        this.AutoUpdateResolution(gl);
+    startExport(gl){
+        this.aliasing_index = -1;
+        this.is_exporting = true;
+        this.UpdateResolution(gl, 3840, 2160);     
+        this.camera.repositionCamera(this.draw_mode == DRAW_MODE_PROJECTION, this.projection_index, true);
+        this.camera.UpdateShaderValues(); 
+        this.camera.changed = false;  
+    }
 
+    draw(gl, data_changed, settings_changed) {
+        //automatically change resolution if not exporting
+        if(!this.is_exporting){
+            this.AutoUpdateResolution(gl);                
+        }
+        
         //skip extra frames when changiong resolution
         if(this.aliasing_index < 0){
             this.aliasing_index += 1;
@@ -347,7 +365,7 @@ class CanvasWrapper {
             if(this.camera.other_camera_is_panning)
                 return;   
                          
-            var continue_drawing = this.camera.mouse_in_canvas || this.camera.panning;
+            var continue_drawing = this.camera.mouse_in_canvas || this.camera.panning || this.is_exporting;
             if(!continue_drawing)
                 return;
         }        

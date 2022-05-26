@@ -59,8 +59,7 @@ const InputParameterWrapper = require("./input_parameter_wrapper");
 const module_utility = require("./utility");
 const setCSS = module_utility.setCSS;
 const lerp = module_utility.lerp;
-const module_export = require("./export");
-const Export = module_export.Export;
+const ExportObject = require("./export");
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
@@ -131,6 +130,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     var state_manager;
     var sheduled_task = TASK_CALCULATE_STREAMLINES;
     var fence_sync = null;//used to check if rendering completed
+    var fence_sync_side_export = null;//used to check if rendering completed
+    var export_object = null;
 
     function onStart(evt) {
         console.log("onStart");
@@ -400,6 +401,56 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         requestAnimationFrame(on_update);
     }
 
+    function on_update_export_main(time_now){       
+        var finished = on_update_export_step(canvas_wrapper_main, gl, fence_sync);
+        if(finished){
+            requestAnimationFrame(on_update_export_aux);
+            return;
+        }
+        requestAnimationFrame(on_update_export_main);
+    }
+
+    function on_update_export_aux(time_now){       
+        var finished = on_update_export_step(canvas_wrapper_side, gl_side, fence_sync_side_export);
+        if(finished){
+            export_object = new ExportObject();
+            export_object.startExport(input_parameter_wrapper);
+            requestAnimationFrame(on_update_wait_for_export_finished);
+            return;
+        }
+        requestAnimationFrame(on_update_export_aux);
+    }
+
+    function on_update_wait_for_export_finished(time_now){ 
+        console.log("on_update_wait_for_export_finished"); 
+        if(export_object.finished){
+            requestAnimationFrame(on_update);
+            return;
+        }
+        requestAnimationFrame(on_update_wait_for_export_finished);
+    }
+
+    function on_update_export_step(canvas_wrapper, gl, fence_sync){
+
+        if(canvas_wrapper.aliasing_index == 64){
+            return true;
+        } 
+
+        var render = true;//should we render this tick? assume there is no current rendering process --> we can render
+        //if there is a current rendering process, we only render if it has completed
+        if(fence_sync !== null){
+            var status = gl.getSyncParameter(fence_sync, gl.SYNC_STATUS);
+            render = (status == gl.SIGNALED)
+        }
+        if(render){
+            canvas_wrapper.draw(gl, data_changed, settings_changed);
+            fence_sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+            gl.flush();
+        }
+        console.log(canvas_wrapper.aliasing_index, render, status);
+        return false;
+    }
+
     function on_update(time_now) {
         tick_counter++;
         var deltaTime = (time_now - time_last_tick) / 1000;
@@ -419,6 +470,17 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             requestAnimationFrame(start_calculating);
             return;  
         }
+        
+        if(sheduled_task == TASK_EXPORT){
+            canvas_wrapper_main.startExport(gl);
+            canvas_wrapper_side.startExport(gl_side);
+            sheduled_task = TASK_NONE;
+            requestAnimationFrame(on_update_export_main);
+            return;  
+        }
+
+        canvas_wrapper_main.is_exporting = false;
+        canvas_wrapper_side.is_exporting = false;
 
         if(shader_manager.IsDirty()){
             //message_display.innerHTML = "initialize shaders (1/2)...";
@@ -626,9 +688,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             document.getElementById("wrapper_dialog_export").className = "hidden";
         });
         document.getElementById("button_dialog_export_export").addEventListener("click", function () {
-            console.log("onClickExport");
+            console.log("onClickExport");            
             UpdateURL();
-            Export(input_parameter_wrapper);
+            sheduled_task = TASK_EXPORT;
+            //Export(input_parameter_wrapper);
         });
     }
 
