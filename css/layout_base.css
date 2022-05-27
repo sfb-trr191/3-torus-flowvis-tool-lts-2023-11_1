@@ -398,14 +398,7 @@ legend {
     margin-top:-50px;
 }
 
-.canvas_wrapper{
-    /*
-    display: flex;
-    padding: 4px 4px 4px 4px;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    */
+.canvas_wrapper{   
     display: grid;
     grid-template-columns: minmax(0, 100%);
     grid-template-rows: minmax(0, 100%);
@@ -414,7 +407,18 @@ legend {
     margin: 0;
     width: 100%;
     height: 100%;
-    
+}
+
+.aspect_wrapper_fixed{
+    aspect-ratio: 16 / 9;
+    max-height: 100%;
+    max-width: 100%;
+    justify-self: center;
+}
+
+.aspect_wrapper_flexible{
+    max-height: 100%;
+    max-width: 100%;
 }
 
 canvas {
