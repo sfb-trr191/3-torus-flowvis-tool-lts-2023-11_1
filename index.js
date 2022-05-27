@@ -555,6 +555,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         fps_display.innerHTML = text_fps_panning;
 
         UpdateHiddenWarnings();
+        writeCurrentResolutionToUI();
         input_changed_manager.CheckValuesChanged();
 
         time_last_tick = time_now;
@@ -566,6 +567,50 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         //console.log(main_canvas.offsetWidth, "x", main_canvas.offsetHeight);
         //canvas_wrapper_main
+    }
+
+    function writeCurrentResolutionToUI(){
+        var aspect_wrapper_main = document.getElementById("aspect_wrapper_main");
+        var input_current_resolution_width_main = document.getElementById("input_current_resolution_width_main");
+        var input_current_resolution_height_main = document.getElementById("input_current_resolution_height_main");
+        var input_current_aspect_ratio_main = document.getElementById("input_current_aspect_ratio_main");
+        var checkbox_fixed_aspect_ratio_main = document.getElementById("checkbox_fixed_aspect_ratio_main");
+                
+        handleAspectRatio(side_canvas, aspect_wrapper_main, input_current_resolution_width_main, input_current_resolution_height_main,
+            input_current_aspect_ratio_main, checkbox_fixed_aspect_ratio_main);
+
+        var aspect_wrapper_aux = document.getElementById("aspect_wrapper_aux");
+        var input_current_resolution_width_aux = document.getElementById("input_current_resolution_width_aux");
+        var input_current_resolution_height_aux = document.getElementById("input_current_resolution_height_aux");
+        var input_current_aspect_ratio_aux = document.getElementById("input_current_aspect_ratio_aux");
+        var checkbox_fixed_aspect_ratio_aux = document.getElementById("checkbox_fixed_aspect_ratio_aux");
+                
+        handleAspectRatio(side_canvas, aspect_wrapper_aux, input_current_resolution_width_aux, input_current_resolution_height_aux,
+            input_current_aspect_ratio_aux, checkbox_fixed_aspect_ratio_aux);
+    }
+
+    function handleAspectRatio(canvas, aspect_wrapper, input_current_resolution_width, input_current_resolution_height, 
+        input_current_aspect_ratio, checkbox_fixed_aspect_ratio){
+
+        var width = canvas.width;
+        var height = canvas.height;
+        
+        input_current_resolution_width.value = width.toFixed(0);
+        input_current_resolution_height.value = height.toFixed(0);
+
+        if(checkbox_fixed_aspect_ratio.checked){
+            var ratio_aux = input_current_aspect_ratio.value;
+
+            aspect_wrapper.className = "aspect_wrapper_fixed";
+            aspect_wrapper.style.setProperty("aspect-ratio", ratio_aux);
+        }
+        else{
+            var ratio_aux = width / height;
+            input_current_aspect_ratio.value = ratio_aux.toFixed(4);
+
+            aspect_wrapper.className = "aspect_wrapper_flexible";
+            aspect_wrapper.style.removeProperty("aspect-ratio");
+        }
     }
 
     var buffer;

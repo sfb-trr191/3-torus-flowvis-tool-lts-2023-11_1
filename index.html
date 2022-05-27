@@ -857,6 +857,32 @@
             - Forward and up vector must be orthogonal.">
                                 </div>
                             </div>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Aspect Ratio</legend>
+                                <div class="vertical_container">   
+                                    <div class="input_row">
+                                        <label>current resolution</label>
+                                        <div id="div_input_current_resolution_main" class="horizontal_div_2">
+                                            <input class="input_readonly" id="input_current_resolution_width_main" type="text" 
+                                                value="" readonly
+                                                title="TODO">
+                                            <input class="input_readonly" id="input_current_resolution_height_main" type="text"
+                                                value="" readonly
+                                                title="TODO">
+                                        </div>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>keep aspect ratio</label>
+                                        <div id="div_input_current_aspect_ratio_main" class="horizontal_div_2">
+                                            <input id="checkbox_fixed_aspect_ratio_main" type="checkbox" title="TODO">
+                                            <input id="input_current_aspect_ratio_main" type="text"
+                                                value=""
+                                                title="TODO">
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>    
                         <div class="group_properties_children">
 
@@ -1146,6 +1172,32 @@
             - Forward and up vector must be orthogonal.">
                                 </div>
                             </div>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Aspect Ratio</legend>
+                                <div class="vertical_container">   
+                                    <div class="input_row">
+                                        <label>current resolution</label>
+                                        <div id="div_input_current_resolution_aux" class="horizontal_div_2">
+                                            <input class="input_readonly" id="input_current_resolution_width_aux" type="text" 
+                                                value="" readonly
+                                                title="TODO">
+                                            <input class="input_readonly" id="input_current_resolution_height_aux" type="text"
+                                                value="" readonly
+                                                title="TODO">
+                                        </div>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>keep aspect ratio</label>
+                                        <div id="div_input_current_aspect_ratio_aux" class="horizontal_div_2">
+                                            <input id="checkbox_fixed_aspect_ratio_aux" type="checkbox" title="TODO">
+                                            <input id="input_current_aspect_ratio_aux" type="text"
+                                                value=""
+                                                title="TODO">
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>    
                         <div class="group_properties_children">
 
@@ -1395,7 +1447,7 @@ Decides how the seeds should be visualized in the right canvas.
             <fieldset class="group">
                 <legend>Main View</legend>
                 <div class="canvas_wrapper">
-                    <div class="aspect_wrapper_fixed">
+                    <div class="aspect_wrapper_fixed" id="aspect_wrapper_main">
                         <canvas id="main_canvas" tabindex="1">Your browser does not seem to support
                             HTML5 canvas.</canvas>
                     </div>
@@ -1406,7 +1458,7 @@ Decides how the seeds should be visualized in the right canvas.
             <fieldset class="group">
                 <legend>Aux View</legend>
                 <div class="canvas_wrapper">
-                    <div class="aspect_wrapper_flexible">
+                    <div class="aspect_wrapper_flexible" id="aspect_wrapper_aux">
                         <canvas id="side_canvas" tabindex="2">Your browser does not seem to support
                             HTML5 canvas.</canvas>
                     </div>

@@ -413,7 +413,7 @@ legend {
     aspect-ratio: 16 / 9;
     max-height: 100%;
     max-width: 100%;
-    justify-self: center;
+    /*justify-self: center;*/
 }
 
 .aspect_wrapper_flexible{
@@ -474,4 +474,9 @@ canvas {
     background-color: rgb(240, 240, 240);
     padding: 0%;
     margin: 0%;
+}
+
+.input_readonly {
+    background: rgb(242, 242, 242);
+    border:1px solid rgb(118, 118, 118);
 }
