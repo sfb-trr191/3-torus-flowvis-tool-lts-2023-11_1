@@ -196,6 +196,11 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_export_layout", PARAM_LAYOUT_EXPORT);
         //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
 
+        
+        new InputWrapper(this, "checkbox_fixed_aspect_ratio_main", "karm");
+        new InputWrapper(this, "input_current_aspect_ratio_main", "arm");
+        new InputWrapper(this, "checkbox_fixed_aspect_ratio_aux", "kara");
+        new InputWrapper(this, "input_current_aspect_ratio_aux", "ara");
     }
 
     fromURL() {
