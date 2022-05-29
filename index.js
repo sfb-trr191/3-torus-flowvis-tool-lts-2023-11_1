@@ -179,6 +179,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         addChangedSideMode();
         addChangedCameraControl();
         addChangedTransferFunction();
+        addListenerExportChangedResolution();
         //testWebGPU();
         //testEigenvalueDecomposition();
 
@@ -472,8 +473,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         }
         
         if(sheduled_task == TASK_EXPORT){
-            canvas_wrapper_main.startExport(gl);
-            canvas_wrapper_side.startExport(gl_side);
+            var width_main = parseInt(document.getElementById("input_export_width_main").value);
+            var height_main = parseInt(document.getElementById("input_export_height_main").value);
+            var width_aux = parseInt(document.getElementById("input_export_width_aux").value);
+            var height_aux = parseInt(document.getElementById("input_export_height_aux").value);
+            canvas_wrapper_main.startExport(gl, width_main, height_main);
+            canvas_wrapper_side.startExport(gl_side, width_aux, height_aux);
             sheduled_task = TASK_NONE;
             requestAnimationFrame(on_update_export_main);
             return;  
@@ -576,7 +581,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var input_current_aspect_ratio_main = document.getElementById("input_current_aspect_ratio_main");
         var checkbox_fixed_aspect_ratio_main = document.getElementById("checkbox_fixed_aspect_ratio_main");
                 
-        handleAspectRatio(side_canvas, aspect_wrapper_main, input_current_resolution_width_main, input_current_resolution_height_main,
+        handleAspectRatio(main_canvas, aspect_wrapper_main, input_current_resolution_width_main, input_current_resolution_height_main,
             input_current_aspect_ratio_main, checkbox_fixed_aspect_ratio_main);
 
         var aspect_wrapper_aux = document.getElementById("aspect_wrapper_aux");
@@ -796,6 +801,29 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             canvas_wrapper_side.draw_slice_index = value;
             console.log("slice_index", value);
             UpdateSliceSettings();
+        });
+    }
+
+    function addListenerExportChangedResolution(){
+        document.getElementById("input_export_width_main").addEventListener("change", (event) => {
+            var width = parseInt(document.getElementById("input_export_width_main").value);
+            var aspect_ratio = parseFloat(document.getElementById("input_current_aspect_ratio_main").value);
+            document.getElementById("input_export_height_main").value = Math.round(width / aspect_ratio); 
+        });
+        document.getElementById("input_export_width_aux").addEventListener("change", (event) => {
+            var width = parseInt(document.getElementById("input_export_width_aux").value);
+            var aspect_ratio = parseFloat(document.getElementById("input_current_aspect_ratio_aux").value);
+            document.getElementById("input_export_height_aux").value = Math.round(width / aspect_ratio); 
+        });
+        document.getElementById("input_export_height_main").addEventListener("change", (event) => {
+            var height = parseInt(document.getElementById("input_export_height_main").value);
+            var aspect_ratio = parseFloat(document.getElementById("input_current_aspect_ratio_main").value);
+            document.getElementById("input_export_width_main").value = Math.round(height * aspect_ratio); 
+        });
+        document.getElementById("input_export_height_aux").addEventListener("change", (event) => {
+            var height = parseInt(document.getElementById("input_export_height_aux").value);
+            var aspect_ratio = parseFloat(document.getElementById("input_current_aspect_ratio_aux").value);
+            document.getElementById("input_export_width_aux").value = Math.round(height * aspect_ratio); 
         });
     }
 

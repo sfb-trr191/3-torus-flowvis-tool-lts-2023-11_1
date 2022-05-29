@@ -331,10 +331,10 @@ class CanvasWrapper {
         }
     }
 
-    startExport(gl){
+    startExport(gl, width, height){
         this.aliasing_index = -1;
         this.is_exporting = true;
-        this.UpdateResolution(gl, 3840, 2160);     
+        this.UpdateResolution(gl, width, height);     
         this.camera.repositionCamera(this.draw_mode == DRAW_MODE_PROJECTION, this.projection_index, true);
         this.camera.UpdateShaderValues(); 
         this.camera.changed = false;  
