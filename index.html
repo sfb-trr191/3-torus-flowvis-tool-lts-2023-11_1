@@ -69,56 +69,126 @@
     </div>
     <div id="wrapper_dialog_export" class="hidden">
         <div class="dialog_export">
-            <fieldset class="group_properties" id="group_properties_export">
-                <legend>Export</legend>
+            <fieldset class="group_properties_export" id="group_properties_export_page_1">
+                <legend>Export Wizard</legend>
                 <div class="group_properties_content">
-                    <div class="input_row">
-                        <label>thumbnail URL main</label>
-                        <input id="input_thumbnail" type="text" value="">
-                    </div>
-                    <div class="input_row">
-                        <label>thumbnail URL aux.</label>
-                        <input id="input_thumbnail_right" type="text" value="">
-                    </div>
-                    <div class="input_row">
-                        <label>latex thumbnail dir</label>
-                        <input id="input_thumbnail_directory" type="text" value="images/">
-                    </div>
-                    <div class="input_row">
-                        <label>latex thumbnail file main</label>
-                        <input id="input_thumbnail_name" type="text" value="thumbnail_main">
-                    </div>
-                    <div class="input_row">
-                        <label>latex thumbnail file aux.</label>
-                        <input id="input_thumbnail_name_right" type="text" value="thumbnail_aux">                        
-                    </div>
-                    <div class="input_row">
-                        <label>selected layout</label>
-                        <select id="select_export_layout">
-                            <option value="1">Default Mode</option>
-                            <option value="2">Edit Mode</option>
-                            <option value="3">Main View</option>
-                            <option value="4">Aux View</option>
-                        </select>
-                    </div>
-                    <div class="input_row" id="input_row_export_resolution_main">
-                        <label>export resolution main</label>
-                        <div class="horizontal_div_2">
-                            <input id="input_export_width_main" type="text" value=""
-                                title="TODO">
-                            <input id="input_export_height_main" type="text" value=""
-                                title="TODO">
-                        </div>
-                    </div>
-                    <div class="input_row" id="input_row_export_resolution_aux">
-                        <label>export resolution aux</label>
-                        <div class="horizontal_div_2">
-                            <input id="input_export_width_aux" type="text" value=""
-                                title="TODO">
-                            <input id="input_export_height_aux" type="text" value=""
-                                title="TODO">
-                        </div>
-                    </div>
+                    <fieldset class="subgroup_properties" id="export_page_1">
+                        <legend>Step 1: Export thumbnails</legend>
+                        <div class="vertical_container">
+                            <p>Thumbnails are required to show the field before it is calculated. You can skip this, but it will result in a worse user experience.</p>
+                            <div class="input_row" id="input_row_export_thumbnail_resolution_main">
+                                <label>thumbnail resolution main</label>
+                                <div class="horizontal_div_2">
+                                    <input id="input_export_thumbnail_width_main" type="text" value=""
+                                        title="TODO">
+                                    <input id="input_export_thumbnail_height_main" type="text" value=""
+                                        title="TODO">
+                                </div>
+                            </div>
+                            <div class="input_row" id="input_row_export_thumbnail_resolution_aux">
+                                <label>thumbnail resolution aux</label>
+                                <div class="horizontal_div_2">
+                                    <input id="input_export_thumbnail_width_aux" type="text" value=""
+                                        title="TODO">
+                                    <input id="input_export_thumbnail_height_aux" type="text" value=""
+                                        title="TODO">
+                                </div>
+                            </div>                            
+                        </div>                        
+                    </fieldset>
+
+                    <fieldset class="subgroup_properties" id="export_page_2">
+                        <legend>Step 2: Upload thumbnails</legend>
+                        <div class="vertical_container">
+                            <p>Please upload the thumbnails to your website or an image host and add their URLs below. You can leave those fields blank, but it will result in a worse user experience.</p>
+                            <div class="input_row">
+                                <label>thumbnail URL main</label>
+                                <input id="input_thumbnail" type="text" value="">
+                            </div>
+                            <div class="input_row">
+                                <label>thumbnail URL aux</label>
+                                <input id="input_thumbnail_right" type="text" value="">
+                            </div>   
+                        </div>                        
+                    </fieldset>
+
+                    <fieldset class="subgroup_properties" id="export_page_3">
+                        <legend>Step 3: Export explorable images and embedding code</legend>
+                        <div class="vertical_container">
+                            
+                            <div class="input_row">
+                                <label>LaTeX image directory</label>
+                                <input id="input_latex_image_directory" type="text" value="images/">
+                            </div>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Main View</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>override layout</label>
+                                        <select id="select_override_layout_main">
+                                            <option value="1">Default Mode</option>
+                                            <option value="2">Edit Mode</option>
+                                            <option value="3">Main View</option>
+                                            <option value="4">Aux View</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>LaTeX image filename</label>
+                                        <input id="input_latex_image_name_main" type="text" value="main_view">
+                                    </div> 
+                                    <div class="input_row" id="input_row_export_resolution_main">
+                                        <label>LaTeX image resolution</label>
+                                        <div class="horizontal_div_2">
+                                            <input id="input_export_width_main" type="text" value=""
+                                                title="TODO">
+                                            <input id="input_export_height_main" type="text" value=""
+                                                title="TODO">
+                                        </div>
+                                    </div>
+                                </div>                        
+                            </fieldset>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Aux View</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>override layout</label>
+                                        <select id="select_override_layout_aux">
+                                            <option value="1">Default Mode</option>
+                                            <option value="2">Edit Mode</option>
+                                            <option value="3">Main View</option>
+                                            <option value="4">Aux View</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>LaTeX image filename</label>
+                                        <input id="input_latex_image_name_aux" type="text" value="aux_view">                        
+                                    </div>
+                                    <div class="input_row" id="input_row_export_resolution_aux">
+                                        <label>LaTeX image resolution</label>
+                                        <div class="horizontal_div_2">
+                                            <input id="input_export_width_aux" type="text" value=""
+                                                title="TODO">
+                                            <input id="input_export_height_aux" type="text" value=""
+                                                title="TODO">
+                                        </div>
+                                    </div>
+                                </div>                        
+                            </fieldset>
+                        </div>                        
+                    </fieldset>
+
+
+
+
+
+
+
+
+
+
+
                 </div>    
                 <div class="group_properties_children">
                     <div id="warning_p" class="warning">
@@ -154,9 +224,19 @@
                     </div>
                 </div>    
             </fieldset>
-            <fieldset class="group_properties" id="group_properties_export_buttons">
-                <button id="button_dialog_export_export">export</button>
-                <button id="button_dialog_export_cancel">cancel</button>
+
+            <fieldset class="group_properties_export_buttons" id="group_properties_export_buttons_page_1">
+                <button class="button_dialog_export" id="button_dialog_export_page_1_cancel">cancel</button>
+                <button class="button_dialog_export" id="button_dialog_export_page_1_skip">skip</button>
+                <button class="button_dialog_export" id="button_dialog_export_page_1_next">next</button>
+            </fieldset>
+            <fieldset class="group_properties_export_buttons" id="group_properties_export_buttons_page_2">
+                <button class="button_dialog_export" id="button_dialog_export_page_2_cancel">cancel</button>
+                <button class="button_dialog_export" id="button_dialog_export_page_2_next">next</button>
+            </fieldset>
+            <fieldset class="group_properties_export_buttons" id="group_properties_export_buttons_page_3">
+                <button class="button_dialog_export" id="button_dialog_export_page_3_cancel">cancel</button>
+                <button class="button_dialog_export" id="button_dialog_export_page_3_finish">finish</button>
             </fieldset>
         </div>
     </div>

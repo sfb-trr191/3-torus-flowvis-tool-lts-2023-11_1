@@ -190,10 +190,11 @@ class InputParameterWrapper {
         //export
         new InputWrapper(this, "input_thumbnail", PARAM_THUMBNAIL);
         new InputWrapper(this, "input_thumbnail_right", PARAM_THUMBNAIL_RIGHT);
-        new InputWrapper(this, "input_thumbnail_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
-        new InputWrapper(this, "input_thumbnail_name", PARAM_EXPORT_THUMBNAIL_NAME);
-        new InputWrapper(this, "input_thumbnail_name_right", PARAM_EXPORT_THUMBNAIL_NAME_RIGHT);
-        new InputWrapper(this, "select_export_layout", PARAM_LAYOUT_EXPORT);
+        new InputWrapper(this, "input_latex_image_directory", PARAM_EXPORT_THUMBNAIL_DIRECTORY);
+        new InputWrapper(this, "input_latex_image_name_main", PARAM_EXPORT_THUMBNAIL_NAME);
+        new InputWrapper(this, "input_latex_image_name_aux", PARAM_EXPORT_THUMBNAIL_NAME_RIGHT);
+        new InputWrapper(this, "select_override_layout_main", PARAM_LAYOUT_EXPORT_MAIN);
+        new InputWrapper(this, "select_override_layout_aux", PARAM_LAYOUT_EXPORT_AUX);
         //this.dict_url_parameter_name_to_input_wrapper["test"].setValue(1)
 
         
@@ -319,20 +320,30 @@ class InputParameterWrapper {
         */
 
         var layout = urlParams.get(PARAM_LAYOUT);
-        var layout_export = urlParams.get(PARAM_LAYOUT_EXPORT);
+        //var layout_export = urlParams.get(PARAM_LAYOUT_EXPORT);
         var invalid_layout = layout === null || layout === "";
-        var invalid_layout_export = layout === null || layout === "";
+        //var invalid_layout_export = layout === null || layout === "";
         if (invalid_layout)
             layout = this.ui_tools.getDefaultLayoutKey();
-        if (invalid_layout_export)
-            layout_export = this.ui_tools.getDefaultLayoutKey();
-        if(layout == "0")
-            layout = layout_export;
+        //if (invalid_layout_export)
+        //    layout_export = this.ui_tools.getDefaultLayoutKey();
+        //if(layout == "0")
+        //    layout = layout_export;
         this.ui_tools.selectLayout(layout);
         //this.tab_manager.selectTab("tab_group_main", tab);
     }
 
-    toQueryString(use_data_array, is_export) {
+    toURL(layout_key, is_lazy){
+        var use_data_array = false;
+        var query_string = this.toQueryString(use_data_array, layout_key);
+        var url_without_query = window.location.toString().replace(window.location.search, "");
+        if(is_lazy){
+            url_without_query = url_without_query.replace("index", "lazy");
+        }
+        return url_without_query + query_string;
+    }
+
+    toQueryString(use_data_array, layout_key) {
         console.log("toURL");
         var params = {};
         if(use_data_array){            
@@ -360,11 +371,14 @@ class InputParameterWrapper {
             params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
             params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
 
+            /*
             if(is_export){
                 params["lay"] = "0";//layout 0 means use the one from export
             }else{                
                 params["lay"] = this.ui_tools.getSelectedLayoutKey();
             }
+            */
+            params["lay"] = layout_key;
 
             
 
@@ -391,12 +405,15 @@ class InputParameterWrapper {
             .join('&')
 
         console.log("query_string:", query_string);
+        return query_string + "&c=1";
+        /*
         return {
             "default" : query_string + "&style=" + STYLE_DEFAULT + "&c=1",
             "embedded_main" : query_string + "&style=" + STYLE_EMBEDDED + "&c=1",
             "embedded_aux" : query_string + "&style=" + STYLE_EMBEDDED_RIGHT + "&c=1",
         };
-    }
+        */
+    }    
 }
 
 module.exports = InputParameterWrapper;

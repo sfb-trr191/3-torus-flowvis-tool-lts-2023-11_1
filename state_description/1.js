@@ -93,9 +93,9 @@ exports.state_description_dict = {
         //export
         new Entry("input_thumbnail", "field", "STR"),
         new Entry("input_thumbnail_right", "field", "STR"),
-        new Entry("input_thumbnail_directory", "field", "STR"),
-        new Entry("input_thumbnail_name", "field", "STR"),
-        new Entry("input_thumbnail_name_right", "field", "STR"),
+        new Entry("input_latex_image_directory", "field", "STR"),
+        new Entry("input_latex_image_name_main", "field", "STR"),
+        new Entry("input_latex_image_name_aux", "field", "STR"),
         new Entry("select_tab", "field", "UI8", "tab_names"),
         
         new Entry("current_state_name_main", "global", "STR"),

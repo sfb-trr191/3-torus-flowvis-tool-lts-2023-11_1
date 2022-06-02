@@ -65,6 +65,7 @@ const conversionTest = module_data_conversion.conversionTest;
 const StateManager = require("./state_manager");
 const TreeView = require("./tree_view");
 const UiTools = require("./ui_tools");
+const ExportWizard = require("./export_wizard");
 //const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
@@ -132,6 +133,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     var fence_sync = null;//used to check if rendering completed
     var fence_sync_side_export = null;//used to check if rendering completed
     var export_object = null;
+    var export_wizard;
 
     function onStart(evt) {
         console.log("onStart");
@@ -174,7 +176,6 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         addOnClickRandomizeSeedPositions();
         addOnClickUpdateURL();
         addOnClickSetMagneticField();
-        addOnClickExport();
         addOnClickTabs();
         addChangedSideMode();
         addChangedCameraControl();
@@ -193,6 +194,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         side_canvas = document.getElementById("side_canvas");
         transfer_function_canvas = document.getElementById("transfer_function_canvas");
         fps_display = document.getElementById("fps_display");
+
+        export_wizard = new ExportWizard();
 
         addBlockContextMenu();
         addBlockScroll();
@@ -414,8 +417,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function on_update_export_aux(time_now){       
         var finished = on_update_export_step(canvas_wrapper_side, gl_side, fence_sync_side_export);
         if(finished){
-            export_object = new ExportObject();
-            export_object.startExport(input_parameter_wrapper);
+            export_object.startExport(input_parameter_wrapper, ui_tools);
             requestAnimationFrame(on_update_wait_for_export_finished);
             return;
         }
@@ -465,14 +467,35 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             UpdateRenderSettings();
         }
 
+        //retrieve sheduled task from export wizard
+        if (sheduled_task == TASK_NONE){
+            sheduled_task = export_wizard.getSheduledTask();
+            
+            console.log("sheduled_task:", sheduled_task);
+        }
+
+        //handle sheduled task
         if(sheduled_task == TASK_CALCULATE_STREAMLINES){
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
             document.getElementById("wrapper_transparent_overlay").className = "wrapper";
             requestAnimationFrame(start_calculating);
             return;  
+        }        
+        if(sheduled_task == TASK_EXPORT_THUMBNAIL){
+            UpdateURL();
+            var width_main = parseInt(document.getElementById("input_export_thumbnail_width_main").value);
+            var height_main = parseInt(document.getElementById("input_export_thumbnail_height_main").value);
+            var width_aux = parseInt(document.getElementById("input_export_thumbnail_width_aux").value);
+            var height_aux = parseInt(document.getElementById("input_export_thumbnail_height_aux").value);
+            canvas_wrapper_main.startExport(gl, width_main, height_main);
+            canvas_wrapper_side.startExport(gl_side, width_aux, height_aux);
+            sheduled_task = TASK_NONE;
+            export_object = new ExportObject(TASK_EXPORT_THUMBNAIL);
+            requestAnimationFrame(on_update_export_main);
+            return;  
         }
-        
-        if(sheduled_task == TASK_EXPORT){
+        if(sheduled_task == TASK_EXPORT_LATEX){
+            UpdateURL();
             var width_main = parseInt(document.getElementById("input_export_width_main").value);
             var height_main = parseInt(document.getElementById("input_export_height_main").value);
             var width_aux = parseInt(document.getElementById("input_export_width_aux").value);
@@ -480,9 +503,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             canvas_wrapper_main.startExport(gl, width_main, height_main);
             canvas_wrapper_side.startExport(gl_side, width_aux, height_aux);
             sheduled_task = TASK_NONE;
+            export_object = new ExportObject(TASK_EXPORT_LATEX);
             requestAnimationFrame(on_update_export_main);
             return;  
         }
+
+        
 
         canvas_wrapper_main.is_exporting = false;
         canvas_wrapper_side.is_exporting = false;
@@ -727,21 +753,6 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         document.getElementById("button_update_url").addEventListener("click", function () {
             console.log("onClickUpdateURL");
             UpdateURL();
-        });
-    }
-
-    function addOnClickExport() {
-        document.getElementById("button_open_dialog_export").addEventListener("click", function () {
-            document.getElementById("wrapper_dialog_export").className = "wrapper";
-        });
-        document.getElementById("button_dialog_export_cancel").addEventListener("click", function () {
-            document.getElementById("wrapper_dialog_export").className = "hidden";
-        });
-        document.getElementById("button_dialog_export_export").addEventListener("click", function () {
-            console.log("onClickExport");            
-            UpdateURL();
-            sheduled_task = TASK_EXPORT;
-            //Export(input_parameter_wrapper);
         });
     }
 
@@ -1169,9 +1180,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         side_camera.saveCurrentState();
         //var use_data_array = document.getElementById("checkbox_url_data_array").checked;
         var use_data_array = false;
-        var is_export = false;
-        var query_string = input_parameter_wrapper.toQueryString(use_data_array, is_export);
-        window.history.pushState(null, null, 'index.html' + query_string["default"]);
+        var layout_key = ui_tools.getSelectedLayoutKey();
+        var query_string = input_parameter_wrapper.toQueryString(use_data_array, layout_key);
+        //window.history.pushState(null, null, 'index.html' + query_string["default"]);
+        window.history.pushState(null, null, 'index.html' + query_string);
     }
 
     function RedirectVersion(){

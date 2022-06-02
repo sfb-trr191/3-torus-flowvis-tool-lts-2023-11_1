@@ -78,7 +78,8 @@ global.PARAM_STYLE = "style";
 global.PARAM_THUMBNAIL = "et";
 global.PARAM_THUMBNAIL_RIGHT = "etr";
 global.PARAM_LAYOUT = "lay";
-global.PARAM_LAYOUT_EXPORT = "laye";
+global.PARAM_LAYOUT_EXPORT_MAIN = "laym";
+global.PARAM_LAYOUT_EXPORT_AUX = "laya";
 global.PARAM_SIDE_MODE = "sm";
 global.PARAM_PROJECTION_INDEX = "pi"
 global.PARAM_EXPORT_THUMBNAIL_DIRECTORY = "etd";
@@ -116,7 +117,9 @@ global.PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
 
 global.TASK_NONE = 0;
 global.TASK_CALCULATE_STREAMLINES = 1;
-global.TASK_EXPORT = 2;
+global.TASK_EXPORT_THUMBNAIL = 2;
+global.TASK_EXPORT_LATEX = 3;
+
 
 global.CAMERA_CONTROL_NONE = 0;
 global.CAMERA_CONTROL_TRACKBALL = 1;
