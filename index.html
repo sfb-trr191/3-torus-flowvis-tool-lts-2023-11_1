@@ -135,7 +135,10 @@
                                     </div>
                                     <div class="input_row">
                                         <label>LaTeX image filename</label>
-                                        <input id="input_latex_image_name_main" type="text" value="main_view">
+                                        <div class="horizontal_div_2_fr_max">
+                                            <input id="input_latex_image_name_main" type="text" value="main_view">
+                                            <label>.png</label>
+                                        </div>
                                     </div> 
                                     <div class="input_row" id="input_row_export_resolution_main">
                                         <label>LaTeX image resolution</label>
@@ -163,7 +166,10 @@
                                     </div>
                                     <div class="input_row">
                                         <label>LaTeX image filename</label>
-                                        <input id="input_latex_image_name_aux" type="text" value="aux_view">                        
+                                        <div class="horizontal_div_2_fr_max">
+                                            <input id="input_latex_image_name_aux" type="text" value="aux_view">    
+                                            <label>.png</label>
+                                        </div>                    
                                     </div>
                                     <div class="input_row" id="input_row_export_resolution_aux">
                                         <label>LaTeX image resolution</label>
@@ -191,35 +197,26 @@
 
                 </div>    
                 <div class="group_properties_children">
-                    <div id="warning_p" class="warning">
+                    <div id="warning_thumbnail_size" class="warning">
                         <h3 class="warning_title">Warning</h3>
                         <p class="warning_text">
-                            For high quality thumbnails it is recommended to deactivate panning mode
-                            by clicking into the canvas and pressing "p".
+                            It is recommended to keep the thumbnail size below 1.000.000 pixels to increase loading speed.
+                            Example resolutions:       
+                            <ul>
+                                <li class="warning_li">1000 x 1000 (1:1)
+                                <li class="warning_li">1280 x 720 (16:9)
+                            </ul>
                         </p>
                     </div>
-                    <div id="warning_index" class="warning">
+                    <div id="warning_export_size" class="warning">
                         <h3 class="warning_title">Warning</h3>
                         <p class="warning_text">
-                            For high quality thumbnails it is recommended to wait until the
-                            progress bars at the bottom of both images disappear. This requires that the mouse is
-                            inside the canvas.
-                        </p>
-                    </div>
-                    <div id="warning_thumbnail_url" class="warning">
-                        <h3 class="warning_title">Warning</h3>
-                        <p class="warning_text">
-                            It is recommended to set the thumbnail
-                            URLs before export. If
-                            you do not know the URLs yet, e.g. because you plan to upload the thumbnails to a server
-                            where
-                            you can not choose the URLs of the uploaded images, you can leave them blank for now and:
-                            <ol>
-                                <li class="warning_li">export, in order to obtain the thumbnails,
-                                <li class="warning_li">upload the thumbnails,
-                                <li class="warning_li">insert the URLs of the uploaded thumbnails in the fields above,
-                                <li class="warning_li">export again, to obtain the correct files.
-                            </ol>
+                            The maximum supported export resolution is 33.177.600 pixels.
+                            Example resolutions:       
+                            <ul>
+                                <li class="warning_li">5760 x 5760 (1:1)
+                                <li class="warning_li">7680 x 4320 (16:9)
+                            </ul>
                         </p>
                     </div>
                 </div>    

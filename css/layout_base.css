@@ -322,6 +322,13 @@ legend {
     min-width: 75px;
 }
 
+.horizontal_div_2_fr_max {
+    display: inline-grid;
+    grid-template-columns: 1fr max-content;
+    column-gap: 4px;
+    gap: 4px;
+}
+
 .span_style_properties_legend_name{
     color: rgb(0, 0, 0);    
     font-weight: bold;

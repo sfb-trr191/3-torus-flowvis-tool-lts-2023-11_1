@@ -584,7 +584,6 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             text_fps_panning += "[P]";
         fps_display.innerHTML = text_fps_panning;
 
-        UpdateHiddenWarnings();
         writeCurrentResolutionToUI();
         input_changed_manager.CheckValuesChanged();
 
@@ -1296,69 +1295,6 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         document.getElementById("input_field_equation_b").value = "-2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
         hide_manager.UpdateVisibility();
-    }
-
-    function UpdateHiddenWarnings() {
-        var warning_counter = 0;
-
-        /*
-        var class_name = "hidden";
-        if(main_camera.panning_forced){
-            class_name = "list_entry";
-            warning_counter += 1;
-        }
-        document.getElementById("list_warning_p").className = class_name;
-        */
-
-        var class_name = "hidden";
-        if (main_camera.panning_forced) {
-            class_name = "warning";
-            warning_counter += 1;
-        }
-        document.getElementById("warning_p").className = class_name;
-
-
-        /*
-                class_name = "hidden";
-                if(canvas_wrapper_main.isRenderingIncomplete()){
-                    class_name = "list_entry";
-                    warning_counter += 1;
-                }
-                document.getElementById("list_warning_index").className = class_name;*/
-
-        class_name = "hidden";
-        if (canvas_wrapper_main.isRenderingIncomplete() || canvas_wrapper_side.isRenderingIncomplete()) {
-            class_name = "warning";
-            warning_counter += 1;
-        }
-        document.getElementById("warning_index").className = class_name;
-
-
-        /*
-                var text = document.getElementById("input_thumbnail").value
-                class_name = "hidden";
-                if(text == ""){
-                    class_name = "list_entry";
-                    warning_counter += 1;
-                }
-                document.getElementById("list_warning_thumbnail_url").className = class_name;*/
-
-        var text = document.getElementById("input_thumbnail").value
-        var text2 = document.getElementById("input_thumbnail_right").value
-        class_name = "hidden";
-        if (text == "" || text2 == "") {
-            class_name = "warning";
-            warning_counter += 1;
-        }
-        document.getElementById("warning_thumbnail_url").className = class_name;
-
-        /*
-                class_name = "hidden";
-                if(warning_counter > 0){
-                    class_name = "warning";
-                    warning_counter += 1;
-                }
-                document.getElementById("h_export_warnings").className = class_name;        */
     }
 
     function testWebGPU() {
