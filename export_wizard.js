@@ -2,6 +2,9 @@
 class ExportWizard{
 
     constructor(){
+        this.recommended_thumbnail_budget = 1000000;
+        this.recommended_export_budget = 33177600;
+        this.max_export_budget = 33177600;
         this.page = 1;
         this.sheduled_task = TASK_NONE;
         this.list_indices = [];
@@ -29,7 +32,7 @@ class ExportWizard{
     addListeners() {
         document.getElementById("button_open_dialog_export").addEventListener("click", (event) => {
             document.getElementById("wrapper_dialog_export").className = "wrapper";
-            this.setToDefaultResolution();
+            this.setToRecommendedResolution();
             this.loadPage(1);
         });
         
@@ -127,6 +130,56 @@ class ExportWizard{
         document.getElementById("input_export_height_aux").value = document.getElementById("input_current_resolution_height_aux").value;
     }
 
+    setToRecommendedResolution(){
+        var recommended = this.recommended_thumbnail_budget;
+        this.setToResolution(recommended, "input_export_thumbnail_width_main", "input_export_thumbnail_height_main", "input_current_aspect_ratio_main");
+        this.setToResolution(recommended, "input_export_thumbnail_width_aux", "input_export_thumbnail_height_aux", "input_current_aspect_ratio_aux");
+    
+        var recommended = this.recommended_export_budget;
+        this.setToResolution(recommended, "input_export_width_main", "input_export_height_main", "input_current_aspect_ratio_main");
+        this.setToResolution(recommended, "input_export_width_aux", "input_export_height_aux", "input_current_aspect_ratio_aux" );
+    }
+
+    setToResolution(recommended, width_export_name, height_export_name, name_aspect_ratio){
+        /**
+         * Rectangle with height a and width ab and area c where b is the aspect ratio factor
+         * a*ab = c
+         * a^2 = c/b
+         * a = sqrt(c/b)
+         */
+        var aspect_ratio = parseFloat(document.getElementById(name_aspect_ratio).value);
+        var height_value = Math.floor(Math.sqrt(recommended / aspect_ratio));//a = sqrt(c/b)
+        var width_value = Math.floor(height_value * aspect_ratio);
+        document.getElementById(width_export_name).value = width_value;
+        document.getElementById(height_export_name).value = height_value;
+        this.snapToStandardResolutions(width_export_name, height_export_name);
+    }
+
+    snapToStandardResolutions(width_export_name, height_export_name){
+        var width_value = parseInt(document.getElementById(width_export_name).value);
+        var height_value = parseInt(document.getElementById(height_export_name).value);
+
+        this.snapToResolution(width_value, height_value, 7680, 4320, width_export_name, height_export_name);//16:9
+        this.snapToResolution(width_value, height_value, 5760, 5760, width_export_name, height_export_name);// 1:1
+        
+        this.snapToResolution(width_value, height_value, 1000, 1000, width_export_name, height_export_name);// 1:1
+
+    }
+
+    snapToResolution(width, height, reference_width, reference_height, width_export_name, height_export_name){
+        if(this.isCloseToResolution(width, height, reference_width, reference_height)){
+            document.getElementById(width_export_name).value = reference_width;
+            document.getElementById(height_export_name).value = reference_height;
+        }
+    }
+
+    isCloseToResolution(width, height, reference_width, reference_height){
+        var threshold = 0.0025;
+        var error_width = Math.abs(width-reference_width) / reference_width;
+        var error_height = Math.abs(height-reference_height) / reference_height;
+        return error_width < threshold && error_height < threshold;
+    }
+
     checkExportSizeWarning(){
         var check_max_size = false;
         var check_thumbnail = false;
@@ -153,7 +206,7 @@ class ExportWizard{
         var size_main = width_main * height_main;
         var size_aux = width_aux * height_aux;
 
-        var max_size = 5760 * 5760;
+        var max_size = this.max_export_budget;
         var above_max = size_main > max_size || size_aux > max_size;
         var class_name = "hidden";
         var allow_thumbnail_warning = true;
@@ -163,7 +216,7 @@ class ExportWizard{
         }
         document.getElementById("warning_export_size").className = class_name;
         
-        var recommended = 1000000;
+        var recommended = this.recommended_thumbnail_budget;
         var above_recommended = size_main > recommended || size_aux > recommended;
         var class_name = "hidden";
         if (check_thumbnail && above_recommended && allow_thumbnail_warning) {
