@@ -975,6 +975,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
         //MAIN
+        canvas_wrapper_main.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_main").value);
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
         canvas_wrapper_main.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
@@ -1025,7 +1026,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         console.log("shader_formula_scalar_float", shader_formula_scalar_float);
         //canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
-        //SIDE
+        //SIDE        
+        canvas_wrapper_side.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_aux").value);
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance_aux").value);
         canvas_wrapper_side.tube_radius_factor = document.getElementById("input_tube_radius_factor_aux").value;
         canvas_wrapper_side.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;

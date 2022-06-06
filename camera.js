@@ -214,6 +214,7 @@ class Camera {
         this.rotationSpeed = 1;
         this.rollspeed = 0.5;
         this.changed = true;
+        this.fov_theta = 90.0; 
 
         this.control_mode = CAMERA_CONTROL_ROTATE_AROUND_CAMERA;
         this.trackball_rotation_sensitivity = 1.0;
@@ -462,7 +463,6 @@ class Camera {
 
         var E = this.position;
         glMatrix.vec3.add(T, this.position, this.forward);//T = this.position + this.forward;
-        var theta = 45.0;//radian instead?
         var m = this.height;
         var k = this.width;
         var w = this.up;
@@ -474,8 +474,8 @@ class Camera {
         glMatrix.vec3.cross(b, w, t);//b = QVector3D::crossProduct(w, t);
         glMatrix.vec3.normalize(b_n, b);//b_n = b.normalized();
         glMatrix.vec3.cross(v_n, t_n, b_n)//v_n = QVector3D::crossProduct(t_n, b_n);
-
-        var g_x = d * Math.tan(theta * Math.PI / 180.0);//TODO does M_PI work here?
+        var theta_half = this.fov_theta / 2;
+        var g_x = d * Math.tan(theta_half * Math.PI / 180.0);//TODO does M_PI work here?
         var g_y = g_x * m / (k * 1.0);//TODO is this correct syntax?
 
         //uniforms
