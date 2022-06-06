@@ -75,7 +75,10 @@
                     <fieldset class="subgroup_properties" id="export_page_1">
                         <legend>Step 1: Export thumbnails</legend>
                         <div class="vertical_container">
-                            <p>Thumbnails are required to show the field before it is calculated. You can skip this, but it will result in a worse user experience.</p>
+                            <p>
+                                Thumbnails are required to show the field before it is calculated. You can skip this, but it will result in a worse user experience.
+                                <br><span class="span_style_darkmode_highlight_text_red">You can skip this step, but it will result in a worse user experience.</span>
+                            </p>
                             <div class="input_row" id="input_row_export_thumbnail_resolution_main">
                                 <label>thumbnail resolution main</label>
                                 <div class="horizontal_div_2">
@@ -100,7 +103,7 @@
                     <fieldset class="subgroup_properties" id="export_page_2">
                         <legend>Step 2: Upload thumbnails</legend>
                         <div class="vertical_container">
-                            <p>Please upload the thumbnails to your website or an image host and add their URLs below. You can leave those fields blank, but it will result in a worse user experience.</p>
+                            <p>Please upload the thumbnails to your website or an image hosting service and add their URLs below. You can leave those fields blank, but it will result in a worse user experience.</p>
                             <div class="input_row">
                                 <label>thumbnail URL main</label>
                                 <input id="input_thumbnail" type="text" value="">
@@ -225,7 +228,7 @@
             <fieldset class="group_properties_export_buttons" id="group_properties_export_buttons_page_1">
                 <button class="button_dialog_export" id="button_dialog_export_page_1_cancel">cancel</button>
                 <button class="button_dialog_export" id="button_dialog_export_page_1_skip">skip</button>
-                <button class="button_dialog_export" id="button_dialog_export_page_1_next">next</button>
+                <button class="button_dialog_export" id="button_dialog_export_page_1_next">download & continue</button>
             </fieldset>
             <fieldset class="group_properties_export_buttons" id="group_properties_export_buttons_page_2">
                 <button class="button_dialog_export" id="button_dialog_export_page_2_cancel">cancel</button>
@@ -233,7 +236,7 @@
             </fieldset>
             <fieldset class="group_properties_export_buttons" id="group_properties_export_buttons_page_3">
                 <button class="button_dialog_export" id="button_dialog_export_page_3_cancel">cancel</button>
-                <button class="button_dialog_export" id="button_dialog_export_page_3_finish">finish</button>
+                <button class="button_dialog_export" id="button_dialog_export_page_3_finish">download & finish</button>
             </fieldset>
         </div>
     </div>
@@ -966,19 +969,23 @@
                                         <div id="div_input_current_resolution_main" class="horizontal_div_2">
                                             <input class="input_readonly" id="input_current_resolution_width_main" type="text" 
                                                 value="" readonly
-                                                title="TODO">
+                                                title="current width of the main view in pixels">
                                             <input class="input_readonly" id="input_current_resolution_height_main" type="text"
                                                 value="" readonly
-                                                title="TODO">
+                                                title="current height of the main view in pixels">
                                         </div>
                                     </div>
                                     <div class="input_row">
                                         <label>keep aspect ratio</label>
                                         <div id="div_input_current_aspect_ratio_main" class="horizontal_div_2">
-                                            <input id="checkbox_fixed_aspect_ratio_main" type="checkbox" title="TODO">
+                                            <input id="checkbox_fixed_aspect_ratio_main" type="checkbox" title="select the resizing behavior of the main view:
+    - checked: the view will resize but keep the aspect ratio specified in the field to the right of this checkbox.
+    - unchecked: the view will resize to the maximum available space.">
                                             <input id="input_current_aspect_ratio_main" type="text"
                                                 value=""
-                                                title="TODO">
+                                                title="The aspect ratio of the main view. The behavior of this field depends on whether the checkbox to the left of this field is checked:
+    - checked: the value of this field can be freely modified to achieve a desired aspect ratio.
+    - unchecked: the value of this field is calculated automatically and can not be changed.">
                                         </div>
                                     </div>
                                 </div>
@@ -1286,19 +1293,24 @@
                                         <div id="div_input_current_resolution_aux" class="horizontal_div_2">
                                             <input class="input_readonly" id="input_current_resolution_width_aux" type="text" 
                                                 value="" readonly
-                                                title="TODO">
+                                                title="current width of the aux view in pixels">
                                             <input class="input_readonly" id="input_current_resolution_height_aux" type="text"
                                                 value="" readonly
-                                                title="TODO">
+                                                title="current height of the aux view in pixels">
                                         </div>
                                     </div>
                                     <div class="input_row">
                                         <label>keep aspect ratio</label>
                                         <div id="div_input_current_aspect_ratio_aux" class="horizontal_div_2">
-                                            <input id="checkbox_fixed_aspect_ratio_aux" type="checkbox" title="TODO">
+                                            <input id="checkbox_fixed_aspect_ratio_aux" type="checkbox" 
+                                                title="select the resizing behavior of the aux view:
+    - checked: the view will resize but keep the aspect ratio specified in the field to the right of this checkbox.
+    - unchecked: the view will resize to the maximum available space.">
                                             <input id="input_current_aspect_ratio_aux" type="text"
                                                 value=""
-                                                title="TODO">
+                                                title="The aspect ratio of the aux view. The behavior of this field depends on whether the checkbox to the left of this field is checked:
+    - checked: the value of this field can be freely modified to achieve a desired aspect ratio.
+    - unchecked: the value of this field is calculated automatically and can not be changed.">
                                         </div>
                                     </div>
                                 </div>
