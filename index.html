@@ -76,25 +76,26 @@
                         <legend>Step 1: Export thumbnails</legend>
                         <div class="vertical_container">
                             <p>
-                                Thumbnails are required to show the field before it is calculated. You can skip this, but it will result in a worse user experience.
+                                Thumbnails are small images that serve as a preview before the field is calculated. The settings below are the recommended size for the current aspect ratio.
+                                If you want a different aspect ratio, change it in "Camera" in the tree view.
                                 <br><span class="span_style_darkmode_highlight_text_red">You can skip this step, but it will result in a worse user experience.</span>
                             </p>
                             <div class="input_row" id="input_row_export_thumbnail_resolution_main">
                                 <label>thumbnail resolution main</label>
                                 <div class="horizontal_div_2">
                                     <input id="input_export_thumbnail_width_main" type="text" value=""
-                                        title="TODO">
+                                        title="width of the thumbnail of the main view in pixels">
                                     <input id="input_export_thumbnail_height_main" type="text" value=""
-                                        title="TODO">
+                                        title="height of the thumbnail of the main view in pixels">
                                 </div>
                             </div>
                             <div class="input_row" id="input_row_export_thumbnail_resolution_aux">
                                 <label>thumbnail resolution aux</label>
                                 <div class="horizontal_div_2">
                                     <input id="input_export_thumbnail_width_aux" type="text" value=""
-                                        title="TODO">
+                                        title="width of the thumbnail of the aux view in pixels">
                                     <input id="input_export_thumbnail_height_aux" type="text" value=""
-                                        title="TODO">
+                                        title="height of the thumbnail of the aux view in pixels">
                                 </div>
                             </div>                            
                         </div>                        
@@ -103,14 +104,17 @@
                     <fieldset class="subgroup_properties" id="export_page_2">
                         <legend>Step 2: Upload thumbnails</legend>
                         <div class="vertical_container">
-                            <p>Please upload the thumbnails to your website or an image hosting service and add their URLs below. You can leave those fields blank, but it will result in a worse user experience.</p>
+                            <p>
+                                Please upload the thumbnails to your website or an image hosting service and add their URLs below. 
+                                <br><span class="span_style_darkmode_highlight_text_red">You can leave those fields blank, but no thumbnails will be shown.</span>
+                            </p>
                             <div class="input_row">
                                 <label>thumbnail URL main</label>
-                                <input id="input_thumbnail" type="text" value="">
+                                <input id="input_thumbnail" type="text" value="" title="URL of the thumbnail of the main view">
                             </div>
                             <div class="input_row">
                                 <label>thumbnail URL aux</label>
-                                <input id="input_thumbnail_right" type="text" value="">
+                                <input id="input_thumbnail_right" type="text" value="" title="URL of the thumbnail of the aux view">
                             </div>   
                         </div>                        
                     </fieldset>
@@ -121,15 +125,19 @@
                             
                             <div class="input_row">
                                 <label>LaTeX image directory</label>
-                                <input id="input_latex_image_directory" type="text" value="images/">
+                                <input id="input_latex_image_directory" type="text" value="images/" 
+                                title="Directory where the images are stored relative to the LaTeX file.
+    - If the images are in the same directory leave this field blank.
+    - If the images are stored in a folder called 'images', the content of this field should be 'images/'.">
                             </div>
 
                             <fieldset class="subgroup_properties">
-                                <legend>Main View</legend>
+                                <legend>Main View Image</legend>
                                 <div class="vertical_container">
                                     <div class="input_row">
                                         <label>override layout</label>
-                                        <select id="select_override_layout_main">
+                                        <select id="select_override_layout_main"
+                                        title="the layout that will be shown when the link is opened">
                                             <option value="1">Default Mode</option>
                                             <option value="2">Edit Mode</option>
                                             <option value="3">Main View</option>
@@ -139,7 +147,10 @@
                                     <div class="input_row">
                                         <label>LaTeX image filename</label>
                                         <div class="horizontal_div_2_fr_max">
-                                            <input id="input_latex_image_name_main" type="text" value="main_view">
+                                            <input id="input_latex_image_name_main" type="text" value="main_view"
+                                            title="The filename of the image. This name is used in the LaTeX code snippet. It is recommended to:
+    - use a unique filename, because of the reason below.
+    - not change the filename after export, otherwise the filename needs to be changed inside of the LaTeX code, too.">
                                             <label>.png</label>
                                         </div>
                                     </div> 
@@ -147,20 +158,21 @@
                                         <label>LaTeX image resolution</label>
                                         <div class="horizontal_div_2">
                                             <input id="input_export_width_main" type="text" value=""
-                                                title="TODO">
+                                                title="width of the image of the main view in pixels">
                                             <input id="input_export_height_main" type="text" value=""
-                                                title="TODO">
+                                                title="height of the image of the main view in pixels">
                                         </div>
                                     </div>
                                 </div>                        
                             </fieldset>
 
                             <fieldset class="subgroup_properties">
-                                <legend>Aux View</legend>
+                                <legend>Aux View Image</legend>
                                 <div class="vertical_container">
                                     <div class="input_row">
                                         <label>override layout</label>
-                                        <select id="select_override_layout_aux">
+                                        <select id="select_override_layout_aux" 
+                                        title="the layout that will be shown when the link is opened">
                                             <option value="1">Default Mode</option>
                                             <option value="2">Edit Mode</option>
                                             <option value="3">Main View</option>
@@ -170,7 +182,10 @@
                                     <div class="input_row">
                                         <label>LaTeX image filename</label>
                                         <div class="horizontal_div_2_fr_max">
-                                            <input id="input_latex_image_name_aux" type="text" value="aux_view">    
+                                            <input id="input_latex_image_name_aux" type="text" value="aux_view"
+                                            title="The filename of the image. This name is used in the LaTeX code snippet. It is recommended to:
+    - use a unique filename, because of the reason below.
+    - not change the filename after export, otherwise the filename needs to be changed inside of the LaTeX code, too.">    
                                             <label>.png</label>
                                         </div>                    
                                     </div>
@@ -178,9 +193,9 @@
                                         <label>LaTeX image resolution</label>
                                         <div class="horizontal_div_2">
                                             <input id="input_export_width_aux" type="text" value=""
-                                                title="TODO">
+                                                title="width of the image of the aux view in pixels">
                                             <input id="input_export_height_aux" type="text" value=""
-                                                title="TODO">
+                                                title="height of the image of the aux view in pixels">
                                         </div>
                                     </div>
                                 </div>                        
