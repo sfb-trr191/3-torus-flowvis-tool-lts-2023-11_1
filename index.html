@@ -664,8 +664,7 @@
                                     </div>
                                     <div class="input_row">
                                         <label>scalar</label>
-                                        <select id="select_transfer_function_index_scalar" title="The transfer function used to color streamlines based on a scalar field
-        if 'Settings.Streamline Shading.shading mode' is set to 'scalar field'.">
+                                        <select id="select_transfer_function_index_scalar" title="The transfer function used to color streamlines based on a scalar field if 'View/Streamline Shading/shading mode' is set to 'scalar field'.">
                                             <option value="0">Black Body Radiation</option>
                                             <option value="1">Green Linear</option>
                                             <option value="2">Cool to Warm</option>
@@ -880,9 +879,9 @@
                                         <label>focus distance</label>
                                         <div class="horizontal_div_2">
                                             <input id="input_trackball_focus_distance_left" type="text" value="0.5"
-                                                title="Distance of the focus point from the camera in the left canvas.">
+                                                title="Distance of the focus point from the camera in the main canvas.">
                                             <input id="input_trackball_focus_distance_right" type="text" value="1.5"
-                                                title="Distance of the focus point from the camera in the right canvas.">
+                                                title="Distance of the focus point from the camera in the aux canvas.">
                                         </div>
                                     </div>
                                 </div>
@@ -914,7 +913,7 @@
                         <div class="group_properties_content">
                             <div class="input_row">
                                 <label>control type</label>
-                                <select id="select_camera_control_3d_left" title="The camera control used in the left view.
+                                <select id="select_camera_control_3d_left" title="The camera control used in the main view.
         - Trackball: camera rotates around a focus point in front of the camera.
         - Rotate around camera: camera rotates around camera position.">
                                     <option selected value="1">Trackball</option>
@@ -1087,11 +1086,11 @@
                         <div class="group_properties_content">
                             <div class="input_row" id="input_row_bounding_axes_length">
                                 <label>length</label>
-                                <input id="input_cube_axes_length_main" type="text" value="0.5" title="Length of axes in the left canvas.">
+                                <input id="input_cube_axes_length_main" type="text" value="0.5" title="Length of axes in the main canvas.">
                             </div>
                             <div class="input_row" id="input_row_bounding_axes_radius">
                                 <label>radius</label>
-                                <input id="input_cube_axes_radius_main" type="text" value="0.01" title="Radius of axes in the left canvas.">
+                                <input id="input_cube_axes_radius_main" type="text" value="0.01" title="Radius of axes in the main canvas.">
                             </div>
                         </div>    
                         <div class="group_properties_children">
@@ -1149,7 +1148,7 @@
                         <div class="group_properties_content">
                             <div class="input_row" id="input_row_side_mode">
                                 <label>Content</label>
-                                <select id="select_side_mode" title="Select what is shown in the right canvas.
+                                <select id="select_side_mode" title="Select what is shown in the aux canvas.
     - 2D FTLE slice: (warning: possibly unintuitive axes)">
                                                 <option value="1">3D fundamental domain</option>
                                                 <!--DRAW_MODE_DEFAULT-->
@@ -1238,7 +1237,7 @@
                         <div class="group_properties_content">
                             <div class="input_row">
                                 <label>control type</label>
-                                <select id="select_camera_control_3d_right" title="The camera control used in the right view.
+                                <select id="select_camera_control_3d_right" title="The camera control used in the aux view.
         - Trackball: camera rotates around a focus point in front of the camera.
         - Rotate around camera: camera rotates around camera position.">
                                     <option selected value="1">Trackball</option>
@@ -1460,11 +1459,11 @@
                         <div class="group_properties_content">
                             <div class="input_row" id="input_row_bounding_axes_length_aux">
                                 <label>length</label>
-                                <input id="input_cube_axes_length_side" type="text" value="0.1" title="Length of axes in the right canvas.">                            
+                                <input id="input_cube_axes_length_side" type="text" value="0.1" title="Length of axes in the aux canvas.">                            
                             </div>
                             <div class="input_row" id="input_row_bounding_axes_radius_aux">
                                 <label>radius</label>
-                                <input id="input_cube_axes_radius_side" type="text" value="0.01" title="Radius of axes in the right canvas.">                            
+                                <input id="input_cube_axes_radius_side" type="text" value="0.01" title="Radius of axes in the aux canvas.">                            
                             </div>
                         </div>    
                         <div class="group_properties_children">
@@ -1532,7 +1531,7 @@
                                         <div class="input_row">
                                             <label>show</label>
                                             <select id="select_seed_mode_side" title="
-Decides how the seeds should be visualized in the right canvas.
+Decides how the seeds should be visualized in the aux canvas.
     -once: seeds are visualized once in the fundamental domain.
     -instance: seeds are visualized in each instance of the fundamental domain.">
                                                 <option value="1">once</option>
