@@ -59,6 +59,10 @@ button {
     background-image: url("../icons/layout_aux_view.png");
 }
 
+#button_layout_compare{
+    background-image: url("../icons/layout_compare.png");
+}
+
 #button_request_data{
     background-image: url("../icons/calculator.png");
 }

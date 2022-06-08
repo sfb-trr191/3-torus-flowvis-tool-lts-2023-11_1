@@ -30,6 +30,7 @@ class UiTools{
         this.generateLayoutEntry("2", "edit", "button_layout_edit_mode", "css/layout_edit_mode.css");
         this.generateLayoutEntry("3", "main", "button_layout_main_view", "css/layout_main_view.css");
         this.generateLayoutEntry("4", "aux", "button_layout_aux_view", "css/layout_aux_view.css");
+        this.generateLayoutEntry("5", "aux", "button_layout_compare", "css/layout_compare.css");
     }
 
     generateLayoutEntry(key, name, id_button, css){
