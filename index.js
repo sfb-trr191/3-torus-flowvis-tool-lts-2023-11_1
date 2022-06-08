@@ -92,6 +92,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     var side_camera;
     var main_canvas;
     var side_canvas;
+    var main_thumbnail;
+    var aux_thumbnail;
     var transfer_function_canvas;
     var input_manager;
     var mouse_manager;
@@ -191,6 +193,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         main_canvas = document.getElementById("main_canvas");
         side_canvas = document.getElementById("side_canvas");
+        main_thumbnail = document.getElementById("image_thumbnail_main");
+        aux_thumbnail = document.getElementById("image_thumbnail_aux");
         transfer_function_canvas = document.getElementById("transfer_function_canvas");
         fps_display = document.getElementById("fps_display");
 
@@ -296,9 +300,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         aliasing = new Aliasing();
 
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, ftle_manager, CANVAS_WRAPPER_MAIN,
-            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_camera, aliasing, shader_manager, global_data, tree_view);
+            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_thumbnail, main_camera, aliasing, shader_manager, global_data, tree_view);
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
-            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, side_camera, aliasing, shader_manager, global_data, tree_view);
+            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, aux_thumbnail, side_camera, aliasing, shader_manager, global_data, tree_view);
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
@@ -327,6 +331,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         tree_view.onEyeChanged();
 
         //message_display.innerHTML = "step 2: initializing basic shaders...";
+        writeCurrentResolutionToUI();//required here to show correct thumbnail size
+        canvas_wrapper_main.ShowThumbnail(true);
+        canvas_wrapper_side.ShowThumbnail(true);
         setTimeout(on_start_step_2, 200);
     }
 
@@ -344,6 +351,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function on_fully_loaded() {
         console.log("on_fully_loaded");
+        canvas_wrapper_main.ShowThumbnail(false);
+        canvas_wrapper_side.ShowThumbnail(false);
         //setCSS(input_parameter_wrapper.css_loaded);
         //message_display.innerHTML = "";
     }

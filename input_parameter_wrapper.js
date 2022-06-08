@@ -291,12 +291,12 @@ class InputParameterWrapper {
 
         var invalid_thumbnail = url === null || url === "";
         if (!invalid_thumbnail)
-            document.getElementById("image_thumbnail").src = url;
+            document.getElementById("image_thumbnail_main").src = url;
 
         var url = thumbnail_url_right;
         var invalid_thumbnail = url === null || url === "";
         if (!invalid_thumbnail)
-            document.getElementById("image_thumbnail_right").src = url;  
+            document.getElementById("image_thumbnail_aux").src = url;  
 
         /*
         switch (style) {

@@ -123,10 +123,11 @@ class UniformLocationsFTLESlice {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, ftle_manager, name, canvas, canvas_width, canvas_height, camera, aliasing, shader_manager, global_data, tree_view) {
+    constructor(gl, streamline_context_static, ftle_manager, name, canvas, canvas_width, canvas_height, thumbnail, camera, aliasing, shader_manager, global_data, tree_view) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
+        this.thumbnail = thumbnail;
         this.canvas_width = canvas_width;
         this.canvas_height = canvas_height;
         this.camera = camera;
@@ -196,6 +197,17 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
 
         this.shader_flags = new ShaderFlags();
+    }
+
+    ShowThumbnail(show){
+        if(show){
+            this.canvas.className = "hidden";
+            this.thumbnail.className = "thumbnail";
+        }
+        else{
+            this.canvas.className = "canvas";
+            this.thumbnail.className = "hidden";
+        }
     }
 
     InitializeShaders(gl){    
