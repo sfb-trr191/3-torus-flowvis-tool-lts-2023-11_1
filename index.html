@@ -76,8 +76,9 @@
                         <legend>Step 1: Export thumbnails</legend>
                         <div class="vertical_container">
                             <p>
-                                Thumbnails are small images that serve as a preview before the field is calculated. The settings below are the recommended size for the current aspect ratio.
-                                If you want a different aspect ratio, change it in "Camera" in the tree view.
+                                Before export, it is recommended to check "keep aspect ratio" and specify an aspect ratio in "Camera" in the tree view.   
+                                <br>Thumbnails are small images that serve as a preview before the field is calculated. 
+                                <br>The settings below are the recommended size for the current aspect ratio.
                                 <br><span class="span_style_darkmode_highlight_text_red">You can skip this step, but it will result in a worse user experience.</span>
                             </p>
                             <div class="input_row" id="input_row_export_thumbnail_resolution_main">
@@ -122,7 +123,11 @@
                     <fieldset class="subgroup_properties" id="export_page_3">
                         <legend>Step 3: Export explorable images and embedding code</legend>
                         <div class="vertical_container">
-                            
+                            <p>
+                                It is recommended to set "override layout" (the layout that will be shown when clicking on the link) and choose unique filenames.
+                                <br>The resolutions below are the recommended size for the current aspect ratio.
+                                <br><span class="span_style_darkmode_highlight_text_red">After exporting, check if the downloaded images are correct.<br>If only parts of the images are shown, you might have to reduce the resolution or try using a different computer.</span>
+                            </p>
                             <div class="input_row">
                                 <label>LaTeX image directory</label>
                                 <input id="input_latex_image_directory" type="text" value="images/" 
