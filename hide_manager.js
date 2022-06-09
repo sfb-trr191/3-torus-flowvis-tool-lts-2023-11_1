@@ -289,6 +289,19 @@ class HideManager {
         this.condition_tab_ftle = new TabIsActiveCondition("tab_group_main", "tab_ftle", tab_manager);
         this.condition_tab_export = new TabIsActiveCondition("tab_group_main", "tab_export", tab_manager);
         
+        this.mcir_advection_time = new MultiConditionalInputRow("input_row_streamline_calculation_advection_time");
+        this.condition_advection_time = new ConditionRequiredValue("select_streamline_termination_method",
+            this.mcir_advection_time,
+            STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME, true);
+        this.mcir_advection_time.set_condition(this.condition_advection_time)
+        this.multi_consodtional_elements.push(this.mcir_advection_time);
+
+        this.mcir_arc_length = new MultiConditionalInputRow("input_row_streamline_calculation_arc_length");
+        this.condition_arc_length = new ConditionRequiredValue("select_streamline_termination_method",
+            this.mcir_arc_length,
+            STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH, true);
+        this.mcir_arc_length.set_condition(this.condition_arc_length)
+        this.multi_consodtional_elements.push(this.mcir_arc_length);
         /*
         // BUTTONS
 
@@ -365,6 +378,10 @@ class HideManager {
         for (var i = 0; i < this.multi_consodtional_elements.length; i++) {
             this.multi_consodtional_elements[i].UpdateVisibility();
         }
+
+        //var termination_method = parseInt(document.getElementById("select_streamline_termination_method").value);
+        //document.getElementById("input_row_streamline_calculation_advection_time").className = (termination_method == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME) ? "input_row" : "hidden";
+        //document.getElementById("input_row_streamline_calculation_arc_length").className = (termination_method == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH) ? "input_row" : "hidden";
     }
 }
 

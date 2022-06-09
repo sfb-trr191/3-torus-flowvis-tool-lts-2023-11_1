@@ -59,7 +59,8 @@ class StreamlineContext {
     CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
         shader_formula_a, shader_formula_b,
         input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction,
-        tube_radius_fundamental, max_radius_factor_highlight) {
+        tube_radius_fundamental, max_radius_factor_highlight,
+        termination_condition, termination_advection_time, termination_arc_length) {
         console.log("CalculateStreamlines");
         console.log("tube_radius_fundamental", tube_radius_fundamental)
         console.log("max_radius_factor_highlight", max_radius_factor_highlight)
@@ -67,6 +68,9 @@ class StreamlineContext {
         //this.streamline_generator.streamline_calculation_method = streamline_calculation_method;
         this.ui_seeds.direction = direction;
         
+        this.streamline_generator.termination_condition = termination_condition;
+        this.streamline_generator.termination_advection_time = termination_advection_time;
+        this.streamline_generator.termination_arc_length = termination_arc_length;
         this.streamline_generator.streamline_error_counter = 0;
         this.streamline_generator.space = space;
         this.streamline_generator.direction = direction;

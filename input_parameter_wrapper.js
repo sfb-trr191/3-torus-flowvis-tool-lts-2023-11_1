@@ -107,6 +107,9 @@ class InputParameterWrapper {
         //data
         //data - general
         new InputWrapper(this, "select_space", "space");
+        new InputWrapper(this, "select_streamline_termination_method", "stm");
+        new InputWrapper(this, "input_streamline_calculation_advection_time", "stt");
+        new InputWrapper(this, "input_streamline_calculation_arc_length", "stl");
         //data - equations
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);

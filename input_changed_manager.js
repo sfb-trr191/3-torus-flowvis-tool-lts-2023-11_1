@@ -79,6 +79,9 @@ class InputChangedManager{
 
     GenerateGroupCalculate(){
         this.group_calculate.AddInput(document.getElementById("select_space"));
+        this.group_calculate.AddInput(document.getElementById("select_streamline_termination_method"));
+        this.group_calculate.AddInput(document.getElementById("input_streamline_calculation_advection_time"));
+        this.group_calculate.AddInput(document.getElementById("input_streamline_calculation_arc_length"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_u"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_v"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_w"));

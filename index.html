@@ -536,6 +536,29 @@
                                 <input id="input_num_points_per_streamline" type="text" value="500"
                                     title="The number of points allocated for each streamline.">
                             </div>
+                            <div class="input_row">
+                                <label>termination method</label>
+                                <select id="select_streamline_termination_method" title="Streamline termination method:
+    - points only: stops when the number of points is reached.
+    - advection time: stops when the advection time is reached. [Also stops if the number of points is reached.]
+    - arc length: stops when the arc length is reached. [Also stops if the number of points is reached.]">
+                                    <option value="0">points only</option>
+                                    <option selected value="1">advection time</option>
+                                    <option value="2">arc length</option>
+                                </select>
+                            </div>
+                            <div class="input_row" id="input_row_streamline_calculation_advection_time">
+                                <label>advection time</label>
+                                <input id="input_streamline_calculation_advection_time" type="text" value="1.0"
+                                    title="The advection time used for termination.
+    - Make sure to set the number of points high enough.">
+                            </div>
+                            <div class="input_row" id="input_row_streamline_calculation_arc_length">
+                                <label>arc length</label>
+                                <input id="input_streamline_calculation_arc_length" type="text" value="1.0"
+                                    title="The arc length used for termination.
+    - Make sure to set the number of points high enough.">
+                            </div>
                             <div class="input_row" id="input_row_data_step_size">
                                 <label>step size</label>
                                 <input id="input_step_size" type="text" value="0.0125"

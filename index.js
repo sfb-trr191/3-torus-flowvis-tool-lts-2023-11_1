@@ -902,6 +902,11 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var tube_radius_fundamental = parseFloat(document.getElementById("input_tube_radius_fundamental").value);
         var max_radius_factor_highlight = parseFloat(document.getElementById("input_max_radius_factor_highlight").value);
 
+        var termination_condition = parseInt(document.getElementById("select_streamline_termination_method").value);
+        var termination_advection_time = parseFloat(document.getElementById("input_streamline_calculation_advection_time").value);
+        var termination_arc_length = parseFloat(document.getElementById("input_streamline_calculation_arc_length").value);
+        
+
         canvas_wrapper_main.tube_radius_fundamental = tube_radius_fundamental;
         canvas_wrapper_side.tube_radius_fundamental = tube_radius_fundamental;
         canvas_wrapper_main.tube_radius_outside = max_radius_factor_highlight;
@@ -909,7 +914,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         streamline_context_static.CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, 
             shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b, num_points_per_streamline, step_size, 
-            segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight);
+            segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight, termination_condition, termination_advection_time, termination_arc_length);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
 

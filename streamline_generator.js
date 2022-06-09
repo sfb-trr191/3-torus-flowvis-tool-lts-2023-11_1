@@ -16,6 +16,9 @@ class StreamlineGenerator {
         this.tubeRadius = 0.005;
 
         this.streamline_error_counter = 0;
+        this.termination_condition = STREAMLINE_TERMINATION_CONDITION_POINTS;
+        this.termination_advection_time = 0;
+        this.termination_arc_length = 0;
     }
 
     GenerateExampleSeeds() {
@@ -182,6 +185,8 @@ class StreamlineGenerator {
         var previous_plus_k1_2 = glMatrix.vec3.create();// previousPosition + k1/2
         var previous_plus_k2_2 = glMatrix.vec3.create();// previousPosition + k2/2
         var previous_plus_k3 = glMatrix.vec3.create();// previousPosition + k3
+
+        var arc_length = 0;
         for (var i = 1; i < this.num_points_per_streamline; i++) {
 
             var currentIndex = startIndex + i;
@@ -231,14 +236,26 @@ class StreamlineGenerator {
             var v_current = glMatrix.vec3.length(f_current);
             var v_average = (v_previous + v_current) * 0.5;
             var time_previous = raw_data.data[previousIndex].time;
-            var time_current = time_previous + (this.step_size / v_average);
 
+            var difference = glMatrix.vec3.create();
+            glMatrix.vec3.subtract(difference, currentPosition, previousPosition);
+            var segment_length = glMatrix.vec3.length(difference);
+            arc_length += segment_length;
+
+            var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
+            
+            console.log("time_current", time_current);
 
             if (i == this.num_points_per_streamline - 1)
                 flag = 3;//end of polyline
 
             var terminate = false;
-            if (this.check_bounds) {
+
+            if(this.AdditionalTerminationChecks(time_current, arc_length)){
+                terminate = true;
+                flag = 3;//end of polyline
+            }
+            else if (this.check_bounds) {
                 var outOfBounds = this.CheckOutOfBounds3(currentPosition);
                 if (outOfBounds) {
                     flag = 3;//end of polyline
@@ -261,7 +278,6 @@ class StreamlineGenerator {
                 }
             }
 
-
             raw_data.data[currentIndex].flag = flag;
             raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], 1);
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
@@ -272,6 +288,20 @@ class StreamlineGenerator {
                 break;
 
         }
+    }
+
+    AdditionalTerminationChecks(time_current, arc_length_current){
+        if(this.termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME){
+            if(time_current > this.termination_advection_time){
+                return true;
+            }
+        }
+        if(this.termination_condition == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH){
+            if(arc_length_current > this.termination_arc_length){
+                return true;
+            }
+        }
+        return false;
     }
 
     CalculateRawStreamline2Plus2D(seed_index, raw_data) {
@@ -310,6 +340,8 @@ class StreamlineGenerator {
         var previous_plus_k1_2 = glMatrix.vec4.create();// previousPosition + k1/2
         var previous_plus_k2_2 = glMatrix.vec4.create();// previousPosition + k2/2
         var previous_plus_k3 = glMatrix.vec4.create();// previousPosition + k3
+
+        var arc_length = 0;
         for (var i = 1; i < this.num_points_per_streamline; i++) {
 
             var currentIndex = startIndex + i;
@@ -360,8 +392,14 @@ class StreamlineGenerator {
             var v_current = glMatrix.vec4.length(f_current);
             var v_average = (v_previous + v_current) * 0.5;
             var time_previous = raw_data.data[previousIndex].time;
-            var time_current = time_previous + (this.step_size / v_average);
 
+            var difference = glMatrix.vec4.create();
+            glMatrix.vec3.subtract(difference, currentPosition, previousPosition);
+            var segment_length = glMatrix.vec4.length(difference);
+            arc_length += segment_length;
+
+            var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
+            
             //set values of current index
             raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
             raw_data.data[currentIndex].CalculateAngleFromPosition_3_2();
@@ -406,7 +444,11 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].flag = flag;
 
             var flag_make_new_point = flag_move_new_point || flag_angle_jumping;
-            if(flag_make_new_point && i < this.num_points_per_streamline - 2){
+            if(this.AdditionalTerminationChecks(time_current, arc_length)){
+                terminate = true;
+                raw_data.data[currentIndex].flag = 3;//end of polyline
+            }
+            else if(flag_make_new_point && i < this.num_points_per_streamline - 2){
                 var newPosition = glMatrix.vec4.create();
                 glMatrix.vec4.copy(newPosition, currentPosition);
                 if(flag_move_new_point){
