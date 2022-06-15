@@ -215,20 +215,50 @@ class TreeViewNode {
     onHeaderClicked(event){
         var ctrl_pressed = event.getModifierState("Control");
         var shift_pressed = event.getModifierState("Shift");
+        //shift --> no children
         if(shift_pressed){
+            var toggle_state = !this.selected;   
+            if(!ctrl_pressed){
+                this.tree_view.deselect();
+                this.selected = true;
+            }else{
+                this.selected = toggle_state;
+            }
+        }
+        //no shift --> with all children
+        else{  
+            var toggle_state = !this.selected;          
+            if(!ctrl_pressed){
+                this.tree_view.deselect();
+                this.selectWithAllChildren(true);
+            }else{
+                this.selectWithAllChildren(toggle_state);
+            }
+        }
+
+
+        /*
+
+                //shift --> no children
+        if(shift_pressed){
+            var toggle_state = !this.selected;   
             if(!ctrl_pressed){
                 this.tree_view.deselect();
             }
-            this.selectWithAllChildren();
-        }
-        else if(ctrl_pressed){
-            this.toggleSelected();
-        }
-        else{         
-            var toggle_state = !this.selected;   
-            this.tree_view.deselect();
             this.selected = toggle_state;
         }
+        //no shift --> with all children
+        else{  
+            var toggle_state = !this.selected;          
+            if(!ctrl_pressed){
+                this.tree_view.deselect();
+            }
+            this.selectWithAllChildren(toggle_state);
+        }
+
+
+        */
+
         this.tree_view.updateHeaderClass();
         this.tree_view.updateLinkedGroup();
         this.tree_view.updatePropertiesHelp();
@@ -238,15 +268,15 @@ class TreeViewNode {
         this.selected = !this.selected;
     }
 
-    selectWithAllChildren(){
-        this.selected = true;
+    selectWithAllChildren(select){
+        this.selected = select;
         var stack = [];
         for(var i=0; i<this.list_children.length; i++){
             stack.push(this.list_children[i]);
         }
         while(stack.length > 0){            
             var node = stack.pop();
-            node.selected = true;
+            node.selected = select;
             for(var i=0; i<node.list_children.length; i++){
                 stack.push(node.list_children[i]);
             }

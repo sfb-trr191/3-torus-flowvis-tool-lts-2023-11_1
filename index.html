@@ -1594,13 +1594,18 @@ Decides how the seeds should be visualized in the aux canvas.
                     </fieldset>
 
                     <div class="shown" id="help_properties">
-                        <p>Click on a node in the tree view to show its properties:
+                        <p>Click on a node in the tree view to select what is shown in the properties view:
                             <ul>
-                                <li>left click: deselect all nodes and select/deselect clicked node</li>
-                                <li>ctrl + left click: add/remove clicked node from selection</li>
-                                <li>shift + left click: deselect all nodes and select clicked node and all childen (recursively)</li>
+                                <li>left click without modifiers: deselect all nodes and select clicked node and all childen (recursively)</li>
                             </ul>
                         </p>
+                        <p>The following modifiers change the behavior:
+                            <ul>
+                                <li>ctrl: add/remove from selection</li>
+                                <li>shift: ignore children</li>
+                            </ul>
+                        </p>
+                        <p>The modifiers can be combined.</p>
                     </div>
 
 
