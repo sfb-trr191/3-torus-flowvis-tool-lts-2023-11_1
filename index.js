@@ -415,6 +415,11 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function on_update_export_main(time_now){       
         var finished = on_update_export_step(canvas_wrapper_main, gl, fence_sync);
+        if(export_wizard.cancel){
+            requestAnimationFrame(on_update);
+            export_wizard.OnExportCancelled();
+            return;
+        }
         if(finished){
             requestAnimationFrame(on_update_export_aux);
             return;
@@ -424,6 +429,11 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function on_update_export_aux(time_now){       
         var finished = on_update_export_step(canvas_wrapper_side, gl_side, fence_sync_side_export);
+        if(export_wizard.cancel){
+            requestAnimationFrame(on_update);
+            export_wizard.OnExportCancelled();
+            return;
+        }
         if(finished){
             export_object.startExport(input_parameter_wrapper, ui_tools);
             requestAnimationFrame(on_update_wait_for_export_finished);
@@ -435,6 +445,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function on_update_wait_for_export_finished(time_now){ 
         console.log("on_update_wait_for_export_finished"); 
         if(export_object.finished){
+            export_wizard.OnExportFinished();
             requestAnimationFrame(on_update);
             return;
         }

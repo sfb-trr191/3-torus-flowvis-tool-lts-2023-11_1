@@ -10,6 +10,7 @@ class ExportWizard{
         this.list_indices = [];
         this.list_pages = [];
         this.list_page_buttons = [];
+        this.cancel = false;
         this.addPages();
         this.addListeners();
         this.addListenersExportChangedResolution();
@@ -19,14 +20,20 @@ class ExportWizard{
         this.list_indices.push(1);
         this.list_indices.push(2);
         this.list_indices.push(3);
+        this.list_indices.push(4);
+        this.list_indices.push(5);
 
         this.list_pages.push(document.getElementById("export_page_1"));        
         this.list_pages.push(document.getElementById("export_page_2"));        
-        this.list_pages.push(document.getElementById("export_page_3"));
+        this.list_pages.push(document.getElementById("export_page_3"));    
+        this.list_pages.push(document.getElementById("export_page_4"));    
+        this.list_pages.push(document.getElementById("export_page_5"));
 
         this.list_page_buttons.push(document.getElementById("group_properties_export_buttons_page_1"));
         this.list_page_buttons.push(document.getElementById("group_properties_export_buttons_page_2"));
         this.list_page_buttons.push(document.getElementById("group_properties_export_buttons_page_3"));
+        this.list_page_buttons.push(document.getElementById("group_properties_export_buttons_page_4"));
+        this.list_page_buttons.push(document.getElementById("group_properties_export_buttons_page_5"));
     }
 
     addListeners() {
@@ -34,34 +41,46 @@ class ExportWizard{
             document.getElementById("wrapper_dialog_export").className = "wrapper";
             this.setToRecommendedResolution();
             this.loadPage(1);
+            this.cancel = false;
         });
         
-        //PAGE 1
+        //PAGE 1 - Step 1
         document.getElementById("button_dialog_export_page_1_cancel").addEventListener("click", (event) => {
             document.getElementById("wrapper_dialog_export").className = "hidden";
         });
         document.getElementById("button_dialog_export_page_1_skip").addEventListener("click", (event) => {
-            this.loadPage(2);
+            this.loadPage(3);
         });
         document.getElementById("button_dialog_export_page_1_next").addEventListener("click", (event) => {
             this.sheduled_task = TASK_EXPORT_THUMBNAIL;
             this.loadPage(2);
         });
 
-        //PAGE 2
+        //PAGE 2 - Waiting
         document.getElementById("button_dialog_export_page_2_cancel").addEventListener("click", (event) => {
-            document.getElementById("wrapper_dialog_export").className = "hidden";
-        });
-        document.getElementById("button_dialog_export_page_2_next").addEventListener("click", (event) => {
-            this.loadPage(3);
+            this.cancel = true;
         });
 
-        //PAGE 3
+        //PAGE 3 - Step 2
         document.getElementById("button_dialog_export_page_3_cancel").addEventListener("click", (event) => {
             document.getElementById("wrapper_dialog_export").className = "hidden";
         });
-        document.getElementById("button_dialog_export_page_3_finish").addEventListener("click", (event) => {
+        document.getElementById("button_dialog_export_page_3_next").addEventListener("click", (event) => {
+            this.loadPage(4);
+        });
+
+        //PAGE 4 - Step 3
+        document.getElementById("button_dialog_export_page_4_cancel").addEventListener("click", (event) => {
+            document.getElementById("wrapper_dialog_export").className = "hidden";
+        });
+        document.getElementById("button_dialog_export_page_4_finish").addEventListener("click", (event) => {
             this.sheduled_task = TASK_EXPORT_LATEX;
+            this.loadPage(5);
+        });
+
+        //PAGE 5 - Waiting
+        document.getElementById("button_dialog_export_page_5_cancel").addEventListener("click", (event) => {
+            this.cancel = true;
         });
     }
 
@@ -246,6 +265,22 @@ class ExportWizard{
                 this.list_page_buttons[i].className = "hidden";       
             }
         }
+
+    }
+
+    OnExportFinished(){
+        console.log("OnExportFinished");
+        if(this.page === 2){
+            this.loadPage(this.page + 1);
+        }
+        else{
+            document.getElementById("wrapper_dialog_export").className = "hidden";
+        }
+    }
+
+    OnExportCancelled(){
+        console.log("OnExportCancelled");
+        document.getElementById("wrapper_dialog_export").className = "hidden";
 
     }
     
