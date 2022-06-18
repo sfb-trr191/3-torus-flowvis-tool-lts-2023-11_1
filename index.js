@@ -136,6 +136,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     var fence_sync_side_export = null;//used to check if rendering completed
     var export_object = null;
     var export_wizard;
+    var block_all_input = false;
 
     function onStart(evt) {
         console.log("onStart");
@@ -479,6 +480,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var deltaTimeDraw = (time_now - time_last_draw) / 1000;
 
         updateViewSizes();
+        ActivateInput();
 
         if(tree_view.eyes_changed){
             console.log("eyes changed");
@@ -495,12 +497,14 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         //handle sheduled task
         if(sheduled_task == TASK_CALCULATE_STREAMLINES){
+            DeactivateInput();
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
             document.getElementById("wrapper_transparent_overlay").className = "wrapper";
             requestAnimationFrame(start_calculating);
             return;  
         }        
         if(sheduled_task == TASK_EXPORT_THUMBNAIL){
+            DeactivateInput();
             UpdateURL();
             var width_main = parseInt(document.getElementById("input_export_thumbnail_width_main").value);
             var height_main = parseInt(document.getElementById("input_export_thumbnail_height_main").value);
@@ -514,6 +518,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             return;  
         }
         if(sheduled_task == TASK_EXPORT_LATEX){
+            DeactivateInput();
             UpdateURL();
             var width_main = parseInt(document.getElementById("input_export_width_main").value);
             var height_main = parseInt(document.getElementById("input_export_height_main").value);
@@ -679,19 +684,17 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickRequestData() {
-        document.getElementById("button_request_data").addEventListener("click", function () {
+        document.getElementById("button_request_data").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickRequestData");
-            //MARKER url changes
-            //window.location.href = window.location.pathname + '?u=123';
-            //window.history.replaceState(null, null, 'index.html?u=123');
-            
-            //CalculateStreamlines();
-            //UpdateRenderSettings();
-            //UpdateGlobalData();
-            //UpdateURL();
             sheduled_task = TASK_CALCULATE_STREAMLINES;
         });
-        document.getElementById("button_calculate_ftle").addEventListener("click", function () {
+        document.getElementById("button_calculate_ftle").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickCalculateFTLE");
             CalculateFTLE();
         });
@@ -699,12 +702,18 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickUpdateRenderSettings() {
-        document.getElementById("button_render_settings").addEventListener("click", function () {
+        document.getElementById("button_render_settings").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickUpdateRenderSettings");
             UpdateRenderSettings();
             UpdateGlobalData();
         });
-        document.getElementById("button_data_update_render_settings").addEventListener("click", function () {
+        document.getElementById("button_data_update_render_settings").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickUpdateRenderSettings");
             UpdateRenderSettings();
             UpdateGlobalData();
@@ -712,7 +721,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickUpdateCamera() {
-        document.getElementById("button_update_camera").addEventListener("click", function () {
+        document.getElementById("button_update_camera").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickUpdateCamera");
             UpdateCamera();
             UpdateSideCamera();
@@ -720,22 +732,34 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickAddSeed() {
-        document.getElementById("button_add_seed").addEventListener("click", function () {
+        document.getElementById("button_add_seed").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickAddSeed");
             AddSeed();
         });
-        document.getElementById("button_add_multi_seed").addEventListener("click", function () {
+        document.getElementById("button_add_multi_seed").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickAddMultiSeed");
             AddMultiSeed();
         });
     }
 
     function addOnClickRandomizeSeedPositions() {
-        document.getElementById("button_randomize_seed_positions").addEventListener("click", function () {
+        document.getElementById("button_randomize_seed_positions").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickRandomizeSeedPositions");
             RandomizeSeedPositions();
         });
-        document.getElementById("button_randomize_seed_colors").addEventListener("click", function () {
+        document.getElementById("button_randomize_seed_colors").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickRandomizeSeedColors");
             RandomizeSeedColors();
         });
@@ -748,19 +772,31 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickSetMagneticField() {
-        document.getElementById("button_open_dialog_load").addEventListener("click", function () {
+        document.getElementById("button_open_dialog_load").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             document.getElementById("wrapper_dialog_load_field").className = "wrapper";
         });
-        document.getElementById("button_dialog_load_cancel").addEventListener("click", function () {
+        document.getElementById("button_dialog_load_cancel").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             document.getElementById("wrapper_dialog_load_field").className = "hidden";
         });
 
-        document.getElementById("fieldset_load_magnetic_field").addEventListener("click", function () {
+        document.getElementById("fieldset_load_magnetic_field").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickSetMagneticField");
             SetMagneticField();
         });
 
-        document.getElementById("fieldset_load_double_pndulum").addEventListener("click", function () {
+        document.getElementById("fieldset_load_double_pndulum").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickSetMagneticField");
             SetDoublePendulum();
         });
@@ -768,26 +804,41 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     }
 
     function addOnClickUpdateURL() {
-        document.getElementById("button_update_url").addEventListener("click", function () {
+        document.getElementById("button_update_url").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClickUpdateURL");
             UpdateURL();
         });
     }
 
     function addOnClickTabs() {
-        document.getElementById("button_tab_data").addEventListener("click", function () {
+        document.getElementById("button_tab_data").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClick: button_tab_data");
             tab_manager.selectTab("tab_group_main", "tab_data");
         });
-        document.getElementById("button_tab_ftle").addEventListener("click", function () {
+        document.getElementById("button_tab_ftle").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClick: button_tab_ftle");
             tab_manager.selectTab("tab_group_main", "tab_ftle");
         });
-        document.getElementById("button_tab_settings").addEventListener("click", function () {
+        document.getElementById("button_tab_settings").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClick: button_tab_settings");
             tab_manager.selectTab("tab_group_main", "tab_settings");
         });
-        document.getElementById("button_tab_transfer_function").addEventListener("click", function () {
+        document.getElementById("button_tab_transfer_function").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClick: button_tab_transfer_function");
             tab_manager.selectTab("tab_group_main", "tab_transfer_function");
         });   
@@ -801,11 +852,17 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             tab_manager.selectTab("tab_group_main", "tab_edit");
         });
         */ 
-        document.getElementById("button_tab_export").addEventListener("click", function () {
+        document.getElementById("button_tab_export").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClick: button_tab_export");
             tab_manager.selectTab("tab_group_main", "tab_export");
         });
-        document.getElementById("button_tab_help").addEventListener("click", function () {
+        document.getElementById("button_tab_help").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
             console.log("onClick: button_tab_help");
             tab_manager.selectTab("tab_group_main", "tab_help");
         });
@@ -1423,6 +1480,18 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.aliasing_index = 0;
         canvas_wrapper_side.ftle_slice_interpolate = document.getElementById("checkbox_ftle_slice_interpolate").checked;
         
+    }
+
+    function DeactivateInput(){        
+        mouse_manager.DeactivateInput();
+        ui_left_tool_bar.DeactivateInput();
+        block_all_input = true;
+    }
+
+    function ActivateInput(){        
+        mouse_manager.ActivateInput();
+        ui_left_tool_bar.ActivateInput();
+        block_all_input = false;
     }
 
 })();

@@ -11,6 +11,7 @@ class MouseManager {
         this.side_canvas = side_canvas;
         this.side_camera = side_camera;
         this.active_camera = camera;
+        this.block_all_input = false;
     }
 
     initialize() {
@@ -23,6 +24,14 @@ class MouseManager {
         this.addOnMouseWheel();
     }
 
+    DeactivateInput(){
+        this.block_all_input = true;
+    }
+
+    ActivateInput(){
+        this.block_all_input = false;
+    }
+
     addOnMouseDown() {
         this.canvas.addEventListener("mousedown", (event) => {
             this.onMouseDown(event, this.canvas, this.camera, this.side_camera);
@@ -33,6 +42,9 @@ class MouseManager {
     }
 
     onMouseDown(event, canvas, camera, other_camera){
+        if(this.block_all_input){
+            return;
+        }
         var shift_pressed = event.getModifierState("Shift");
         var ctrl_pressed = event.getModifierState("Control");
         var pos_percentage = getMousePositionPercentage(canvas, event)
@@ -64,19 +76,10 @@ class MouseManager {
     }
 
     addOnMouseUp() {
-        /*
-        this.canvas.addEventListener("mouseup", (event) => {
-            var pos = getMousePositionPercentage(this.canvas, event)
-            //console.log("up", "x: " + pos.x, "y: " + pos.y);
-            this.camera.StopPanning();
-        });
-        this.side_canvas.addEventListener("mouseup", (event) => {
-            var pos = getMousePositionPercentage(this.side_canvas, event)
-            //console.log("up", "x: " + pos.x, "y: " + pos.y);
-            this.side_camera.StopPanning();
-        });
-        */
         document.addEventListener("mouseup", (event) => {
+            if(this.block_all_input){
+                return;
+            }
             this.camera.StopPanning();
             this.side_camera.StopPanning();
             this.camera.other_camera_is_panning = false;
@@ -104,6 +107,10 @@ class MouseManager {
 
     addOnMouseMove() {
         document.addEventListener("mousemove", (event) => {
+            if(this.block_all_input){
+                return;
+            }
+
             var pos = getMousePosition(this.canvas, event);
             var pos_percentage = getMousePositionPercentage(this.canvas, event)
             var pos_canonical = getMousePositionCanonical(this.canvas, event);
@@ -128,6 +135,9 @@ class MouseManager {
     }
 
     onMouseWheel(event, canvas, camera, other_camera){
+        if(this.block_all_input){
+            return;
+        }
         var slow = false;
         var pos = getMousePosition(canvas, event);
         camera.move_forward_backward_wheel(event.deltaY, pos.x, pos.y, slow);
