@@ -8,6 +8,9 @@ class LayoutEntry{
         this.button = document.getElementById(id_button);
 
         this.button.addEventListener("click", (event) => {
+            if(this.ui_tools.block_all_input){
+                return;
+            }
             this.select();
         });
         
@@ -23,6 +26,7 @@ class LayoutEntry{
 
 class UiTools{
     constructor() {
+        this.block_all_input = false;
         this.selected_layout_key = this.getDefaultLayoutKey();//layout 0 means use the one from export
         this.list_layouts = [];
         this.dict_layouts = {};
@@ -61,6 +65,14 @@ class UiTools{
 
     getDefaultLayoutKey(){
         return "2";
+    }
+
+    DeactivateInput(){
+        this.block_all_input = true;
+    }
+
+    ActivateInput(){
+        this.block_all_input = false;
     }
 }
 

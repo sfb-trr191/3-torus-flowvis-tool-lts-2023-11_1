@@ -1485,12 +1485,14 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function DeactivateInput(){        
         mouse_manager.DeactivateInput();
         ui_left_tool_bar.DeactivateInput();
+        ui_tools.DeactivateInput();
         block_all_input = true;
     }
 
     function ActivateInput(){        
         mouse_manager.ActivateInput();
         ui_left_tool_bar.ActivateInput();
+        ui_tools.ActivateInput();
         block_all_input = false;
     }
 
