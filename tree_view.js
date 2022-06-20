@@ -261,7 +261,7 @@ class TreeViewNode {
 
         this.tree_view.updateHeaderClass();
         this.tree_view.updateLinkedGroup();
-        this.tree_view.updatePropertiesHelp();
+        //this.tree_view.updatePropertiesHelp();
     }
 
     toggleSelected(){
@@ -307,14 +307,16 @@ class TreeView{
     constructor() {
         this.invisible_container = document.getElementById("invisible_container");
         this.element = document.getElementById("container_tree_view_nodes");
-        this.node_help_properties = document.getElementById("help_properties");
+        //this.node_help_properties = document.getElementById("help_properties");
         this.list_nodes = [];
         this.dict_eye_id_to_node = {};
         this.eyes_changed = false;
         this.generateNodes();
+        this.node_help.selected = true;
         this.updateCollapseState();
+        this.updateHeaderClass();
         this.updateLinkedGroup();
-        this.updatePropertiesHelp();
+        //this.updatePropertiesHelp();
 
         console.log("this.dict_eye_id_to_node", this.dict_eye_id_to_node);
     }
@@ -358,7 +360,7 @@ class TreeView{
         var node_aux_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_aux_view_visual_objects_indicators_clicked_position", EYE, 15, EYE_DEFAULT_VISIBLE);
         var node_aux_seeds = this.generateNode(this, "Seeds", "group_properties_root_aux_view_visual_objects_indicators_seeds", EYE, 16, EYE_DEFAULT_INVISIBLE);        
 
-        var node_todo = this.generateNode(this, "Todo", "group_properties_root_todo", NO_EYE, null, EYE_DEFAULT_VISIBLE);
+        var node_help = this.generateNode(this, "Help", "group_properties_root_help", NO_EYE, null, EYE_DEFAULT_VISIBLE);
 
         this.element.appendChild(node_root.node);
 
@@ -390,8 +392,9 @@ class TreeView{
         node_aux_indicators.addChild(node_aux_top_right_axes);
         node_aux_indicators.addChild(node_aux_clicked_position);
         node_aux_indicators.addChild(node_aux_seeds);
-        node_root.addChild(node_todo);  
+        node_root.addChild(node_help);  
         
+        this.node_help = node_help;
         
     }  
 
@@ -431,6 +434,7 @@ class TreeView{
         }
     }
 
+    /*
     updatePropertiesHelp(){
         for(var i=0; i<this.list_nodes.length; i++){
             if(this.list_nodes[i].selected){
@@ -440,6 +444,7 @@ class TreeView{
         }
         this.node_help_properties.className = "shown";
     }
+    */
 
     deselect(){
         for(var i=0; i<this.list_nodes.length; i++){
