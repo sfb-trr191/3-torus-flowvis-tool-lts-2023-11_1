@@ -14,6 +14,10 @@ class MouseManager {
         this.block_all_input = false;
     }
 
+    Link(ui_left_tool_bar){
+        this.ui_left_tool_bar = ui_left_tool_bar;
+    }
+
     initialize() {
         console.log("initialize mouse manager");
         this.addOnMouseDown();
@@ -35,9 +39,11 @@ class MouseManager {
     addOnMouseDown() {
         this.canvas.addEventListener("mousedown", (event) => {
             this.onMouseDown(event, this.canvas, this.camera, this.side_camera);
+            this.ui_left_tool_bar.SelectLeft();
         });
         this.side_canvas.addEventListener("mousedown", (event) => {
             this.onMouseDown(event, this.side_canvas, this.side_camera, this.camera);
+            this.ui_left_tool_bar.SelectRight();
         });
     }
 

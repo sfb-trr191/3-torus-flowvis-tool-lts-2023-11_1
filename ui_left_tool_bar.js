@@ -16,7 +16,7 @@ class UISelectedCameraIndicator{
     SelectLeft(){
         this.selected_left = true;
         this.selected_right = false;
-        this.button_left.className = "camera_selected";
+        this.button_left.className = "camera_selected_main";
         this.button_right.className = "camera_unselected";
     }
 
@@ -24,7 +24,7 @@ class UISelectedCameraIndicator{
         this.selected_left = false;
         this.selected_right = true;
         this.button_left.className = "camera_unselected";
-        this.button_right.className = "camera_selected";
+        this.button_right.className = "camera_selected_aux";
     }
 }
 
@@ -142,6 +142,14 @@ class UILeftToolBar{
 
     ActivateInput(){
         this.block_all_input = false;
+    }
+
+    SelectLeft(){
+        this.ui_selected_camera_indicator.SelectLeft();
+    }
+
+    SelectRight(){
+        this.ui_selected_camera_indicator.SelectRight();
     }
 }
 

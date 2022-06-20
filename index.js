@@ -214,6 +214,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         input_manager.initialize();
         mouse_manager = new MouseManager(main_canvas, main_camera, side_canvas, side_camera);
         mouse_manager.initialize();
+
         //buildErrorDictionary();
 
         if (!(gl = getRenderingContext(main_canvas)))
@@ -248,6 +249,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         ui_transfer_functions = new UITransferFunctions();
 
         ui_left_tool_bar = new UILeftToolBar(main_camera, side_camera);
+        mouse_manager.Link(ui_left_tool_bar);
 
         lights = new Lights();
         lights.GenerateDefaultLighting();

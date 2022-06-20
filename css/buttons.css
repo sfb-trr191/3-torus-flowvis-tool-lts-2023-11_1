@@ -112,11 +112,15 @@ button {
 }
 
 .subgroup_toolbar button.camera_unselected {
-    background-image: url("../icons/camera_unselected.png");
+    background-image: url("../icons/camera_unselected_white.png");
 }
 
-.subgroup_toolbar button.camera_selected {
-    background-image: url("../icons/camera_selected.png");
+.subgroup_toolbar button.camera_selected_main {
+    background-image: url("../icons/camera_selected_main.png");
+}
+
+.subgroup_toolbar button.camera_selected_aux {
+    background-image: url("../icons/camera_selected_aux.png");
 }
 
 #button_camera_Yneg_Zpos_Xpos{
