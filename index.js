@@ -808,6 +808,31 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             SetDoublePendulum();
         });
         
+        document.getElementById("fieldset_load_example_1").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample1");
+            SetExample1();
+        });
+
+        document.getElementById("fieldset_load_example_2").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample2");
+            SetExample2();
+        });
+
+        document.getElementById("fieldset_load_example_3").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample3");
+            SetExample3();
+        });
+
+        
     }
 
     function addOnClickUpdateURL() {
@@ -1387,6 +1412,34 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
         hide_manager.UpdateVisibility();
     }
+
+    function SetExample1(){
+        document.getElementById("select_space").value = "1";
+        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
+        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_w").value = "0";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+
+    function SetExample2(){
+        document.getElementById("select_space").value = "1";
+        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
+        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_w").value = "1";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+
+    function SetExample3(){
+        document.getElementById("select_space").value = "1";
+        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
+        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_w").value = "cos(2 * PI * x)";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+    
 
     function testWebGPU() {
         async function demo() {

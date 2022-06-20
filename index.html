@@ -310,14 +310,25 @@
                         <label>a = sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_x*v_x - sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_y*v_y</label>
                         <label>b = -2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y</label>
                     </fieldset>                   
-                    <fieldset class="fieldset_load_example">
-                        <legend>Example 1</legend>
+                    <fieldset class="fieldset_load_example" id="fieldset_load_example_1">
+                        <legend>Example 1: Magnetic Field: w = 0</legend>
+                        <label>Set equations to the most basic magnetic field:</label>
+                        <label>u = cos(2 * PI * z)</label>
+                        <label>v = sin(2 * PI * z)</label>
+                        <label>w = 0</label>
                     </fieldset>
-                    <fieldset class="fieldset_load_example">
-                        <legend>Example 2</legend>
+                    <fieldset class="fieldset_load_example" id="fieldset_load_example_2">
+                        <legend>Example 2: Magnetic Field: w = c</legend>
+                        <label>Set equations to magnetic field with constant w:</label>
+                        <label>u = cos(2 * PI * z)</label>
+                        <label>v = sin(2 * PI * z)</label>
+                        <label>w = 1</label>
                     </fieldset>
-                    <fieldset class="fieldset_load_example">
-                        <legend>Example 3</legend>
+                    <fieldset class="fieldset_load_example" id="fieldset_load_example_3">
+                        <legend>Example 3: Magnetic Field: w = c * cos(2 * PI * x)</legend>
+                        <label>u = cos(2 * PI * z)</label>
+                        <label>v = sin(2 * PI * z)</label>
+                        <label>w = cos(2 * PI * x)</label>
                     </fieldset>
                 </div>   
             </fieldset>
