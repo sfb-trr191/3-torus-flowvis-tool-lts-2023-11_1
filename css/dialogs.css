@@ -172,3 +172,53 @@
 .warning_title{
     color: rgb(255, 0, 0);
 }
+
+.progress_bar_border{
+    height: 24px;
+    width: 100%;
+    background-color: rgb(230, 230, 230);
+}
+
+.progress_bar{
+    height:24px;
+    width:50%;
+    background-color: rgb(52, 124, 52);
+}
+
+.auto_rotate{
+    animation:auto_rotate 2s infinite linear
+}    
+@keyframes auto_rotate{
+    0%{transform:rotate(0deg)}
+    100%{transform:rotate(359deg)}
+}
+
+.auto_rotate_indicator_icon{
+    margin: auto;
+    width: 96px;
+    height: 96px;
+    position: absolute; /*Can also be `fixed`*/
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: url("../icons/rotating_circle.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.export_downloading_icon{    
+    position: relative;
+    width: 128px;
+    height: 128px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    background-image: url("../icons/downloading_folder.png");
+    background-size: 64px 64px;
+    background-position: 32px 38px;
+    background-repeat: no-repeat;
+}
+
+.export_downloading_icon_wrapper{
+    
+}

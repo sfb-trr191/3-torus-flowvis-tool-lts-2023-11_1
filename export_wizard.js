@@ -253,6 +253,7 @@ class ExportWizard{
     loadPage(number){
         console.log("EXP: loadPage,",number);
         this.page = number;
+        this.DeactivateWaitingForDownloadImage();
         this.checkExportSizeWarning();
 
         for(var i=0; i<this.list_indices.length; i++){
@@ -282,6 +283,22 @@ class ExportWizard{
         console.log("OnExportCancelled");
         document.getElementById("wrapper_dialog_export").className = "hidden";
 
+    }
+
+    OnProgressChanged(fraction){  
+        var width = Math.round(100 * fraction);
+        document.getElementById("progress_bar_export_thumbnail").style.width = width + '%'; 
+        document.getElementById("progress_bar_export_image").style.width = width + '%'; 
+    }    
+
+    ActivateWaitingForDownloadImage(){ 
+        document.getElementById("wrapper_export_thumbnail_downloading_icon").className = "export_downloading_icon_wrapper"; 
+        document.getElementById("wrapper_export_image_downloading_icon").className = "export_downloading_icon_wrapper"; 
+    }    
+
+    DeactivateWaitingForDownloadImage(){ 
+        document.getElementById("wrapper_export_thumbnail_downloading_icon").className = "hidden"; 
+        document.getElementById("wrapper_export_image_downloading_icon").className = "hidden"; 
     }
     
 }

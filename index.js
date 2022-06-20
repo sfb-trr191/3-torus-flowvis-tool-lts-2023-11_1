@@ -416,6 +416,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function on_update_export_main(time_now){       
         var finished = on_update_export_step(canvas_wrapper_main, gl, fence_sync);
+        var fraction = 0.5 * (canvas_wrapper_main.aliasing_index / 64);
+        export_wizard.OnProgressChanged(fraction);
         if(export_wizard.cancel){
             requestAnimationFrame(on_update);
             export_wizard.OnExportCancelled();
@@ -430,6 +432,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function on_update_export_aux(time_now){       
         var finished = on_update_export_step(canvas_wrapper_side, gl_side, fence_sync_side_export);
+        var fraction = 0.5 + 0.5 * (canvas_wrapper_side.aliasing_index / 64);
+        export_wizard.OnProgressChanged(fraction);
         if(export_wizard.cancel){
             requestAnimationFrame(on_update);
             export_wizard.OnExportCancelled();
@@ -437,6 +441,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         }
         if(finished){
             export_object.startExport(input_parameter_wrapper, ui_tools);
+            export_wizard.ActivateWaitingForDownloadImage();
             requestAnimationFrame(on_update_wait_for_export_finished);
             return;
         }
