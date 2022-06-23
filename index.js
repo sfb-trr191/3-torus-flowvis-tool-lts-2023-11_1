@@ -323,9 +323,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         initializeAttributes();
 
         input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools);
+        input_parameter_wrapper.fromURLVersion();
+        RedirectVersion();
         input_parameter_wrapper.fromURL();
         UpdateVersionString();
-        RedirectVersion();
         onChangedDrawMode();
         onChangedCameraControl();
         OnSelectedTransferFunction();

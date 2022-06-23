@@ -207,10 +207,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_current_aspect_ratio_aux", "ara");
     }
 
-    fromURL() {
-        console.log("fromURL:", window.location.search);
+    fromURLVersion(){
         const urlParams = new URLSearchParams(window.location.search);
-
         const no_search = window.location.search.length < 1;
         const complete = urlParams.has("c") || no_search;
         if(!complete){
@@ -219,6 +217,36 @@ class InputParameterWrapper {
 
         const upgrade = urlParams.has("upgrade");        
         window["global_is_upgrade"] = upgrade;
+
+        if(no_search){
+            //do nothing
+        }
+        else{
+            var f1 = urlParams.has("v_y");
+            var f2 = urlParams.has("v_m");
+            var f3 = urlParams.has("v_n");
+            var f4 = urlParams.has("v_s");
+            if(f1 && f2 && f3 && f4){
+                window["URL_VERSION_YEAR"] = parseInt(urlParams.get("v_y"));
+                window["URL_VERSION_MONTH"] = parseInt(urlParams.get("v_m"));
+                window["URL_VERSION_NUMBER"] = parseInt(urlParams.get("v_n"));
+                window["URL_STATE_VERSION"] = parseInt(urlParams.get("v_s"));
+            }
+            else{
+                console.error("missing version");
+                stop_script;
+            }
+        }
+
+    }
+
+    fromURL() {
+        console.log("fromURL:", window.location.search);
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const no_search = window.location.search.length < 1;
+        const complete = urlParams.has("c") || no_search;
+
 
         var use_data_array = urlParams.has("data");
         //document.getElementById("checkbox_url_data_array").checked = use_data_array;
@@ -259,21 +287,6 @@ class InputParameterWrapper {
 
             const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
             this.transfer_function_manager.fromString(transfer_function_manager);  
-
-            var f1 = urlParams.has("v_y");
-            var f2 = urlParams.has("v_m");
-            var f3 = urlParams.has("v_n");
-            var f4 = urlParams.has("v_s");
-            if(f1 && f2 && f3 && f4){
-                window["URL_VERSION_YEAR"] = parseInt(urlParams.get("v_y"));
-                window["URL_VERSION_MONTH"] = parseInt(urlParams.get("v_m"));
-                window["URL_VERSION_NUMBER"] = parseInt(urlParams.get("v_n"));
-                window["URL_STATE_VERSION"] = parseInt(urlParams.get("v_s"));
-            }
-            else{
-                console.error("missing version");
-                stop_script;
-            }
         }
 
         const text = urlParams.get("text");
