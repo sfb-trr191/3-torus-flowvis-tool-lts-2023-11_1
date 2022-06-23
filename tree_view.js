@@ -361,6 +361,7 @@ class TreeView{
         var node_aux_seeds = this.generateNode(this, "Seeds", "group_properties_root_aux_view_visual_objects_indicators_seeds", EYE, 16, EYE_DEFAULT_INVISIBLE);        
 
         var node_help = this.generateNode(this, "Help", "group_properties_root_help", NO_EYE, null, EYE_DEFAULT_VISIBLE);
+        var node_credits = this.generateNode(this, "Credits", "group_properties_root_credits", NO_EYE, null, EYE_DEFAULT_VISIBLE);
 
         this.element.appendChild(node_root.node);
 
@@ -393,6 +394,7 @@ class TreeView{
         node_aux_indicators.addChild(node_aux_clicked_position);
         node_aux_indicators.addChild(node_aux_seeds);
         node_root.addChild(node_help);  
+        node_root.addChild(node_credits);  
         
         this.node_help = node_help;
         
