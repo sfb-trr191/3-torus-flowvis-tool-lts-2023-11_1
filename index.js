@@ -1314,6 +1314,13 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var number = window["URL_VERSION_NUMBER"];
         return GetShortVersionString(year, month, number);
     }
+
+    function GetShortVersionStringCurrent(){
+        var year = window["VERSION_YEAR"];
+        var month = window["VERSION_MONTH"];
+        var number = window["VERSION_NUMBER"];
+        return GetShortVersionString(year, month, number);
+    }
     
     function GetShortVersionString(year, month, number){   
         month = month.toString();
@@ -1332,7 +1339,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         return 100000*year + 1000*month + number;  
     }
     
-
+    /*
     //extended version used for display
     function GetCompleteVersionStringURL(){
         var year = window["URL_VERSION_YEAR"];
@@ -1356,6 +1363,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         month = month.length == 1 ? "0" + month : month;
         return year + "-" + month + "." + number + "S" + state;
     }
+    */
 
     function UpdateVersionString(){
 
@@ -1380,9 +1388,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
                 "<span style='color: red'>.</span>";
         }
 
-        var string_url = GetCompleteVersionStringURL();            
+        var string_url = GetShortVersionStringURL();            
 
-        var string_current = GetCompleteVersionStringCurrent();
+        var string_current = GetShortVersionStringCurrent();
 
         var string_compare = "Version: " + string_current + ". ";
 
