@@ -168,6 +168,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         else if(url_without_query.includes("christian-lang")){
             document.title = "[DEV] 3-Torus FlowVis Tool";
         }
+        else{
+            document.title = "3-Torus FlowVis Tool";
+        }
         console.log("url_without_query", url_without_query);
     }
 
