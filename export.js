@@ -15,7 +15,7 @@ class ExportObject{
             var layout_key_state = ui_tools.getSelectedLayoutKey();
             var url_state = input_parameter_wrapper.toURL(layout_key_state, false);
             zip.file("url_direct_state.txt", url_state);
-            this.save(zip, "exported-thumbnails.zip", "", "thumbnail_main", "thumbnail_aux");
+            this.save(zip, "3-torus_export_thumbnails.zip", "", "thumbnail_main", "thumbnail_aux");
         }
         else if(this.task == TASK_EXPORT_LATEX){
             var image_dir_name = document.getElementById("input_latex_image_directory").value;
@@ -42,7 +42,7 @@ class ExportObject{
             zip.file("html/html_default.txt", GenerateExportString_HTML(url_lazy_state, "iframe_3_torus_flowvis_tool_default"));
             zip.file("html/html_main.txt", GenerateExportString_HTML(url_lazy_main, "iframe_3_torus_flowvis_tool_embedded_main"));
             zip.file("html/html_aux.txt", GenerateExportString_HTML(url_lazy_aux, "iframe_3_torus_flowvis_tool_embedded_aux"));
-            this.save(zip, "exported.zip", image_dir_name, file_name_main, file_name_aux);
+            this.save(zip, "3-torus_export_content.zip", image_dir_name, file_name_main, file_name_aux);
         }     
     }
 
