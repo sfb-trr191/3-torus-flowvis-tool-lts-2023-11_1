@@ -43,8 +43,12 @@ button {
     background-color: rgb(150, 150, 150);
 }
 
-#button_layout_default_mode{
-    background-image: url("../icons/layout_default_mode.png");
+#button_layout_focus_main{
+    background-image: url("../icons/layout_focus_main.png");
+}
+
+#button_layout_focus_aux{
+    background-image: url("../icons/layout_focus_aux.png");
 }
 
 #button_layout_edit_mode{
