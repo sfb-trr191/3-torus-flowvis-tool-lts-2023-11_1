@@ -66,7 +66,7 @@ const StateManager = require("./state_manager");
 const TreeView = require("./tree_view");
 const UiTools = require("./ui_tools");
 const ExportWizard = require("./export_wizard");
-//const Tests = require("./tests");
+const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
 ; (function () {
@@ -141,7 +141,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function onStart(evt) {
         console.log("onStart");
 
-        //var tests = new Tests();
+        var tests = new Tests();
        
         window["URL_VERSION_YEAR"] = window["VERSION_YEAR"];
         window["URL_VERSION_MONTH"] = window["VERSION_MONTH"];

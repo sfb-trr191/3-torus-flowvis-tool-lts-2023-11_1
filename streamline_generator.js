@@ -123,8 +123,8 @@ class StreamlineGenerator {
         this.shader_rule_v_y_neg_v_y = "v_y+1";	    //if v_y<1 : v_y=___
     }
 
-    CalculateRawStreamlines(raw_data) {
-        console.log("CalculateRawStreamlines");
+    CalculateRawStreamlines(raw_data, part_index) {
+        console.log("CalculateRawStreamlines: part_index: ", part_index);
         var t_start = performance.now();
 
         raw_data.initialize(this.seeds, this.seed_signums, this.num_points_per_streamline);
@@ -136,8 +136,9 @@ class StreamlineGenerator {
                 }
                 break;
             case SPACE_2_PLUS_2D:
+                var snap_nearest_z = part_index == PART_INDEX_OUTSIDE;
                 for (var i = 0; i < this.seeds.length; i++) {
-                    this.CalculateRawStreamline2Plus2D(i, raw_data);
+                    this.CalculateRawStreamline2Plus2D(i, raw_data, snap_nearest_z);
                 }
                 //raw_data.SwapComponents_0123_2301();
                 break;
@@ -304,8 +305,8 @@ class StreamlineGenerator {
         return false;
     }
 
-    CalculateRawStreamline2Plus2D(seed_index, raw_data) {
-        console.log("CalculateRawStreamline2Plus2D: ", seed_index, "check bounds:", this.check_bounds);
+    CalculateRawStreamline2Plus2D(seed_index, raw_data, snap_nearest_z) {
+        console.log("CalculateRawStreamline2Plus2D: ", seed_index, "check bounds:", this.check_bounds, "snap_nearest_z:", snap_nearest_z);
 
         var startIndex = seed_index * this.num_points_per_streamline;
         var total_points = raw_data.num_points;
@@ -406,17 +407,25 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
 
-            //check if angle is jumping --> must start new line
-            var flag_angle_jumping = raw_data.data[currentIndex].IsAngleJumping(raw_data.data[previousIndex]);
-            if(flag_angle_jumping){       
-                flag = 3;//end of polyline     
-                console.log("angle jumping: ", flag_angle_jumping, raw_data.data[previousIndex].angle, raw_data.data[currentIndex].angle);    
-                if(raw_data.data[currentIndex].angle > 0.5){
-                    raw_data.data[currentIndex].angle -= 1;
-                }else{
-                    raw_data.data[currentIndex].angle += 1;
+            
+            var flag_angle_jumping = false;
+            if(snap_nearest_z){
+                raw_data.data[currentIndex].SnapToOld(raw_data.data[previousIndex].angle);
+            }
+            else{
+                //check if angle is jumping --> must start new line
+                flag_angle_jumping = raw_data.data[currentIndex].IsAngleJumping(raw_data.data[previousIndex]);
+                if(flag_angle_jumping){       
+                    flag = 3;//end of polyline     
+                    console.log("angle jumping: ", flag_angle_jumping, raw_data.data[previousIndex].angle, raw_data.data[currentIndex].angle);    
+                    if(raw_data.data[currentIndex].angle > 0.5){
+                        raw_data.data[currentIndex].angle -= 1;
+                    }else{
+                        raw_data.data[currentIndex].angle += 1;
+                    }
                 }
             }
+
 
             if (i == this.num_points_per_streamline - 1)
                 flag = 3;//end of polyline

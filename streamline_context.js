@@ -139,7 +139,7 @@ class StreamlineContext {
         var raw_data = this.GetRawData(part_index);
         console.log("CalculateStreamlinesPart");
 
-        this.streamline_generator.CalculateRawStreamlines(raw_data);
+        this.streamline_generator.CalculateRawStreamlines(raw_data, part_index);
         this.lod_0.ExtractMultiPolyLines(part_index);
 
         switch (this.streamline_generator.space) {

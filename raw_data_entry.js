@@ -23,6 +23,22 @@ class RawDataEntry {
         var b = other_entry.angle;
         return Math.abs(a-b) > 0.5;
     }
+
+    //requires that this.angle is already calculated
+    SnapToOld(old_value){
+        var new_value = this.angle;
+        var old_floor = Math.floor(old_value);
+
+        var new_a = new_value + old_floor - 1;
+        var new_b = new_value + old_floor;
+        var new_c = new_value + old_floor + 1;
+
+        var result_ab = Math.abs(old_value-new_a) < Math.abs(old_value-new_b) ? new_a : new_b;
+        var result = Math.abs(old_value-result_ab) < Math.abs(old_value-new_c) ? result_ab : new_c;
+
+        //console.log("STO: new:", new_value, "old:", old_value, "result:", result, "new_a:", new_a, "new_b:", new_b, "new_c:", new_c, "new_d:", new_d);
+        this.angle = result;
+    }
 }
 
 module.exports = RawDataEntry;
