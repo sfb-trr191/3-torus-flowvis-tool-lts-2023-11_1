@@ -116,7 +116,7 @@ class StreamlineContext {
 
     ClearStreamlinesPart(part_index, gl, gl_side) {
         var raw_data = this.GetRawData(part_index);
-        raw_data.initialize([], 0);
+        raw_data.initialize([], [], 0);
         //for all lods
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].ResetPart(part_index);
