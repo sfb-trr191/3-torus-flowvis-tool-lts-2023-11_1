@@ -182,15 +182,20 @@ class LODData {
         var streamline_generator = this.p_streamline_generator;
 
         var vectorMultiPolyLines = this.GetVectorMultiPolyLines(part_index);
-
         var direction = streamline_generator.direction;
         var multi = new MultiPolyLine();
         var poly = new PolyLine();
         var currentDirection;
         for (var seedIndex = 0; seedIndex < raw_data.num_seeds; seedIndex++) {
-            var startIndex = seedIndex * raw_data.num_points_per_streamline;
+            var startIndex = raw_data.start_indices[seedIndex];//seedIndex * raw_data.num_points_per_streamline;
+            var stopIndex = seedIndex < raw_data.num_seeds-1 ? raw_data.start_indices[seedIndex+1] : raw_data.data.length;
+            var num_points_this_streamline = stopIndex - startIndex;
+            //console.log("startIndex", startIndex);
+            //console.log("stopIndex", stopIndex);
+            //console.log("num_points_this_streamline", num_points_this_streamline);
             var oldFlag = 1337;
-            for (var offset = 0; offset < raw_data.num_points_per_streamline; offset++) {
+            var offset = 0;
+            for (var offset = 0; offset < num_points_this_streamline; offset++) {
                 var index = startIndex + offset;
                 var flag = raw_data.data[index].flag;
                 switch (flag) {

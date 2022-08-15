@@ -1,4 +1,5 @@
 const glMatrix = require("gl-matrix");
+const RawDataEntry = require("./raw_data_entry");
 const math = require("mathjs");
 
 class StreamlineGenerator {
@@ -156,7 +157,19 @@ class StreamlineGenerator {
     CalculateRawStreamline3Torus(seed_index, raw_data) {
         console.log("CalculateRawStreamline3Torus: ", seed_index);
 
-        var startIndex = seed_index * this.num_points_per_streamline;
+        var startIndex = raw_data.data.length;//seed_index * this.num_points_per_streamline;
+
+        //push seed
+        var new_entry = new RawDataEntry();
+        raw_data.data.push(new_entry);
+        console.log("this.seeds[i]: ", this.seeds[seed_index]);
+        glMatrix.vec4.copy(raw_data.data[startIndex].position, this.seeds[seed_index]);
+        raw_data.data[startIndex].u_v_w_signum[3] = this.seed_signums[seed_index];
+        raw_data.data[startIndex].flag = this.seed_signums[seed_index];
+
+        //push startindex
+        raw_data.start_indices.push(startIndex);
+
         var total_points = raw_data.num_points;
         var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
@@ -188,8 +201,9 @@ class StreamlineGenerator {
         var previous_plus_k3 = glMatrix.vec3.create();// previousPosition + k3
 
         var arc_length = 0;
-        for (var i = 1; i < this.num_points_per_streamline; i++) {
-
+        var i=1;
+        //for (var i = 1; i < this.num_points_per_streamline; i++) {
+        while(true){
             var currentIndex = startIndex + i;
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
@@ -247,12 +261,13 @@ class StreamlineGenerator {
             
             console.log("time_current", time_current);
 
-            if (i == this.num_points_per_streamline - 1)
-                flag = 3;//end of polyline
+            //push entry for current index
+            var new_entry = new RawDataEntry();
+            raw_data.data.push(new_entry);
 
             var terminate = false;
 
-            if(this.AdditionalTerminationChecks(time_current, arc_length)){
+            if(this.TerminationChecks(i, time_current, arc_length)){
                 terminate = true;
                 flag = 3;//end of polyline
             }
@@ -261,11 +276,16 @@ class StreamlineGenerator {
                 if (outOfBounds) {
                     flag = 3;//end of polyline
                     //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
-
-                    if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
+                   
+                    if (this.continue_at_bounds) {//if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
                         var movedPosition = this.MoveOutOfBounds3(currentPosition);
                         var f_movedPosition = this.f(movedPosition, signum);
                         var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
+
+                        //push entry for moved position (current index + 1)
+                        var new_entry = new RawDataEntry();
+                        raw_data.data.push(new_entry);
+
                         raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
                         raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], 1);;//1 or -1 for start
                         raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
@@ -288,10 +308,17 @@ class StreamlineGenerator {
             if (terminate)
                 break;
 
+            i++;
+
         }
     }
 
-    AdditionalTerminationChecks(time_current, arc_length_current){
+    TerminationChecks(i, time_current, arc_length_current){
+        if(this.termination_condition == STREAMLINE_TERMINATION_CONDITION_POINTS){            
+            if (i >= this.num_points_per_streamline - 1){
+                return true;
+            }
+        }
         if(this.termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME){
             if(time_current > this.termination_advection_time){
                 return true;
@@ -308,7 +335,20 @@ class StreamlineGenerator {
     CalculateRawStreamline2Plus2D(seed_index, raw_data, snap_nearest_z) {
         console.log("CalculateRawStreamline2Plus2D: ", seed_index, "check bounds:", this.check_bounds, "snap_nearest_z:", snap_nearest_z);
 
-        var startIndex = seed_index * this.num_points_per_streamline;
+        var startIndex = raw_data.data.length;//seed_index * this.num_points_per_streamline;
+
+        //push seed
+        var new_entry = new RawDataEntry();
+        raw_data.data.push(new_entry);
+        console.log("this.seeds[i]: ", this.seeds[seed_index]);
+        glMatrix.vec4.copy(raw_data.data[startIndex].position, this.seeds[seed_index]);
+        raw_data.data[startIndex].u_v_w_signum[3] = this.seed_signums[seed_index];
+        raw_data.data[startIndex].flag = this.seed_signums[seed_index];
+
+        //push startindex
+        raw_data.start_indices.push(startIndex);
+
+
         var total_points = raw_data.num_points;
         var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec4.fromValues(positionData.position[0], positionData.position[1], positionData.position[2], positionData.position[3]);
@@ -343,8 +383,9 @@ class StreamlineGenerator {
         var previous_plus_k3 = glMatrix.vec4.create();// previousPosition + k3
 
         var arc_length = 0;
-        for (var i = 1; i < this.num_points_per_streamline; i++) {
-
+        var i=1;
+        //for (var i = 1; i < this.num_points_per_streamline; i++) {
+        while(true){  
             var currentIndex = startIndex + i;
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
@@ -401,6 +442,10 @@ class StreamlineGenerator {
 
             var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
             
+            //push entry for current index
+            var new_entry = new RawDataEntry();
+            raw_data.data.push(new_entry);
+
             //set values of current index
             raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
             raw_data.data[currentIndex].CalculateAngleFromPosition_3_2();
@@ -427,8 +472,8 @@ class StreamlineGenerator {
             }
 
 
-            if (i == this.num_points_per_streamline - 1)
-                flag = 3;//end of polyline
+            //if (i == this.num_points_per_streamline - 1)
+            //    flag = 3;//end of polyline
 
             var terminate = false;
             var flag_move_new_point = false;
@@ -453,11 +498,11 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].flag = flag;
 
             var flag_make_new_point = flag_move_new_point || flag_angle_jumping;
-            if(this.AdditionalTerminationChecks(time_current, arc_length)){
+            if(this.TerminationChecks(i, time_current, arc_length)){
                 terminate = true;
                 raw_data.data[currentIndex].flag = 3;//end of polyline
             }
-            else if(flag_make_new_point && i < this.num_points_per_streamline - 2){
+            else if(flag_make_new_point){//else if(flag_make_new_point && i < this.num_points_per_streamline - 2){
                 var newPosition = glMatrix.vec4.create();
                 glMatrix.vec4.copy(newPosition, currentPosition);
                 if(flag_move_new_point){
@@ -465,6 +510,11 @@ class StreamlineGenerator {
                 }
                 var f_newPosition = this.g(newPosition, signum);
                 var v_newPosition = glMatrix.vec4.length(f_newPosition);
+
+                //push entry for moved position (current index + 1)
+                var new_entry = new RawDataEntry();
+                raw_data.data.push(new_entry);
+
                 raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
                 raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(newPosition[0], newPosition[1], newPosition[2], newPosition[3]);;//1 or -1 for start
                 raw_data.data[currentIndex + 1].CalculateAngleFromPosition_3_2();
@@ -497,6 +547,8 @@ class StreamlineGenerator {
             //previousPosition = currentPosition;
             if (terminate)
                 break;
+
+            i++;
 
             console.log("currentPosition", i, currentPosition[0] + " " + currentPosition[1] + " " + currentPosition[2] + " " + currentPosition[3]);
         }

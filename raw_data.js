@@ -12,6 +12,7 @@ class RawData {
         this.num_points = 0;
         this.data = new Array();
         this.position_data = new Array();
+        this.start_indices = [];
     }
 
     /**
@@ -27,6 +28,7 @@ class RawData {
         console.log("num_seeds: ", this.num_seeds);
         console.log("num_points_per_streamline: ", this.num_points_per_streamline);
         console.log("num_points: ", this.num_points);
+        /*
         this.data = new Array(this.num_points);
         for (var i = 0; i < this.data.length; i++) {
             var new_entry = new RawDataEntry();
@@ -39,6 +41,9 @@ class RawData {
             this.data[index].u_v_w_signum[3] = seed_signums[i];
             this.data[index].flag = seed_signums[i];
         }
+        */
+        this.data.length = 0;
+        this.start_indices.length = 0;
         console.log("data length: ", this.data.length);
         console.log("data: ", this.data);
     }
