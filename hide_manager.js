@@ -289,6 +289,14 @@ class HideManager {
         this.condition_tab_ftle = new TabIsActiveCondition("tab_group_main", "tab_ftle", tab_manager);
         this.condition_tab_export = new TabIsActiveCondition("tab_group_main", "tab_export", tab_manager);
         
+        
+        this.mcir_number_of_points = new MultiConditionalInputRow("input_row_streamline_calculation_points_per_streamline");
+        this.condition_number_of_points = new ConditionRequiredValue("select_streamline_termination_method",
+            this.mcir_number_of_points,
+            STREAMLINE_TERMINATION_CONDITION_POINTS, true);
+        this.mcir_number_of_points.set_condition(this.condition_number_of_points)
+        this.multi_consodtional_elements.push(this.mcir_number_of_points);
+
         this.mcir_advection_time = new MultiConditionalInputRow("input_row_streamline_calculation_advection_time");
         this.condition_advection_time = new ConditionRequiredValue("select_streamline_termination_method",
             this.mcir_advection_time,
