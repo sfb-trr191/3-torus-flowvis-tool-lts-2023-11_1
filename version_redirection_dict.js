@@ -15,4 +15,7 @@ exports.VERSION_REDIRECTION_DICT = {
     "2022-02.6" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-03_1/index.html", //versions before ui overhaul
     "2022-02.7" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-03_1/index.html", //versions before ui overhaul
     "2022-03.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-03_1/index.html", //versions before ui overhaul
+    "2022-06.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-08_1/index.html", //versions before dynamic streamline array size
+    "2022-07.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-08_1/index.html", //versions before dynamic streamline array size
+    "2022-08.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-08_1/index.html", //versions before dynamic streamline array size
 }
