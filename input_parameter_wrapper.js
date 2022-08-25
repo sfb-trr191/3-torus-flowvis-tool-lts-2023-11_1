@@ -122,6 +122,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_streamline_calculation_direction", "scd");        
         new InputWrapper(this, "input_num_points_per_streamline", PARAM_input_num_points_per_streamline);
         new InputWrapper(this, "input_step_size", PARAM_input_step_size);
+        new InputWrapper(this, "input_streamline_calculation_inbetweens", "ibt");
         new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
 
         new InputWrapper(this, "input_tube_radius_fundamental", "tr");

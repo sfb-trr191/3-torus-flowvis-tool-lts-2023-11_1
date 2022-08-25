@@ -58,7 +58,7 @@ class StreamlineContext {
 
     CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
         shader_formula_a, shader_formula_b,
-        input_num_points_per_streamline, step_size, segment_duplicator_iterations, direction,
+        input_num_points_per_streamline, step_size, inbetweens, segment_duplicator_iterations, direction,
         tube_radius_fundamental, max_radius_factor_highlight,
         termination_condition, termination_advection_time, termination_arc_length) {
         console.log("CalculateStreamlines");
@@ -81,6 +81,7 @@ class StreamlineContext {
         this.streamline_generator.shader_formula_b = shader_formula_b;
         this.streamline_generator.num_points_per_streamline = input_num_points_per_streamline;
         this.streamline_generator.step_size = step_size;
+        this.streamline_generator.inbetweens = inbetweens;
         this.segment_duplicator.iterations = segment_duplicator_iterations;
 
         this.streamline_generator.SetRulesTorus();

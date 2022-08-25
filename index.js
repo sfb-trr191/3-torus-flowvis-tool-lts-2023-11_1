@@ -998,6 +998,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         var shader_formula_b = document.getElementById("input_field_equation_b").value;
         var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
         var step_size = document.getElementById("input_step_size").value;
+        var inbetweens = document.getElementById("input_streamline_calculation_inbetweens").value;
         var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
         var space = parseInt(document.getElementById("select_space").value);
         var direction = parseInt(document.getElementById("select_streamline_calculation_direction").value);
@@ -1017,7 +1018,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.tube_radius_outside = max_radius_factor_highlight;
 
         streamline_context_static.CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, 
-            shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b, num_points_per_streamline, step_size, 
+            shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b, num_points_per_streamline, step_size, inbetweens, 
             segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight, termination_condition, termination_advection_time, termination_arc_length);
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();

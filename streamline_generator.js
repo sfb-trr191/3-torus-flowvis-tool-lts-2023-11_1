@@ -10,6 +10,7 @@ class StreamlineGenerator {
         this.seeds = [];
         this.num_points_per_streamline = 10;
         this.step_size = 0.0125;
+        this.inbetweens = 0;
         this.epsilon_move_just_outside_cube = 0.00001;
         this.confine_to_cube = false;
         this.check_bounds = true;
@@ -126,6 +127,7 @@ class StreamlineGenerator {
 
     CalculateRawStreamlines(raw_data, part_index) {
         console.log("CalculateRawStreamlines: part_index: ", part_index);
+        console.log("CalculateRawStreamlines: this.inbetweens: ", this.inbetweens);
         var t_start = performance.now();
 
         raw_data.initialize(this.seeds, this.seed_signums, this.num_points_per_streamline);
@@ -151,7 +153,7 @@ class StreamlineGenerator {
         console.log("CalculateRawStreamlines completed");
 
         var t_stop = performance.now();
-        console.log("Performance: calculated raw streamlines in: ", Math.ceil(t_stop-t_start), "ms");
+        console.log("Performance: calculated raw streamlines in: ", Math.ceil(t_stop-t_start), "ms. Number of points:", raw_data.data.length);
     }
 
     CalculateRawStreamline3Torus(seed_index, raw_data) {
@@ -199,6 +201,8 @@ class StreamlineGenerator {
         var previous_plus_k1_2 = glMatrix.vec3.create();// previousPosition + k1/2
         var previous_plus_k2_2 = glMatrix.vec3.create();// previousPosition + k2/2
         var previous_plus_k3 = glMatrix.vec3.create();// previousPosition + k3
+        var substep_currentPosition = glMatrix.vec3.create();
+        var substep_previousPosition = glMatrix.vec3.create();
 
         var arc_length = 0;
         var i=1;
@@ -208,36 +212,45 @@ class StreamlineGenerator {
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
             previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
-            //console.log("i: ", i);
-            //console.log("previousPosition: ", previousPosition);
-            //console.log("this.step_size: ", this.step_size);
 
-            //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
-            glMatrix.vec3.scale(k1, this.f(previousPosition, signum), this.step_size);
+            
+            glMatrix.vec3.copy(substep_previousPosition, previousPosition);
+            var sub_step_size = this.step_size// / (this.inbetweens + 1);
+            //multiple rk4 steps
+            for (var sub_step_index = 0; sub_step_index <= this.inbetweens; sub_step_index++) {
+                //CALCULATE: vec3 k1 = step_size * f(substep_previousPosition, signum);
+                glMatrix.vec3.scale(k1, this.f(substep_previousPosition, signum), sub_step_size);
 
-            //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
-            glMatrix.vec3.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
-            glMatrix.vec3.add(previous_plus_k1_2, previousPosition, k1_2);// previousPosition + k1/2            
-            glMatrix.vec3.scale(k2, this.f(previous_plus_k1_2, signum), this.step_size);
+                //CALCULATE: vec3 k2 = step_size * f(substep_previousPosition + k1/2, signum);
+                glMatrix.vec3.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
+                glMatrix.vec3.add(previous_plus_k1_2, substep_previousPosition, k1_2);// substep_previousPosition + k1/2            
+                glMatrix.vec3.scale(k2, this.f(previous_plus_k1_2, signum), sub_step_size);
 
-            //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
-            glMatrix.vec3.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
-            glMatrix.vec3.add(previous_plus_k2_2, previousPosition, k2_2);// previousPosition + k2/2     
-            glMatrix.vec3.scale(k3, this.f(previous_plus_k2_2, signum), this.step_size);
+                //CALCULATE: vec3 k3 = step_size * f(substep_previousPosition + k2/2, signum);
+                glMatrix.vec3.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+                glMatrix.vec3.add(previous_plus_k2_2, substep_previousPosition, k2_2);// substep_previousPosition + k2/2     
+                glMatrix.vec3.scale(k3, this.f(previous_plus_k2_2, signum), sub_step_size);
 
-            //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
-            glMatrix.vec3.add(previous_plus_k3, previousPosition, k3);// previousPosition + k3
-            glMatrix.vec3.scale(k4, this.f(previous_plus_k3, signum), this.step_size);
+                //CALCULATE: vec3 k4 = step_size * f(substep_previousPosition + k3, signum);
+                glMatrix.vec3.add(previous_plus_k3, substep_previousPosition, k3);// substep_previousPosition + k3
+                glMatrix.vec3.scale(k4, this.f(previous_plus_k3, signum), sub_step_size);
 
-            //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
-            glMatrix.vec3.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
-            glMatrix.vec3.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
-            glMatrix.vec3.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
-            glMatrix.vec3.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
-            glMatrix.vec3.add(currentPosition, previousPosition, k1_6);// previousPosition + k1 / 6 
-            glMatrix.vec3.add(currentPosition, currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
-            glMatrix.vec3.add(currentPosition, currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
-            glMatrix.vec3.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+                //CALCULATE: vec3 substep_currentPosition = substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
+                glMatrix.vec3.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+                glMatrix.vec3.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+                glMatrix.vec3.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+                glMatrix.vec3.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+                glMatrix.vec3.add(substep_currentPosition, substep_previousPosition, k1_6);// substep_previousPosition + k1 / 6 
+                glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k2_3);// substep_previousPosition + k1 / 6 + k2 / 3
+                glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k3_3);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+                glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k4_6);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+              
+                //prepare next substep iteration: copy current to previous
+                glMatrix.vec3.copy(substep_previousPosition, substep_currentPosition);  
+            }
+
+            //after every substep, copy the final value to currentPosition
+            glMatrix.vec3.copy(currentPosition, substep_currentPosition);
 
             //console.log(i, currentPosition);
             if (this.confine_to_cube)
@@ -381,6 +394,8 @@ class StreamlineGenerator {
         var previous_plus_k1_2 = glMatrix.vec4.create();// previousPosition + k1/2
         var previous_plus_k2_2 = glMatrix.vec4.create();// previousPosition + k2/2
         var previous_plus_k3 = glMatrix.vec4.create();// previousPosition + k3
+        var substep_currentPosition = glMatrix.vec4.create();
+        var substep_previousPosition = glMatrix.vec4.create();
 
         var arc_length = 0;
         var i=1;
@@ -390,37 +405,46 @@ class StreamlineGenerator {
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
             previousPosition = glMatrix.vec4.fromValues(previousVec4[0], previousVec4[1], previousVec4[2], previousVec4[3]);
-            //previousPosition = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], currentPosition[3]);
-            //console.log("i: ", i);
-            //console.log("previousPosition: ", previousPosition);
-            //console.log("this.step_size: ", this.step_size);
 
-            //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
-            glMatrix.vec4.scale(k1, this.g(previousPosition, signum), this.step_size);
+            glMatrix.vec4.copy(substep_previousPosition, previousPosition);
+            var sub_step_size = this.step_size// / (this.inbetweens + 1);
+            //multiple rk4 steps
+            for (var sub_step_index = 0; sub_step_index <= this.inbetweens; sub_step_index++) {
 
-            //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
-            glMatrix.vec4.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
-            glMatrix.vec4.add(previous_plus_k1_2, previousPosition, k1_2);// previousPosition + k1/2            
-            glMatrix.vec4.scale(k2, this.g(previous_plus_k1_2, signum), this.step_size);
+                //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
+                glMatrix.vec4.scale(k1, this.g(substep_previousPosition, signum), sub_step_size);
 
-            //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
-            glMatrix.vec4.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
-            glMatrix.vec4.add(previous_plus_k2_2, previousPosition, k2_2);// previousPosition + k2/2     
-            glMatrix.vec4.scale(k3, this.g(previous_plus_k2_2, signum), this.step_size);
+                //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
+                glMatrix.vec4.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
+                glMatrix.vec4.add(previous_plus_k1_2, substep_previousPosition, k1_2);// previousPosition + k1/2            
+                glMatrix.vec4.scale(k2, this.g(previous_plus_k1_2, signum), sub_step_size);
 
-            //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
-            glMatrix.vec4.add(previous_plus_k3, previousPosition, k3);// previousPosition + k3
-            glMatrix.vec4.scale(k4, this.g(previous_plus_k3, signum), this.step_size);
+                //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
+                glMatrix.vec4.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+                glMatrix.vec4.add(previous_plus_k2_2, substep_previousPosition, k2_2);// previousPosition + k2/2     
+                glMatrix.vec4.scale(k3, this.g(previous_plus_k2_2, signum), sub_step_size);
 
-            //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
-            glMatrix.vec4.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
-            glMatrix.vec4.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
-            glMatrix.vec4.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
-            glMatrix.vec4.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
-            glMatrix.vec4.add(currentPosition, previousPosition, k1_6);// previousPosition + k1 / 6 
-            glMatrix.vec4.add(currentPosition, currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
-            glMatrix.vec4.add(currentPosition, currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
-            glMatrix.vec4.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+                //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
+                glMatrix.vec4.add(previous_plus_k3, substep_previousPosition, k3);// previousPosition + k3
+                glMatrix.vec4.scale(k4, this.g(previous_plus_k3, signum), sub_step_size);
+
+                //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
+                glMatrix.vec4.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+                glMatrix.vec4.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+                glMatrix.vec4.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+                glMatrix.vec4.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+                glMatrix.vec4.add(substep_currentPosition, substep_previousPosition, k1_6);// previousPosition + k1 / 6 
+                glMatrix.vec4.add(substep_currentPosition, substep_currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
+                glMatrix.vec4.add(substep_currentPosition, substep_currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+                glMatrix.vec4.add(substep_currentPosition, substep_currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+
+                              
+                //prepare next substep iteration: copy current to previous
+                glMatrix.vec4.copy(substep_previousPosition, substep_currentPosition);  
+            }
+
+            //after every substep, copy the final value to currentPosition
+            glMatrix.vec4.copy(currentPosition, substep_currentPosition);
 
             //console.log(i, currentPosition);
             if (this.confine_to_cube)

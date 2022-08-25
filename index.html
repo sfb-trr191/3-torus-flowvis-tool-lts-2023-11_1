@@ -617,6 +617,14 @@
                                 <input id="input_step_size" type="text" value="0.0125"
                                     title="The step size parameter of RK4 (4th order Runge-Kutta method).">
                             </div>
+                            <div class="input_row" id="input_row_streamline_calculation_inbetweens">
+                                <label>inbetweens</label>
+                                <input id="input_streamline_calculation_inbetweens" type="text" value="0"
+                                    title="The number of calculated points discarded between each pair of saved points. Increasing this parameter saves memory.
+    Examples:
+    - 0 Inbetweens: every point is saved and used for drawing.
+    - 2 Inbetweens: only every third point is saved and used for drawing.">
+                            </div>
                             <div class="input_row" id="input_row_tube_radius_fundamental">
                                 <label>tube radius</label>
                                 <input id="input_tube_radius_fundamental" type="text" value="0.005"
