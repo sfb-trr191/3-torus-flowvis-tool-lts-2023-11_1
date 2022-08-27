@@ -51,6 +51,7 @@ const ObjectManager = require("./object_manager");
 const GlobalData = require("./global_data");
 const ShaderManager = require("./shader_manager");
 const StreamlineContext = require("./streamline_context");
+const BackgroundObjectCalculateStreamlines = require("./background_object_calculate_streamlines")
 const FTLEManager = require("./ftle_manager");
 const Aliasing = require("./aliasing");
 const CanvasWrapper = require("./canvas_wrapper");
@@ -137,6 +138,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     var export_object = null;
     var export_wizard;
     var block_all_input = false;
+
+    var bo_calculate_streamlines;
 
     function onStart(evt) {
         console.log("onStart");
@@ -364,16 +367,79 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         //message_display.innerHTML = "";
     }
 
-    function start_calculating(time_now){
-        CalculateStreamlines();
+    function state_streamline_calculation_setup(time_now){
+        console.log("#SC: state_streamline_calculation_setup");
+        bo_calculate_streamlines = new BackgroundObjectCalculateStreamlines(gl, gl_side);
+
+        //var t_start = performance.now();        
+
+        canvas_wrapper_main.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
+        canvas_wrapper_side.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
+        canvas_wrapper_main.tube_radius_outside = bo_calculate_streamlines.input_parameters.max_radius_factor_highlight;
+        canvas_wrapper_side.tube_radius_outside = bo_calculate_streamlines.input_parameters.max_radius_factor_highlight;
+
+        //streamline_context_static.CalculateStreamlines(gl, gl_side);
+
+        //var t_stop = performance.now();
+        //console.log("Performance: calculated streamlines in: ", Math.ceil(t_stop-t_start), "ms");
+
+        //var errors = streamline_context_static.streamline_generator.streamline_error_counter;
+        //if(errors > 0){
+        //    alert("Warning: There were " + errors + " errors during streamline calculation. The respective streamlines are terminated where the error occured. Make sure the equations do not result in infinity or NaN values.");
+        //}
+
+        requestAnimationFrame(state_streamline_calculation_setup_part_default);
+    }
+
+    function state_streamline_calculation_setup_part_default(time_now){
+        console.log("#SC: state_streamline_calculation_setup_part_default");
+        streamline_context_static.SetupPartDefault(bo_calculate_streamlines);
+        requestAnimationFrame(state_streamline_calculation_calculate_new_streamline);
+    }
+
+    function state_streamline_calculation_setup_part_outside(time_now){
+        console.log("#SC: state_streamline_calculation_setup_part_outside");
+        streamline_context_static.SetupPartOutside(bo_calculate_streamlines);
+        requestAnimationFrame(state_streamline_calculation_calculate_new_streamline);
+    }
+
+    function state_streamline_calculation_calculate_new_streamline(time_now){
+        console.log("#SC: state_streamline_calculation_calculate_new_streamline", bo_calculate_streamlines.next_streamline_index);
+        if(bo_calculate_streamlines.next_streamline_index == streamline_context_static.streamline_generator.seeds.length){
+            requestAnimationFrame(state_streamline_calculation_finish_part);
+            return;
+        }
+        streamline_context_static.streamline_generator.CalculateNextStreamline(bo_calculate_streamlines);
+
+        bo_calculate_streamlines.test_index++;
+        bo_calculate_streamlines.OnProgressChanged(bo_calculate_streamlines.next_streamline_index/(streamline_context_static.streamline_generator.seeds.length));
+        requestAnimationFrame(state_streamline_calculation_calculate_new_streamline);
+    }
+
+    function state_streamline_calculation_finish_part(time_now){
+        console.log("#SC: state_streamline_calculation_finish_part");     
+        streamline_context_static.FinishStreamlinesPart(bo_calculate_streamlines);
+        if(bo_calculate_streamlines.part_index == PART_INDEX_DEFAULT){
+            requestAnimationFrame(state_streamline_calculation_setup_part_outside);
+            return;
+        }
+        requestAnimationFrame(state_streamline_calculation_finished);
+    }
+
+    function state_streamline_calculation_finished(time_now){
+        console.log("#SC: state_streamline_calculation_finished");
+        data_changed = true;
+        input_changed_manager.UpdateDefaultValuesCalculate();
+
         UpdateRenderSettings();
         UpdateGlobalData();
         UpdateURL();
         sheduled_task = TASK_NONE;
         document.getElementById("wrapper_dialog_calculating").className = "hidden";
-        //document.getElementById("wrapper_transparent_overlay").className = "hidden";   
         requestAnimationFrame(on_update);
     }
+
+
 
     function prepare_left_shader(time_now){
         shader_manager.PrepareRaytracingShaderMain(gl);
@@ -511,7 +577,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             DeactivateInput();
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
             document.getElementById("wrapper_transparent_overlay").className = "wrapper";
-            requestAnimationFrame(start_calculating);
+            requestAnimationFrame(state_streamline_calculation_setup);
             return;  
         }        
         if(sheduled_task == TASK_EXPORT_THUMBNAIL){

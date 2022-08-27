@@ -125,6 +125,27 @@ class StreamlineGenerator {
         this.shader_rule_v_y_neg_v_y = "v_y+1";	    //if v_y<1 : v_y=___
     }
 
+    SetupCalculateRawStreamlines(bo_calculate_streamlines){
+        bo_calculate_streamlines.raw_data.initialize(this.seeds, this.seed_signums, this.num_points_per_streamline);
+        bo_calculate_streamlines.next_streamline_index = 0;
+    }
+
+    CalculateNextStreamline(bo_calculate_streamlines){
+        switch (this.space) {
+            case SPACE_3_TORUS:
+                this.CalculateRawStreamline3Torus(bo_calculate_streamlines.next_streamline_index, bo_calculate_streamlines.raw_data);
+                break;
+            case SPACE_2_PLUS_2D:
+                var snap_nearest_z = part_index == PART_INDEX_OUTSIDE;
+                this.CalculateRawStreamline2Plus2D(bo_calculate_streamlines.next_streamline_index, bo_calculate_streamlines.raw_data, snap_nearest_z);
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
+        bo_calculate_streamlines.next_streamline_index++;
+    }
+
     CalculateRawStreamlines(raw_data, part_index) {
         console.log("CalculateRawStreamlines: part_index: ", part_index);
         console.log("CalculateRawStreamlines: this.inbetweens: ", this.inbetweens);
@@ -164,7 +185,7 @@ class StreamlineGenerator {
         //push seed
         var new_entry = new RawDataEntry();
         raw_data.data.push(new_entry);
-        console.log("this.seeds[i]: ", this.seeds[seed_index]);
+        //console.log("this.seeds[i]: ", this.seeds[seed_index]);
         glMatrix.vec4.copy(raw_data.data[startIndex].position, this.seeds[seed_index]);
         raw_data.data[startIndex].u_v_w_signum[3] = this.seed_signums[seed_index];
         raw_data.data[startIndex].flag = this.seed_signums[seed_index];
@@ -182,10 +203,10 @@ class StreamlineGenerator {
         raw_data.data[startIndex].flag = signum;
         raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
         var previousPosition = startPosition;
-        console.log("startIndex: ", startIndex);
-        console.log("positionData: ", positionData);
-        console.log("startPosition: ", startPosition);
-        console.log("previousPosition: ", previousPosition);
+        //console.log("startIndex: ", startIndex);
+        //console.log("positionData: ", positionData);
+        //console.log("startPosition: ", startPosition);
+        //console.log("previousPosition: ", previousPosition);
 
         var currentPosition = glMatrix.vec3.create();
         var k1 = glMatrix.vec3.create();
@@ -272,7 +293,7 @@ class StreamlineGenerator {
 
             var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
             
-            console.log("time_current", time_current);
+            //console.log("time_current", time_current);
 
             //push entry for current index
             var new_entry = new RawDataEntry();

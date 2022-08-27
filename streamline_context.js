@@ -56,6 +56,72 @@ class StreamlineContext {
         this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side);
     }
 
+    SetupPartDefault(bo_calculate_streamlines){
+        var part_index = PART_INDEX_DEFAULT;
+        var generate_copies = true;
+        var check_bounds = true;
+        this.SetupPart(bo_calculate_streamlines, part_index, generate_copies, check_bounds);   
+    }
+
+    SetupPartOutside(bo_calculate_streamlines){
+        var part_index = PART_INDEX_OUTSIDE;
+        var generate_copies = false;
+        var check_bounds = false;
+        this.SetupPart(bo_calculate_streamlines, part_index, generate_copies, check_bounds);   
+    }
+
+    SetupPart(bo_calculate_streamlines, part_index, generate_copies, check_bounds){
+        bo_calculate_streamlines.next_streamline_index = 0;
+        bo_calculate_streamlines.part_index = part_index;
+        bo_calculate_streamlines.generate_copies = generate_copies;
+        this.streamline_generator.check_bounds = check_bounds;
+
+
+
+        bo_calculate_streamlines.raw_data = this.GetRawData(bo_calculate_streamlines.part_index);
+
+        this.ui_seeds.direction = bo_calculate_streamlines.input_parameters.direction;
+    
+        this.streamline_generator.termination_condition = bo_calculate_streamlines.input_parameters.termination_condition;
+        this.streamline_generator.termination_advection_time = bo_calculate_streamlines.input_parameters.termination_advection_time;
+        this.streamline_generator.termination_arc_length = bo_calculate_streamlines.input_parameters.termination_arc_length;
+        this.streamline_generator.streamline_error_counter = 0;
+        this.streamline_generator.space = bo_calculate_streamlines.input_parameters.space;
+        this.streamline_generator.direction = bo_calculate_streamlines.input_parameters.direction;
+        this.streamline_generator.shader_formula_u = bo_calculate_streamlines.input_parameters.shader_formula_u;
+        this.streamline_generator.shader_formula_v = bo_calculate_streamlines.input_parameters.shader_formula_v;
+        this.streamline_generator.shader_formula_w = bo_calculate_streamlines.input_parameters.shader_formula_w;
+        this.streamline_generator.shader_formula_a = bo_calculate_streamlines.input_parameters.shader_formula_a;
+        this.streamline_generator.shader_formula_b = bo_calculate_streamlines.input_parameters.shader_formula_b;
+        this.streamline_generator.num_points_per_streamline = bo_calculate_streamlines.input_parameters.input_num_points_per_streamline;
+        this.streamline_generator.step_size = bo_calculate_streamlines.input_parameters.step_size;
+        this.streamline_generator.inbetweens = bo_calculate_streamlines.input_parameters.inbetweens;
+        this.segment_duplicator.iterations = bo_calculate_streamlines.input_parameters.segment_duplicator_iterations;
+
+        this.streamline_generator.SetRulesTorus();
+        this.streamline_generator.SetRules2Plus2D();
+        this.streamline_generator.GenerateSeedsFromUI();
+
+        //flag_calculate determines whether streamlines are calculated or cleared depending on the part index and the selected calculation method
+        var flag_fundamental = bo_calculate_streamlines.input_parameters.streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
+            || bo_calculate_streamlines.input_parameters.streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_FUNDAMENTAL;
+        var flag_r3 = bo_calculate_streamlines.input_parameters.streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
+            || bo_calculate_streamlines.input_parameters.streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_R3;
+        var flag_calculate = part_index == PART_INDEX_DEFAULT ? flag_fundamental : flag_r3;
+
+        //tubeRadius depends on the part index
+        this.streamline_generator.tubeRadius = part_index == PART_INDEX_DEFAULT ? bo_calculate_streamlines.input_parameters.tube_radius_fundamental
+            : bo_calculate_streamlines.input_parameters.tube_radius_fundamental * bo_calculate_streamlines.input_parameters.max_radius_factor_highlight;
+
+        if (flag_calculate) {
+            //this.CalculateStreamlinesPart(PART_INDEX_DEFAULT, gl, gl_side, generate_copies);
+            this.streamline_generator.SetupCalculateRawStreamlines(bo_calculate_streamlines);
+        }
+        else {
+            this.ClearStreamlinesPart(bo_calculate_streamlines.part_index, bo_calculate_streamlines.gl, bo_calculate_streamlines.gl_side);
+        }
+    }
+
     CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, shader_formula_u, shader_formula_v, shader_formula_w,
         shader_formula_a, shader_formula_b,
         input_num_points_per_streamline, step_size, inbetweens, segment_duplicator_iterations, direction,
@@ -141,6 +207,62 @@ class StreamlineContext {
         console.log("CalculateStreamlinesPart");
 
         this.streamline_generator.CalculateRawStreamlines(raw_data, part_index);
+        this.lod_0.ExtractMultiPolyLines(part_index);
+
+        switch (this.streamline_generator.space) {
+            case SPACE_3_TORUS:
+                raw_data.MakeDataHomogenous();
+                break;
+            case SPACE_2_PLUS_2D:
+                raw_data.CopyAngleIntoPosition();
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
+
+        //reset all lods that are not calculated
+        for (var i = this.highest_active_lod_index+1; i < this.lod_list.length; i++) {
+            this.lod_list[i].ResetPart(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
+        }        
+
+        //simplify active lods except lod_0
+        for (var i = 1; i <= this.highest_active_lod_index; i++) {
+            this.lod_list[i].DouglasPeuker(part_index, this.lod_list[i - 1]);
+        }
+
+        for (var i = 0; i <= this.highest_active_lod_index; i++) {
+            this.lod_list[i].GenerateLineSegments(part_index);
+            if (generate_copies)
+                this.lod_list[i].GenerateLineSegmentCopies(part_index);
+            this.lod_list[i].CalculateMatrices(part_index);
+            this.lod_list[i].CalculateBVH(part_index);
+        }
+
+        raw_data.GeneratePositionData();
+
+        for (var i = 0; i < this.lod_list.length; i++) {
+            this.lod_list[i].UpdateDataUnit();
+            this.lod_list[i].UpdateDataTextures(gl, gl_side);
+        }
+
+        for (var i = 0; i < this.lod_list.length; i++) {
+            this.lod_list[i].LogState();
+        }
+    }
+
+    FinishStreamlinesPart(bo_calculate_streamlines) {
+        var part_index = bo_calculate_streamlines.part_index;
+        var gl = bo_calculate_streamlines.gl;
+        var gl_side = bo_calculate_streamlines.gl_side;
+        var generate_copies = bo_calculate_streamlines.generate_copies;
+
+
+
+        var raw_data = this.GetRawData(part_index);
+        console.log("FinishStreamlinesPart");
+
         this.lod_0.ExtractMultiPolyLines(part_index);
 
         switch (this.streamline_generator.space) {

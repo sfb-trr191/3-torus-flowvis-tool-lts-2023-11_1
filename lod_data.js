@@ -347,7 +347,7 @@ class LODData {
             }
         }
         console.log("GenerateLineSegments completed");
-        console.log("this.vectorLineSegment [", vectorLineSegment.length, "]: ", vectorLineSegment);
+        //console.log("this.vectorLineSegment [", vectorLineSegment.length, "]: ", vectorLineSegment);
     }
 
     CalculateMatrices(part_index) {

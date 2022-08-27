@@ -54,7 +54,7 @@ class DataUnit {
 
         //generate arrays of the containers
         for (var i = 0; i < this.list_data_containers.length; i++) {
-            console.log("container: ", i, this.list_data_containers[i]);
+            //console.log("container: ", i, this.list_data_containers[i]);
             this.list_data_containers[i].generateArrays();
         }
 
