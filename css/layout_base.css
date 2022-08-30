@@ -399,10 +399,12 @@ legend {
     top:50%;
     left:50%;
     overflow:auto;
-    width:400px;
-    height:100px;
-    margin-left:-200px;
-    margin-top:-50px;
+    width:500px;
+    height:150px;
+    margin-left:-250px;
+    margin-top:-75px;
+
+    display: grid;
 }
 
 .canvas_wrapper{   
