@@ -240,7 +240,7 @@ class HideManager {
         this.group_data = new HideGroup("select_data_paramaters_mode");
         this.group_data.AddInputRow("input_row_duplicator_iterations", LEVEL_DEBUG, false);
         this.group_data.AddInputRow("input_row_data_step_size", LEVEL_ADVANCED, false);
-        this.group_data.AddInputRow("input_streamline_calculation_inbetweens", LEVEL_ADVANCED, false);        
+        this.group_data.AddInputRow("input_row_streamline_calculation_inbetweens", LEVEL_ADVANCED, false);        
         this.group_data.AddInputRow("input_row_tube_radius_fundamental", LEVEL_ADVANCED, false);
         this.group_data.AddInputRow("input_row_max_radius_factor_highlight", LEVEL_ADVANCED, false);
         this.groups.push(this.group_data);
