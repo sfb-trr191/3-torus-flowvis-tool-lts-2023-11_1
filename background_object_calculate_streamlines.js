@@ -6,6 +6,7 @@ class BackgroundObjectCalculateStreamlines{
         this.gl = gl;
         this.gl_side = gl_side;
         this.input_parameters = new Object();
+        this.current_streamline = new Object();
         this.finished = false;
         this.test_index = 0;
         this.grabInputParameters();

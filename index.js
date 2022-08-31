@@ -394,26 +394,38 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
     function state_streamline_calculation_setup_part_default(time_now){
         console.log("#SC: state_streamline_calculation_setup_part_default");
         streamline_context_static.SetupPartDefault(bo_calculate_streamlines);
-        requestAnimationFrame(state_streamline_calculation_calculate_new_streamline);
+        requestAnimationFrame(state_streamline_calculation_setup_new_streamline);
     }
 
     function state_streamline_calculation_setup_part_outside(time_now){
         console.log("#SC: state_streamline_calculation_setup_part_outside");
         streamline_context_static.SetupPartOutside(bo_calculate_streamlines);
-        requestAnimationFrame(state_streamline_calculation_calculate_new_streamline);
+        requestAnimationFrame(state_streamline_calculation_setup_new_streamline);
     }
 
-    function state_streamline_calculation_calculate_new_streamline(time_now){
-        console.log("#SC: state_streamline_calculation_calculate_new_streamline", bo_calculate_streamlines.next_streamline_index);
+    function state_streamline_calculation_setup_new_streamline(time_now){
+        console.log("#SC: state_streamline_calculation_setup_new_streamline", bo_calculate_streamlines.next_streamline_index);
+        bo_calculate_streamlines.OnProgressChanged(bo_calculate_streamlines.next_streamline_index/(streamline_context_static.streamline_generator.seeds.length));
         if(bo_calculate_streamlines.next_streamline_index == streamline_context_static.streamline_generator.seeds.length){
             requestAnimationFrame(state_streamline_calculation_finish_part);
             return;
         }
-        streamline_context_static.streamline_generator.CalculateNextStreamline(bo_calculate_streamlines);
+        streamline_context_static.streamline_generator.SetupNextStreamline(bo_calculate_streamlines);
 
-        bo_calculate_streamlines.test_index++;
-        bo_calculate_streamlines.OnProgressChanged(bo_calculate_streamlines.next_streamline_index/(streamline_context_static.streamline_generator.seeds.length));
-        requestAnimationFrame(state_streamline_calculation_calculate_new_streamline);
+        requestAnimationFrame(state_streamline_calculation_continue_streamline);
+    }
+
+    function state_streamline_calculation_continue_streamline(time_now){
+        console.log("#SC: state_streamline_calculation_continue_streamline", bo_calculate_streamlines.next_streamline_index);
+        if(bo_calculate_streamlines.current_streamline.finished){
+            bo_calculate_streamlines.next_streamline_index++;            
+            requestAnimationFrame(state_streamline_calculation_setup_new_streamline);
+            return;
+        }
+        streamline_context_static.streamline_generator.ContinueStreamline(bo_calculate_streamlines);
+
+        bo_calculate_streamlines.OnProgressChanged(bo_calculate_streamlines.streamline_part_progress);
+        requestAnimationFrame(state_streamline_calculation_continue_streamline);
     }
 
     function state_streamline_calculation_finish_part(time_now){
