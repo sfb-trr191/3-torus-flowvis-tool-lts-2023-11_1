@@ -587,6 +587,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         //handle sheduled task
         if(sheduled_task == TASK_CALCULATE_STREAMLINES){
             DeactivateInput();
+            UpdateRenderSettings();
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
             document.getElementById("wrapper_transparent_overlay").className = "wrapper";
             requestAnimationFrame(state_streamline_calculation_setup);
