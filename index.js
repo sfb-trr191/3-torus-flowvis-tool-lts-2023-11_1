@@ -915,6 +915,21 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             SetExample3();
         });
 
+        document.getElementById("fieldset_load_example_4").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample4");
+            SetExample4();
+        });
+        
+        document.getElementById("fieldset_load_example_5").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample5");
+            SetExample5();
+        });
         
     }
 
@@ -1531,7 +1546,25 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
         hide_manager.UpdateVisibility();
     }
-    
+
+    function SetExample4(){
+        document.getElementById("select_space").value = "1";
+        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
+        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_w").value = "sin(2 * PI * x) + cos(2 * PI * y)";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+
+    function SetExample5(){
+        document.getElementById("select_space").value = "1";
+        document.getElementById("input_field_equation_u").value = "2 * sin(2 * PI * z)";
+        document.getElementById("input_field_equation_v").value = "sin(2 * PI * y) + 2 * cos (2 * PI * z)";
+        document.getElementById("input_field_equation_w").value = "cos(2 * PI * x)";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+  
 
     function testWebGPU() {
         async function demo() {
