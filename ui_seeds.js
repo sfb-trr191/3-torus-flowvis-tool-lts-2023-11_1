@@ -396,7 +396,7 @@ class UIMultiSeed {
 
         //ROW COUNT PER AXIS        
         this.node_row_count_per_axis_label = document.createElement("label");
-        this.node_row_count_per_axis_label.innerHTML = "count per axis";
+        this.node_row_count_per_axis_label.innerHTML = "number per axis";
         this.node_row_count_per_axis.appendChild(this.node_row_count_per_axis_label);
 
         this.node_input_count_per_axis= document.createElement("input");
