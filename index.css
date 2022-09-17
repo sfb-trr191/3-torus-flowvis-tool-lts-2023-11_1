@@ -507,7 +507,7 @@ legend {
 
 .horizontal_div_multi_seed_header {
     display: inline-grid;
-    grid-template-columns: 32px 1fr 68px 32px;
+    grid-template-columns: 32px 1fr 32px;
     column-gap: 4px;
     gap: 4px;
 }

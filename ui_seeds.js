@@ -268,6 +268,11 @@ class UIMultiSeed {
         this.node_header.className = "horizontal_div_multi_seed_header";        
         this.node_vertical.appendChild(this.node_header);
 
+        this.className_node_row_count = "horizontal_div_multi_seed_vec3";    
+        this.node_row_count = document.createElement("div");
+        this.node_row_count.className = this.className_node_row_count;        
+        this.node_vertical.appendChild(this.node_row_count);
+
         this.className_node_row_axis = "horizontal_div_multi_seed_vec3";    
         this.node_row_axis = document.createElement("div");
         this.node_row_axis.className = this.className_node_row_axis;        
@@ -338,12 +343,6 @@ class UIMultiSeed {
         });
         this.node_header.appendChild(this.node_input_select);
 
-        this.node_input_count = document.createElement("input");
-        this.node_input_count.type = "text";
-        this.node_input_count.value = "4";
-        this.node_input_count.title = "Number of seeds.";
-        this.node_header.appendChild(this.node_input_count);
-
         this.node_button = document.createElement("button");
         this.node_button.innerHTML = "x";
         this.node_button.type = "button";
@@ -383,6 +382,17 @@ class UIMultiSeed {
         this.node_input_axis_value.value = "0.5";
         this.node_input_axis_value.title = "The fixed x, y, or z value (depending on the selected axis).";
         this.node_row_axis.appendChild(this.node_input_axis_value);
+
+        //ROW COUNT    
+        this.node_row_count_label = document.createElement("label");
+        this.node_row_count_label.innerHTML = "number of seeds";
+        this.node_row_count.appendChild(this.node_row_count_label);
+
+        this.node_input_count= document.createElement("input");
+        this.node_input_count.type = "text";
+        this.node_input_count.value = "4";
+        this.node_input_count.title = "The number of seeds.";
+        this.node_row_count.appendChild(this.node_input_count);
 
         //ROW COUNT PER AXIS        
         this.node_row_count_per_axis_label = document.createElement("label");
@@ -616,6 +626,7 @@ class UIMultiSeed {
         var mode = parseInt(this.node_input_select.value);
         switch(mode){
             case MULTI_SEED_MODE_RANDOM:
+                this.node_row_count.className = this.className_node_row_count;
                 this.node_row_axis.className = "hidden";
                 this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = this.className_node_row_random_number;
@@ -624,6 +635,7 @@ class UIMultiSeed {
                 this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_FIXED_POINT:
+                this.node_row_count.className = this.className_node_row_count;
                 this.node_row_axis.className = "hidden";
                 this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
@@ -632,6 +644,7 @@ class UIMultiSeed {
                 this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_LINE:
+                this.node_row_count.className = this.className_node_row_count;
                 this.node_row_axis.className = "hidden";
                 this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = "hidden";
@@ -640,6 +653,7 @@ class UIMultiSeed {
                 this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_ALIGNED_PLANE_RANDOM:
+                this.node_row_count.className = this.className_node_row_count;
                 this.node_row_axis.className = this.className_node_row_axis;
                 this.node_row_count_per_axis.className = "hidden";
                 this.node_row_random_number.className = this.className_node_row_random_number;
@@ -648,6 +662,7 @@ class UIMultiSeed {
                 this.node_row_two_colors2.className = "hidden";
                 break;
             case MULTI_SEED_MODE_ALIGNED_PLANE_GRID:
+                this.node_row_count.className = "hidden";
                 this.node_row_axis.className = this.className_node_row_axis;
                 this.node_row_count_per_axis.className = this.className_node_row_count_per_axis;
                 this.node_row_random_number.className = "hidden";
