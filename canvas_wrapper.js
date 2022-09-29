@@ -347,7 +347,7 @@ class CanvasWrapper {
         this.aliasing_index = -1;
         this.is_exporting = true;
         this.UpdateResolution(gl, width, height);     
-        this.camera.repositionCamera(this.draw_mode == DRAW_MODE_PROJECTION, this.projection_index, true);
+        this.camera.repositionCamera(this.draw_mode == DRAW_MODE_PROJECTION, this.projection_index, this.is_main_renderer);
         this.camera.UpdateShaderValues(); 
         this.camera.changed = false;  
     }
