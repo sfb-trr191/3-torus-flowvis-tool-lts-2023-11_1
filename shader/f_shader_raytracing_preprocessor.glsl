@@ -111,6 +111,8 @@ struct HitInformation
     vec3 vol_accumulated_color;
 
     bool was_copied_from_outside;
+    
+    int debug_value;
 };
 
 struct Ray
@@ -485,6 +487,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 	hit.ignore_override = false;
     hit.vol_accumulated_opacity = 0.0;
     hit.vol_accumulated_color = vec3(0,0,0);
+    hit.debug_value = 0;
 
     hit_outside.hitType = TYPE_NONE;
 	hit_outside.distance = 0.0;	
@@ -755,6 +758,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
   */
 #ifdef CUT_AT_CUBE_FACES
 	{
+        //
 		IntersectUnitCube(ray, doesIntersect, nearest_t, normal_face);
 		if(doesIntersect)
 		{
@@ -861,22 +865,18 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 				//ray intersects cube --> check if cube hit is inside this object
 				if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
 				{
-					HandleOutOfBound_LineSegment(part_index, ray, glNode.objectIndex, hitCube);					
+					HandleOutOfBound_LineSegment(part_index, ray, glNode.objectIndex, hitCube);//possible problem here					
 				}
-			}
-			if(hitCube.hitType == TYPE_NONE || hitCube.hitType ==TYPE_IGNORE_CUBE)
+			}     
+
+            if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
 			{
-				
-				if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
-				{
 #ifdef HANDLE_INSIDE
-					{
-						HandleInside_LineSegment(part_index, ray, glNode.objectIndex, hit);
-					}
+                {
+                    HandleInside_LineSegment(part_index, ray, glNode.objectIndex, hit);
+                }
 #endif
-					IntersectLineSegment(part_index, check_bounds, ray, ray_local_cutoff, glNode, hit);	
-          						
-				}
+                IntersectLineSegment(part_index, check_bounds, ray, ray_local_cutoff, glNode, hit);	          						
 			}
       				
 		}
@@ -1459,6 +1459,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.multiPolyID = hit_outside.multiPolyID;
                 hit.velocity = hit_outside.velocity;
                 hit.cost = hit_outside.cost;
+                hit.debug_value = 1;//red
             }
             else if(hit_outside.distance < hit.distance){
                 hit.was_copied_from_outside = true;
@@ -1470,7 +1471,14 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.multiPolyID = hit_outside.multiPolyID;
                 hit.velocity = hit_outside.velocity;
                 hit.cost = hit_outside.cost;
+                hit.debug_value = 2;//green
             }
+            else{
+                hit.debug_value = 3;//blue
+            }
+        }
+        else{            
+            hit.debug_value = 4;//yellow
         }
     }
     else{
@@ -1510,6 +1518,12 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 			if(hit.distance < hitCube.distance)
 				transfer = false;
 		}
+        if(hit.was_copied_from_outside){
+            if(hit.distance < hitCube.distance)
+				transfer = false;
+        }
+        
+        //transfer = false;
 		if(transfer)
 		{
 			hit.hitType = hitCube.hitType;
@@ -1521,6 +1535,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 			hit.velocity = hitCube.velocity;
 			hit.cost = hitCube.cost;
 		}
+        
 	}
 
 	if(hit.hitType>TYPE_NONE && hit.distance < maxRayDistance)
@@ -1553,6 +1568,20 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 
     //blend volume with surface
     resultColor = mix(surface_color, hit.vol_accumulated_color, hit.vol_accumulated_opacity);
+/*
+    if(hit.debug_value == 1){
+        resultColor = vec3(1, 0, 0);
+    }
+    if(hit.debug_value == 2){
+        resultColor = vec3(0, 1, 0);
+    }
+    if(hit.debug_value == 3){
+        resultColor = vec3(0, 0, 1);
+    }
+    if(hit.debug_value == 4){
+        resultColor = vec3(1, 1, 0);
+    }
+    */
     
 	//return hitCube.hitType>TYPE_NONE ? surface_color : resultColor;
 	return resultColor;
