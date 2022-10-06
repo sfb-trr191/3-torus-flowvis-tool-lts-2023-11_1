@@ -272,6 +272,7 @@ class StreamlineGenerator {
         var substep_previousPosition = glMatrix.vec3.create();
         
         while(true){
+            var local_i = tmp.i;//does not change even if duplicating point (used for point data)
             var currentIndex = tmp.startIndex + tmp.i;
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
@@ -369,6 +370,7 @@ class StreamlineGenerator {
                         raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
                         raw_data.data[currentIndex + 1].time = time_current;
                         raw_data.data[currentIndex + 1].arc_length = arc_length_current;
+                        raw_data.data[currentIndex + 1].local_i = local_i+1;                        
                         raw_data.data[currentIndex + 1].velocity = v_movedPosition;
                         tmp.i++;
                     }
@@ -383,6 +385,7 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
             raw_data.data[currentIndex].arc_length = arc_length_current;
+            raw_data.data[currentIndex].local_i = local_i;               
 
             //previousPosition = currentPosition;
             if (terminate){
@@ -433,6 +436,7 @@ class StreamlineGenerator {
         var substep_previousPosition = glMatrix.vec4.create();
 
         while(true){  
+            var local_i = tmp.i;//does not change even if duplicating point (used for point data)
             var currentIndex = tmp.startIndex + tmp.i;
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
@@ -509,6 +513,7 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
             raw_data.data[currentIndex].arc_length = arc_length_current;
+            raw_data.data[currentIndex].local_i = local_i;               
             
             var flag_angle_jumping = false;
             if(snap_nearest_z){
@@ -578,6 +583,7 @@ class StreamlineGenerator {
                 raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_newPosition[0], f_newPosition[1], f_newPosition[2], signum);//TODO
                 raw_data.data[currentIndex + 1].time = time_current;
                 raw_data.data[currentIndex + 1].arc_length = arc_length_current;
+                raw_data.data[currentIndex + 1].local_i = local_i+1;               
                 raw_data.data[currentIndex + 1].velocity = v_newPosition;
                 tmp.i++;
             }

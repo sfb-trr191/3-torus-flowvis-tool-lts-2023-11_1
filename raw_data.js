@@ -86,18 +86,28 @@ class RawData {
         console.log("0x1 this.data[i].position[0]", this.data[0].position+"");
 }
 
-    GeneratePositionData() {
-        console.log("GeneratePositionData");
+    GeneratePositionData(termination_condition, termination_max_value) {
+        console.log("GeneratePositionData", termination_condition);
         this.position_data = new Array(this.data.length);
         for (var i = 0; i < this.data.length; i++) {
             var new_entry = new PositionData();
             new_entry.x = this.data[i].position[0];
             new_entry.y = this.data[i].position[1];
             new_entry.z = this.data[i].position[2];
-            new_entry.time = this.data[i].time;
+
+            if(termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME){
+                new_entry.cost = this.data[i].time / termination_max_value;
+            }
+            else if(termination_condition == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH){
+                new_entry.cost = this.data[i].arc_length / termination_max_value;
+            }
+            else{
+                new_entry.cost = this.data[i].local_i / termination_max_value;
+                console.log("PositionData: ", this.data[i].local_i, termination_max_value, new_entry.cost);
+            }
+
             this.position_data[i] = new_entry;
         }
-        console.log("position_data: ", this.position_data);
     }
 
 }

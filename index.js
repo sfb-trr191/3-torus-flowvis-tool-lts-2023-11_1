@@ -1018,6 +1018,13 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             console.log("slice_index", value);
             UpdateSliceSettings();
         });
+
+        document.getElementById("slide_max_cost").addEventListener("change", (event) => {
+            var value = document.getElementById("slide_max_cost").value / 100;
+            console.log("slide_max_cost", value);
+            document.getElementById("input_max_cost_percentage").value = value;
+            UpdateRenderSettings();
+        });
     }
 
     function addChangedCameraControl() {
@@ -1188,6 +1195,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
         //MAIN
+        canvas_wrapper_main.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);        
         canvas_wrapper_main.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_main").value);
         canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
@@ -1240,6 +1248,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         //canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
         //SIDE        
+        canvas_wrapper_side.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);
         canvas_wrapper_side.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_aux").value);
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance_aux").value);
         canvas_wrapper_side.tube_radius_factor = document.getElementById("input_tube_radius_factor_aux").value;

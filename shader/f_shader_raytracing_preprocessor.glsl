@@ -209,12 +209,15 @@ uniform int height;
 uniform int dim_x;//dim of volume texture
 uniform int dim_y;//dim of volume texture
 uniform int dim_z;//dim of volume texture
+
+
+uniform float max_streamline_cost;
+const int growth = 1;//DUMMY
+
 const float epsilon_move_ray = 0.0000001;//DUMMY
 const float epsilon_out_of_bounds = 0.000001;//DUMMY
 const bool ignore_copy = false;//DUMMY
-const float growth_max_cost = 0.0;//DUMMY
-const float scalar_cost_max = 0.0;//DUMMY
-const int growth = 0;//DUMMY
+
 const int growth_id = -1;//DUMMY
 const bool check_bounds = true;//DUMMY
 const int allowOutOfBoundSphere = 0;//DUMMY
@@ -1081,7 +1084,7 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	vec3 b = GetPosition(lineSegment.indexB, part_index);
 	float cost_a = GetCost(lineSegment.indexA, part_index);
 	float cost_b = GetCost(lineSegment.indexB, part_index);
-	float cost_cutoff = growth_max_cost * scalar_cost_max;
+	float cost_cutoff = max_streamline_cost;
 	if(growth == 1)
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
@@ -1271,16 +1274,16 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float local_percentage = z_os / h;
 	float cost = mix(cost_a, cost_b, local_percentage);
-	/*
+	
 	if(growth == 1)
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
 		{
-			if(cost > growth_max_cost * scalar_cost_max)
+			if(cost > max_streamline_cost)
 				return;
 		}
 	}
-	*/
+	
 
 	if(distance_os > ray_local_cutoff)
 		return;
@@ -1395,7 +1398,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
 		{
-			if(cost > growth_max_cost * scalar_cost_max)
+			if(cost > max_streamline_cost)
 				return;
 		}
 	}
@@ -1806,7 +1809,7 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 
 	float cost_a = GetCost(lineSegment.indexA, part_index);
 	float cost_b = GetCost(lineSegment.indexB, part_index);
-	float cost_cutoff = growth_max_cost * scalar_cost_max;
+	float cost_cutoff = max_streamline_cost;
 	if(growth == 1)
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
@@ -1870,7 +1873,7 @@ void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitIn
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
 		{
-			if(cost > growth_max_cost * scalar_cost_max)
+			if(cost > max_streamline_cost)
 				return;
 		}	
 	}
@@ -1922,7 +1925,7 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 
 	float cost_a = GetCost(lineSegment.indexA, part_index);
 	float cost_b = GetCost(lineSegment.indexB, part_index);
-	float cost_cutoff = growth_max_cost * scalar_cost_max;
+	float cost_cutoff = max_streamline_cost;
 	if(growth == 1)
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
@@ -1983,7 +1986,7 @@ void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
 		{
-			if(cost > growth_max_cost * scalar_cost_max)
+			if(cost > max_streamline_cost)
 				return;
 		}	
 	}
@@ -2694,7 +2697,8 @@ vec3 GetPosition(int index, int part_index)
 
 float GetCost(int index, int part_index)
 {
-    float cost = 0.0;
+    ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData(part_index) + index * POSITION_DATA_FLOAT_COUNT);
+    float cost = texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r;
     return cost;
 }
 

@@ -22,6 +22,7 @@ class UniformLocationsRayTracing {
         this.location_offset_x = gl.getUniformLocation(program, "offset_x");
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
+        this.location_max_cost = gl.getUniformLocation(program, "max_streamline_cost");        
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
@@ -177,6 +178,7 @@ class CanvasWrapper {
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
         this.max_volume_distance = 0;// 0=same as limited_max_distance
+        this.max_cost = 0;
         this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
         this.is_exporting = false;
 
@@ -562,6 +564,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
+        gl.uniform1f(this.location_raytracing.location_max_cost, this.max_cost);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
         gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);

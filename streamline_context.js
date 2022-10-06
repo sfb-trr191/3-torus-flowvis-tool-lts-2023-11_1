@@ -76,15 +76,27 @@ class StreamlineContext {
         bo_calculate_streamlines.generate_copies = generate_copies;
         this.streamline_generator.check_bounds = check_bounds;
 
+        //references for better readability
+        var termination_condition = bo_calculate_streamlines.input_parameters.termination_condition;
+        var termination_advection_time = bo_calculate_streamlines.input_parameters.termination_advection_time;
+        var termination_arc_length = bo_calculate_streamlines.input_parameters.termination_arc_length;
+        var num_points_per_streamline = bo_calculate_streamlines.input_parameters.num_points_per_streamline;
 
 
         bo_calculate_streamlines.raw_data = this.GetRawData(bo_calculate_streamlines.part_index);
 
         this.ui_seeds.direction = bo_calculate_streamlines.input_parameters.direction;
+
+        this.streamline_generator.termination_condition = termination_condition;
+        this.streamline_generator.termination_advection_time = termination_advection_time;
+        this.streamline_generator.termination_arc_length = termination_arc_length;
+        this.streamline_generator.num_points_per_streamline = num_points_per_streamline;
+
+        this.streamline_generator.termination_max_value = 
+            termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME ? termination_advection_time
+            : termination_condition == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH ? termination_arc_length
+            : (num_points_per_streamline-1);
     
-        this.streamline_generator.termination_condition = bo_calculate_streamlines.input_parameters.termination_condition;
-        this.streamline_generator.termination_advection_time = bo_calculate_streamlines.input_parameters.termination_advection_time;
-        this.streamline_generator.termination_arc_length = bo_calculate_streamlines.input_parameters.termination_arc_length;
         this.streamline_generator.streamline_error_counter = 0;
         this.streamline_generator.space = bo_calculate_streamlines.input_parameters.space;
         this.streamline_generator.direction = bo_calculate_streamlines.input_parameters.direction;
@@ -93,7 +105,6 @@ class StreamlineContext {
         this.streamline_generator.shader_formula_w = bo_calculate_streamlines.input_parameters.shader_formula_w;
         this.streamline_generator.shader_formula_a = bo_calculate_streamlines.input_parameters.shader_formula_a;
         this.streamline_generator.shader_formula_b = bo_calculate_streamlines.input_parameters.shader_formula_b;
-        this.streamline_generator.num_points_per_streamline = bo_calculate_streamlines.input_parameters.input_num_points_per_streamline;
         this.streamline_generator.step_size = bo_calculate_streamlines.input_parameters.step_size;
         this.streamline_generator.inbetweens = bo_calculate_streamlines.input_parameters.inbetweens;
         this.segment_duplicator.iterations = bo_calculate_streamlines.input_parameters.segment_duplicator_iterations;
@@ -190,7 +201,7 @@ class StreamlineContext {
             this.lod_list[i].CalculateBVH(part_index);
         }
 
-        raw_data.GeneratePositionData();
+        raw_data.GeneratePositionData(this.streamline_generator.termination_condition, this.streamline_generator.termination_max_value);
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].UpdateDataUnit();
@@ -240,7 +251,7 @@ class StreamlineContext {
             this.lod_list[i].CalculateBVH(part_index);
         }
 
-        raw_data.GeneratePositionData();
+        raw_data.GeneratePositionData(this.streamline_generator.termination_condition, this.streamline_generator.termination_max_value);
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].UpdateDataUnit();
@@ -296,7 +307,7 @@ class StreamlineContext {
             this.lod_list[i].CalculateBVH(part_index);
         }
 
-        raw_data.GeneratePositionData();
+        raw_data.GeneratePositionData(this.streamline_generator.termination_condition, this.streamline_generator.termination_max_value);
 
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].UpdateDataUnit();

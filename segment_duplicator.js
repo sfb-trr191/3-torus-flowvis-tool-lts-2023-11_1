@@ -101,6 +101,8 @@ class SegmentDuplicator {
                     vec4_from_vec3_1(newA.position, resultA);
                     //newA.position = glMatrix.vec4.fromValues(0.40, 0.40, 0.40, 1);
                     newA.time = rawDataA.time;
+                    newA.arc_length = rawDataA.arc_length;
+                    newA.local_i = rawDataA.local_i;
                     pointDataVector.push(newA);
 
                     newSegment.indexB = pointDataVector.length;
@@ -109,6 +111,8 @@ class SegmentDuplicator {
                     //newB.position = resultB;
                     vec4_from_vec3_1(newB.position, resultB);
                     newB.time = rawDataB.time;
+                    newB.arc_length = rawDataB.arc_length;
+                    newB.local_i = rawDataB.local_i;
                     pointDataVector.push(newB);
 
                     /*

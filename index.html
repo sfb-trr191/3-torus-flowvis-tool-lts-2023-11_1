@@ -833,7 +833,19 @@
                         <div class="group_properties_content">
                             <fieldset class="subgroup_properties">
                                 <legend>Streamline Shading</legend>
-                                <div class="vertical_container">                                    
+                                <div class="vertical_container">     
+                                    <div class="input_row" id="input_row_max_cost_percentage">
+                                        <label>normalized max cost</label>
+                                        <div class="horizontal_div_2">
+                                            <div class="slide_container">
+                                                <input type="range" min="0" max="100" value="100" class="slider"
+                                                    id="slide_max_cost" title="">                                        
+                                            </div>
+                                            <input id="input_max_cost_percentage" type="text" value="1.0"
+                                            title="The normalized maximum cost depending on the termination condition. If a value smaller 1 is chosen, only a fraction of the streamline is shown. 
+    - values between 0 and 1.">
+                                        </div>
+                                    </div>                            
                                     <div class="input_row">
                                         <label>shading mode</label>
                                         <select id="select_shading_mode_streamlines" title="This parameter decides the color of streamlines.

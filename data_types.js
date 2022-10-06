@@ -32,7 +32,7 @@ class PositionData {
     x = 0.0;
     y = 0.0;
     z = 0.0;
-    time = 0.0;
+    cost = 0.0;
 
     constructor() { }
 
@@ -40,7 +40,7 @@ class PositionData {
         console.log("x: " + this.x);
         console.log("y: " + this.y);
         console.log("z: " + this.z);
-        console.log("time: " + this.time);
+        console.log("cost: " + this.cost);
     }
 
     getFloatCount() {
@@ -56,7 +56,7 @@ class PositionData {
         arrayf[index++] = this.x;
         arrayf[index++] = this.y;
         arrayf[index++] = this.z;
-        arrayf[index++] = this.time;
+        arrayf[index++] = this.cost;
     }
 }
 
