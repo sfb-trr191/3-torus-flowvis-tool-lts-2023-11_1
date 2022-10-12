@@ -454,11 +454,14 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
 
     function prepare_left_shader(time_now){
-        shader_manager.PrepareRaytracingShaderMain(gl);
-        
+        shader_manager.PrepareRaytracingShaderMain(gl);   
+
+        document.getElementById("wrapper_dialog_prepare_left_shader").className = "hidden";        
         //message_display.innerHTML = "initialize shaders (2/2)...";
-        document.getElementById("wrapper_dialog_prepare_left_shader").className = "hidden";
-        document.getElementById("wrapper_dialog_prepare_right_shader").className = "wrapper";
+        if(shader_manager.ShouldPrepareRaytracingShaderSide(gl)){
+            document.getElementById("wrapper_dialog_prepare_right_shader").className = "wrapper";
+            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+        }
         requestAnimationFrame(prepare_right_shader);
     }
 
@@ -469,7 +472,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         t_start_waiting_for_shaders = performance.now();
 
         document.getElementById("wrapper_dialog_prepare_right_shader").className = "hidden";
-        document.getElementById("wrapper_dialog_wait_for_shader").className = "wrapper";
+        if(shader_manager.DidPrepareShader()){
+            document.getElementById("wrapper_dialog_wait_for_shader").className = "wrapper";
+            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+        }
         requestAnimationFrame(wait_for_shader);
     }
 
@@ -629,8 +635,10 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
         if(shader_manager.IsDirty()){
             //message_display.innerHTML = "initialize shaders (1/2)...";
-            document.getElementById("wrapper_dialog_prepare_left_shader").className = "wrapper";
-            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            if(shader_manager.ShouldPrepareRaytracingShaderMain(gl)){
+                document.getElementById("wrapper_dialog_prepare_left_shader").className = "wrapper";
+                document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            }
             requestAnimationFrame(prepare_left_shader);
             return;
         }        

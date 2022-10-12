@@ -116,6 +116,16 @@ class ShaderManager {
         return key;
     }
 
+    DidPrepareShader(){
+        return this.flag_prepare_main || this.flag_prepare_side;
+    }
+
+    ShouldPrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float, shader_flags){
+        //get shader key
+        var shader_key = this.GetShaderKey(shader_formula_scalar_float, shader_flags);
+        return ! (shader_key in dict_shaders);
+    }
+
     PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float, shader_flags){
         //the return container
         var container;
@@ -138,6 +148,22 @@ class ShaderManager {
         return container;
     }
 
+    ShouldPrepareRaytracingShaderMain(gl){
+
+        //get variables
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+
+        this.canvas_wrapper_main.UpdateShaderFlags();
+        var shader_flags = this.canvas_wrapper_main.shader_flags;
+
+        this.flag_prepare_main = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float, shader_flags);
+        return this.flag_prepare_main;
+    }
+
+
     PrepareRaytracingShaderMain(gl){
         var t_start = performance.now();
 
@@ -155,6 +181,21 @@ class ShaderManager {
         
         var t_stop = performance.now();
         console.log("Performance: Prepare left shader in: ", Math.ceil(t_stop-t_start), "ms");
+    }
+
+    ShouldPrepareRaytracingShaderSide(gl){
+
+        //get variables
+        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
+        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+
+        this.canvas_wrapper_side.UpdateShaderFlags();
+        var shader_flags = this.canvas_wrapper_side.shader_flags;
+
+        this.flag_prepare_side = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float, shader_flags);
+        return this.flag_prepare_side;
     }
 
     PrepareRaytracingShaderSide(gl){
