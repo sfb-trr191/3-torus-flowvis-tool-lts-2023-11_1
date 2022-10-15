@@ -31,8 +31,13 @@ class ShaderManager {
         return code;
     }
 
-    GetShader(shader_formula_scalar, shader_flags) {
+    GetShader(shader_formula_scalar, 
+        light_transport_p0, light_transport_p1, light_transport_p2, 
+        light_transport_d0, light_transport_d1, light_transport_d2, 
+        shader_flags) {
         var code = F_SHADER_RAYTRACING_PREPROCESSOR.replace("shader_formula_scalar", shader_formula_scalar);
+
+        code = this.LoadModules(code, shader_flags);
 
         var defines = "";
         if(shader_flags.show_volume_rendering)
@@ -59,9 +64,28 @@ class ShaderManager {
             defines += "\n#define SHOW_SEEDS_ONCE";
         if(shader_flags.show_seeds_instance)
             defines += "\n#define SHOW_SEEDS_INSTANCE";
+        if(shader_flags.integrate_light)
+            defines += "\n#define INTEGRATE_LIGHT";
         
         code = code.replace("$defines$", defines);
-        console.log(code);
+        
+        code = code.replace("light_transport_p0", light_transport_p0);
+        code = code.replace("light_transport_p1", light_transport_p1);
+        code = code.replace("light_transport_p2", light_transport_p2);
+        code = code.replace("light_transport_d0", light_transport_d0);
+        code = code.replace("light_transport_d1", light_transport_d1);
+        code = code.replace("light_transport_d2", light_transport_d2);
+        console.log("code:", code);
+        return code;
+    }
+
+    LoadModules(code, shader_flags){
+        if(shader_flags.integrate_light){
+            code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS);
+
+        }else{
+            code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", "");
+        }
         return code;
     }
 
@@ -86,7 +110,10 @@ class ShaderManager {
         return code;  
     }
 
-    GetShaderKey(shader_formula_scalar_float, shader_flags){
+    GetShaderKey(shader_formula_scalar_float, 
+        light_transport_p0, light_transport_p1, light_transport_p2, 
+        light_transport_d0, light_transport_d1, light_transport_d2, 
+        shader_flags){
         var key = shader_formula_scalar_float;
 
         if(shader_flags.show_volume_rendering)
@@ -112,7 +139,18 @@ class ShaderManager {
         if(shader_flags.show_seeds_once)
             key += ";SHOW_SEEDS_ONCE"     
         if(shader_flags.show_seeds_instance)
-            key += ";SHOW_SEEDS_INSTANCE"        
+            key += ";SHOW_SEEDS_INSTANCE"     
+        if(shader_flags.integrate_light){
+            key += ";INTEGRATE_LIGHT" 
+            key += ";"+light_transport_p0 
+            key += ";"+light_transport_p1 
+            key += ";"+light_transport_p2 
+            key += ";"+light_transport_d0 
+            key += ";"+light_transport_d1 
+            key += ";"+light_transport_d2 
+        }
+
+        console.log("code:", key);       
         return key;
     }
 
@@ -120,18 +158,30 @@ class ShaderManager {
         return this.flag_prepare_main || this.flag_prepare_side;
     }
 
-    ShouldPrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float, shader_flags){
+    ShouldPrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float,  
+        light_transport_p0, light_transport_p1, light_transport_p2, 
+        light_transport_d0, light_transport_d1, light_transport_d2,
+        shader_flags){
         //get shader key
-        var shader_key = this.GetShaderKey(shader_formula_scalar_float, shader_flags);
+        var shader_key = this.GetShaderKey(shader_formula_scalar_float, 
+            light_transport_p0, light_transport_p1, light_transport_p2, 
+            light_transport_d0, light_transport_d1, light_transport_d2, 
+            shader_flags);
         return ! (shader_key in dict_shaders);
     }
 
-    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float, shader_flags){
+    PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float,  
+        light_transport_p0, light_transport_p1, light_transport_p2, 
+        light_transport_d0, light_transport_d1, light_transport_d2,
+        shader_flags){
         //the return container
         var container;
 
         //get shader key
-        var shader_key = this.GetShaderKey(shader_formula_scalar_float, shader_flags);
+        var shader_key = this.GetShaderKey(shader_formula_scalar_float, 
+            light_transport_p0, light_transport_p1, light_transport_p2, 
+            light_transport_d0, light_transport_d1, light_transport_d2,
+            shader_flags);
 
         //get old container if possible
         if(shader_key in dict_shaders){
@@ -141,7 +191,10 @@ class ShaderManager {
         //otherwise create new container
         else{
             console.log("Performance: shader_key:", shader_key, "is created");
-            var f_source = this.GetShader(shader_formula_scalar_float, shader_flags);
+            var f_source = this.GetShader(shader_formula_scalar_float, 
+                light_transport_p0, light_transport_p1, light_transport_p2, 
+                light_transport_d0, light_transport_d1, light_transport_d2,
+                shader_flags);
             container = new ShaderContainer(gl, f_source, V_SHADER_RAYTRACING);
             dict_shaders[shader_key] = container;
         }
@@ -151,15 +204,21 @@ class ShaderManager {
     ShouldPrepareRaytracingShaderMain(gl){
 
         //get variables
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
+        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
+        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
 
         this.canvas_wrapper_main.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_main.shader_flags;
 
-        this.flag_prepare_main = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float, shader_flags);
+        this.flag_prepare_main = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float,  
+            light_transport_p0, light_transport_p1, light_transport_p2, 
+            light_transport_d0, light_transport_d1, light_transport_d2,
+            shader_flags);
         return this.flag_prepare_main;
     }
 
@@ -168,16 +227,22 @@ class ShaderManager {
         var t_start = performance.now();
 
         //get variables
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
+        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
+        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
 
         this.canvas_wrapper_main.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_main.shader_flags;
 
         //get container
-        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float, shader_flags);
+        this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float,  
+            light_transport_p0, light_transport_p1, light_transport_p2, 
+            light_transport_d0, light_transport_d1, light_transport_d2,
+            shader_flags);
         
         var t_stop = performance.now();
         console.log("Performance: Prepare left shader in: ", Math.ceil(t_stop-t_start), "ms");
@@ -186,32 +251,44 @@ class ShaderManager {
     ShouldPrepareRaytracingShaderSide(gl){
 
         //get variables
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
+        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
+        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
 
         this.canvas_wrapper_side.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_side.shader_flags;
 
-        this.flag_prepare_side = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float, shader_flags);
+        this.flag_prepare_side = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float,  
+            light_transport_p0, light_transport_p1, light_transport_p2, 
+            light_transport_d0, light_transport_d1, light_transport_d2,
+            shader_flags);
         return this.flag_prepare_side;
     }
 
     PrepareRaytracingShaderSide(gl){
         var t_start = performance.now();
-
+        input_formula_scalar
         //get variables
-        var shader_formula_scalar = document.getElementById("input_formula_scalar").value;
-        var shader_formula_scalar_float = shader_formula_scalar.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
+        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
+        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
 
         this.canvas_wrapper_side.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_side.shader_flags;
 
         //get container
-        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float, shader_flags);
+        this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float,  
+            light_transport_p0, light_transport_p1, light_transport_p2, 
+            light_transport_d0, light_transport_d1, light_transport_d2,
+            shader_flags);
         
         var t_stop = performance.now();
         console.log("Performance: Prepare right shader in: ", Math.ceil(t_stop-t_start), "ms");
@@ -222,6 +299,19 @@ class ShaderManager {
         var ok_right = this.container_side.check_status(gl_side, ext_parallel_side);
         this.shaders_linked = ok_left && ok_right;
         this.settings_changed = false;
+    }
+
+    GetFormula(element_id){
+        var shader_formula = document.getElementById(element_id).value;
+        return shader_formula;
+    }
+
+    GetFormulaFloat(element_id){
+        var shader_formula = document.getElementById(element_id).value;
+        var shader_formula_float = shader_formula.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+            return ($2 == ".") ? $0 : $0 + ".0";
+        });
+        return shader_formula_float;
     }
 
 }

@@ -11,6 +11,7 @@ const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl")
 const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
 const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
 const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_preprocessor.glsl");
+const shader_modules_light_integration_definitions = require("./shader/modules/light_integration_definitions.glsl");
 const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
 const f_shader_sum = require("./shader/f_shader_sum.glsl");
 const f_shader_transfer_function = require("./shader/f_shader_transfer_function.glsl");
@@ -1202,10 +1203,13 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         side_camera.trackball_wheel_sensitivity = parseFloat(document.getElementById("input_trackball_wheel_sensitivity").value);
         side_camera.trackball_focus_distance = parseFloat(document.getElementById("input_trackball_focus_distance_right").value);
 
+        var max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
+        var light_integrator_type = document.getElementById("select_light_integrator_type").value;
+        var light_integration_step_size = parseFloat(document.getElementById("input_light_integration_step_size").value);
+        var light_integration_max_step_count = parseInt(document.getElementById("input_light_integration_max_step_count").value);
         //MAIN
         canvas_wrapper_main.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);        
         canvas_wrapper_main.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_main").value);
-        canvas_wrapper_main.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
         canvas_wrapper_main.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
@@ -1233,8 +1237,9 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_main.streamline_method = tree_view.IsVisibleInHierarchy(1) ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
         canvas_wrapper_main.seed_visualization_mode = tree_view.IsVisibleInHierarchy(7) ? SEED_VISUALIZATION_MODE_INSTANCE : SEED_VISUALIZATION_MODE_NONE;
 
-        canvas_wrapper_main.CalculateLimitedMaxRayDistance();
+        canvas_wrapper_main.SetLightIntegratorParameters(max_ray_distance, light_integrator_type, light_integration_step_size, light_integration_max_step_count);
         canvas_wrapper_main.max_iteration_count = Math.ceil(canvas_wrapper_main.limited_max_distance) * 3;
+        canvas_wrapper_main.max_iteration_count = 10000;
         console.log("fog_type", canvas_wrapper_main.fog_type);
         console.log("limited_max_distance", canvas_wrapper_main.limited_max_distance);
         document.getElementById("input_limited_max_ray_distance").value = canvas_wrapper_main.limited_max_distance.toFixed(3);
@@ -1290,7 +1295,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.seed_visualization_mode = tree_view.IsVisibleInHierarchy(16) ? parseInt(document.getElementById("select_seed_mode_side").value) : SEED_VISUALIZATION_MODE_NONE;
 
 
-        canvas_wrapper_side.CalculateLimitedMaxRayDistance();
+        canvas_wrapper_side.SetLightIntegratorParameters(max_ray_distance, light_integrator_type, light_integration_step_size, light_integration_max_step_count);
         canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
         console.log("limited_max_distance", canvas_wrapper_side.limited_max_distance);

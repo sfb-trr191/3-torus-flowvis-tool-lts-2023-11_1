@@ -566,6 +566,52 @@
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
+                            <fieldset class="subgroup_properties">
+                                <legend>Light Integration</legend>
+                                <div class="vertical_container" id="fieldset_light_integrator_type">
+                                    <div class="input_row" id="input_row_space">
+                                        <label>Type</label>
+                                        <select id="select_light_integrator_type" title="Select how light is transported.">
+                                            <option value="0">Line</option>
+                                            <option value="1">RK4</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row" id="input_row_light_integration_step_size">
+                                        <label>step size</label>
+                                        <input id="input_light_integration_step_size" type="text" value="0.01" 
+                                        title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_integration_max_step_count">
+                                        <label>max step count</label>
+                                        <input id="input_light_integration_max_step_count" type="text" value="1000" 
+                                        title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_transport_p0">
+                                        <label>P0</label>
+                                        <input id="input_field_light_transport_p0" type="text" value="d0" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_transport_p1">
+                                        <label>P1</label>
+                                        <input id="input_field_light_transport_p1" type="text" value="d1" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_transport_p2">
+                                        <label>P2</label>
+                                        <input id="input_field_light_transport_p2" type="text" value="d2" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_transport_d0">
+                                        <label>D0</label>
+                                        <input id="input_field_light_transport_d0" type="text" value="sin(d0)" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_transport_d1">
+                                        <label>D1</label>
+                                        <input id="input_field_light_transport_d1" type="text" value="cos(d0)" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_light_transport_d2">
+                                        <label>D2</label>
+                                        <input id="input_field_light_transport_d2" type="text" value="0.0" title="">
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>    
                         <div class="group_properties_children">
 

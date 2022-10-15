@@ -10,6 +10,12 @@ class UniformLocationsRayTracing {
         console.log("UniformLocationsRayTracing: ", name)
         this.location_num_visual_seeds = gl.getUniformLocation(program, "num_visual_seeds");
 
+        this.light_integrator_type = LIGHT_INTEGRATOR_LINE;
+        this.location_light_integration_step_size = gl.getUniformLocation(program, "light_integration_step_size");
+        this.location_light_integration_max_step_count = gl.getUniformLocation(program, "light_integration_max_step_count");
+
+        
+
         this.location_color_r = gl.getUniformLocation(program, "color_r");
         this.location_texture_float = gl.getUniformLocation(program, "texture_float");
         this.location_texture_int = gl.getUniformLocation(program, "texture_int");
@@ -154,6 +160,8 @@ class CanvasWrapper {
         this.streamline_method = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;
         this.streamline_method_projection = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;        
         this.limited_max_distance = 0;
+        this.light_integration_step_size = 0;
+        this.light_integration_max_step_count = 0;
         this.max_iteration_count = 1;
         this.min_scalar = 0;
         this.max_scalar = 0;
@@ -247,9 +255,10 @@ class CanvasWrapper {
         this.attribute_location_dummy_program_raytracing = gl.getAttribLocation(this.program_raytracing, "a_position"); 
     }
 
-    CalculateLimitedMaxRayDistance() {
+    CalculateLimitedMaxRayDistance(max_ray_distance) {
         var d = this.fog_density;
-        this.limited_max_distance = this.max_ray_distance;
+        this.max_ray_distance = max_ray_distance;
+        this.limited_max_distance = max_ray_distance;
         if (this.fog_type == FOG_EXPONENTIAL) {
             this.limited_max_distance = Math.min(this.max_ray_distance, 6.90776 / d);//js allows division by zero;
         }
@@ -257,6 +266,24 @@ class CanvasWrapper {
             //see https://www.wolframalpha.com/input/?i=e%5E%28-%28d*z%29%5E2%29+%3E+0.001
             this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d * d)));//js allows division by zero;
         }
+    }
+
+    SetLightIntegratorParameters(max_ray_distance, light_integrator_type, light_integration_step_size, light_integration_max_step_count){
+        this.CalculateLimitedMaxRayDistance(max_ray_distance);
+        this.light_integrator_type = light_integrator_type;        
+        this.light_integration_step_size = light_integration_step_size;
+        this.light_integration_max_step_count = light_integration_max_step_count;
+        /*
+        if(light_integrator_type == LIGHT_INTEGRATOR_LINE){
+            this.light_integration_step_size = this.limited_max_distance;
+        }
+        else if(light_integrator_type == LIGHT_INTEGRATOR_RK4){
+            this.light_integration_step_size = light_integration_step_size;
+        }
+        */
+        this.integrate_light = (light_integrator_type == LIGHT_INTEGRATOR_RK4);
+        
+
     }
 
     SetRenderSizes(width, height, width_panning, height_panning) {
@@ -467,7 +494,8 @@ class CanvasWrapper {
             this.show_movable_axes,
             this.cut_at_cube_faces,
             this.handle_inside,
-            this.seed_visualization_mode);
+            this.seed_visualization_mode,
+            this.integrate_light);
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
@@ -564,6 +592,9 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
+        gl.uniform1f(this.location_raytracing.location_light_integration_step_size, this.light_integration_step_size);  
+        gl.uniform1i(this.location_raytracing.location_light_integration_max_step_count, this.light_integration_max_step_count);  
+        
         gl.uniform1f(this.location_raytracing.location_max_cost, this.max_cost);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);

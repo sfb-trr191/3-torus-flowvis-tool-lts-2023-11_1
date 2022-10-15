@@ -7,7 +7,8 @@ class ShaderFlags {
         tube_radius_factor, tube_radius_factor_projection, tube_radius_factor_projection_highlight, 
         show_bounding_box, show_bounding_box_projection,
         streamline_method, streamline_method_projection, 
-        volume_rendering_mode, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode){
+        volume_rendering_mode, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode,
+        integrate_light){
 
         this.changed = true;
         this.show_movable_axes = show_movable_axes;
@@ -90,6 +91,8 @@ class ShaderFlags {
             default:
                 break;
         }
+
+        this.integrate_light = integrate_light;
     }
 
 

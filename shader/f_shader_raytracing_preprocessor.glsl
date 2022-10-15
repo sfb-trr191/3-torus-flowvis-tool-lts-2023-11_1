@@ -121,6 +121,12 @@ struct Ray
 	vec3 direction;
 	vec3 dir_inv;		//cached value of: 1 / ray.direction
 	float rayDistance;	//the distance already travelled
+    float local_cutoff; //the max distance used for intersection testing, for linear rays, this is just maxRayDistance, but if light is integrated this uses the segment length from the integration step
+
+    //the following variables are for ray integration
+    vec3 nextPosition;
+    vec3 nextDirection;
+    float segment_length;
 };
 
 struct Sphere
@@ -167,6 +173,9 @@ const int PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain
 //                 START UNIFORMS
 //
 ////////////////////////////////////////////////////////////////////
+
+uniform float light_integration_step_size;
+uniform int light_integration_max_step_count;
 
 uniform int num_visual_seeds;
 uniform int visualize_seeds_mode;
@@ -337,6 +346,16 @@ vec4 GetScalarColor(int index, int transfer_function_index);
 GL_Cylinder GetCylinder(int index);
 
 ivec3 GetIndex3D(int global_index);
+
+//**********************************************************
+//                       modules
+
+void RayEulerStep(inout Ray ray);
+void RayRK4Step(inout Ray ray);
+vec3 RayLightFunctionPos(vec3 position, vec3 direction);
+vec3 RayLightFunctionDir(vec3 position, vec3 direction);
+
+//**********************************************************
 
 void main() {
     float i = gl_FragCoord[0];//x
@@ -564,6 +583,7 @@ Ray GenerateRay(float x_offset, float y_offset)
 	ray.direction = r_ij;
 	ray.dir_inv = 1.0/ray.direction;
 	ray.rayDistance = 0.0;
+    ray.local_cutoff = maxRayDistance;
 	return ray;
 }
 
@@ -596,6 +616,7 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 	ray.direction = r_ij;
 	ray.dir_inv = 1.0/ray.direction;
 	ray.rayDistance = 0.0;
+    ray.local_cutoff = maxRayDistance;
 	return ray;
 }
 
@@ -625,6 +646,22 @@ vec3 RepositionIntoFundamentalDomain(vec3 position)
 	return new_position;
 }
 
+#ifdef INTEGRATE_LIGHT
+void LightIntegrationPre(inout Ray ray){
+    RayRK4Step(ray);
+}
+
+void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside){
+    /*
+    if(flag_ray_stays_inside){
+
+    }
+    */
+    ray.origin = ray.nextPosition;
+    ray.direction = ray.nextDirection;
+}
+#endif 
+
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {			
 	Ray variableRay;
@@ -632,6 +669,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	variableRay.direction = ray.direction;
 	variableRay.dir_inv = ray.dir_inv;
 	variableRay.rayDistance = 0.0;
+    variableRay.local_cutoff = maxRayDistance;
 			
 	int count = 0;
 	int hitCount = 0;
@@ -639,7 +677,10 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	//IntersectAxesCorner(ray, hit, hitCube, 0);
 
 	while(true)
-	{		        
+	{		
+#ifdef INTEGRATE_LIGHT
+        LightIntegrationPre(variableRay);  
+#endif      
 		IntersectInstance(variableRay, hit, hitCube);
 		//calculate exit (the point where ray leaves the current instance)
 		//formula: target = origin + t * direction
@@ -651,16 +692,24 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		//float t_y = (tar_y - variableRay.origin.y) * variableRay.dir_inv.y;	
 		//float t_z = (tar_z - variableRay.origin.z) * variableRay.dir_inv.z;	
 		vec3 t_v = (tar - variableRay.origin) * variableRay.dir_inv;	
-		float t = min(t_v.x, min(t_v.y, t_v.z));		
-		vec3 exit = variableRay.origin + t * variableRay.direction;
+		float t_exit = min(t_v.x, min(t_v.y, t_v.z));		
+		vec3 exit = variableRay.origin + t_exit * variableRay.direction;
+        float t = t_exit;
+        
+        //bool flag_ray_stays_inside = variableRay.segment_length < t_exit;
+        bool flag_ray_stays_inside = variableRay.local_cutoff < t_exit;
+        if(flag_ray_stays_inside){
+            //t = variableRay.segment_length;
+            t = variableRay.local_cutoff;
+        }
 
 #ifdef SHOW_VOLUME_RENDERING
         bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
             && variableRay.rayDistance < max_volume_distance;
         if(volume_flag)
         {
-            float distance_exit = t;
-            IntersectVolumeInstance(variableRay, distance_exit, hit, hitCube);
+            float distance_end = t;
+            IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
         }
 #endif
 
@@ -669,37 +718,52 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		
 		//update distance "traveled" using value from this instance
 		variableRay.rayDistance += t;
-		
+
 		//stop at maxRayDistance + 1.8
 		//1.8 is a bit greater than sqrt(3) which is the max distance inside unit cube
 		if(variableRay.rayDistance > (maxRayDistance + 1.8))
 			break;
-	
-        if(projection_index >= 0)
-        {
-            if(projection_index == 0){
-                if(exit.x < 0.001)
-                    break;
+
+        if(!flag_ray_stays_inside){
+            if(projection_index >= 0)
+            {
+                if(projection_index == 0){
+                    if(exit.x < 0.001)
+                        break;
+                }
+                else if (projection_index == 1){
+                if(exit.y < 0.001)
+                        break;
+                }
+                else if (projection_index == 2){
+                if(exit.z < 0.001)
+                        break;
+                }
+                //update ray origin for next instance	
+                variableRay.origin = MoveOutOfBoundsProjection(exit);
+            }	
+            else{
+                //update ray origin for next instance		
+                //MoveRayOrigin(variableRay, exit);
+#ifdef INTEGRATE_LIGHT
+                variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
+#else
+                variableRay.origin = MoveOutOfBounds(exit);
+#endif   
             }
-            else if (projection_index == 1){
-               if(exit.y < 0.001)
-                    break;
-            }
-            else if (projection_index == 2){
-               if(exit.z < 0.001)
-                    break;
-            }
-            //update ray origin for next instance	
-		    variableRay.origin = MoveOutOfBoundsProjection(exit);
-        }	
-        else{
-		    //update ray origin for next instance		
-		    //MoveRayOrigin(variableRay, exit);
-		    variableRay.origin = MoveOutOfBounds(exit);
         }
+
+#ifdef INTEGRATE_LIGHT
+        LightIntegrationPost(variableRay, flag_ray_stays_inside);  
+        if(count >= light_integration_max_step_count){
+            break;
+        }
+#endif    
+        
         count++;
 		if(count >= maxIterationCount)
 			break;
+            
 				
 		//break;
 	}	
@@ -776,7 +840,8 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 #ifdef SHOW_STREAMLINES
     {
         bool check_bounds = true;
-	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, maxRayDistance, hit, hitCube);
+	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, ray.local_cutoff, hit, hitCube);
+	    //IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, maxRayDistance, hit, hitCube);
     }
 #endif
   /*
@@ -808,7 +873,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	
 #ifdef SHOW_BOUNDING_BOX
 	{
-        IntersectAxes(is_main_renderer, ray, maxRayDistance, hit, hitCube);
+        IntersectAxes(is_main_renderer, ray, ray.local_cutoff, hit, hitCube);
 	}
 #endif
 
@@ -2937,5 +3002,7 @@ GL_Cylinder GetCylinder(int index)
 	cylinder.radius = texelFetch(texture_float_global, pointer+ivec3(44,0,0), 0).r;
   return cylinder;
 }
+
+$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$
 
 `;
