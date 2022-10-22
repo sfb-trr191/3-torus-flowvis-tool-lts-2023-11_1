@@ -135,6 +135,16 @@ struct Sphere
 	float radius;
 };
 
+struct MoveOutOfBoundsFlags
+{
+	bool x_greater;
+	bool y_greater;
+	bool z_greater;
+	bool x_smaller;
+	bool y_smaller;
+	bool z_smaller;
+};
+
 ////////////////////////////////////////////////////////////////////
 //
 //                 START CONSTANTS
@@ -285,6 +295,8 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 bool CheckOutOfBounds(vec3 position);
 vec3 MoveOutOfBounds(vec3 position);
 vec3 MoveOutOfBoundsProjection(vec3 position);
+vec3 MoveOutOfBoundsAndGetFlags(vec3 position, inout MoveOutOfBoundsFlags flags);
+vec3 ApplyMoveOutOfBoundsFlags(vec3 position, MoveOutOfBoundsFlags flags);
 bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(Sphere sphere, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
@@ -659,6 +671,7 @@ void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside){
     */
     ray.origin = ray.nextPosition;
     ray.direction = ray.nextDirection;
+    ray.dir_inv = 1.0/ray.direction;
 }
 #endif 
 
@@ -670,14 +683,19 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	variableRay.dir_inv = ray.dir_inv;
 	variableRay.rayDistance = 0.0;
     variableRay.local_cutoff = maxRayDistance;
+
+    Ray transitional_ray;
 			
 	int count = 0;
 	int hitCount = 0;
+    float tmp_rayDistance = 0.0;
 
 	//IntersectAxesCorner(ray, hit, hitCube, 0);
 
 	while(true)
-	{		
+	{
+        tmp_rayDistance = variableRay.rayDistance;
+
 #ifdef INTEGRATE_LIGHT
         LightIntegrationPre(variableRay);  
 #endif      
@@ -697,7 +715,12 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         float t = t_exit;
         
         //bool flag_ray_stays_inside = variableRay.segment_length < t_exit;
-        bool flag_ray_stays_inside = variableRay.local_cutoff < t_exit;
+        //bool flag_ray_stays_inside = variableRay.local_cutoff < t_exit;
+        bool flag_ray_stays_inside = false;
+#ifdef INTEGRATE_LIGHT
+        flag_ray_stays_inside = ! CheckOutOfBounds(variableRay.nextPosition);
+#endif  
+        
         if(flag_ray_stays_inside){
             //t = variableRay.segment_length;
             t = variableRay.local_cutoff;
@@ -724,7 +747,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		if(variableRay.rayDistance > (maxRayDistance + 1.8))
 			break;
 
-        if(!flag_ray_stays_inside){
+        if(!flag_ray_stays_inside){            
             if(projection_index >= 0)
             {
                 if(projection_index == 0){
@@ -746,7 +769,60 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                 //update ray origin for next instance		
                 //MoveRayOrigin(variableRay, exit);
 #ifdef INTEGRATE_LIGHT
+                //V1
+                //variableRay.nextPosition = MoveOutOfBounds(exit);//problem, wrong direction because next position not matching next direction
+                
+                //V2
+                /*
+                float exit_distance = distance(variableRay.origin, exit);
+
+                MoveOutOfBoundsFlags flags;
+                variableRay.nextPosition = MoveOutOfBoundsAndGetFlags(variableRay.nextPosition, flags);//problem, exit might need other flags
+
+                transitional_ray.origin = ApplyMoveOutOfBoundsFlags(exit, flags);
+                transitional_ray.direction = variableRay.direction;
+                transitional_ray.dir_inv = variableRay.dir_inv;
+                transitional_ray.rayDistance = tmp_rayDistance + exit_distance;//TODO
+                transitional_ray.local_cutoff = variableRay.local_cutoff - exit_distance;//TODO
+                IntersectInstance(transitional_ray, hit, hitCube);
+                */
+                //V3
+
+                //set next position of variable ray, next iteration will resume normally
                 variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
+                variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
+                //however, for the transition we use a transitional ray
+                //the transitional ray keeps the same direction as the variable ray
+                //but will be moved (possibly multiple times if multiple borders are crossed)            
+                transitional_ray.direction = variableRay.direction;
+                transitional_ray.dir_inv = variableRay.dir_inv;
+                //each iteration the local cutoff is reduced by the exit distance i.e. the distance from current position to the cube intersection
+                float exit_distance = distance(variableRay.origin, exit);
+                transitional_ray.local_cutoff = variableRay.local_cutoff;
+                transitional_ray.rayDistance = tmp_rayDistance;
+                while(transitional_ray.local_cutoff >= exit_distance && exit_distance > 0.0){
+                    transitional_ray.local_cutoff -= exit_distance;
+                    transitional_ray.rayDistance += exit_distance;
+                    transitional_ray.origin = MoveOutOfBounds(exit);
+                    IntersectInstance(transitional_ray, hit, hitCube);
+
+                    //calculate exit (the point where ray leaves the current instance)
+                    //formula: target = origin + t * direction
+                    //float tar_x = (variableRay.direction.x > 0) ? 1 : 0;	
+                    //float tar_y = (variableRay.direction.y > 0) ? 1 : 0;
+                    //float tar_z = (variableRay.direction.z > 0) ? 1 : 0;
+                    vec3 tar = step(vec3(0,0,0), transitional_ray.direction);
+                    //float t_x = (tar_x - variableRay.origin.x) * variableRay.dir_inv.x;	
+                    //float t_y = (tar_y - variableRay.origin.y) * variableRay.dir_inv.y;	
+                    //float t_z = (tar_z - variableRay.origin.z) * variableRay.dir_inv.z;	
+                    vec3 t_v = (tar - transitional_ray.origin) * transitional_ray.dir_inv;	
+                    float t_exit = min(t_v.x, min(t_v.y, t_v.z));		
+                    exit = transitional_ray.origin + t_exit * transitional_ray.direction;
+
+                    exit_distance = distance(transitional_ray.origin, exit);
+                }
+                
+                
 #else
                 variableRay.origin = MoveOutOfBounds(exit);
 #endif   
@@ -840,7 +916,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 #ifdef SHOW_STREAMLINES
     {
         bool check_bounds = true;
-	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, ray.local_cutoff, hit, hitCube);
+	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, ray.local_cutoff+0.001, hit, hitCube);
 	    //IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, maxRayDistance, hit, hitCube);
     }
 #endif
@@ -873,7 +949,9 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	
 #ifdef SHOW_BOUNDING_BOX
 	{
-        IntersectAxes(is_main_renderer, ray, ray.local_cutoff, hit, hitCube);
+        bool check_bounds = is_main_renderer;
+        //bool check_bounds = false;
+        IntersectAxes(check_bounds, ray, ray.local_cutoff+0.001, hit, hitCube);
 	}
 #endif
 
@@ -1017,6 +1095,125 @@ vec3 MoveOutOfBounds(vec3 position)
 		z = z-1.0;
 	}
 	else if(z < 0.0+epsilon_move_ray)
+	{
+		x = x;
+		y = y;
+		z = z+1.0;
+	}
+
+	return vec3(x,y,z);
+}
+
+vec3 MoveOutOfBoundsAndGetFlags(vec3 position, inout MoveOutOfBoundsFlags flags)
+{
+	//user friendly variables
+	float x = position.x;
+	float y = position.y;
+	float z = position.z;
+	//additional "constant" variables for this calculation
+	float x0 = x;
+	float y0 = y;
+	float z0 = z;
+
+    flags.x_greater = false;
+    flags.x_smaller = false;
+    flags.y_greater = false;
+    flags.y_smaller = false;
+    flags.z_greater = false;
+    flags.z_smaller = false;
+	
+	if(x > 1.0-epsilon_move_ray)
+	{
+		x = x-1.0;
+		y = y;
+		z = z;
+        flags.x_greater = true;
+	}
+	else if(x < 0.0+epsilon_move_ray)
+	{
+		x = x+1.0;
+		y = y;
+		z = z;
+        flags.x_smaller = true;
+	}
+
+	if(y > 1.0-epsilon_move_ray)
+	{
+		x = x;
+		y = y-1.0;
+		z = z;
+        flags.y_greater = true;
+	}
+	else if(y < 0.0+epsilon_move_ray)
+	{
+		x = x;
+		y = y+1.0;
+		z = z;
+        flags.y_smaller = true;
+	}
+
+	if(z > 1.0-epsilon_move_ray)
+	{
+		x = x;
+		y = y;
+		z = z-1.0;
+        flags.z_greater = true;
+	}
+	else if(z < 0.0+epsilon_move_ray)
+	{
+		x = x;
+		y = y;
+		z = z+1.0;
+        flags.z_smaller = true;
+	}
+
+	return vec3(x,y,z);
+}
+
+vec3 ApplyMoveOutOfBoundsFlags(vec3 position, MoveOutOfBoundsFlags flags)
+{
+	//user friendly variables
+	float x = position.x;
+	float y = position.y;
+	float z = position.z;
+	//additional "constant" variables for this calculation
+	float x0 = x;
+	float y0 = y;
+	float z0 = z;
+	
+	if(flags.x_greater)
+	{
+		x = x-1.0;
+		y = y;
+		z = z;
+	}
+	else if(flags.x_smaller)
+	{
+		x = x+1.0;
+		y = y;
+		z = z;
+	}
+
+	if(flags.y_greater)
+	{
+		x = x;
+		y = y-1.0;
+		z = z;
+	}
+	else if(flags.y_smaller)
+	{
+		x = x;
+		y = y+1.0;
+		z = z;
+	}
+
+	if(flags.z_greater)
+	{
+		x = x;
+		y = y;
+		z = z-1.0;
+	}
+	else if(flags.z_smaller)
 	{
 		x = x;
 		y = y;
