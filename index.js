@@ -1295,7 +1295,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
         canvas_wrapper_side.seed_visualization_mode = tree_view.IsVisibleInHierarchy(16) ? parseInt(document.getElementById("select_seed_mode_side").value) : SEED_VISUALIZATION_MODE_NONE;
 
 
-        canvas_wrapper_side.SetLightIntegratorParameters(max_ray_distance, light_integrator_type, light_integration_step_size, light_integration_max_step_count);
+        canvas_wrapper_side.SetLightIntegratorParameters(max_ray_distance, LIGHT_INTEGRATOR_LINE, light_integration_step_size, light_integration_max_step_count);
         canvas_wrapper_side.max_iteration_count = 1;
         console.log("fog_type", canvas_wrapper_side.fog_type);
         console.log("limited_max_distance", canvas_wrapper_side.limited_max_distance);
