@@ -1153,9 +1153,11 @@ class UISeeds {
             var x = entry.node_input_x.value;
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
-            var v_x = 0;//entry.node_input_v_x.value;
-            var v_y = 0;//entry.node_input_v_y.value;
-            var v_z = 0;//entry.node_input_v_z.value;
+            var w = entry.node_input_w.value;
+            var v_x = entry.node_input_v_x.value;
+            var v_y = entry.node_input_v_y.value;
+            var v_z = entry.node_input_v_z.value;
+            var v_w = entry.node_input_v_w.value;
             //v_x = -1.25;
             //v_y = 0.75;
             var visual_seed = new StreamlineSeed();
