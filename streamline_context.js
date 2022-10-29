@@ -105,6 +105,12 @@ class StreamlineContext {
         this.streamline_generator.shader_formula_w = bo_calculate_streamlines.input_parameters.shader_formula_w;
         this.streamline_generator.shader_formula_a = bo_calculate_streamlines.input_parameters.shader_formula_a;
         this.streamline_generator.shader_formula_b = bo_calculate_streamlines.input_parameters.shader_formula_b;
+        this.streamline_generator.shader_formula_p0 = bo_calculate_streamlines.input_parameters.shader_formula_p0;
+        this.streamline_generator.shader_formula_p1 = bo_calculate_streamlines.input_parameters.shader_formula_p1;
+        this.streamline_generator.shader_formula_p2 = bo_calculate_streamlines.input_parameters.shader_formula_p2;
+        this.streamline_generator.shader_formula_d0 = bo_calculate_streamlines.input_parameters.shader_formula_d0;
+        this.streamline_generator.shader_formula_d1 = bo_calculate_streamlines.input_parameters.shader_formula_d1;
+        this.streamline_generator.shader_formula_d2 = bo_calculate_streamlines.input_parameters.shader_formula_d2;
         this.streamline_generator.step_size = bo_calculate_streamlines.input_parameters.step_size;
         this.streamline_generator.inbetweens = bo_calculate_streamlines.input_parameters.inbetweens;
         this.segment_duplicator.iterations = bo_calculate_streamlines.input_parameters.segment_duplicator_iterations;

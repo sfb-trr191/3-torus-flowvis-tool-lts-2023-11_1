@@ -1119,6 +1119,9 @@ class UISeeds {
                 case SPACE_2_PLUS_2D:
                     seed = glMatrix.vec4.fromValues(x, y, v_x, v_y);
                     break;
+                case SPACE_2_SPHERE_3_PLUS_3D:
+                    seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    break;
                 default:
                     console.log("Error unknonw space");
                     break;

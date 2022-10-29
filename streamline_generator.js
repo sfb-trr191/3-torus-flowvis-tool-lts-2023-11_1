@@ -140,6 +140,9 @@ class StreamlineGenerator {
             case SPACE_2_PLUS_2D:
                 this.SetupStreamline2Plus2D(bo_calculate_streamlines);
                 break;
+            case SPACE_2_SPHERE_3_PLUS_3D:
+                this.SetupStreamline2Sphere3Plus3D(bo_calculate_streamlines);
+                break;
             default:
                 console.log("Error unknonw space");
                 break;
@@ -231,6 +234,48 @@ class StreamlineGenerator {
         tmp.i=1;
     }
 
+    SetupStreamline2Sphere3Plus3D(bo_calculate_streamlines) {
+        var seed_index = bo_calculate_streamlines.next_streamline_index;
+        var tmp = bo_calculate_streamlines.current_streamline;
+        var raw_data = bo_calculate_streamlines.raw_data;
+        console.log("#SC: SetupStreamline3Torus: ", seed_index);
+
+
+        var startIndex = raw_data.data.length;//seed_index * this.num_points_per_streamline;
+
+        //push seed
+        var new_entry = new RawDataEntry();
+        raw_data.data.push(new_entry);
+        //console.log("this.seeds[i]: ", this.seeds[seed_index]);
+        glMatrix.vec4.copy(raw_data.data[startIndex].position, this.seeds[seed_index]);
+        raw_data.data[startIndex].u_v_w_signum[3] = this.seed_signums[seed_index];
+        raw_data.data[startIndex].flag = this.seed_signums[seed_index];
+
+        //push startindex
+        raw_data.start_indices.push(startIndex);
+
+        //var total_points = raw_data.num_points;
+        var positionData = raw_data.data[startIndex];
+        var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
+        //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
+        var signum = positionData.flag;
+
+        var f_start = this.f(startPosition, signum);
+        raw_data.data[startIndex].flag = signum;
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
+        //var previousPosition = startPosition;
+        //console.log("startIndex: ", startIndex);
+        //console.log("positionData: ", positionData);
+        //console.log("startPosition: ", startPosition);
+        //console.log("previousPosition: ", previousPosition);
+
+
+        tmp.startIndex = startIndex;
+        tmp.signum = signum;
+        tmp.i=1;
+
+    }
+
     ContinueStreamline(bo_calculate_streamlines){
         switch (this.space) {
             case SPACE_3_TORUS:
@@ -238,6 +283,9 @@ class StreamlineGenerator {
                 break;
             case SPACE_2_PLUS_2D:
                 this.ContinueStreamline2Plus2D(bo_calculate_streamlines);
+                break;
+            case SPACE_2_SPHERE_3_PLUS_3D:
+                this.ContinueStreamline2Sphere3Plus3D(bo_calculate_streamlines);
                 break;
             default:
                 console.log("Error unknonw space");
@@ -627,6 +675,168 @@ class StreamlineGenerator {
         }        
     }
 
+    ContinueStreamline2Sphere3Plus3D(bo_calculate_streamlines) {
+        var t_start = performance.now();
+
+
+        var tmp = bo_calculate_streamlines.current_streamline;
+        var raw_data = bo_calculate_streamlines.raw_data;
+        var signum = tmp.signum;
+        console.log("#SC: ContinueStreamline3Torus", tmp.i);
+
+        var currentPosition = glMatrix.vec3.create();
+        var k1 = glMatrix.vec3.create();
+        var k2 = glMatrix.vec3.create();
+        var k3 = glMatrix.vec3.create();
+        var k4 = glMatrix.vec3.create();
+        var k1_2 = glMatrix.vec3.create();// k1_2 = k1/2
+        var k2_2 = glMatrix.vec3.create();// k2_2 = k2/2
+        var k1_6 = glMatrix.vec3.create();// k1_6 = k1/6
+        var k2_3 = glMatrix.vec3.create();// k2_3 = k2/3
+        var k3_3 = glMatrix.vec3.create();// k3_3 = k3/3
+        var k4_6 = glMatrix.vec3.create();// k4_6 = k4/6
+        var previous_plus_k1_2 = glMatrix.vec3.create();// previousPosition + k1/2
+        var previous_plus_k2_2 = glMatrix.vec3.create();// previousPosition + k2/2
+        var previous_plus_k3 = glMatrix.vec3.create();// previousPosition + k3
+        var substep_currentPosition = glMatrix.vec3.create();
+        var substep_previousPosition = glMatrix.vec3.create();
+        
+        while(true){
+            var local_i = tmp.i;//does not change even if duplicating point (used for point data)
+            var currentIndex = tmp.startIndex + tmp.i;
+            var previousIndex = currentIndex - 1;
+            var previousVec4 = raw_data.data[previousIndex].position;
+            var previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
+
+            
+            glMatrix.vec3.copy(substep_previousPosition, previousPosition);
+            var sub_step_size = this.step_size// / (this.inbetweens + 1);
+            //multiple rk4 steps
+            for (var sub_step_index = 0; sub_step_index <= this.inbetweens; sub_step_index++) {
+                //CALCULATE: vec3 k1 = step_size * f(substep_previousPosition, signum);
+                glMatrix.vec3.scale(k1, this.f(substep_previousPosition, signum), sub_step_size);
+
+                //CALCULATE: vec3 k2 = step_size * f(substep_previousPosition + k1/2, signum);
+                glMatrix.vec3.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
+                glMatrix.vec3.add(previous_plus_k1_2, substep_previousPosition, k1_2);// substep_previousPosition + k1/2            
+                glMatrix.vec3.scale(k2, this.f(previous_plus_k1_2, signum), sub_step_size);
+
+                //CALCULATE: vec3 k3 = step_size * f(substep_previousPosition + k2/2, signum);
+                glMatrix.vec3.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+                glMatrix.vec3.add(previous_plus_k2_2, substep_previousPosition, k2_2);// substep_previousPosition + k2/2     
+                glMatrix.vec3.scale(k3, this.f(previous_plus_k2_2, signum), sub_step_size);
+
+                //CALCULATE: vec3 k4 = step_size * f(substep_previousPosition + k3, signum);
+                glMatrix.vec3.add(previous_plus_k3, substep_previousPosition, k3);// substep_previousPosition + k3
+                glMatrix.vec3.scale(k4, this.f(previous_plus_k3, signum), sub_step_size);
+
+                //CALCULATE: vec3 substep_currentPosition = substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
+                glMatrix.vec3.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+                glMatrix.vec3.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+                glMatrix.vec3.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+                glMatrix.vec3.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+                glMatrix.vec3.add(substep_currentPosition, substep_previousPosition, k1_6);// substep_previousPosition + k1 / 6 
+                glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k2_3);// substep_previousPosition + k1 / 6 + k2 / 3
+                glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k3_3);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+                glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k4_6);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+              
+                //prepare next substep iteration: copy current to previous
+                glMatrix.vec3.copy(substep_previousPosition, substep_currentPosition);  
+            }
+
+            //after every substep, copy the final value to currentPosition
+            glMatrix.vec3.copy(currentPosition, substep_currentPosition);
+
+            //console.log(i, currentPosition);
+            if (this.confine_to_cube)
+                currentPosition = this.ConfineToCube(currentPosition, previousPosition);
+
+
+            var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
+            var f_previous = this.f(previousPosition, signum);
+            var f_current = this.f(currentPosition, signum);
+            var v_previous = glMatrix.vec3.length(f_previous);
+            var v_current = glMatrix.vec3.length(f_current);
+            var v_average = (v_previous + v_current) * 0.5;
+            var time_previous = raw_data.data[previousIndex].time;
+            var arc_length_previous = raw_data.data[previousIndex].arc_length;
+
+            var difference = glMatrix.vec3.create();
+            glMatrix.vec3.subtract(difference, currentPosition, previousPosition);
+            var segment_length = glMatrix.vec3.length(difference);
+
+            var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
+            var arc_length_current = arc_length_previous + segment_length;
+
+            //console.log("time_current", time_current);
+
+            //push entry for current index
+            var new_entry = new RawDataEntry();
+            raw_data.data.push(new_entry);
+
+            var terminate = false;
+
+            if(this.TerminationChecks(tmp.i, time_current, arc_length_current, bo_calculate_streamlines)){
+                terminate = true;
+                flag = 3;//end of polyline
+            }
+            else if (this.check_bounds) {
+                var outOfBounds = this.CheckOutOfBounds3(currentPosition);
+                if (outOfBounds) {
+                    flag = 3;//end of polyline
+                    //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
+                   
+                    if (this.continue_at_bounds) {//if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
+                        var movedPosition = this.MoveOutOfBounds3(currentPosition);
+                        var f_movedPosition = this.f(movedPosition, signum);
+                        var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
+
+                        //push entry for moved position (current index + 1)
+                        var new_entry = new RawDataEntry();
+                        raw_data.data.push(new_entry);
+
+                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], 1);;//1 or -1 for start
+                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
+                        raw_data.data[currentIndex + 1].time = time_current;
+                        raw_data.data[currentIndex + 1].arc_length = arc_length_current;
+                        raw_data.data[currentIndex + 1].local_i = local_i+1;                        
+                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
+                        tmp.i++;
+                    }
+                    else {
+                        terminate = true;
+                    }
+                }
+            }
+
+            raw_data.data[currentIndex].flag = flag;
+            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], 1);
+            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
+            raw_data.data[currentIndex].time = time_current;
+            raw_data.data[currentIndex].arc_length = arc_length_current;
+            raw_data.data[currentIndex].local_i = local_i;               
+
+            //previousPosition = currentPosition;
+            if (terminate){
+                tmp.finished = true;
+                this.InterpolateLastSegment(currentIndex, previousIndex, raw_data);
+                this.UpdateTotalStreamlineProgress(tmp.i, time_current, arc_length_current, bo_calculate_streamlines);
+                break;
+            }
+
+            tmp.i++;
+
+            var t_now = performance.now();
+            var t_diff = Math.ceil(t_now-t_start);
+            if(t_diff > 100){
+                this.UpdateTotalStreamlineProgress(tmp.i, time_current, arc_length_current, bo_calculate_streamlines);
+                break;
+            }
+
+        }
+    }
+
     TerminationChecks(i, time_current, arc_length_current, bo_calculate_streamlines){
         if(this.termination_condition == STREAMLINE_TERMINATION_CONDITION_POINTS){  
             console.log("#TerminationChecks", i, time_current, arc_length_current, bo_calculate_streamlines.input_parameters.num_points_per_streamline);          
@@ -743,6 +953,29 @@ class StreamlineGenerator {
         result[1] = v * signum;
         result[2] = a * signum;
         result[3] = b * signum;
+        return result;
+    }
+
+    f_2Sphere3Plus3D(vector, signum) {
+        //console.log("--------------");
+        //console.log("vector: ", vector, "test");
+        //console.log("vector0: ", vector[0]);
+        //console.log("vector1: ", vector[1]);
+        //console.log("vector2: ", vector[2]);
+        let scope = {
+            x: vector[0],
+            y: vector[1],
+            z: vector[2],
+        };
+        //console.log("scope: ", scope);
+        //console.log("this.shader_formula_u: ", this.shader_formula_u);
+        var u = math.evaluate(this.shader_formula_u, scope)
+        var v = math.evaluate(this.shader_formula_v, scope);
+        var w = math.evaluate(this.shader_formula_w, scope);
+        var result = glMatrix.vec3.create();
+        result[0] = u * signum;
+        result[1] = v * signum;
+        result[2] = w * signum;
         return result;
     }
 

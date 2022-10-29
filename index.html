@@ -533,6 +533,7 @@
                                 <select id="select_space" title="Select which space streamlines are calculated in.">
                                     <option value="1">3-Torus</option>
                                     <option value="2">2+2D</option>
+                                    <option value="3">2-Sphere (3+3D)</option>
                                 </select>
                             </div>
                             <div class="input_row" id="input_row_field_equation_u">
@@ -565,6 +566,30 @@
                                 <input id="input_field_equation_b" type="text" value="y^2" title="b component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
+                            </div>
+                            <div class="input_row" id="input_row_equation_p0">
+                                <label>P0</label>
+                                <input id="input_field_equation_p0" type="text" value="d0" title="">
+                            </div>
+                            <div class="input_row" id="input_row_equation_p1">
+                                <label>P1</label>
+                                <input id="input_field_equation_p1" type="text" value="d1" title="">
+                            </div>
+                            <div class="input_row" id="input_row_equation_p2">
+                                <label>P2</label>
+                                <input id="input_field_equation_p2" type="text" value="d2" title="">
+                            </div>
+                            <div class="input_row" id="input_row_equation_d0">
+                                <label>D0</label>
+                                <input id="input_field_equation_d0" type="text" value="sin(d0)" title="">
+                            </div>
+                            <div class="input_row" id="input_row_equation_d1">
+                                <label>D1</label>
+                                <input id="input_field_equation_d1" type="text" value="cos(d0)" title="">
+                            </div>
+                            <div class="input_row" id="input_row_equation_d2">
+                                <label>D2</label>
+                                <input id="input_field_equation_d2" type="text" value="0.0" title="">
                             </div>
                             <fieldset class="subgroup_properties">
                                 <legend>Light Integration</legend>
