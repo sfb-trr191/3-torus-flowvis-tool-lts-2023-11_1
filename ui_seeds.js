@@ -1087,24 +1087,27 @@ class UISeeds {
     }
 
     createPointList(space) {
-        var point_list = [];
+        var seed_positions = [];
+        var seed_directions = [];
         var visual_seeds = [];
         var seed_signums = [];
-        this.createPointListSeeds(space, point_list, visual_seeds, seed_signums);
-        this.createPointListPhantomSeeds(space, point_list, visual_seeds, seed_signums);
-        this.point_list = point_list;
+        this.createPointListSeeds(space, seed_positions, seed_directions, visual_seeds, seed_signums);
+        this.createPointListPhantomSeeds(space, seed_positions, visual_seeds, seed_signums);
+        this.seed_positions = seed_positions;
+        this.seed_directions = seed_directions;
         this.seed_signums = seed_signums;
         this.visual_seeds = visual_seeds;
     }
 
-    createPointListSeeds(space, point_list, visual_seeds, seed_signums){
+    createPointListSeeds(space, seed_positions, seed_directions, visual_seeds, seed_signums){
         for (var i = 0; i < this.list.length; i++) {
             var entry = this.list[i];
             var x = entry.node_input_x.value;
             var y = entry.node_input_y.value;
             var z = entry.node_input_z.value;
-            var v_x = Math.cos(2*Math.PI*z);
-            var v_y = Math.sin(2*Math.PI*z);
+            var v_x = 0;//entry.node_input_v_x.value;
+            var v_y = 0;//entry.node_input_v_y.value;
+            var v_z = 0;//entry.node_input_v_z.value;
             //v_x = -1.25;
             //v_y = 0.75;
             var visual_seed = new StreamlineSeed();
@@ -1112,15 +1115,19 @@ class UISeeds {
             visual_seeds.push(visual_seed);
 
             var seed;
+            var seed_direction;
             switch (space) {
                 case SPACE_3_TORUS:
                     seed = glMatrix.vec4.fromValues(x, y, z, 1);
                     break;
                 case SPACE_2_PLUS_2D:
+                    v_x = Math.cos(2*Math.PI*z);
+                    v_y = Math.sin(2*Math.PI*z);
                     seed = glMatrix.vec4.fromValues(x, y, v_x, v_y);
                     break;
                 case SPACE_2_SPHERE_3_PLUS_3D:
                     seed = glMatrix.vec4.fromValues(x, y, z, 1);
+                    seed_direction = glMatrix.vec4.fromValues(v_x, v_y, v_z, 1);
                     break;
                 default:
                     console.log("Error unknonw space");
@@ -1130,24 +1137,28 @@ class UISeeds {
 
             switch(this.direction){
                 case DIRECTION_FORWARD:
-                    point_list.push(seed);
+                    seed_positions.push(seed);
+                    seed_directions.push(seed_direction);
                     seed_signums.push(1);
                     break;
                 case DIRECTION_BACKWARD:
-                    point_list.push(seed);
+                    seed_positions.push(seed);
+                    seed_directions.push(seed_direction);
                     seed_signums.push(-1);
                     break;
                 case DIRECTION_BOTH:
-                    point_list.push(seed);
+                    seed_positions.push(seed);
+                    seed_directions.push(seed_direction);
                     seed_signums.push(1);
-                    point_list.push(seed);
+                    seed_positions.push(seed);
+                    seed_directions.push(seed_direction);
                     seed_signums.push(-1);
                     break;
             }
         }
     }
 
-    createPointListPhantomSeeds(space, point_list, visual_seeds, seed_signums){
+    createPointListPhantomSeeds(space, seed_positions, visual_seeds, seed_signums){
         for (var i = 0; i < this.list_phantom_seeds.length; i++) {
             var entry = this.list_phantom_seeds[i];
             var x = entry.node_input_x.value;
@@ -1177,17 +1188,17 @@ class UISeeds {
 
             switch(this.direction){
                 case DIRECTION_FORWARD:
-                    point_list.push(seed);
+                    seed_positions.push(seed);
                     seed_signums.push(1);
                     break;
                 case DIRECTION_BACKWARD:
-                    point_list.push(seed);
+                    seed_positions.push(seed);
                     seed_signums.push(-1);
                     break;
                 case DIRECTION_BOTH:
-                    point_list.push(seed);
+                    seed_positions.push(seed);
                     seed_signums.push(1);
-                    point_list.push(seed);
+                    seed_positions.push(seed);
                     seed_signums.push(-1);
                     break;
             }
