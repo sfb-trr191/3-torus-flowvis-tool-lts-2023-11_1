@@ -13,31 +13,76 @@ class UISeed {
         this.index = index;
         this.is_phantom = is_phantom;
         this.node = document.createElement("div");
-        this.node.className = "horizontal_div_seed";
+        //this.node.className = "horizontal_div_seed";
+        this.node.className = "seed_grid_3";
 
         this.node_label = document.createElement("label");
+        this.node_label.className = "seed_label";
         this.node_label.innerHTML = index;
         this.node.appendChild(this.node_label);
 
         this.node_input_x = document.createElement("input");
+        this.node_input_x.className = "seed_x";
         this.node_input_x.type = "text";
         this.node_input_x.value = "0.5";
         this.node_input_x.title = "x component of the seed position. \n    - Must be between 0 and 1.";
         this.node.appendChild(this.node_input_x);
 
         this.node_input_y = document.createElement("input");
+        this.node_input_y.className = "seed_y";
         this.node_input_y.type = "text";
         this.node_input_y.value = "0.5";
         this.node_input_y.title = "y component of the seed position. \n    - Must be between 0 and 1.";
         this.node.appendChild(this.node_input_y);
 
         this.node_input_z = document.createElement("input");
+        this.node_input_z.className = "seed_z";
         this.node_input_z.type = "text";
         this.node_input_z.value = "0.5";
         this.node_input_z.title = "z component of the seed position. \n    - Must be between 0 and 1.";
         this.node.appendChild(this.node_input_z);
 
+        this.node_input_w = document.createElement("input");
+        this.node_input_w.className = "seed_w";
+        this.node_input_w.type = "text";
+        this.node_input_w.value = "0.5";
+        this.node_input_w.title = "w component of the seed position. \n    - Must be between 0 and 1.";
+        this.node.appendChild(this.node_input_w);
+
+
+
+        this.node_input_v_x = document.createElement("input");
+        this.node_input_v_x.className = "seed_v_x";
+        this.node_input_v_x.type = "text";
+        this.node_input_v_x.value = "0.5";
+        this.node_input_v_x.title = "x component of the seed direction. \n    - Must be between 0 and 1.";
+        this.node.appendChild(this.node_input_v_x);
+
+        this.node_input_v_y = document.createElement("input");
+        this.node_input_v_y.className = "seed_v_y";
+        this.node_input_v_y.type = "text";
+        this.node_input_v_y.value = "0.5";
+        this.node_input_v_y.title = "y component of the seed direction. \n    - Must be between 0 and 1.";
+        this.node.appendChild(this.node_input_v_y);
+
+        this.node_input_v_z = document.createElement("input");
+        this.node_input_v_z.className = "seed_v_z";
+        this.node_input_v_z.type = "text";
+        this.node_input_v_z.value = "0.5";
+        this.node_input_v_z.title = "z component of the seed direction. \n    - Must be between 0 and 1.";
+        this.node.appendChild(this.node_input_v_z);
+
+        this.node_input_v_w = document.createElement("input");
+        this.node_input_v_w.className = "seed_v_w";
+        this.node_input_v_w.type = "text";
+        this.node_input_v_w.value = "0.5";
+        this.node_input_v_w.title = "w component of the seed direction. \n    - Must be between 0 and 1.";
+        this.node.appendChild(this.node_input_v_w);
+
+
+
         this.node_input_c = document.createElement("input");
+        this.node_input_c.className = "seed_c";
         this.node_input_c.type = "color";
         this.node_input_c.value = "#00FF00";
         this.node_input_c.title = "Color of the streamline started at this seed.";
@@ -45,6 +90,7 @@ class UISeed {
 
         if(!is_phantom){
             this.node_random = document.createElement("button");
+            this.node_random.className = "seed_button_random_position";
             this.node_random.innerHTML = "";
             this.node_random.type = "button";
             this.node_random.id = "button_randomize_this_seed_position";
@@ -56,6 +102,7 @@ class UISeed {
             this.node.appendChild(this.node_random);
     
             this.node_random_col = document.createElement("button");
+            this.node_random_col.className = "seed_button_random_color";
             this.node_random_col.innerHTML = "";
             this.node_random_col.type = "button";
             this.node_random_col.id = "button_randomize_this_seed_color";
@@ -67,6 +114,7 @@ class UISeed {
             this.node.appendChild(this.node_random_col);
 
             this.node_button = document.createElement("button");
+            this.node_button.className = "seed_button_remove";
             this.node_button.innerHTML = "x";
             this.node_button.type = "button";
             this.node_button.id = "button_delete_this_seed";
