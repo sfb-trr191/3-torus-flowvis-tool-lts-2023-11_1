@@ -166,13 +166,23 @@ class UISeed {
         this.node_input_x.value = split[0];
         this.node_input_y.value = split[1];
         this.node_input_z.value = split[2];
-        this.node_input_c.value = split[3];
+        this.node_input_w.value = split[3];
+        this.node_input_v_x.value = split[4];
+        this.node_input_v_y.value = split[5];
+        this.node_input_v_z.value = split[6];
+        this.node_input_v_w.value = split[7];
+        this.node_input_c.value = split[8];
     }
 
     toString() {
         var s = this.node_input_x.value + "~"
             + this.node_input_y.value + "~"
             + this.node_input_z.value + "~"
+            + this.node_input_w.value + "~"
+            + this.node_input_v_x.value + "~"
+            + this.node_input_v_y.value + "~"
+            + this.node_input_v_z.value + "~"
+            + this.node_input_v_w.value + "~"
             + this.node_input_c.value;
         return s;
     }
@@ -953,6 +963,7 @@ class UISeeds {
         this.list.push(new_seed);
         this.element.appendChild(new_seed.node);
         this.changed_count = true;
+        this.UpdateCSS();
     }
 
     addMultiSeed() {
@@ -1440,6 +1451,26 @@ class UISeeds {
     UpdateChanges(){        
         this.UpdatePhantomSeeds();
         this.createPointList();
+        this.UpdateCSS();
+    }
+
+    UpdateCSS(){
+        var space = parseInt(document.getElementById("select_space").value);
+        for (var i = 0; i < this.list.length; i++) {
+            switch (space) {
+                case SPACE_3_TORUS:
+                    this.list[i].node.className = "seed_grid_3";                       
+                    break;
+                case SPACE_2_PLUS_2D:
+                    this.list[i].node.className = "seed_grid_3";                  
+                    break;
+                case SPACE_2_SPHERE_3_PLUS_3D:
+                    this.list[i].node.className = "seed_grid_3Plus3";                
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
 /*

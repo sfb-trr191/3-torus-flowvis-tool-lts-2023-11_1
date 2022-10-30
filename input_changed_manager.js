@@ -87,6 +87,12 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_field_equation_w"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_a"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_b"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_p0"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_p1"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_p2"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_d0"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_d1"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_d2"));
         this.group_calculate.AddInput(document.getElementById("input_num_points_per_streamline"));
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("input_streamline_calculation_inbetweens"));

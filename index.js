@@ -1034,6 +1034,12 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
             document.getElementById("input_max_cost_percentage").value = value;
             UpdateRenderSettings();
         });
+
+        document.getElementById("select_space").addEventListener("change", (event) => {
+            ui_seeds.UpdateCSS();
+        });
+
+        
     }
 
     function addChangedCameraControl() {

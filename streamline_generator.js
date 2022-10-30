@@ -47,6 +47,7 @@ class StreamlineGenerator {
         //this.seeds = this.p_ui_seeds.createPointList();
         this.p_ui_seeds.createPointList(this.space);
         this.seeds = this.p_ui_seeds.seed_positions;
+        this.seed_directions = this.p_ui_seeds.seed_directions;
         this.seed_signums = this.p_ui_seeds.seed_signums;
         console.log("seeds");
         console.log(this.seeds);
@@ -248,6 +249,7 @@ class StreamlineGenerator {
         raw_data.data.push(new_entry);
         //console.log("this.seeds[i]: ", this.seeds[seed_index]);
         glMatrix.vec4.copy(raw_data.data[startIndex].position, this.seeds[seed_index]);
+        glMatrix.vec4.copy(raw_data.data[startIndex].direction, this.seed_directions[seed_index]);
         raw_data.data[startIndex].u_v_w_signum[3] = this.seed_signums[seed_index];
         raw_data.data[startIndex].flag = this.seed_signums[seed_index];
 
@@ -257,22 +259,21 @@ class StreamlineGenerator {
         //var total_points = raw_data.num_points;
         var positionData = raw_data.data[startIndex];
         var startPosition = glMatrix.vec3.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
+        var startDirection = glMatrix.vec3.fromValues(positionData.direction[0], positionData.direction[1], positionData.direction[2]);
         //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
         var signum = positionData.flag;
 
-        var f_start = this.f(startPosition, signum);
+        var f_start = this.f_2Sphere3Plus3D_position(startPosition, startDirection, signum);
         raw_data.data[startIndex].flag = signum;
         raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
-        //var previousPosition = startPosition;
-        //console.log("startIndex: ", startIndex);
-        //console.log("positionData: ", positionData);
-        //console.log("startPosition: ", startPosition);
-        //console.log("previousPosition: ", previousPosition);
-
 
         tmp.startIndex = startIndex;
         tmp.signum = signum;
         tmp.i=1;
+
+        console.log("-------------------");
+        console.log("START position", raw_data.data[startIndex].position);
+        console.log("START direction", raw_data.data[startIndex].direction);
 
     }
 
@@ -700,66 +701,117 @@ class StreamlineGenerator {
         var previous_plus_k3 = glMatrix.vec3.create();// previousPosition + k3
         var substep_currentPosition = glMatrix.vec3.create();
         var substep_previousPosition = glMatrix.vec3.create();
+
+        var currentDirection = glMatrix.vec3.create();
+        var l1 = glMatrix.vec3.create();
+        var l2 = glMatrix.vec3.create();
+        var l3 = glMatrix.vec3.create();
+        var l4 = glMatrix.vec3.create();
+        var l1_2 = glMatrix.vec3.create();// k1_2 = k1/2
+        var l2_2 = glMatrix.vec3.create();// k2_2 = k2/2
+        var l1_6 = glMatrix.vec3.create();// k1_6 = k1/6
+        var l2_3 = glMatrix.vec3.create();// k2_3 = k2/3
+        var l3_3 = glMatrix.vec3.create();// k3_3 = k3/3
+        var l4_6 = glMatrix.vec3.create();// k4_6 = k4/6
+        var previous_plus_l1_2 = glMatrix.vec3.create();// previousPosition + k1/2
+        var previous_plus_l2_2 = glMatrix.vec3.create();// previousPosition + k2/2
+        var previous_plus_l3 = glMatrix.vec3.create();// previousPosition + k3
+        var substep_currentDirection = glMatrix.vec3.create();
+        var substep_previousDirection = glMatrix.vec3.create();
         
         while(true){
             var local_i = tmp.i;//does not change even if duplicating point (used for point data)
             var currentIndex = tmp.startIndex + tmp.i;
             var previousIndex = currentIndex - 1;
             var previousVec4 = raw_data.data[previousIndex].position;
+            var previousDirectionVec4 = raw_data.data[previousIndex].direction;
             var previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
+            var previousDirection = glMatrix.vec3.fromValues(previousDirectionVec4[0], previousDirectionVec4[1], previousDirectionVec4[2]);
 
+            /*
+            console.log("-------------------");
+            console.log("PRE previousPosition", previousPosition);
+            console.log("PRE previousDirection", previousDirection);
+*/
+            //debugger;
             
             glMatrix.vec3.copy(substep_previousPosition, previousPosition);
+            glMatrix.vec3.copy(substep_previousDirection, previousDirection);
             var sub_step_size = this.step_size// / (this.inbetweens + 1);
             //multiple rk4 steps
             for (var sub_step_index = 0; sub_step_index <= this.inbetweens; sub_step_index++) {
                 //CALCULATE: vec3 k1 = step_size * f(substep_previousPosition, signum);
-                glMatrix.vec3.scale(k1, this.f(substep_previousPosition, signum), sub_step_size);
+                glMatrix.vec3.scale(k1, this.f_2Sphere3Plus3D_position(substep_previousPosition, substep_previousDirection, signum), sub_step_size);
+                glMatrix.vec3.scale(l1, this.f_2Sphere3Plus3D_direction(substep_previousPosition, substep_previousDirection, signum), sub_step_size);
 
                 //CALCULATE: vec3 k2 = step_size * f(substep_previousPosition + k1/2, signum);
                 glMatrix.vec3.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
-                glMatrix.vec3.add(previous_plus_k1_2, substep_previousPosition, k1_2);// substep_previousPosition + k1/2            
-                glMatrix.vec3.scale(k2, this.f(previous_plus_k1_2, signum), sub_step_size);
+                glMatrix.vec3.scale(l1_2, l1, 1 / 2);// k1_2 = k1/2
+                glMatrix.vec3.add(previous_plus_k1_2, substep_previousPosition, k1_2);// substep_previousPosition + k1/2      
+                glMatrix.vec3.add(previous_plus_l1_2, substep_previousDirection, l1_2);// substep_previousPosition + k1/2            
+                glMatrix.vec3.scale(k2, this.f_2Sphere3Plus3D_position(previous_plus_k1_2, previous_plus_l1_2, signum), sub_step_size);
+                glMatrix.vec3.scale(l2, this.f_2Sphere3Plus3D_direction(previous_plus_k1_2, previous_plus_l1_2, signum), sub_step_size);
 
                 //CALCULATE: vec3 k3 = step_size * f(substep_previousPosition + k2/2, signum);
                 glMatrix.vec3.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+                glMatrix.vec3.scale(l2_2, l2, 1 / 2);// k2_2 = k2/2
                 glMatrix.vec3.add(previous_plus_k2_2, substep_previousPosition, k2_2);// substep_previousPosition + k2/2     
-                glMatrix.vec3.scale(k3, this.f(previous_plus_k2_2, signum), sub_step_size);
+                glMatrix.vec3.add(previous_plus_l2_2, substep_previousDirection, l2_2);// substep_previousPosition + k2/2  
+                glMatrix.vec3.scale(k3, this.f_2Sphere3Plus3D_position(previous_plus_k2_2, previous_plus_l2_2, signum), sub_step_size);
+                glMatrix.vec3.scale(l3, this.f_2Sphere3Plus3D_direction(previous_plus_k2_2, previous_plus_l2_2, signum), sub_step_size);
 
                 //CALCULATE: vec3 k4 = step_size * f(substep_previousPosition + k3, signum);
                 glMatrix.vec3.add(previous_plus_k3, substep_previousPosition, k3);// substep_previousPosition + k3
-                glMatrix.vec3.scale(k4, this.f(previous_plus_k3, signum), sub_step_size);
+                glMatrix.vec3.add(previous_plus_l3, substep_previousDirection, l3);// substep_previousPosition + k3
+                glMatrix.vec3.scale(k4, this.f_2Sphere3Plus3D_position(previous_plus_k3, previous_plus_l3, signum), sub_step_size);
+                glMatrix.vec3.scale(l4, this.f_2Sphere3Plus3D_direction(previous_plus_k3, previous_plus_l3, signum), sub_step_size);
 
                 //CALCULATE: vec3 substep_currentPosition = substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
                 glMatrix.vec3.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+                glMatrix.vec3.scale(l1_6, l1, 1 / 6);// k1_6 = k1/6
                 glMatrix.vec3.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+                glMatrix.vec3.scale(l2_3, l2, 1 / 3);// k2_3 = k2/3
                 glMatrix.vec3.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+                glMatrix.vec3.scale(l3_3, l3, 1 / 3);// k3_3 = k3/3
                 glMatrix.vec3.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+                glMatrix.vec3.scale(l4_6, l4, 1 / 6);// k4_6 = k4/6
                 glMatrix.vec3.add(substep_currentPosition, substep_previousPosition, k1_6);// substep_previousPosition + k1 / 6 
+                glMatrix.vec3.add(substep_currentDirection, substep_previousDirection, l1_6);// substep_previousPosition + k1 / 6 
                 glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k2_3);// substep_previousPosition + k1 / 6 + k2 / 3
+                glMatrix.vec3.add(substep_currentDirection, substep_currentDirection, l2_3);// substep_previousPosition + k1 / 6 + k2 / 3
                 glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k3_3);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+                glMatrix.vec3.add(substep_currentDirection, substep_currentDirection, l3_3);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3
                 glMatrix.vec3.add(substep_currentPosition, substep_currentPosition, k4_6);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+                glMatrix.vec3.add(substep_currentDirection, substep_currentDirection, l4_6);// substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
               
                 //prepare next substep iteration: copy current to previous
                 glMatrix.vec3.copy(substep_previousPosition, substep_currentPosition);  
+                glMatrix.vec3.copy(substep_previousDirection, substep_currentDirection);  
+
             }
 
             //after every substep, copy the final value to currentPosition
             glMatrix.vec3.copy(currentPosition, substep_currentPosition);
+            glMatrix.vec3.copy(currentDirection, substep_currentDirection);
 
             //console.log(i, currentPosition);
-            if (this.confine_to_cube)
-                currentPosition = this.ConfineToCube(currentPosition, previousPosition);
+            //if (this.confine_to_cube)
+            //    currentPosition = this.ConfineToCube(currentPosition, previousPosition);
 
-
+            //TODO: should length be both vectors combined or only position vector
             var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
-            var f_previous = this.f(previousPosition, signum);
-            var f_current = this.f(currentPosition, signum);
+            var f_previous = this.f_2Sphere3Plus3D_position(previousPosition, previousDirection, signum);
+            var f_current = this.f_2Sphere3Plus3D_position(currentPosition, currentDirection, signum);
             var v_previous = glMatrix.vec3.length(f_previous);
             var v_current = glMatrix.vec3.length(f_current);
             var v_average = (v_previous + v_current) * 0.5;
             var time_previous = raw_data.data[previousIndex].time;
             var arc_length_previous = raw_data.data[previousIndex].arc_length;
+
+            //TODO: normalization step necessary?
+            //glMatrix.vec3.normalize(currentPosition, currentPosition);
+            //glMatrix.vec3.normalize(currentDirection, currentDirection);
+
 
             var difference = glMatrix.vec3.create();
             glMatrix.vec3.subtract(difference, currentPosition, previousPosition);
@@ -780,42 +832,24 @@ class StreamlineGenerator {
                 terminate = true;
                 flag = 3;//end of polyline
             }
-            else if (this.check_bounds) {
-                var outOfBounds = this.CheckOutOfBounds3(currentPosition);
-                if (outOfBounds) {
-                    flag = 3;//end of polyline
-                    //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
-                   
-                    if (this.continue_at_bounds) {//if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
-                        var movedPosition = this.MoveOutOfBounds3(currentPosition);
-                        var f_movedPosition = this.f(movedPosition, signum);
-                        var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
 
-                        //push entry for moved position (current index + 1)
-                        var new_entry = new RawDataEntry();
-                        raw_data.data.push(new_entry);
 
-                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
-                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], 1);;//1 or -1 for start
-                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
-                        raw_data.data[currentIndex + 1].time = time_current;
-                        raw_data.data[currentIndex + 1].arc_length = arc_length_current;
-                        raw_data.data[currentIndex + 1].local_i = local_i+1;                        
-                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
-                        tmp.i++;
-                    }
-                    else {
-                        terminate = true;
-                    }
-                }
-            }
+
 
             raw_data.data[currentIndex].flag = flag;
             raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], 1);
+            raw_data.data[currentIndex].direction = glMatrix.vec4.fromValues(currentDirection[0], currentDirection[1], currentDirection[2], 1);
             raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
             raw_data.data[currentIndex].time = time_current;
             raw_data.data[currentIndex].arc_length = arc_length_current;
-            raw_data.data[currentIndex].local_i = local_i;               
+            raw_data.data[currentIndex].local_i = local_i;            
+            
+            console.log("-------------------");
+            console.log("position", raw_data.data[currentIndex].position, glMatrix.vec3.length(raw_data.data[currentIndex].position));
+            console.log("direction", raw_data.data[currentIndex].direction, glMatrix.vec3.length(raw_data.data[currentIndex].direction));
+            console.log("time_current", time_current);
+            console.log("arc_length_current", arc_length_current);
+            console.log("difference", difference);
 
             //previousPosition = currentPosition;
             if (terminate){
@@ -956,26 +990,70 @@ class StreamlineGenerator {
         return result;
     }
 
-    f_2Sphere3Plus3D(vector, signum) {
-        //console.log("--------------");
-        //console.log("vector: ", vector, "test");
-        //console.log("vector0: ", vector[0]);
-        //console.log("vector1: ", vector[1]);
-        //console.log("vector2: ", vector[2]);
+    f_2Sphere3Plus3D_position(vector_position, vector_direction,signum) {
         let scope = {
-            x: vector[0],
-            y: vector[1],
-            z: vector[2],
+            p0: vector_position[0],
+            p1: vector_position[1],
+            p2: vector_position[2],
+            d0: vector_direction[0],
+            d1: vector_direction[1],
+            d2: vector_direction[2]
         };
         //console.log("scope: ", scope);
         //console.log("this.shader_formula_u: ", this.shader_formula_u);
-        var u = math.evaluate(this.shader_formula_u, scope)
-        var v = math.evaluate(this.shader_formula_v, scope);
-        var w = math.evaluate(this.shader_formula_w, scope);
+        var u = math.evaluate(this.shader_formula_p0, scope)
+        var v = math.evaluate(this.shader_formula_p1, scope);
+        var w = math.evaluate(this.shader_formula_p2, scope);
         var result = glMatrix.vec3.create();
         result[0] = u * signum;
         result[1] = v * signum;
         result[2] = w * signum;
+        /*
+        console.log("shader_formula_p0:", this.shader_formula_p0);
+        console.log("shader_formula_p1:", this.shader_formula_p1);
+        console.log("shader_formula_p2:", this.shader_formula_p2);
+        console.log("u:", u);
+        console.log("v:", v);
+        console.log("w:", w);
+        console.log("signum:", signum);
+        console.log("f_2Sphere3Plus3D_position:", result);
+        debugger;
+        */
+        return result;
+    }
+
+    f_2Sphere3Plus3D_direction(vector_position, vector_direction, signum) {
+        let scope = {
+            p0: vector_position[0],
+            p1: vector_position[1],
+            p2: vector_position[2],
+            d0: vector_direction[0],
+            d1: vector_direction[1],
+            d2: vector_direction[2]
+        };
+        //console.log("scope: ", scope);
+        //console.log("this.shader_formula_u: ", this.shader_formula_u);
+        var u = math.evaluate(this.shader_formula_d0, scope)
+        var v = math.evaluate(this.shader_formula_d1, scope);
+        var w = math.evaluate(this.shader_formula_d2, scope);
+        var result = glMatrix.vec3.create();
+        
+        result[0] = u * signum;
+        result[1] = v * signum;
+        result[2] = w * signum;
+        
+            /*
+        console.log("shader_formula_d0:", this.shader_formula_d0);
+        console.log("shader_formula_d1:", this.shader_formula_d1);
+        console.log("shader_formula_d2:", this.shader_formula_d2);
+        console.log("u:", u);
+        console.log("v:", v);
+        console.log("w:", w);
+        console.log("signum:", signum);
+        console.log("f_2Sphere3Plus3D_direction:", result);
+        debugger;
+        */
+        
         return result;
     }
 
