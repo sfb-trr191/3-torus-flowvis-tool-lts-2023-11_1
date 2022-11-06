@@ -1438,8 +1438,9 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 	float y_2 = (ray_os.origin + ray_os.direction).y;
 	float d_x =  x_2 - x_1;
 	float d_y =  y_2 - y_1;
-	float d_r = sqrt(d_x*d_x + d_y*d_y);
-	float d_r_squared = d_r * d_r;
+	//float d_r = sqrt(d_x*d_x + d_y*d_y);
+	//float d_r_squared = d_r * d_r;
+    float d_r_squared = d_x*d_x + d_y*d_y;
 	float D = x_1 * y_2 - x_2 * y_1;
 	float discriminant = r*r * d_r_squared - D*D;
 	if(discriminant < 0.0)
@@ -2467,8 +2468,9 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 	float y_2 = (ray_os.origin + ray_os.direction).y;
 	float d_x =  x_2 - x_1;
 	float d_y =  y_2 - y_1;
-	float d_r = sqrt(d_x*d_x + d_y*d_y);
-	float d_r_squared = d_r * d_r;
+	//float d_r = sqrt(d_x*d_x + d_y*d_y);
+	//float d_r_squared = d_r * d_r;
+    float d_r_squared = d_x*d_x + d_y*d_y;
 	float D = x_1 * y_2 - x_2 * y_1;
 	float discriminant = r*r * d_r_squared - D*D;
 	if(discriminant < 0.0)
