@@ -71,6 +71,9 @@ const ExportWizard = require("./export_wizard");
 const Tests = require("./tests");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
+
+const math4D = require("./math4D");
+
 ; (function () {
     "use strict"
     window.addEventListener("load", onStart, false);
@@ -144,6 +147,8 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
     function onStart(evt) {
         console.log("onStart");
+
+        //math4D.Test();
 
         var tests = new Tests();
        
