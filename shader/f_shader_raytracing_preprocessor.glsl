@@ -1523,10 +1523,11 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 			
 	bool copy = (lineSegment.copy == 1);
 	
-	vec3 position_os = ray.origin + distance_os * ray.direction;	
+
+	vec3 position_ws = ray.origin + distance_os * ray.direction;	
 	if(check_bounds)
 	{
-		bool outOfBounds = CheckOutOfBounds(position_os);	
+		bool outOfBounds = CheckOutOfBounds(position_ws);	
 		if(outOfBounds)	
 			return;	
 	}	
@@ -1581,7 +1582,7 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
-		hit.position = position_os;	
+		hit.position = position_ws;	
 		hit.positionCenter = tube_center;
 		hit.normal = normalize(hit.position - tube_center);
 		hit.copy = copy;
@@ -1627,7 +1628,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 	
 	float distance_surface = ray.rayDistance + distance_os;
 		
-	vec3 position_os = ray.origin + distance_os * ray.direction;//intersection point in world space
+	vec3 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
 
 	/*
 	bool doOutOfBoundsCheck = false;
@@ -1638,7 +1639,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 
 	if(doOutOfBoundsCheck)
 	{
-		bool outOfBounds = CheckOutOfBounds(position_os);	
+		bool outOfBounds = CheckOutOfBounds(position_ws);	
 		if(outOfBounds)	
 			return;
 	}
@@ -1651,7 +1652,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
     */
 	if(check_bounds)
 	{
-		bool outOfBounds = CheckOutOfBounds(position_os);	
+		bool outOfBounds = CheckOutOfBounds(position_ws);	
 		if(outOfBounds)	
 			return;	
 	}	
@@ -1693,7 +1694,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 		hit.hitType = type;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
-		hit.position = ray.origin + distance_os * ray.direction;
+		hit.position = position_ws;
 		hit.positionCenter = sphere.center;
 		hit.normal = normalize(hit.position - sphere.center);
 		//hit.normal = normalize(sphere.center - hit.position);
@@ -2040,14 +2041,14 @@ void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout
 	//return;
 	float distance_os = t;
 	float distance = ray.rayDistance + distance_os;
-	vec3 position_os = ray.origin + distance_os * ray.direction;
+	vec3 position_ws = ray.origin + distance_os * ray.direction;
 	
 	
 	for(int i=0; i<3; i++)
 	{
 		if(planeNormal[i] == 0.0)
 		{
-			if(position_os[i] < 0.0 || position_os[i] > 1.0)
+			if(position_ws[i] < 0.0 || position_ws[i] > 1.0)
 				return;
 		}
 	}
@@ -2543,10 +2544,10 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 	float distance_os = distance(ray_os.origin, p_os);				
 	float distance = ray.rayDistance + distance_os;
 				
-	vec3 position_os = ray.origin + distance_os * ray.direction;
+	vec3 position_ws = ray.origin + distance_os * ray.direction;
 	if(check_bounds)
 	{
-		bool outOfBounds = CheckOutOfBounds(position_os);	
+		bool outOfBounds = CheckOutOfBounds(position_ws);	
 		if(outOfBounds)	
 			return;	
 	}
@@ -2564,7 +2565,7 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 		hit.hitType = TYPE_GL_CYLINDER;//change
         hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
-		hit.position = position_os;	
+		hit.position = position_ws;	
 		hit.positionCenter = tube_center;
 		hit.normal = normalize(hit.position - tube_center);
 		hit.copy = false;//copy;
@@ -2608,10 +2609,10 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 	
 	float distance_surface = ray.rayDistance + distance_os;
 		
-	vec3 position_os = ray.origin + distance_os * ray.direction;//intersection point in world space
+	vec3 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
 	if(check_bounds)
 	{
-		bool outOfBounds = CheckOutOfBounds(position_os);	
+		bool outOfBounds = CheckOutOfBounds(position_ws);	
 		if(outOfBounds)	
 			return;	
 	}
@@ -2625,7 +2626,7 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 		hit.hitType = type;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
-		hit.position = ray.origin + distance_os * ray.direction;
+		hit.position = position_ws;
 		hit.positionCenter = sphere.center;
 		hit.normal = normalize(hit.position - sphere.center);
 		//hit.normal = normalize(sphere.center - hit.position);
