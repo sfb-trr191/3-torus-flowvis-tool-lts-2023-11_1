@@ -73,6 +73,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
 
 const math4D = require("./math4D");
+const cpu_intersect = require("./cpu_intersect");
 
 ; (function () {
     "use strict"
@@ -149,6 +150,7 @@ const math4D = require("./math4D");
         console.log("onStart");
 
         //math4D.Test();
+        cpu_intersect.Test();
 
         var tests = new Tests();
        
