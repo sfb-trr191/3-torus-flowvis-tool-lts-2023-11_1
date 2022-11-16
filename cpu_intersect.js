@@ -152,7 +152,7 @@ function IntersectSphere(ray_origin_3D, ray_destination_3D, sphere_center_3D, sp
 	{
 		if(t2 < 0.0)
 			return;
-            t_os = t2;
+        t_os = t2;
 	}
 	else if (t2 < 0.0)
         t_os = t1;
@@ -208,7 +208,7 @@ function Intersect3Sphere(ray_origin_4D, ray_direction_4D, sphere_center_4D, sph
 	{
 		if(t2 < 0.0)
 			return;
-            t_os = t2;
+        t_os = t2;
 	}
 	else if (t2 < 0.0)
         t_os = t1;
@@ -379,7 +379,10 @@ function ValidateIntersectionSpherinder(ray_origin_4D, ray_direction_4D, spherin
             best_shortest_distance = shortest_distance;
     }
 
-    if(result.intersect){
+    if(result.flag_outside_interval){
+        console.log("no intersection in interval but outside of spherinder interval");
+    }
+    else if(result.intersect){
         //var dist = glMatrix.vec3.distance(sphere_center_3D, result.intersection_3D);
         //var diff = Math.abs(dist - sphere_radius);
         //console.log("result: ", result);
@@ -392,6 +395,10 @@ function ValidateIntersectionSpherinder(ray_origin_4D, ray_direction_4D, spherin
 
         if(diff < 0.000001){
             console.log("valid hit found, diff to radius is:", diff, "shortest dist=", best_shortest_distance);
+            console.log("           ray_origin_4D:", ray_origin_4D);
+            console.log("           ray_direction_4D:", ray_direction_4D);
+            console.log("           spherinder_point_A:", spherinder_point_A);
+            console.log("           spherinder_point_B:", spherinder_point_B);
         }
         else{
             console.log("INVALID hit found, diff to radius is:", diff, "shortest dist=", best_shortest_distance);
@@ -404,11 +411,14 @@ function ValidateIntersectionSpherinder(ray_origin_4D, ray_direction_4D, spherin
 
         //if the shortest distance is smaller than the radius we might have missed an intersection
         if(best_shortest_distance < radius){
+            /*
             if(result.flag_outside_interval){
                 console.log("no intersection in interval but outside of spherinder interval");
             }else{
                 console.log("WARNING: missed intersection shortest distance:", best_shortest_distance, "intersection:", result);                
             }
+            */
+            console.log("WARNING: missed intersection shortest distance:", best_shortest_distance, "intersection:", result);        
         }else{
             console.log("no intersection at all. best distance:", best_shortest_distance);
         }
@@ -431,7 +441,8 @@ function RandomizedTestIntersectSphere(){
 }
 
 function RandomizedTestIntersect3Sphere(){
-    rng = seedrandom();
+    console.log("------------ RandomizedTestIntersect3Sphere ------------");
+    rng = seedrandom("RandomizedTestIntersect3Sphere");
 
     for (var i=0; i<100; i++) {
         var result = {};
@@ -448,7 +459,8 @@ function RandomizedTestIntersect3Sphere(){
 }
 
 function RandomizedTestIntersectSpherinder(){
-    rng = seedrandom();
+    console.log("------------ RandomizedTestIntersectSpherinder ------------");
+    rng = seedrandom("RandomizedTestIntersectSpherinder");
 
     for (var i=0; i<100; i++) {
         var result = {};
@@ -464,13 +476,102 @@ function RandomizedTestIntersectSpherinder(){
     }
 }
 
+function TestCase01(){
+    console.log("TestCase01: POSITIVE INTERSECTION LINE SPHERINDER");
+    var radius = 0.5;
+    var result = {};
+    result.intersect = false;
+    result.flag_outside_interval = false;
+    var ray_origin_4D = glMatrix.vec4.fromValues(
+        0.011895515024662018,
+        -0.42977961897850037,
+        -0.6823511719703674,
+        0.7213745713233948
+    );
+    var ray_direction_4D = glMatrix.vec4.fromValues(
+        -0.2936179041862488,
+        -0.4730651080608368,
+        0.567871630191803,
+        -0.606234073638916
+    );
+    var spherinder_point_A = glMatrix.vec4.fromValues(
+        0.5463999509811401,
+        -0.4963940680027008,
+        -0.7993444204330444,
+        0.9073070883750916
+    );
+    var spherinder_point_B = glMatrix.vec4.fromValues(
+        -0.8008022904396057,
+        0.5201994776725769,
+        -0.41431981325149536,
+        -0.9893190264701843
+    );
+    IntersectSpherinder(ray_origin_4D, ray_direction_4D, spherinder_point_A, spherinder_point_B, radius, result);
+    ValidateIntersectionSpherinder(ray_origin_4D, ray_direction_4D, spherinder_point_A, spherinder_point_B, radius, result);
+}
+
+function TestCase02(){
+    console.log("TestCase02: NEGATIVE INTERSECTION LINE SPHERINDER");
+    var radius = 0.5;
+    var result = {};
+    result.intersect = false;
+    result.flag_outside_interval = false;
+    var ray_origin_4D = glMatrix.vec4.fromValues(
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    );
+    var ray_direction_4D = glMatrix.vec4.fromValues(
+        0.0,
+        0.0,
+        0.0,
+        1.0
+    );
+    var spherinder_point_A = glMatrix.vec4.fromValues(
+        1.0,
+        0.0,
+        0.0,
+        0.0
+    );
+    var spherinder_point_B = glMatrix.vec4.fromValues(
+        1.0,
+        1.0,
+        0.0,
+        0.0
+    );
+    IntersectSpherinder(ray_origin_4D, ray_direction_4D, spherinder_point_A, spherinder_point_B, radius, result);
+    ValidateIntersectionSpherinder(ray_origin_4D, ray_direction_4D, spherinder_point_A, spherinder_point_B, radius, result);
+}
+
+function KnownTestCases(){
+    console.log("--------------------------KnownTestCases----------------------------");
+    TestCase01();
+    console.log("--------------------------");
+    TestCase02();
+}
+
 function Test(){
     console.log("CPU INTERSECTION TESTS");
     //TestIntersectSphere();
     //RandomizedTestIntersectSphere();
     RandomizedTestIntersectSpherinder();
-    //RandomizedTestIntersect3Sphere();
+    RandomizedTestIntersect3Sphere();
+    KnownTestCases();
     debugger;
 }
 
 exports.Test = Test;
+
+/*
+
+
+    var ray_direction_4D = glMatrix.vec4.fromValues(
+        000000000000,
+        000000000000,
+        000000000000,
+        000000000000
+    );
+
+
+*/
