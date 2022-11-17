@@ -1112,51 +1112,6 @@ const cpu_intersect = require("./cpu_intersect");
         canvas_wrapper_transfer_function.updateBuffers();
     }
 
-    function CalculateStreamlines() {
-        console.log("CalculateStreamlines");
-        var t_start = performance.now();
-
-        var shader_formula_u = document.getElementById("input_field_equation_u").value;
-        var shader_formula_v = document.getElementById("input_field_equation_v").value;
-        var shader_formula_w = document.getElementById("input_field_equation_w").value;
-        var shader_formula_a = document.getElementById("input_field_equation_a").value;
-        var shader_formula_b = document.getElementById("input_field_equation_b").value;
-        var num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
-        var step_size = document.getElementById("input_step_size").value;
-        var inbetweens = document.getElementById("input_streamline_calculation_inbetweens").value;
-        var segment_duplicator_iterations = document.getElementById("segment_duplicator_iterations").value;
-        var space = parseInt(document.getElementById("select_space").value);
-        var direction = parseInt(document.getElementById("select_streamline_calculation_direction").value);
-
-        var streamline_calculation_method = document.getElementById("select_streamline_calculation_method").value;
-        var tube_radius_fundamental = parseFloat(document.getElementById("input_tube_radius_fundamental").value);
-        var max_radius_factor_highlight = parseFloat(document.getElementById("input_max_radius_factor_highlight").value);
-
-        var termination_condition = parseInt(document.getElementById("select_streamline_termination_method").value);
-        var termination_advection_time = parseFloat(document.getElementById("input_streamline_calculation_advection_time").value);
-        var termination_arc_length = parseFloat(document.getElementById("input_streamline_calculation_arc_length").value);
-        
-
-        canvas_wrapper_main.tube_radius_fundamental = tube_radius_fundamental;
-        canvas_wrapper_side.tube_radius_fundamental = tube_radius_fundamental;
-        canvas_wrapper_main.tube_radius_outside = max_radius_factor_highlight;
-        canvas_wrapper_side.tube_radius_outside = max_radius_factor_highlight;
-
-        streamline_context_static.CalculateStreamlines(gl, gl_side, space, streamline_calculation_method, 
-            shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b, num_points_per_streamline, step_size, inbetweens, 
-            segment_duplicator_iterations, direction, tube_radius_fundamental, max_radius_factor_highlight, termination_condition, termination_advection_time, termination_arc_length);
-        data_changed = true;
-        input_changed_manager.UpdateDefaultValuesCalculate();
-
-        var t_stop = performance.now();
-        console.log("Performance: calculated streamlines in: ", Math.ceil(t_stop-t_start), "ms");
-
-        var errors = streamline_context_static.streamline_generator.streamline_error_counter;
-        if(errors > 0){
-            alert("Warning: There were " + errors + " errors during streamline calculation. The respective streamlines are terminated where the error occured. Make sure the equations do not result in infinity or NaN values.");
-        }
-    }
-
     function CalculateFTLE() {
         var dim_x = parseInt(document.getElementById("input_ftle_dim_x").value);
         var dim_y = parseInt(document.getElementById("input_ftle_dim_y").value);
