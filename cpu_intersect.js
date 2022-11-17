@@ -558,7 +558,7 @@ function Test(){
     RandomizedTestIntersectSpherinder();
     RandomizedTestIntersect3Sphere();
     KnownTestCases();
-    debugger;
+    //debugger;
 }
 
 exports.Test = Test;

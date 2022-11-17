@@ -94,6 +94,7 @@ class RawData {
             new_entry.x = this.data[i].position[0];
             new_entry.y = this.data[i].position[1];
             new_entry.z = this.data[i].position[2];
+            new_entry.w = this.data[i].position[3];//added for S3
 
             if(termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME){
                 new_entry.cost = this.data[i].time / termination_max_value;

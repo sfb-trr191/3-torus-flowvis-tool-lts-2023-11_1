@@ -595,7 +595,9 @@ const cpu_intersect = require("./cpu_intersect");
         if (sheduled_task == TASK_NONE){
             sheduled_task = export_wizard.getSheduledTask();
             
-            console.log("sheduled_task:", sheduled_task);
+            if (sheduled_task != TASK_NONE){                
+                console.log("sheduled_task:", sheduled_task);
+            }
         }
 
         //handle sheduled task

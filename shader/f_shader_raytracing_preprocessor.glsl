@@ -2861,7 +2861,7 @@ float GetTubeRadius(int part_index){
 ////////////////////////////////////////////////////////////////////
 
 //DATA SIZES
-const int POSITION_DATA_FLOAT_COUNT = 4;
+const int POSITION_DATA_FLOAT_COUNT = 8;
 const int POSITION_DATA_INT_COUNT = 0;
 const int LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
 const int LINE_SEGMENT_INT_COUNT = 8;
@@ -2960,10 +2960,24 @@ vec3 GetPosition(int index, int part_index)
     return position;
 }
 
+vec4 GetPosition4D(int index, int part_index)
+{
+    ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData(part_index) + index * POSITION_DATA_FLOAT_COUNT);
+    float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
+    float y = texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r;
+    float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
+    float w = texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r;  
+    vec4 position = vec4(x, y, z, w);
+    if(projection_index >=0)
+        position[projection_index] = 0.0;
+
+    return position;
+}
+
 float GetCost(int index, int part_index)
 {
     ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData(part_index) + index * POSITION_DATA_FLOAT_COUNT);
-    float cost = texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r;
+    float cost = texelFetch(texture_float, pointer+ivec3(4,0,0), 0).r;
     return cost;
 }
 

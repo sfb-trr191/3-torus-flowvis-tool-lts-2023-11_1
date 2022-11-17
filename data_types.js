@@ -8,7 +8,7 @@ The class must implement:
 - writeToArrays()
 */
 
-var POSITION_DATA_FLOAT_COUNT = 4;
+var POSITION_DATA_FLOAT_COUNT = 8;
 var POSITION_DATA_INT_COUNT = 0;
 var LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
 var LINE_SEGMENT_INT_COUNT = 8;
@@ -32,6 +32,7 @@ class PositionData {
     x = 0.0;
     y = 0.0;
     z = 0.0;
+    w = 0.0;
     cost = 0.0;
 
     constructor() { }
@@ -40,6 +41,7 @@ class PositionData {
         console.log("x: " + this.x);
         console.log("y: " + this.y);
         console.log("z: " + this.z);
+        console.log("w: " + this.w);
         console.log("cost: " + this.cost);
     }
 
@@ -56,6 +58,7 @@ class PositionData {
         arrayf[index++] = this.x;
         arrayf[index++] = this.y;
         arrayf[index++] = this.z;
+        arrayf[index++] = this.w;
         arrayf[index++] = this.cost;
     }
 }
