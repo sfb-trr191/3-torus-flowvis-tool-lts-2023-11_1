@@ -1,4 +1,4 @@
-global.SHADER_MODULE_VOLUME_RENDERING = `
+global.SHADER_MODULE_DEFAULT_VOLUME_RENDERING = `
 
 void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube)
 {

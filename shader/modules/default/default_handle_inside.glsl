@@ -1,4 +1,4 @@
-global.SHADER_MODULE_HANDLE_INSIDE = `
+global.SHADER_MODULE_DEFAULT_HANDLE_INSIDE = `
 
 void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit)
 {	

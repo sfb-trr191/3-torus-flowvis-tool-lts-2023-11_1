@@ -1,4 +1,4 @@
-global.SHADER_MODULE_OUT_OF_BOUNDS = `
+global.SHADER_MODULE_DEFAULT_OUT_OF_BOUNDS = `
 
 //used once at the beginning of intersect to reposition the original ray inside the fundamental domain (for fundamental domain based rendering)
 //see: variableRay.origin = RepositionIntoFundamentalDomain(ray.origin);

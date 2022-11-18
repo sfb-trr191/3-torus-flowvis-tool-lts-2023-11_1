@@ -1,4 +1,4 @@
-global.SHADER_MODULE_HANDLE_OUT_OF_BOUNDS = `
+global.SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS = `
 
 
 void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube)

@@ -1,30 +1,31 @@
 //########## GLOBALS ##########
 const module_const = require("./const");
 const module_version = require("./version");
-const f_shader_average = require("./shader/f_shader_average.glsl");
-const f_shader_compute_flow_map_slice = require("./shader/f_shader_compute_flow_map_slice.glsl");
-const f_shader_compute_flow_map_slice_AB = require("./shader/f_shader_compute_flow_map_slice_AB.glsl");
-const f_shader_compute_flowmap_finite_differences = require("./shader/f_shader_compute_flowmap_finite_differences.glsl");
-const f_shader_compute_ftle_normals = require("./shader/f_shader_compute_ftle_normals.glsl");
-const f_shader_copy = require("./shader/f_shader_copy.glsl");
-const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl");
-const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
-const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
-const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_preprocessor.glsl");
-const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
-const f_shader_sum = require("./shader/f_shader_sum.glsl");
-const f_shader_transfer_function = require("./shader/f_shader_transfer_function.glsl");
-const f_shader_transfer_function_points = require("./shader/f_shader_transfer_function_points.glsl");
-const v_shader_raytracing = require("./shader/v_shader_raytracing.glsl");
-const v_shader_resampling = require("./shader/v_shader_resampling.glsl");
-const v_shader_transfer_function_points = require("./shader/v_shader_transfer_function_points.glsl");
+const f_shader_average = require("./shader/stand_alone/f_shader_average.glsl");
+const f_shader_compute_flow_map_slice_AB = require("./shader/stand_alone/f_shader_compute_flow_map_slice_AB.glsl");
+const f_shader_compute_flow_map_slice = require("./shader/stand_alone/f_shader_compute_flow_map_slice.glsl");
+const f_shader_compute_flowmap_finite_differences = require("./shader/stand_alone/f_shader_compute_flowmap_finite_differences.glsl");
+const f_shader_compute_ftle_normals = require("./shader/stand_alone/f_shader_compute_ftle_normals.glsl");
+const f_shader_copy = require("./shader/stand_alone/f_shader_copy.glsl");
+const f_shader_flow_map_slice = require("./shader/stand_alone/f_shader_flow_map_slice.glsl");
+const f_shader_placeholder = require("./shader/stand_alone/f_shader_placeholder.glsl");
+const f_shader_raytracing = require("./shader/stand_alone/f_shader_raytracing.glsl");
+const f_shader_resampling = require("./shader/stand_alone/f_shader_resampling.glsl");
+const f_shader_sum = require("./shader/stand_alone/f_shader_sum.glsl");
+const f_shader_transfer_function_points = require("./shader/stand_alone/f_shader_transfer_function_points.glsl");
+const f_shader_transfer_function = require("./shader/stand_alone/f_shader_transfer_function.glsl");
+const v_shader_raytracing = require("./shader/stand_alone/v_shader_raytracing.glsl");
+const v_shader_resampling = require("./shader/stand_alone/v_shader_resampling.glsl");
+const v_shader_transfer_function_points = require("./shader/stand_alone/v_shader_transfer_function_points.glsl");
 
+//modular shader:
+const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_preprocessor.glsl");
 //modules
-const shader_modules_light_integration_definitions = require("./shader/modules/light_integration_definitions.glsl");
-const shader_modules_out_of_bounds = require("./shader/modules/out_of_bounds.glsl");
-const shader_modules_volume_rendering = require("./shader/modules/volume_rendering.glsl");
-const shader_modules_handle_inside = require("./shader/modules/handle_inside.glsl");
-const shader_modules_handle_out_of_bounds = require("./shader/modules/handle_out_of_bounds.glsl");
+const shader_modules_light_integration_definitions = require("./shader/modules/default/default_light_integration_definitions.glsl");
+const shader_modules_out_of_bounds = require("./shader/modules/default/default_out_of_bounds.glsl");
+const shader_modules_volume_rendering = require("./shader/modules/default/default_volume_rendering.glsl");
+const shader_modules_handle_inside = require("./shader/modules/default/default_handle_inside.glsl");
+const shader_modules_handle_out_of_bounds = require("./shader/modules/default/default_handle_out_of_bounds.glsl");
 //modules: shared
 const shader_modules_data_access = require("./shader/modules/shared/shared_data_access.glsl");
 const shader_modules_shared_structs = require("./shader/modules/shared/shared_structs.glsl");

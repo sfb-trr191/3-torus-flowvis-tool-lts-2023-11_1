@@ -81,7 +81,7 @@ class ShaderManager {
 
     LoadModules(code, shader_flags){
         if(shader_flags.integrate_light){
-            code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS);
+            code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_DEFAULT_LIGHT_INTEGRATION_DEFINITIONS);
         }else{
             code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", "");
         }
@@ -93,10 +93,10 @@ class ShaderManager {
         
         
         //not used in s3
-        code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_VOLUME_RENDERING);        
-        code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_OUT_OF_BOUNDS);
-        code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_HANDLE_INSIDE);
-        code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_HANDLE_OUT_OF_BOUNDS);
+        code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_DEFAULT_VOLUME_RENDERING);        
+        code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_OUT_OF_BOUNDS);
+        code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_DEFAULT_HANDLE_INSIDE);
+        code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS);
 
         //shared
         code = code.replace("$SHADER_MODULE_SHARED_DATA_ACCESS$", SHADER_MODULE_SHARED_DATA_ACCESS);
@@ -107,7 +107,7 @@ class ShaderManager {
         code = code.replace("$SHADER_MODULE_SHARED_SHADING$", SHADER_MODULE_SHARED_SHADING);    
         
         
-
+        
         
         
         
