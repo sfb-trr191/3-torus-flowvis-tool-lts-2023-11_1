@@ -11,7 +11,6 @@ const f_shader_flow_map_slice = require("./shader/f_shader_flow_map_slice.glsl")
 const f_shader_placeholder = require("./shader/f_shader_placeholder.glsl");
 const f_shader_raytracing = require("./shader/f_shader_raytracing.glsl");
 const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_preprocessor.glsl");
-const shader_modules_light_integration_definitions = require("./shader/modules/light_integration_definitions.glsl");
 const f_shader_resampling = require("./shader/f_shader_resampling.glsl");
 const f_shader_sum = require("./shader/f_shader_sum.glsl");
 const f_shader_transfer_function = require("./shader/f_shader_transfer_function.glsl");
@@ -19,6 +18,25 @@ const f_shader_transfer_function_points = require("./shader/f_shader_transfer_fu
 const v_shader_raytracing = require("./shader/v_shader_raytracing.glsl");
 const v_shader_resampling = require("./shader/v_shader_resampling.glsl");
 const v_shader_transfer_function_points = require("./shader/v_shader_transfer_function_points.glsl");
+
+//modules
+const shader_modules_light_integration_definitions = require("./shader/modules/light_integration_definitions.glsl");
+const shader_modules_out_of_bounds = require("./shader/modules/out_of_bounds.glsl");
+const shader_modules_volume_rendering = require("./shader/modules/volume_rendering.glsl");
+const shader_modules_handle_inside = require("./shader/modules/handle_inside.glsl");
+const shader_modules_handle_out_of_bounds = require("./shader/modules/handle_out_of_bounds.glsl");
+//modules: shared
+const shader_modules_data_access = require("./shader/modules/shared/shared_data_access.glsl");
+const shader_modules_shared_structs = require("./shader/modules/shared/shared_structs.glsl");
+const shader_modules_shared_uniforms = require("./shader/modules/shared/shared_uniforms.glsl");
+const shader_modules_shared_const = require("./shader/modules/shared/shared_const.glsl");
+const shader_modules_shared_function_declarations = require("./shader/modules/shared/shared_function_declarations.glsl");
+const shader_modules_shared_shading = require("./shader/modules/shared/shared_shading.glsl");
+//modules: default
+const shader_modules_default_intersections = require("./shader/modules/default/default_intersections.glsl");
+const shader_modules_default_ray_generation = require("./shader/modules/default/default_ray_generation.glsl");
+const shader_modules_default_shading = require("./shader/modules/default/default_shading.glsl");
+//modules: s3
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");

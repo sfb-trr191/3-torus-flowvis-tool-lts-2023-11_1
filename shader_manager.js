@@ -82,10 +82,35 @@ class ShaderManager {
     LoadModules(code, shader_flags){
         if(shader_flags.integrate_light){
             code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS);
-
         }else{
             code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", "");
         }
+
+        //different for s3
+        code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS);       
+        code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);   
+        code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_DEFAULT_SHADING);    
+        
+        
+        //not used in s3
+        code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_VOLUME_RENDERING);        
+        code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_OUT_OF_BOUNDS);
+        code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_HANDLE_INSIDE);
+        code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_HANDLE_OUT_OF_BOUNDS);
+
+        //shared
+        code = code.replace("$SHADER_MODULE_SHARED_DATA_ACCESS$", SHADER_MODULE_SHARED_DATA_ACCESS);
+        code = code.replace("$SHADER_MODULE_SHARED_STRUCTS$", SHADER_MODULE_SHARED_STRUCTS);
+        code = code.replace("$SHADER_MODULE_SHARED_UNIFORMS$", SHADER_MODULE_SHARED_UNIFORMS);
+        code = code.replace("$SHADER_MODULE_SHARED_CONST$", SHADER_MODULE_SHARED_CONST);
+        code = code.replace("$SHADER_MODULE_SHARED_FUNCTION_DECLARATIONS$", SHADER_MODULE_SHARED_FUNCTION_DECLARATIONS);
+        code = code.replace("$SHADER_MODULE_SHARED_SHADING$", SHADER_MODULE_SHARED_SHADING);    
+        
+        
+
+        
+        
+        
         return code;
     }
 
