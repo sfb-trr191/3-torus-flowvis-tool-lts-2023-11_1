@@ -25,6 +25,11 @@ class ShaderContainer {
             if(!gl.getProgramParameter(this.program, ext_parallel.COMPLETION_STATUS_KHR)){
                 return false;
             }
+            if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+                console.error('Link failed: ' + gl.getProgramInfoLog(this.program));
+                console.error('vs info-log: ' + gl.getShaderInfoLog(this.vertex_shader));
+                console.error('fs info-log: ' + gl.getShaderInfoLog(this.fragment_shader));
+            }
             return true;
         }
         else{

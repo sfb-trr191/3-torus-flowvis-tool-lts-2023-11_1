@@ -83,6 +83,8 @@ void RayEulerStep(inout Ray ray);
 void RayRK4Step(inout Ray ray);
 vec3 RayLightFunctionPos(vec3 position, vec3 direction);
 vec3 RayLightFunctionDir(vec3 position, vec3 direction);
+void LightIntegrationPre(inout Ray ray);
+void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 
 //**********************************************************
 
