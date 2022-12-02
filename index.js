@@ -38,6 +38,7 @@ const shader_modules_default_intersections = require("./shader/modules/default/d
 const shader_modules_default_ray_generation = require("./shader/modules/default/default_ray_generation.glsl");
 const shader_modules_default_shading = require("./shader/modules/default/default_shading.glsl");
 //modules: s3
+const shader_modules_s3_intersections = require("./shader/modules/s3/s3_intersections.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");
@@ -312,7 +313,10 @@ const cpu_intersect = require("./cpu_intersect");
             document.getElementById("input_camera_forward_z"),
             document.getElementById("input_camera_up_x"),
             document.getElementById("input_camera_up_y"),
-            document.getElementById("input_camera_up_z"));
+            document.getElementById("input_camera_up_z"),
+            document.getElementById("input_camera_right_x"),
+            document.getElementById("input_camera_right_y"),
+            document.getElementById("input_camera_right_z"));
 
         side_camera.SetRenderSizes(512, 384, 256, 192);
         //side_camera.position = glMatrix.vec3.fromValues(0.500000, -0.750000, 1.200000);
@@ -331,7 +335,10 @@ const cpu_intersect = require("./cpu_intersect");
             document.getElementById("input_side_camera_forward_z"),
             document.getElementById("input_side_camera_up_x"),
             document.getElementById("input_side_camera_up_y"),
-            document.getElementById("input_side_camera_up_z"));
+            document.getElementById("input_side_camera_up_z"),
+            document.getElementById("input_side_camera_right_x"),
+            document.getElementById("input_side_camera_right_y"),
+            document.getElementById("input_side_camera_right_z"));
 
         aliasing = new Aliasing();
 
@@ -404,6 +411,8 @@ const cpu_intersect = require("./cpu_intersect");
         canvas_wrapper_side.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
         canvas_wrapper_main.tube_radius_outside = bo_calculate_streamlines.input_parameters.max_radius_factor_highlight;
         canvas_wrapper_side.tube_radius_outside = bo_calculate_streamlines.input_parameters.max_radius_factor_highlight;
+
+        main_camera.OnCalculateStreamlines(bo_calculate_streamlines.input_parameters.space);
 
         //streamline_context_static.CalculateStreamlines(gl, gl_side);
 

@@ -479,6 +479,7 @@ class CanvasWrapper {
 
     UpdateShaderFlags(){
         this.shader_flags.Update(
+            this.p_streamline_context_static.streamline_generator.space,
             this.projection_index, 
             this.draw_mode, 
             this.max_iteration_count, 

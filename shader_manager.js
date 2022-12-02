@@ -87,7 +87,12 @@ class ShaderManager {
         }
 
         //different for s3
-        code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS);       
+        if(shader_flags.space == SPACE_3_SPHERE_4_PLUS_4D){
+            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_S3_INTERSECTIONS);    
+        }
+        else{
+            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS);    
+        }   
         code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);   
         code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_DEFAULT_SHADING);    
         
@@ -139,8 +144,7 @@ class ShaderManager {
         light_transport_p0, light_transport_p1, light_transport_p2, 
         light_transport_d0, light_transport_d1, light_transport_d2, 
         shader_flags){
-        var key = shader_formula_scalar_float;
-
+        var key = shader_flags.space + ";" + shader_formula_scalar_float;
         if(shader_flags.show_volume_rendering)
             key += ";SHOW_VOLUME_RENDERING"
         if(shader_flags.show_volume_rendering_forward)

@@ -1190,6 +1190,10 @@ class UISeeds {
                     seed = glMatrix.vec4.fromValues(x, y, z, 1);
                     seed_direction = glMatrix.vec4.fromValues(v_x, v_y, v_z, 1);
                     break;
+                case SPACE_3_SPHERE_4_PLUS_4D:
+                    seed = glMatrix.vec4.fromValues(x, y, z, w);
+                    seed_direction = glMatrix.vec4.fromValues(v_x, v_y, v_z, v_w);
+                    break;
                 default:
                     console.log("Error unknonw space");
                     break;
@@ -1466,6 +1470,9 @@ class UISeeds {
                     break;
                 case SPACE_2_SPHERE_3_PLUS_3D:
                     this.list[i].node.className = "seed_grid_3Plus3";                
+                    break;
+                case SPACE_3_SPHERE_4_PLUS_4D:
+                    this.list[i].node.className = "seed_grid_4Plus4";                
                     break;
                 default:
                     break;

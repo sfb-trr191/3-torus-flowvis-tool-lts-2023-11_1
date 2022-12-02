@@ -3,7 +3,7 @@ class ShaderFlags {
         this.changed = true;
     }
 
-    Update(projection_index, draw_mode, max_iteration_count, tube_radius_fundamental,
+    Update(space, projection_index, draw_mode, max_iteration_count, tube_radius_fundamental,
         tube_radius_factor, tube_radius_factor_projection, tube_radius_factor_projection_highlight, 
         show_bounding_box, show_bounding_box_projection,
         streamline_method, streamline_method_projection, 
@@ -11,6 +11,7 @@ class ShaderFlags {
         integrate_light){
 
         this.changed = true;
+        this.space = space;
         this.show_movable_axes = show_movable_axes;
         this.cut_at_cube_faces = cut_at_cube_faces;
         this.handle_inside = handle_inside;

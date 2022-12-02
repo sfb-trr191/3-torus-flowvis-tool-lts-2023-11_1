@@ -119,9 +119,11 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_field_equation_p0", "p0");
         new InputWrapper(this, "input_field_equation_p1", "p1");
         new InputWrapper(this, "input_field_equation_p2", "p2");
+        new InputWrapper(this, "input_field_equation_p3", "p3");
         new InputWrapper(this, "input_field_equation_d0", "d0");
         new InputWrapper(this, "input_field_equation_d1", "d1");
         new InputWrapper(this, "input_field_equation_d2", "d2");
+        new InputWrapper(this, "input_field_equation_d3", "d3");
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);

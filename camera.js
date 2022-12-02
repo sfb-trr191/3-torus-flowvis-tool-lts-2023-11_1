@@ -216,6 +216,7 @@ class Camera {
         this.changed = true;
         this.fov_theta = 90.0; 
 
+        this.is4D = false;
         this.control_mode = CAMERA_CONTROL_ROTATE_AROUND_CAMERA;
         this.trackball_rotation_sensitivity = 1.0;
         this.trackball_translation_sensitivity = 1.0;
@@ -234,6 +235,7 @@ class Camera {
         this.position = glMatrix.vec3.create();
         this.forward = glMatrix.vec3.create();
         this.up = glMatrix.vec3.create();
+        this.right = glMatrix.vec3.create();
 
         //calculated values for raytracing
         this.q_x = glMatrix.vec3.create();
@@ -265,7 +267,8 @@ class Camera {
 
     LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z,
         input_camera_forward_x, input_camera_forward_y, input_camera_forward_z,
-        input_camera_up_x, input_camera_up_y, input_camera_up_z) {
+        input_camera_up_x, input_camera_up_y, input_camera_up_z,
+        input_camera_right_x, input_camera_right_y, input_camera_right_z) {
 
         this.input_camera_position_x = input_camera_position_x;
         this.input_camera_position_y = input_camera_position_y;
@@ -278,6 +281,18 @@ class Camera {
         this.input_camera_up_x = input_camera_up_x;
         this.input_camera_up_y = input_camera_up_y;
         this.input_camera_up_z = input_camera_up_z;
+        
+        this.input_camera_right_x = input_camera_right_x;
+        this.input_camera_right_y = input_camera_right_y;
+        this.input_camera_right_z = input_camera_right_z;
+    }
+
+    //camera behavior is changed when calculating streamlines
+    OnCalculateStreamlines(space){        
+        this.is4D = false;
+        if(space == SPACE_3_SPHERE_4_PLUS_4D){                 
+            this.is4D = true;
+        }
     }
 
     set_control(mode){
@@ -290,6 +305,7 @@ class Camera {
         this.forward = new_vec3_from_input(this.input_camera_forward_x, this.input_camera_forward_y, this.input_camera_forward_z);
         var up_negated = new_vec3_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z);
         glMatrix.vec3.negate(this.up, up_negated);
+        this.right = new_vec3_from_input(this.input_camera_right_x, this.input_camera_right_y, this.input_camera_right_z);
         this.changed = true;
     }
 
@@ -309,6 +325,9 @@ class Camera {
         this.input_camera_up_x.value = up_negated[0].toFixed(decimals);
         this.input_camera_up_y.value = up_negated[1].toFixed(decimals);
         this.input_camera_up_z.value = up_negated[2].toFixed(decimals);
+        this.input_camera_right_x.value = this.right[0].toFixed(decimals);
+        this.input_camera_right_y.value = this.right[1].toFixed(decimals);
+        this.input_camera_right_z.value = this.right[2].toFixed(decimals);
         this.input_changed_manager.UpdateDefaultValuesCamera();
     }
 
@@ -447,6 +466,15 @@ class Camera {
     }
 
     UpdateShaderValues() {
+        if(this.is4D){
+            this.UpdateShaderValues4D();
+        }
+        else{
+            this.UpdateShaderValues3D();
+        }
+    }
+
+    UpdateShaderValues3D() {
         //std::cout << "UpdateShaderValues" << std::endl;
         var T = glMatrix.vec3.create();
         var t = glMatrix.vec3.create();
@@ -468,12 +496,12 @@ class Camera {
         var w = this.up;
 
         //pre calculations
-        glMatrix.vec3.subtract(t, T, E);//t = T - E;//this should be same as forward
+        glMatrix.vec3.subtract(t, T, E);//t = T - E;//t should be same as forward
         //t = T - E;//this should be same as forward
-        glMatrix.vec3.normalize(t_n, t);//t_n = t.normalized();
-        glMatrix.vec3.cross(b, w, t);//b = QVector3D::crossProduct(w, t);
-        glMatrix.vec3.normalize(b_n, b);//b_n = b.normalized();
-        glMatrix.vec3.cross(v_n, t_n, b_n)//v_n = QVector3D::crossProduct(t_n, b_n);
+        glMatrix.vec3.normalize(t_n, t);//t_n should be same as forward
+        glMatrix.vec3.cross(b, w, t);//b should be the same as right
+        glMatrix.vec3.normalize(b_n, b);//b_n should be the same as right
+        glMatrix.vec3.cross(v_n, t_n, b_n)//v_n should be the same as up
         var theta_half = this.fov_theta / 2;
         var g_x = d * Math.tan(theta_half * Math.PI / 180.0);//TODO does M_PI work here?
         var g_y = g_x * m / (k * 1.0);//TODO is this correct syntax?
@@ -483,6 +511,7 @@ class Camera {
         glMatrix.vec3.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
 
         //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
+        //p_1m is the bottom left reference pixel, each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
         var t_n_times_d = glMatrix.vec3.create();
         var g_x_times_b_n = glMatrix.vec3.create();
         var g_y_times_v_n = glMatrix.vec3.create();
@@ -502,37 +531,68 @@ class Camera {
         glMatrix.vec3.cross(this.normal_top, top_right, top_left);//normal_top = QVector3D::crossProduct(top_right, top_left);
         glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
 
-        /*
-        console.log("position "+this.position);
-        console.log("forward "+this.forward);
-        console.log("T "+T);
-        console.log("t "+t);
-        console.log("t_n "+t_n);
-        console.log("b "+b);
-        console.log("b_n "+b_n);
-        console.log("v_n "+v_n);
-        console.log("E "+E);
-        console.log("q_x "+this.q_x);
-        console.log("q_y "+this.q_y);
-        console.log("p_1m "+this.p_1m);
-        console.log("top_left "+top_left);
-        console.log("bottom_left "+bottom_left);
-        console.log("top_right "+top_right);
-        console.log("bottom_right "+bottom_right);
-        console.log("normal_left "+this.normal_left);
-        console.log("normal_right "+this.normal_right);
-        console.log("normal_top "+this.normal_top);
-        console.log("normal_bottom "+this.normal_bottom);
-
-        var out_vector = glMatrix.vec3.create();
-        var test_vector = glMatrix.vec3.create();
-        test_vector[0] = 0;
-        test_vector[1] = 1;
-        test_vector[2] = 2;
-        vec3_add_scalar(out_vector, test_vector, 0.5);
-        console.log("out_vector "+out_vector);
-        */
+        glMatrix.vec3.copy(this.right, b_n);//here for display purposes only
     }
+
+    UpdateShaderValues4D() {
+        //std::cout << "UpdateShaderValues" << std::endl;
+        var T = glMatrix.vec3.create();
+        var t = glMatrix.vec3.create();
+        var t_n = glMatrix.vec3.create();
+        var b = glMatrix.vec3.create();
+        var b_n = glMatrix.vec3.create();
+        var v_n = glMatrix.vec3.create();
+        var top_left = glMatrix.vec3.create();
+        var bottom_left = glMatrix.vec3.create();
+        var top_right = glMatrix.vec3.create();
+        var bottom_right = glMatrix.vec3.create();
+
+        var d = 1.0;//distance to plane
+
+        var E = this.position;
+        glMatrix.vec3.add(T, this.position, this.forward);//T = this.position + this.forward;
+        var m = this.height;
+        var k = this.width;
+        var w = this.up;
+
+        //pre calculations
+        glMatrix.vec3.copy(t, this.forward);//t = T - E;//t should be same as forward
+        //t = T - E;//this should be same as forward
+        glMatrix.vec3.normalize(t_n, t);//t_n should be same as forward
+        glMatrix.vec3.copy(b, this.right);//b should be the same as right
+        glMatrix.vec3.normalize(b_n, b);//b_n should be the same as right
+        glMatrix.vec3.normalize(v_n, this.up)//v_n should be the same as up
+        var theta_half = this.fov_theta / 2;
+        var g_x = d * Math.tan(theta_half * Math.PI / 180.0);//TODO does M_PI work here?
+        var g_y = g_x * m / (k * 1.0);//TODO is this correct syntax?
+
+        //uniforms
+        glMatrix.vec3.scale(this.q_x, b_n, ((2 * g_x) / (k - 1)));//this.q_x = ((2 * g_x) / (k - 1)) * b_n;
+        glMatrix.vec3.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
+
+        //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
+        //p_1m is the bottom left reference pixel, each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
+        var t_n_times_d = glMatrix.vec3.create();
+        var g_x_times_b_n = glMatrix.vec3.create();
+        var g_y_times_v_n = glMatrix.vec3.create();
+        glMatrix.vec3.scale(t_n_times_d, t_n, d);//t_n * d
+        glMatrix.vec3.scale(g_x_times_b_n, b_n, g_x);//g_x * b_n
+        glMatrix.vec3.scale(g_y_times_v_n, v_n, g_y);//g_y * v_n
+        glMatrix.vec3.subtract(this.p_1m, t_n_times_d, g_x_times_b_n);
+        glMatrix.vec3.subtract(this.p_1m, this.p_1m, g_y_times_v_n);
+
+        top_left = t_n * d - g_x * b_n + g_y * v_n;
+        bottom_left = t_n * d - g_x * b_n - g_y * v_n;
+        top_right = t_n * d + g_x * b_n + g_y * v_n;
+        bottom_right = t_n * d + g_x * b_n - g_y * v_n;
+
+        glMatrix.vec3.cross(this.normal_left, top_left, bottom_left);//normal_left = QVector3D::crossProduct(top_left, bottom_left);
+        glMatrix.vec3.cross(this.normal_right, bottom_right, top_right);//normal_right = QVector3D::crossProduct(bottom_right, top_right);
+        glMatrix.vec3.cross(this.normal_top, top_right, top_left);//normal_top = QVector3D::crossProduct(top_right, top_left);
+        glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
+
+    }
+
 
     someTestFunction4546() {
         console.log("someTestFunction4546")

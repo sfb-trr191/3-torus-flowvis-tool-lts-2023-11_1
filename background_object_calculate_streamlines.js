@@ -22,9 +22,11 @@ class BackgroundObjectCalculateStreamlines{
         this.input_parameters.shader_formula_p0 = document.getElementById("input_field_equation_p0").value;
         this.input_parameters.shader_formula_p1 = document.getElementById("input_field_equation_p1").value;
         this.input_parameters.shader_formula_p2 = document.getElementById("input_field_equation_p2").value;
+        this.input_parameters.shader_formula_p3 = document.getElementById("input_field_equation_p3").value;
         this.input_parameters.shader_formula_d0 = document.getElementById("input_field_equation_d0").value;
         this.input_parameters.shader_formula_d1 = document.getElementById("input_field_equation_d1").value;
         this.input_parameters.shader_formula_d2 = document.getElementById("input_field_equation_d2").value;
+        this.input_parameters.shader_formula_d3 = document.getElementById("input_field_equation_d3").value;
         this.input_parameters.num_points_per_streamline = document.getElementById("input_num_points_per_streamline").value;
         this.input_parameters.step_size = document.getElementById("input_step_size").value;
         this.input_parameters.inbetweens = document.getElementById("input_streamline_calculation_inbetweens").value;
