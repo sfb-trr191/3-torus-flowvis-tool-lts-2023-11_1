@@ -48,6 +48,14 @@ new_vec3_from_input = function (field_0, field_1, field_2) {
     return glMatrix.vec3.fromValues(v0, v1, v2);
 }
 
+new_vec4_from_input = function (field_0, field_1, field_2, field_3) {
+    var v0 = field_0.value;
+    var v1 = field_1.value;
+    var v2 = field_2.value;
+    var v3 = field_3.value;
+    return glMatrix.vec4.fromValues(v0, v1, v2, v3);
+}
+
 new_vec3_from_input_name = function (field_name_0, field_name_1, field_name_2) {
     var v0 = document.getElementById(field_name_0).value;
     var v1 = document.getElementById(field_name_1).value;
@@ -55,3 +63,10 @@ new_vec3_from_input_name = function (field_name_0, field_name_1, field_name_2) {
     return glMatrix.vec3.fromValues(v0, v1, v2);
 }
 
+new_vec4_from_input_name = function (field_name_0, field_name_1, field_name_2, field_name_3) {
+    var v0 = document.getElementById(field_name_0).value;
+    var v1 = document.getElementById(field_name_1).value;
+    var v2 = document.getElementById(field_name_2).value;
+    var v3 = document.getElementById(field_name_3).value;
+    return glMatrix.vec4.fromValues(v0, v1, v2, v3);
+}

@@ -48,36 +48,37 @@ class CameraState {
 
     constructor() {
         //saved variables
-        this.forward = glMatrix.vec3.create();
-        this.up = glMatrix.vec3.create();
-        this.position = glMatrix.vec3.create();
+        this.forward = glMatrix.vec4.create();
+        this.up = glMatrix.vec4.create();
+        this.right = glMatrix.vec4.create();
+        this.position = glMatrix.vec4.create();
         //unsaved variables
         this.allow_panning = true;
     }
 
     setProjectionX() {
-        this.forward = glMatrix.vec3.fromValues(-1, 0, 0);
-        this.up = glMatrix.vec3.fromValues(0, 0, -1);
-        this.position = glMatrix.vec3.fromValues(1, 0.5, 0.5);
+        this.forward = glMatrix.vec4.fromValues(-1, 0, 0, 0);
+        this.up = glMatrix.vec4.fromValues(0, 0, -1, 0);
+        this.position = glMatrix.vec4.fromValues(1, 0.5, 0.5, 0);
         this.allow_panning = false;
     }
 
     setProjectionY() {
-        this.forward = glMatrix.vec3.fromValues(0, -1, 0);
-        this.up = glMatrix.vec3.fromValues(-1, 0, 0);
-        this.position = glMatrix.vec3.fromValues(0.5, 1, 0.5);
+        this.forward = glMatrix.vec4.fromValues(0, -1, 0, 0);
+        this.up = glMatrix.vec4.fromValues(-1, 0, 0, 0);
+        this.position = glMatrix.vec4.fromValues(0.5, 1, 0.5, 0);
         this.allow_panning = false;
     }
 
     setProjectionZ() {
-        this.forward = glMatrix.vec3.fromValues(0, 0, -1);
-        this.up = glMatrix.vec3.fromValues(0, -1, 0);
-        this.position = glMatrix.vec3.fromValues(0.5, 0.5, 1);
+        this.forward = glMatrix.vec4.fromValues(0, 0, -1, 0);
+        this.up = glMatrix.vec4.fromValues(0, -1, 0, 0);
+        this.position = glMatrix.vec4.fromValues(0.5, 0.5, 1, 0);
         this.allow_panning = false;
     }
 
     fromString(s) {
-        console.log("CAMERA_STATE ", s);
+        console.log("0x22 CAMERA_STATE ", s);
         if (s === null)
             return;
         console.log("CAMERA_STATE not null");
@@ -88,24 +89,41 @@ class CameraState {
         this.position[0] = split[0];
         this.position[1] = split[1];
         this.position[2] = split[2];
-        this.forward[0] = split[3];
-        this.forward[1] = split[4];
-        this.forward[2] = split[5];
-        this.up[0] = split[6];
-        this.up[1] = split[7];
-        this.up[2] = split[8];
+        this.position[3] = split[3];
+        this.forward[0] = split[4];
+        this.forward[1] = split[5];
+        this.forward[2] = split[6];
+        this.forward[3] = split[7];
+        this.up[0] = split[8];
+        this.up[1] = split[9];
+        this.up[2] = split[10];
+        this.up[3] = split[11];
+        this.right[0] = split[12];
+        this.right[1] = split[13];
+        this.right[2] = split[14];
+        this.right[3] = split[15];
+
+        console.log("fromString this.position", this.position);
     }
 
     toString() {
         var s = this.position[0] + "~"
             + this.position[1] + "~"
             + this.position[2] + "~"
+            + this.position[3] + "~"
             + this.forward[0] + "~"
             + this.forward[1] + "~"
             + this.forward[2] + "~"
+            + this.forward[3] + "~"
             + this.up[0] + "~"
             + this.up[1] + "~"
-            + this.up[2]
+            + this.up[2] + "~"
+            + this.up[3] + "~"
+            + this.right[0] + "~"
+            + this.right[1] + "~"
+            + this.right[2] + "~"
+            + this.right[3]
+        console.log("0x22 toString", s);
         return s;
     }
 
@@ -232,21 +250,21 @@ class Camera {
         this.mouse_in_canvas = false;
 
         //description of the camera for the user
-        this.position = glMatrix.vec3.create();
-        this.forward = glMatrix.vec3.create();
-        this.up = glMatrix.vec3.create();
-        this.right = glMatrix.vec3.create();
+        this.position = glMatrix.vec4.create();
+        this.forward = glMatrix.vec4.create();
+        this.up = glMatrix.vec4.create();
+        this.right = glMatrix.vec4.create();
 
         //calculated values for raytracing
-        this.q_x = glMatrix.vec3.create();
-        this.q_y = glMatrix.vec3.create();
-        this.p_1m = glMatrix.vec3.create();
+        this.q_x = glMatrix.vec4.create();
+        this.q_y = glMatrix.vec4.create();
+        this.p_1m = glMatrix.vec4.create();
 
         //normals used for the view pyramid
-        this.normal_left = glMatrix.vec3.create();
-        this.normal_right = glMatrix.vec3.create();
-        this.normal_top = glMatrix.vec3.create();
-        this.normal_bottom = glMatrix.vec3.create();
+        this.normal_left = glMatrix.vec4.create();
+        this.normal_right = glMatrix.vec4.create();
+        this.normal_top = glMatrix.vec4.create();
+        this.normal_bottom = glMatrix.vec4.create();
 
         this.states = {};
         this.states["state_default"] = new CameraState();
@@ -265,26 +283,50 @@ class Camera {
         this.InitTracknall2();
     }
 
-    LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z,
-        input_camera_forward_x, input_camera_forward_y, input_camera_forward_z,
-        input_camera_up_x, input_camera_up_y, input_camera_up_z,
-        input_camera_right_x, input_camera_right_y, input_camera_right_z) {
+    LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z, input_camera_position_w,
+        input_camera_forward_x, input_camera_forward_y, input_camera_forward_z, input_camera_forward_w,
+        input_camera_up_x, input_camera_up_y, input_camera_up_z, input_camera_up_w,
+        input_camera_right_x, input_camera_right_y, input_camera_right_z, input_camera_right_w) {
 
         this.input_camera_position_x = input_camera_position_x;
         this.input_camera_position_y = input_camera_position_y;
         this.input_camera_position_z = input_camera_position_z;
+        this.input_camera_position_w = input_camera_position_w;
 
         this.input_camera_forward_x = input_camera_forward_x;
         this.input_camera_forward_y = input_camera_forward_y;
         this.input_camera_forward_z = input_camera_forward_z;
+        this.input_camera_forward_w = input_camera_forward_w;
 
         this.input_camera_up_x = input_camera_up_x;
         this.input_camera_up_y = input_camera_up_y;
         this.input_camera_up_z = input_camera_up_z;
+        this.input_camera_up_w = input_camera_up_w;
         
         this.input_camera_right_x = input_camera_right_x;
         this.input_camera_right_y = input_camera_right_y;
         this.input_camera_right_z = input_camera_right_z;
+        this.input_camera_right_w = input_camera_right_w;
+    }
+
+    SetDefaultValuesMain(){
+        this.position = glMatrix.vec4.fromValues(0.5, 0.5, 0.5, 0);
+        this.forward = glMatrix.vec4.fromValues(0.000001, 1.000000, 0.000001, 0);
+        this.up = glMatrix.vec4.fromValues(0.000001, 0.000001, -1.000000, 0);
+        this.right = glMatrix.vec4.fromValues(0.000001, 1.000001, 0.000001, 0);
+        glMatrix.vec4.normalize(this.forward, this.forward);
+        glMatrix.vec4.normalize(this.up, this.up);
+        glMatrix.vec4.normalize(this.right, this.right);
+    }
+
+    SetDefaultValuesAux(){
+        this.position = glMatrix.vec4.fromValues(0.500000, -1.000000, 0.500000, 0);
+        this.forward = glMatrix.vec4.fromValues(0.000001, 1.000000, 0.000001, 0);
+        this.up = glMatrix.vec4.fromValues(0.000001, 0.000001, -1.000000, 0);
+        this.right = glMatrix.vec4.fromValues(0.000001, 1.000001, 0.000001, 0);
+        glMatrix.vec4.normalize(this.forward, this.forward);
+        glMatrix.vec4.normalize(this.up, this.up);
+        glMatrix.vec4.normalize(this.right, this.right);
     }
 
     //camera behavior is changed when calculating streamlines
@@ -301,33 +343,37 @@ class Camera {
 
     FromInput() {
         //console.log("FromInput");
-        this.position = new_vec3_from_input(this.input_camera_position_x, this.input_camera_position_y, this.input_camera_position_z);
-        this.forward = new_vec3_from_input(this.input_camera_forward_x, this.input_camera_forward_y, this.input_camera_forward_z);
-        var up_negated = new_vec3_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z);
-        glMatrix.vec3.negate(this.up, up_negated);
-        this.right = new_vec3_from_input(this.input_camera_right_x, this.input_camera_right_y, this.input_camera_right_z);
+        this.position = new_vec4_from_input(this.input_camera_position_x, this.input_camera_position_y, this.input_camera_position_z, this.input_camera_position_w);
+        this.forward = new_vec4_from_input(this.input_camera_forward_x, this.input_camera_forward_y, this.input_camera_forward_z, this.input_camera_forward_w);
+        var up_negated = new_vec4_from_input(this.input_camera_up_x, this.input_camera_up_y, this.input_camera_up_z, this.input_camera_up_w);
+        glMatrix.vec4.negate(this.up, up_negated);
+        this.right = new_vec4_from_input(this.input_camera_right_x, this.input_camera_right_y, this.input_camera_right_z, this.input_camera_right_w);
         this.changed = true;
     }
 
     WriteToInputFields() {
         if (!this.changed)
             return;
-        //console.log("WriteToInputFields")
+        console.log("0x22 this.position", this.position)
         var decimals = 6;
-        var up_negated = glMatrix.vec3.create();
-        glMatrix.vec3.negate(up_negated, this.up);
+        var up_negated = glMatrix.vec4.create();
+        glMatrix.vec4.negate(up_negated, this.up);
         this.input_camera_position_x.value = this.position[0].toFixed(decimals);
         this.input_camera_position_y.value = this.position[1].toFixed(decimals);
         this.input_camera_position_z.value = this.position[2].toFixed(decimals);
+        this.input_camera_position_w.value = this.position[3].toFixed(decimals);
         this.input_camera_forward_x.value = this.forward[0].toFixed(decimals);
         this.input_camera_forward_y.value = this.forward[1].toFixed(decimals);
         this.input_camera_forward_z.value = this.forward[2].toFixed(decimals);
+        this.input_camera_forward_w.value = this.forward[3].toFixed(decimals);
         this.input_camera_up_x.value = up_negated[0].toFixed(decimals);
         this.input_camera_up_y.value = up_negated[1].toFixed(decimals);
         this.input_camera_up_z.value = up_negated[2].toFixed(decimals);
+        this.input_camera_up_w.value = up_negated[3].toFixed(decimals);
         this.input_camera_right_x.value = this.right[0].toFixed(decimals);
         this.input_camera_right_y.value = this.right[1].toFixed(decimals);
         this.input_camera_right_z.value = this.right[2].toFixed(decimals);
+        this.input_camera_right_w.value = this.right[3].toFixed(decimals);
         this.input_changed_manager.UpdateDefaultValuesCamera();
     }
 
@@ -394,12 +440,19 @@ class Camera {
         this.input_camera_position_x.value = split[0];
         this.input_camera_position_y.value = split[1];
         this.input_camera_position_z.value = split[2];
-        this.input_camera_forward_x.value = split[3];
-        this.input_camera_forward_y.value = split[4];
-        this.input_camera_forward_z.value = split[5];
-        this.input_camera_up_x.value = split[6];
-        this.input_camera_up_y.value = split[7];
-        this.input_camera_up_z.value = split[8];
+        this.input_camera_position_w.value = split[3];
+        this.input_camera_forward_x.value = split[4];
+        this.input_camera_forward_y.value = split[5];
+        this.input_camera_forward_z.value = split[6];
+        this.input_camera_forward_w.value = split[7];
+        this.input_camera_up_x.value = split[8];
+        this.input_camera_up_y.value = split[9];
+        this.input_camera_up_z.value = split[10];
+        this.input_camera_up_w.value = split[11];
+        this.input_camera_right_x.value = split[12];
+        this.input_camera_right_y.value = split[13];
+        this.input_camera_right_z.value = split[14];
+        this.input_camera_right_w.value = split[15];
 
         this.FromInput();
     }
@@ -422,12 +475,19 @@ class Camera {
         var s = this.input_camera_position_x.value + "~"
             + this.input_camera_position_y.value + "~"
             + this.input_camera_position_z.value + "~"
+            + this.input_camera_position_w.value + "~"
             + this.input_camera_forward_x.value + "~"
             + this.input_camera_forward_y.value + "~"
             + this.input_camera_forward_z.value + "~"
+            + this.input_camera_forward_w.value + "~"
             + this.input_camera_up_x.value + "~"
             + this.input_camera_up_y.value + "~"
-            + this.input_camera_up_z.value;
+            + this.input_camera_up_z.value + "~"
+            + this.input_camera_up_w.value + "~"
+            + this.input_camera_right_x.value + "~"
+            + this.input_camera_right_y.value + "~"
+            + this.input_camera_right_z.value + "~"
+            + this.input_camera_right_w.value;
         return s;
     }
 
@@ -475,7 +535,8 @@ class Camera {
     }
 
     UpdateShaderValues3D() {
-        //std::cout << "UpdateShaderValues" << std::endl;
+        console.log("0x22 UpdateShaderValues3D");
+        console.log("0x22 this.position", this.position);
         var T = glMatrix.vec3.create();
         var t = glMatrix.vec3.create();
         var t_n = glMatrix.vec3.create();
@@ -486,14 +547,21 @@ class Camera {
         var bottom_left = glMatrix.vec3.create();
         var top_right = glMatrix.vec3.create();
         var bottom_right = glMatrix.vec3.create();
+        var p_1m_3d = glMatrix.vec3.create();
+        var q_x_3d = glMatrix.vec3.create();
+        var q_y_3d = glMatrix.vec3.create();
 
         var d = 1.0;//distance to plane
 
-        var E = this.position;
-        glMatrix.vec3.add(T, this.position, this.forward);//T = this.position + this.forward;
+        var E = glMatrix.vec3.create();
+        var forward_3D = glMatrix.vec3.create();
+        var w = glMatrix.vec3.create();
+        vec3_from_vec4(E, this.position);
+        vec3_from_vec4(forward_3D, this.forward);
+        vec3_from_vec4(w, this.up);
+        glMatrix.vec3.add(T, E, forward_3D);//T = this.position + this.forward;
         var m = this.height;
         var k = this.width;
-        var w = this.up;
 
         //pre calculations
         glMatrix.vec3.subtract(t, T, E);//t = T - E;//t should be same as forward
@@ -507,8 +575,8 @@ class Camera {
         var g_y = g_x * m / (k * 1.0);//TODO is this correct syntax?
 
         //uniforms
-        glMatrix.vec3.scale(this.q_x, b_n, ((2 * g_x) / (k - 1)));//this.q_x = ((2 * g_x) / (k - 1)) * b_n;
-        glMatrix.vec3.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
+        glMatrix.vec3.scale(q_x_3d, b_n, ((2 * g_x) / (k - 1)));//this.q_x = ((2 * g_x) / (k - 1)) * b_n;
+        glMatrix.vec3.scale(q_y_3d, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
 
         //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
         //p_1m is the bottom left reference pixel, each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
@@ -518,8 +586,8 @@ class Camera {
         glMatrix.vec3.scale(t_n_times_d, t_n, d);//t_n * d
         glMatrix.vec3.scale(g_x_times_b_n, b_n, g_x);//g_x * b_n
         glMatrix.vec3.scale(g_y_times_v_n, v_n, g_y);//g_y * v_n
-        glMatrix.vec3.subtract(this.p_1m, t_n_times_d, g_x_times_b_n);
-        glMatrix.vec3.subtract(this.p_1m, this.p_1m, g_y_times_v_n);
+        glMatrix.vec3.subtract(p_1m_3d, t_n_times_d, g_x_times_b_n);
+        glMatrix.vec3.subtract(p_1m_3d, p_1m_3d, g_y_times_v_n);
 
         top_left = t_n * d - g_x * b_n + g_y * v_n;
         bottom_left = t_n * d - g_x * b_n - g_y * v_n;
@@ -532,10 +600,18 @@ class Camera {
         glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
 
         glMatrix.vec3.copy(this.right, b_n);//here for display purposes only
+
+
+        //store 4D values
+        vec4_from_vec3_0(this.q_x, q_x_3d);
+        vec4_from_vec3_0(this.q_y, q_y_3d);
+        vec4_from_vec3_0(this.p_1m, p_1m_3d);
+
+        console.log("0x22 this.position", this.position);
     }
 
     UpdateShaderValues4D() {
-        //std::cout << "UpdateShaderValues" << std::endl;
+        console.log("UpdateShaderValues4D");
         var T = glMatrix.vec3.create();
         var t = glMatrix.vec3.create();
         var t_n = glMatrix.vec3.create();
@@ -590,7 +666,6 @@ class Camera {
         glMatrix.vec3.cross(this.normal_right, bottom_right, top_right);//normal_right = QVector3D::crossProduct(bottom_right, top_right);
         glMatrix.vec3.cross(this.normal_top, top_right, top_left);//normal_top = QVector3D::crossProduct(top_right, top_left);
         glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
-
     }
 
 
@@ -1136,27 +1211,31 @@ class Camera {
             this.saveCurrentState();
 
         var state_new = this.states[state_name_new];
-        glMatrix.vec3.copy(this.forward, state_new.forward);
-        glMatrix.vec3.copy(this.up, state_new.up);
-        glMatrix.vec3.copy(this.position, state_new.position);
+        glMatrix.vec4.copy(this.forward, state_new.forward);
+        glMatrix.vec4.copy(this.up, state_new.up);
+        glMatrix.vec4.copy(this.right, state_new.right);
+        glMatrix.vec4.copy(this.position, state_new.position);
         this.allow_panning = state_new.allow_panning;
 
         this.current_state_name = state_name_new;
         console.log("loadState: ", this.current_state_name);
         console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
         console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
+        console.log(this.current_state_name, "right", this.states[this.current_state_name].right);
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
 
     }
 
     saveCurrentState() {
         var state_old = this.states[this.current_state_name];
-        glMatrix.vec3.copy(state_old.forward, this.forward);
-        glMatrix.vec3.copy(state_old.up, this.up);
-        glMatrix.vec3.copy(state_old.position, this.position);
+        glMatrix.vec4.copy(state_old.forward, this.forward);
+        glMatrix.vec4.copy(state_old.up, this.up);
+        glMatrix.vec4.copy(state_old.right, this.right);
+        glMatrix.vec4.copy(state_old.position, this.position);
         console.log("saveCurrentState: ", this.current_state_name);
         console.log(this.current_state_name, "forward", this.states[this.current_state_name].forward);
         console.log(this.current_state_name, "up", this.states[this.current_state_name].up);
+        console.log(this.current_state_name, "right", this.states[this.current_state_name].right);
         console.log(this.current_state_name, "position", this.states[this.current_state_name].position);
     }
       

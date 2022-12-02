@@ -298,47 +298,50 @@ const cpu_intersect = require("./cpu_intersect");
         ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
-        main_camera.position = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
-        main_camera.forward = glMatrix.vec3.fromValues(0.000001, 1.0, 0.000001);
-        main_camera.up = glMatrix.vec3.fromValues(0.000001, 0.000001, -1.0);
-        glMatrix.vec3.normalize(main_camera.forward, main_camera.forward);
-        glMatrix.vec3.normalize(main_camera.up, main_camera.up);
+        main_camera.SetDefaultValuesMain();
 
         main_camera.LinkInput(
             document.getElementById("input_camera_position_x"),
             document.getElementById("input_camera_position_y"),
             document.getElementById("input_camera_position_z"),
+            document.getElementById("input_camera_position_w"),
             document.getElementById("input_camera_forward_x"),
             document.getElementById("input_camera_forward_y"),
             document.getElementById("input_camera_forward_z"),
+            document.getElementById("input_camera_forward_w"),
             document.getElementById("input_camera_up_x"),
             document.getElementById("input_camera_up_y"),
             document.getElementById("input_camera_up_z"),
+            document.getElementById("input_camera_up_w"),
             document.getElementById("input_camera_right_x"),
             document.getElementById("input_camera_right_y"),
-            document.getElementById("input_camera_right_z"));
+            document.getElementById("input_camera_right_z"),
+            document.getElementById("input_camera_right_w"));
 
         side_camera.SetRenderSizes(512, 384, 256, 192);
+        side_camera.SetDefaultValuesAux();
         //side_camera.position = glMatrix.vec3.fromValues(0.500000, -0.750000, 1.200000);
         //side_camera.forward = glMatrix.vec3.fromValues(-0.023683, 0.813820, -0.580633);
         //side_camera.up = glMatrix.vec3.fromValues(-0.008492, -0.580940, -0.813903);
-        side_camera.position = glMatrix.vec3.fromValues(0.500000, -1.000000, 0.500000);
-        side_camera.forward = glMatrix.vec3.fromValues(0.000001, 1.000000, 0.000001);
-        side_camera.up = glMatrix.vec3.fromValues(-0.000001, -0.000001, -1.000000);
+
 
         side_camera.LinkInput(
             document.getElementById("input_side_camera_position_x"),
             document.getElementById("input_side_camera_position_y"),
             document.getElementById("input_side_camera_position_z"),
+            document.getElementById("input_side_camera_position_w"),
             document.getElementById("input_side_camera_forward_x"),
             document.getElementById("input_side_camera_forward_y"),
             document.getElementById("input_side_camera_forward_z"),
+            document.getElementById("input_side_camera_forward_w"),
             document.getElementById("input_side_camera_up_x"),
             document.getElementById("input_side_camera_up_y"),
             document.getElementById("input_side_camera_up_z"),
+            document.getElementById("input_side_camera_up_w"),
             document.getElementById("input_side_camera_right_x"),
             document.getElementById("input_side_camera_right_y"),
-            document.getElementById("input_side_camera_right_z"));
+            document.getElementById("input_side_camera_right_z"),
+            document.getElementById("input_side_camera_right_w"));
 
         aliasing = new Aliasing();
 
