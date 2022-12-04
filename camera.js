@@ -508,15 +508,15 @@ class Camera {
 
     GetCameraDataWithPosition(eyePosition) {
         var data = new GL_CameraData();
-        data.q_x = vec4fromvec3(this.q_x, 0);
-        data.q_y = vec4fromvec3(this.q_y, 0);
-        data.p_1m = vec4fromvec3(this.p_1m, 0);
-        data.E = vec4fromvec3(eyePosition, 0);
-        data.forward = vec4fromvec3(this.forward, 0);
-        data.normal_left = vec4fromvec3(this.normal_left, 0);
-        data.normal_right = vec4fromvec3(this.normal_right, 0);
-        data.normal_top = vec4fromvec3(this.normal_top, 0);
-        data.normal_bottom = vec4fromvec3(this.normal_bottom, 0);
+        glMatrix.vec4.copy(data.q_x, this.q_x);//data.q_x = vec4fromvec3(this.q_x, 0);
+        glMatrix.vec4.copy(data.q_y, this.q_y);//data.q_y = vec4fromvec3(this.q_y, 0);
+        glMatrix.vec4.copy(data.p_1m, this.p_1m);//data.p_1m = vec4fromvec3(this.p_1m, 0);
+        glMatrix.vec4.copy(data.E, eyePosition);//data.E = vec4fromvec3(eyePosition, 0);
+        glMatrix.vec4.copy(data.forward, this.forward);//data.forward = vec4fromvec3(this.forward, 0);
+        glMatrix.vec4.copy(data.normal_left, this.normal_left);//data.normal_left = vec4fromvec3(this.normal_left, 0);
+        glMatrix.vec4.copy(data.normal_right, this.normal_right);//data.normal_right = vec4fromvec3(this.normal_right, 0);
+        glMatrix.vec4.copy(data.normal_top, this.normal_top);//data.normal_top = vec4fromvec3(this.normal_top, 0);
+        glMatrix.vec4.copy(data.normal_bottom, this.normal_bottom);//data.normal_bottom = vec4fromvec3(this.normal_bottom, 0);
         return data;
     }
 
@@ -579,7 +579,7 @@ class Camera {
         glMatrix.vec3.scale(q_y_3d, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
 
         //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
-        //p_1m is the bottom left reference pixel, each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
+        //p_1m is the bottom left reference pixel (as a direction relative to E), each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
         var t_n_times_d = glMatrix.vec3.create();
         var g_x_times_b_n = glMatrix.vec3.create();
         var g_y_times_v_n = glMatrix.vec3.create();
@@ -618,10 +618,10 @@ class Camera {
         var b = glMatrix.vec3.create();
         var b_n = glMatrix.vec3.create();
         var v_n = glMatrix.vec3.create();
-        var top_left = glMatrix.vec3.create();
-        var bottom_left = glMatrix.vec3.create();
-        var top_right = glMatrix.vec3.create();
-        var bottom_right = glMatrix.vec3.create();
+        //var top_left = glMatrix.vec3.create();
+        //var bottom_left = glMatrix.vec3.create();
+        //var top_right = glMatrix.vec3.create();
+        //var bottom_right = glMatrix.vec3.create();
 
         var d = 1.0;//distance to plane
 
@@ -647,7 +647,7 @@ class Camera {
         glMatrix.vec3.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
 
         //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
-        //p_1m is the bottom left reference pixel, each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
+        //p_1m is the bottom left reference pixel (as a direction relative to E), each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
         var t_n_times_d = glMatrix.vec3.create();
         var g_x_times_b_n = glMatrix.vec3.create();
         var g_y_times_v_n = glMatrix.vec3.create();
@@ -657,15 +657,15 @@ class Camera {
         glMatrix.vec3.subtract(this.p_1m, t_n_times_d, g_x_times_b_n);
         glMatrix.vec3.subtract(this.p_1m, this.p_1m, g_y_times_v_n);
 
-        top_left = t_n * d - g_x * b_n + g_y * v_n;
-        bottom_left = t_n * d - g_x * b_n - g_y * v_n;
-        top_right = t_n * d + g_x * b_n + g_y * v_n;
-        bottom_right = t_n * d + g_x * b_n - g_y * v_n;
+        //top_left = t_n * d - g_x * b_n + g_y * v_n;
+        //bottom_left = t_n * d - g_x * b_n - g_y * v_n;
+        //top_right = t_n * d + g_x * b_n + g_y * v_n;
+        //bottom_right = t_n * d + g_x * b_n - g_y * v_n;
 
-        glMatrix.vec3.cross(this.normal_left, top_left, bottom_left);//normal_left = QVector3D::crossProduct(top_left, bottom_left);
-        glMatrix.vec3.cross(this.normal_right, bottom_right, top_right);//normal_right = QVector3D::crossProduct(bottom_right, top_right);
-        glMatrix.vec3.cross(this.normal_top, top_right, top_left);//normal_top = QVector3D::crossProduct(top_right, top_left);
-        glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
+        //glMatrix.vec3.cross(this.normal_left, top_left, bottom_left);//normal_left = QVector3D::crossProduct(top_left, bottom_left);
+        //glMatrix.vec3.cross(this.normal_right, bottom_right, top_right);//normal_right = QVector3D::crossProduct(bottom_right, top_right);
+        //glMatrix.vec3.cross(this.normal_top, top_right, top_left);//normal_top = QVector3D::crossProduct(top_right, top_left);
+        //glMatrix.vec3.cross(this.normal_bottom, bottom_left, bottom_right);//normal_bottom = QVector3D::crossProduct(bottom_left, bottom_right);
     }
 
 
@@ -753,6 +753,14 @@ class Camera {
     }
 
     UpdatePanning(x, y, x_canonical, y_canonical, left_handed) {
+        if(this.is4D){
+            this.UpdatePanning4D(x, y, x_canonical, y_canonical, left_handed);
+        }else{
+            this.UpdatePanning3D(x, y, x_canonical, y_canonical, left_handed);
+        }
+    }
+
+    UpdatePanning3D(x, y, x_canonical, y_canonical, left_handed) {
         //check if panning mode is allowed
         if(!this.allow_panning)
             return
@@ -772,8 +780,11 @@ class Camera {
         }
         if(this.control_mode == CAMERA_CONTROL_TRACKBALL3){
             this.UpdatePanningTrackball3(x_canonical, y_canonical, left_handed);
-        }
-        
+        }        
+    }
+
+    UpdatePanning4D(x, y, x_canonical, y_canonical, left_handed) {
+        console.warn("UpdatePanning4D not implemented yet"); 
     }
 
     UpdatePanningRotateAroundCamera(x, y, left_handed) {
@@ -972,6 +983,13 @@ class Camera {
     }
 
     RollLeft(deltaTime, left_handed) {
+        if(this.is4D)
+            this.RollLeft4D(deltaTime, left_handed);
+        else
+            this.RollLeft3D(deltaTime, left_handed);
+    }
+
+    RollLeft3D(deltaTime, left_handed) {
         var handedness = left_handed ? 1 : -1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
@@ -980,7 +998,18 @@ class Camera {
         this.changed = true;
     }
 
+    RollLeft4D(deltaTime, left_handed) {        
+        console.warn("RollLeft4D not implemented yet");
+    }
+
     RollRight(deltaTime, left_handed) {
+        if(this.is4D)
+            this.RollRight4D(deltaTime, left_handed);
+        else
+            this.RollRight3D(deltaTime, left_handed);
+    }
+
+    RollRight3D(deltaTime, left_handed) {
         var handedness = left_handed ? 1 : -1;
         var quaternion = glMatrix.quat.create();
         //QQuaternion quaternion = QQuaternion::fromDirection(forward, up);
@@ -989,7 +1018,18 @@ class Camera {
         this.changed = true;
     }
 
+    RollRight4D(deltaTime, left_handed) {        
+        console.warn("RollRight4D not implemented yet");
+    }
+
     moveLeft(deltaTime, slow) {
+        if(this.is4D)
+            this.moveLeft4D(deltaTime, slow);
+        else
+            this.moveLeft3D(deltaTime, slow);
+    }
+
+    moveLeft3D(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var left = glMatrix.vec3.create();
@@ -1003,7 +1043,18 @@ class Camera {
         this.changed = true;
     }
 
+    moveLeft4D(deltaTime, slow) {        
+        console.warn("moveLeft4D not implemented yet");
+    }
+
     moveRight(deltaTime, slow) {
+        if(this.is4D)
+            this.moveRight4D(deltaTime, slow);
+        else
+            this.moveRight3D(deltaTime, slow);
+    }
+
+    moveRight3D(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var left = glMatrix.vec3.create();
@@ -1017,7 +1068,18 @@ class Camera {
         this.changed = true;
     }
 
-    move_left_right(delta_x, slow){
+    moveRight4D(deltaTime, slow) {        
+        console.warn("moveRight4D not implemented yet");
+    }
+
+    move_left_right(delta_x, slow) {
+        if(this.is4D)
+            this.move_left_right4D(delta_x, slow);
+        else
+            this.move_left_right3D(delta_x, slow);
+    }
+
+    move_left_right3D(delta_x, slow){
         var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
 
         var left = glMatrix.vec3.create();
@@ -1031,7 +1093,18 @@ class Camera {
         this.changed = true;
     }
 
+    move_left_right4D(delta_x, slow) {        
+        console.warn("move_left_right4D not implemented yet");
+    }
+
     moveForward(deltaTime, slow) {
+        if(this.is4D)
+            this.moveForward4D(deltaTime, slow);
+        else
+            this.moveForward3D(deltaTime, slow);
+    }
+
+    moveForward3D(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var change = glMatrix.vec3.create();
@@ -1042,7 +1115,18 @@ class Camera {
         this.changed = true;
     }
 
+    moveForward4D(deltaTime, slow) {        
+        console.warn("moveForward4D not implemented yet");
+    }
+
     moveBackward(deltaTime, slow) {
+        if(this.is4D)
+            this.moveBackward4D(deltaTime, slow);
+        else
+            this.moveBackward3D(deltaTime, slow);
+    }
+
+    moveBackward3D(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
 
         var change = glMatrix.vec3.create();
@@ -1053,7 +1137,18 @@ class Camera {
         this.changed = true;
     }
 
-    move_forward_backward(delta_y, slow){
+    moveBackward4D(deltaTime, slow) {        
+        console.warn("moveBackward4D not implemented yet");
+    }
+
+    move_forward_backward(delta_y, slow) {
+        if(this.is4D)
+            this.move_forward_backward4D(delta_y, slow);
+        else
+            this.move_forward_backward3D(delta_y, slow);
+    }
+
+    move_forward_backward3D(delta_y, slow){
         var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
 
         var change = glMatrix.vec3.create();
@@ -1064,7 +1159,18 @@ class Camera {
         this.changed = true;
     }
 
+    move_forward_backward4D(delta_y, slow) {        
+        console.warn("move_forward_backward4D not implemented yet");
+    }
+
     move_forward_backward_wheel(delta_y, x, y, slow){
+        if(this.is4D)
+            this.move_forward_backward_wheel4D(delta_y, x, y, slow);
+        else
+            this.move_forward_backward_wheel3D(delta_y, x, y, slow);
+    }
+
+    move_forward_backward_wheel3D(delta_y, x, y, slow){
         var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
 
         var change = glMatrix.vec3.create();
@@ -1080,15 +1186,27 @@ class Camera {
         this.changed = true;
     }
 
+    move_forward_backward_wheel4D(delta_y, x, y, slow){
+        console.warn("move_forward_backward_wheel4D not implemented yet");
+    }
+
     move_forward_to_cursor(deltaTime, slow){
-        this.move_forward_or_backward_cursor(deltaTime, slow, -1);
+        if(this.is4D){
+            this.move_forward_or_backward_cursor4D(deltaTime, slow, -1);
+        }else{
+            this.move_forward_or_backward_cursor3D(deltaTime, slow, -1);
+        }
     }    
 
     move_backward_from_cursor(deltaTime, slow){
-        this.move_forward_or_backward_cursor(deltaTime, slow, 1);
+        if(this.is4D){
+            this.move_forward_or_backward_cursor4D(deltaTime, slow, 1);
+        }else{
+            this.move_forward_or_backward_cursor3D(deltaTime, slow, 1);
+        }
     }    
 
-    move_forward_or_backward_cursor(deltaTime, slow, signum){
+    move_forward_or_backward_cursor3D(deltaTime, slow, signum){
         var x = this.last_mouse_position["x"];
         var y = this.last_mouse_position["y"];
         var v = slow ? this.velocity_slow : this.velocity;
@@ -1104,6 +1222,10 @@ class Camera {
         glMatrix.vec3.subtract(this.position, this.position, change);
 
         this.changed = true;  
+    }
+
+    move_forward_or_backward_cursor4D(deltaTime, slow, signum){
+        console.warn("move_forward_or_backward_cursor4D not implemented yet");
     }
 
     generate_ray_direction(x, y){
@@ -1130,6 +1252,13 @@ class Camera {
     }
 
     moveUp(deltaTime, slow) {
+        if(this.is4D)
+            this.moveUp4D(deltaTime, slow);
+        else
+            this.moveUp3D(deltaTime, slow);
+    }
+
+    moveUp3D(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
         var handedness = this.left_handed ? 1 : -1;
 
@@ -1141,7 +1270,18 @@ class Camera {
         this.changed = true;
     }
 
+    moveUp4D(deltaTime, slow) {
+        console.warn("moveUp4D not implemented yet");
+    }
+
     moveDown(deltaTime, slow) {
+        if(this.is4D)
+            this.moveDown4D(deltaTime, slow);
+        else
+            this.moveDown3D(deltaTime, slow);
+    }
+
+    moveDown3D(deltaTime, slow) {
         var v = slow ? this.velocity_slow : this.velocity;
         var handedness = this.left_handed ? 1 : -1;
 
@@ -1153,7 +1293,18 @@ class Camera {
         this.changed = true;
     }
 
-    move_up_down(delta_y, slow){
+    moveDown4D(deltaTime, slow) {
+        console.warn("moveDown4D not implemented yet");
+    }
+
+    move_up_down(delta_y, slow) {
+        if(this.is4D)
+            this.move_up_down4D(delta_y, slow);
+        else
+            this.move_up_down3D(delta_y, slow);
+    }
+
+    move_up_down3D(delta_y, slow){
         var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
         var handedness = this.left_handed ? 1 : -1;
 
@@ -1164,12 +1315,21 @@ class Camera {
         this.changed = true;
     }
 
+    move_up_down4D(delta_y, slow) {        
+        console.warn("move_up_down4D not implemented yet");
+    }
+
     repositionCamera(is_projection, projection_index, allow_default) {
-        if (is_projection) {
-            this.repositionCameraProjection(projection_index);
+        if(this.is4D){
+            //do nothing yet
         }
-        else if (allow_default) {
-            this.repositionCameraDefault();
+        else{
+            if (is_projection) {
+                this.repositionCameraProjection(projection_index);
+            }
+            else if (allow_default) {
+                this.repositionCameraDefault();
+            }
         }
     }
 
