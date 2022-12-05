@@ -34,10 +34,12 @@ const shader_modules_shared_const = require("./shader/modules/shared/shared_cons
 const shader_modules_shared_function_declarations = require("./shader/modules/shared/shared_function_declarations.glsl");
 const shader_modules_shared_shading = require("./shader/modules/shared/shared_shading.glsl");
 //modules: default
+const shader_modules_default_structs = require("./shader/modules/default/default_structs.glsl");
 const shader_modules_default_intersections = require("./shader/modules/default/default_intersections.glsl");
 const shader_modules_default_ray_generation = require("./shader/modules/default/default_ray_generation.glsl");
 const shader_modules_default_shading = require("./shader/modules/default/default_shading.glsl");
 //modules: s3
+const shader_modules_s3_structs = require("./shader/modules/s3/s3_structs.glsl");
 const shader_modules_s3_intersections = require("./shader/modules/s3/s3_intersections.glsl");
 
 //########## THIRD PARTY MODULES ##########

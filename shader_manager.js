@@ -88,10 +88,12 @@ class ShaderManager {
 
         //different for s3
         if(shader_flags.space == SPACE_3_SPHERE_4_PLUS_4D){
+            code = code.replace("$SHADER_MODULE_ADDITIONAL_STRUCTS$", SHADER_MODULE_S3_STRUCTS);    
             code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_S3_INTERSECTIONS);    
         }
         else{
-            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS);    
+            code = code.replace("$SHADER_MODULE_ADDITIONAL_STRUCTS$", SHADER_MODULE_DEFAULT_STRUCTS);     
+            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS);   
         }   
         code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);   
         code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_DEFAULT_SHADING);    
