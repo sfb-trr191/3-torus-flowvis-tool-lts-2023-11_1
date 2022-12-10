@@ -8,6 +8,9 @@ const module_utility = require("./utility");
 const { rightArithShift } = require("mathjs");
 const distancePointToLine = module_utility.distancePointToLine;
 
+const module_math4D = require("./math4D");
+const getAligned4DRotationMatrix = module_math4D.getAligned4DRotationMatrix;
+
 class PolyLineSegment {
 
     constructor() {
@@ -350,20 +353,20 @@ class LODData {
         //console.log("this.vectorLineSegment [", vectorLineSegment.length, "]: ", vectorLineSegment);
     }
 
-    CalculateMatrices(part_index) {
-        console.log("CalculateMatrices", part_index);
+    CalculateMatrices(part_index, space) {
+        console.log("CalculateMatrices", part_index, space);
         var raw_data = this.p_streamline_context.GetRawData(part_index);
         var vectorLineSegment = this.GetVectorLineSegment(part_index);
         for (var i = 0; i < vectorLineSegment.length; i++) {
             var projection_index = -1;
-            var matrixCombined = this.CalculateMatrix(part_index, i, projection_index);
+            var matrixCombined = this.CalculateMatrix(part_index, space, i, projection_index);
             var matrixInverted = glMatrix.mat4.create();
             glMatrix.mat4.invert(matrixInverted, matrixCombined);//matrixInverted = matrixCombined.inverted();
             vectorLineSegment[i].matrix = matrixCombined;
             vectorLineSegment[i].matrix_inv = matrixInverted;
             
             for (var projection_index=0; projection_index<3; projection_index++){
-                var matrix = this.CalculateMatrix(part_index, i, projection_index);
+                var matrix = this.CalculateMatrix(part_index, space, i, projection_index);
                 var matrix_inv = glMatrix.mat4.create();
                 glMatrix.mat4.invert(matrix_inv, matrix);
                 vectorLineSegment[i].list_matrix_projection[projection_index] = matrix;
@@ -373,7 +376,15 @@ class LODData {
         console.log("CalculateMatrices completed");
     }
 
-    CalculateMatrix(part_index, segment_index, projection_index){
+    CalculateMatrix(part_index, space, segment_index, projection_index){
+        if(space == SPACE_3_SPHERE_4_PLUS_4D){
+            return this.CalculateMatrix4D(part_index, segment_index, projection_index);
+        }else{
+            return this.CalculateMatrix3D(part_index, segment_index, projection_index);
+        }
+    }
+
+    CalculateMatrix3D(part_index, segment_index, projection_index){
         var raw_data = this.p_streamline_context.GetRawData(part_index);
         var vectorLineSegment = this.GetVectorLineSegment(part_index);
 
@@ -451,6 +462,26 @@ class LODData {
         }
 
         return matrixCombined;
+    }
+
+    CalculateMatrix4D(part_index, segment_index, projection_index){
+        console.log("CalculateMatrix4D");
+        var raw_data = this.p_streamline_context.GetRawData(part_index);
+        var vectorLineSegment = this.GetVectorLineSegment(part_index);
+
+        var lineSegment = vectorLineSegment[segment_index];
+        var indexA = lineSegment.indexA;
+        var indexB = lineSegment.indexB;
+        var posA_ws = glMatrix.vec4.create();
+        var posB_ws = glMatrix.vec4.create();
+        glMatrix.vec4.copy(posA_ws, raw_data.data[indexA].position);//vec4
+        glMatrix.vec4.copy(posB_ws, raw_data.data[indexB].position);//vec4
+
+        var point_B_translated = glMatrix.vec4.create();
+        glMatrix.vec4.subtract(point_B_translated, posB_ws, posA_ws);
+
+        var matrix = getAligned4DRotationMatrix(point_B_translated);
+        return matrix;
     }
 
     CalculateBVH(part_index) {

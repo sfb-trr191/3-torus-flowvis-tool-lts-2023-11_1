@@ -167,6 +167,7 @@ class StreamlineContext {
                 break;
             default:
                 console.log("Error unknonw space");
+                debugger;
                 break;
         }
 
@@ -185,7 +186,7 @@ class StreamlineContext {
             this.lod_list[i].GenerateLineSegments(part_index);
             if (generate_copies)
                 this.lod_list[i].GenerateLineSegmentCopies(part_index);
-            this.lod_list[i].CalculateMatrices(part_index);
+            this.lod_list[i].CalculateMatrices(part_index, this.streamline_generator.space);
             this.lod_list[i].CalculateBVH(part_index);
         }
 

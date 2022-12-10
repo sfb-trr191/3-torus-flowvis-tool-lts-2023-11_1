@@ -94,6 +94,11 @@ class ShaderFlags {
         }
 
         this.integrate_light = integrate_light;
+
+
+        if(space == SPACE_3_SPHERE_4_PLUS_4D){            
+            this.show_movable_axes = false;
+        }
     }
 
 
