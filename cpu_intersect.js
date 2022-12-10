@@ -359,6 +359,10 @@ function ValidateIntersection3Sphere(ray_origin_4D, ray_direction_4D, sphere_cen
         var dist = glMatrix.vec4.distance(sphere_center_4D, result.intersection_4D);
         var diff = Math.abs(dist - sphere_radius);
         console.log("intersection found, diff: ", diff, "shortest_distance", shortest_distance);
+        console.log("           ray_origin_4D:", ray_origin_4D);
+        console.log("           ray_direction_4D:", ray_direction_4D);
+        console.log("           sphere_center_4D:", sphere_center_4D);
+        console.log("           intersection_4D:", result.intersection_4D);
     }else{
         var diff = Math.abs(shortest_distance - sphere_radius);
         console.log("no intersection found, diff: ", diff, "shortest_distance", shortest_distance);
@@ -544,11 +548,43 @@ function TestCase02(){
     ValidateIntersectionSpherinder(ray_origin_4D, ray_direction_4D, spherinder_point_A, spherinder_point_B, radius, result);
 }
 
+function TestCase03(){
+    console.log("TestCase03: POSITIVE INTERSECTION LINE 3SPHERE");
+
+    var radius = 0.5;
+    var result = {};
+    result.intersect = false;
+    result.flag_outside_interval = false;
+    var ray_origin_4D = glMatrix.vec4.fromValues(
+        0.0,
+        0.0,
+        0.0,
+        1.0
+    );
+    var ray_direction_4D = glMatrix.vec4.fromValues(
+        0.0,
+        1.0,
+        0.0,
+        0.0
+    );
+    var sphere_center_4D = glMatrix.vec4.fromValues(
+        0.0,
+        2.0,
+        0.0,
+        1.0
+    );
+
+    Intersect3Sphere(ray_origin_4D, ray_direction_4D, sphere_center_4D, radius, result);
+    ValidateIntersection3Sphere(ray_origin_4D, ray_direction_4D, sphere_center_4D, radius, result);
+}
+
 function KnownTestCases(){
     console.log("--------------------------KnownTestCases----------------------------");
     TestCase01();
     console.log("--------------------------");
     TestCase02();
+    console.log("--------------------------");
+    TestCase03();
 }
 
 function Test(){

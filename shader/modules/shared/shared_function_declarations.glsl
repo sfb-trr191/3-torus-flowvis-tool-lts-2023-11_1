@@ -87,4 +87,6 @@ void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 
 //**********************************************************
 
+void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
+
 `;

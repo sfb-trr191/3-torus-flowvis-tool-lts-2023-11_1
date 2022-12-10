@@ -76,6 +76,12 @@ struct Sphere
 	float radius;
 };
 
+struct Sphere4D
+{
+	vec4 center;
+	float radius;
+};
+
 struct MoveOutOfBoundsFlags
 {
 	bool x_greater;

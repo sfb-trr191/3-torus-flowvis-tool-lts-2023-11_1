@@ -1,5 +1,9 @@
 global.SHADER_MODULE_S3_INTERSECTIONS = `
 
+bool IsVec4Similar(vec4 a, vec4 b){
+    return distance(a,b) < 0.00001;
+}
+
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {			
 	Ray variableRay;
@@ -8,10 +12,31 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	variableRay.dir_inv = ray.dir_inv;
 	variableRay.rayDistance = 0.0;
     variableRay.local_cutoff = maxRayDistance;
-			
+
+    /*	
+    if(IsVec4Similar(ray.origin, vec4(0.0, 0.0, 0.0, 1.0))){
+        hit.hitType = TYPE_STREAMLINE_SEGMENT;
+    }
+    return;
+    */
+
+
 	int count = 0;
 	int hitCount = 0;
     float tmp_rayDistance = 0.0;
+
+    int part_index = 0;
+    float ray_local_cutoff = 100000.0;
+    Sphere4D sphere4D;
+    bool copy = false;
+    int multiPolyID = 0;
+    int type = TYPE_STREAMLINE_SEGMENT;
+    float velocity = 0.0;
+    float cost = 0.0;
+
+    sphere4D.center = vec4(0.0, 2.0, 0.0, 1.0);
+    sphere4D.radius = 0.5;
+    Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, type, velocity, cost);
 
     return;
     /*
@@ -416,13 +441,13 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 		hit.ignore_override = ignore_override;
 	}
 }
-
-void Intersect3Sphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
+*/
+void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
 {
-	vec4 z = ray.origin - sphere.center;//e-c
+	vec4 z = ray.origin - sphere4D.center;//e-c
 	float a = dot(ray.direction, ray.direction);//unnecessary
 	float b = 2.0 * dot(ray.direction, z);
-	float c = dot(z, z) - sphere.radius * sphere.radius;
+	float c = dot(z, z) - sphere4D.radius * sphere4D.radius;
 
 	float discriminant = b*b - 4.0 * a *c;
 	if (discriminant < 0.0)
@@ -450,7 +475,7 @@ void Intersect3Sphere(int part_index, bool check_bounds, Ray ray, float ray_loca
 	
 	float distance_surface = ray.rayDistance + distance_os;
 		
-	vec3 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
+	vec4 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
 
 	if(growth == 1)
 	{
@@ -489,8 +514,8 @@ void Intersect3Sphere(int part_index, bool check_bounds, Ray ray, float ray_loca
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;
-		hit.positionCenter = sphere.center;
-		hit.normal = normalize(hit.position - sphere.center);
+		hit.positionCenter = sphere4D.center;
+		hit.normal = normalize(hit.position - sphere4D.center);
 		//hit.normal = normalize(sphere.center - hit.position);
 		hit.copy = copy;
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
@@ -499,6 +524,6 @@ void Intersect3Sphere(int part_index, bool check_bounds, Ray ray, float ray_loca
 		
 	}
 }
-*/
+
 
 `;

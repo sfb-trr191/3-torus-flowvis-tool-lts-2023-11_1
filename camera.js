@@ -41,6 +41,8 @@ class GL_CameraData {
         gl.uniform4fv(location_normal_right, this.normal_right);
         gl.uniform4fv(location_normal_top, this.normal_top);
         gl.uniform4fv(location_normal_bottom, this.normal_bottom);
+
+        console.log("WriteToUniform this.E", this.E)
     }
 }
 
