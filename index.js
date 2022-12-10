@@ -21,7 +21,6 @@ const v_shader_transfer_function_points = require("./shader/stand_alone/v_shader
 //modular shader:
 const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_preprocessor.glsl");
 //modules
-const shader_modules_light_integration_definitions = require("./shader/modules/default/default_light_integration_definitions.glsl");
 const shader_modules_out_of_bounds = require("./shader/modules/default/default_out_of_bounds.glsl");
 const shader_modules_volume_rendering = require("./shader/modules/default/default_volume_rendering.glsl");
 const shader_modules_handle_inside = require("./shader/modules/default/default_handle_inside.glsl");
@@ -35,12 +34,18 @@ const shader_modules_shared_function_declarations = require("./shader/modules/sh
 const shader_modules_shared_shading = require("./shader/modules/shared/shared_shading.glsl");
 //modules: default
 const shader_modules_default_structs = require("./shader/modules/default/default_structs.glsl");
+const shader_modules_default_function_declarations = require("./shader/modules/default/default_function_declarations.glsl");
 const shader_modules_default_intersections = require("./shader/modules/default/default_intersections.glsl");
 const shader_modules_default_ray_generation = require("./shader/modules/default/default_ray_generation.glsl");
 const shader_modules_default_shading = require("./shader/modules/default/default_shading.glsl");
+const shader_modules_default_light_integration_definitions = require("./shader/modules/default/default_light_integration_definitions.glsl");
 //modules: s3
 const shader_modules_s3_structs = require("./shader/modules/s3/s3_structs.glsl");
+const shader_modules_s3_function_declarations = require("./shader/modules/s3/s3_function_declarations.glsl");
 const shader_modules_s3_intersections = require("./shader/modules/s3/s3_intersections.glsl");
+const shader_modules_s3_ray_generation = require("./shader/modules/s3/s3_ray_generation.glsl");
+const shader_modules_s3_shading = require("./shader/modules/s3/s3_shading.glsl");
+const shader_modules_s3_light_integration_definitions = require("./shader/modules/s3/s3_light_integration_definitions.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");

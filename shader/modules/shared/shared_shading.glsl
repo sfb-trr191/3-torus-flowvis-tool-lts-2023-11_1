@@ -54,6 +54,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
             bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
             return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
         }
+#ifdef SHOW_VOLUME_RENDERING
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_FTLE)
         {
             int z_offset = 0;
@@ -61,6 +62,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
             vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index_streamline_scalar);
             return rgba_forward.rgb;
         }
+#endif
         
 	}
 	if(hit.hitType == TYPE_SEED){

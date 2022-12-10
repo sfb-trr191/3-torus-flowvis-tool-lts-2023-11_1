@@ -535,8 +535,8 @@ class Camera {
     }
 
     UpdateShaderValues3D() {
-        console.log("0x22 UpdateShaderValues3D");
-        console.log("0x22 this.position", this.position);
+        //console.log("0x22 UpdateShaderValues3D", this.name);
+        //console.log("0x22 this.position", this.position);
         var T = glMatrix.vec3.create();
         var t = glMatrix.vec3.create();
         var t_n = glMatrix.vec3.create();
@@ -607,11 +607,11 @@ class Camera {
         vec4_from_vec3_0(this.q_y, q_y_3d);
         vec4_from_vec3_0(this.p_1m, p_1m_3d);
 
-        console.log("0x22 this.position", this.position);
+        //console.log("0x22 this.position", this.position);
     }
 
     UpdateShaderValues4D() {
-        console.log("UpdateShaderValues4D");
+        //console.log("UpdateShaderValues4D", this.name);
         var T = glMatrix.vec3.create();
         var t = glMatrix.vec3.create();
         var t_n = glMatrix.vec3.create();

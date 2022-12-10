@@ -134,4 +134,12 @@ vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir)
 }  
 
 
+float GetScalar(vec3 position){
+    float x = position.x;
+	float y = position.y;
+	float z = position.z;
+    return shader_formula_scalar;
+}
+
+
 `;

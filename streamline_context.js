@@ -165,6 +165,9 @@ class StreamlineContext {
             case SPACE_2_PLUS_2D:
                 raw_data.CopyAngleIntoPosition();
                 break;
+            case SPACE_3_SPHERE_4_PLUS_4D:
+                //do nothing
+                break;
             default:
                 console.log("Error unknonw space");
                 debugger;

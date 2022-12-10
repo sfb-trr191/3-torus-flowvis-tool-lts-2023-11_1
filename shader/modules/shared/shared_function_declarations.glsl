@@ -27,7 +27,7 @@ float ExtractLinearPercentage(float a, float b, float value);
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override);
 float CalculateFogFactor(float dist);
 vec3 GetObjectColor(Ray ray, inout HitInformation hit);
-float GetScalar(vec3 position);
+
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir);
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
 
@@ -64,6 +64,7 @@ float GetTubeRadius(int part_index);
 
 float GetCost(int index, int part_index);
 vec3 GetPosition(int index, int part_index);
+vec4 GetPosition4D(int index, int part_index);
 float GetVelocity(int index, int part_index);
 GL_LineSegment GetLineSegment(int index, int part_index);
 GL_TreeNode GetNode(int index, int part_index);
@@ -81,8 +82,6 @@ ivec3 GetIndex3D(int global_index);
 
 void RayEulerStep(inout Ray ray);
 void RayRK4Step(inout Ray ray);
-vec3 RayLightFunctionPos(vec3 position, vec3 direction);
-vec3 RayLightFunctionDir(vec3 position, vec3 direction);
 void LightIntegrationPre(inout Ray ray);
 void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 

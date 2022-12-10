@@ -15,6 +15,7 @@ $SHADER_MODULE_ADDITIONAL_STRUCTS$
 $SHADER_MODULE_SHARED_UNIFORMS$
 $SHADER_MODULE_SHARED_CONST$
 $SHADER_MODULE_SHARED_FUNCTION_DECLARATIONS$
+$SHADER_MODULE_ADDITIONAL_FUNCTION_DECLARATIONS$
 
 //#######################################################
 //#                                                     #
@@ -179,13 +180,6 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
             hit.cost = hit_outside.cost;
         }
     }
-}
-
-float GetScalar(vec3 position){
-    float x = position.x;
-	float y = position.y;
-	float z = position.z;
-    return shader_formula_scalar;
 }
 
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {

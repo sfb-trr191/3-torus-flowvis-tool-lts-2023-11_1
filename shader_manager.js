@@ -35,9 +35,10 @@ class ShaderManager {
         light_transport_p0, light_transport_p1, light_transport_p2, 
         light_transport_d0, light_transport_d1, light_transport_d2, 
         shader_flags) {
-        var code = F_SHADER_RAYTRACING_PREPROCESSOR.replace("shader_formula_scalar", shader_formula_scalar);
+        var code = F_SHADER_RAYTRACING_PREPROCESSOR;
 
         code = this.LoadModules(code, shader_flags);
+        code = code.replace("shader_formula_scalar", shader_formula_scalar);
 
         var defines = "";
         if(shader_flags.show_volume_rendering)
@@ -81,29 +82,44 @@ class ShaderManager {
 
     LoadModules(code, shader_flags){
         if(shader_flags.integrate_light){
-            code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_DEFAULT_LIGHT_INTEGRATION_DEFINITIONS);
+            if(shader_flags.space == SPACE_3_SPHERE_4_PLUS_4D){
+                code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_S3_LIGHT_INTEGRATION_DEFINITIONS);
+            }else{
+                code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", SHADER_MODULE_DEFAULT_LIGHT_INTEGRATION_DEFINITIONS);
+            }            
         }else{
             code = code.replace("$SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$", "");
         }
 
         //different for s3
         if(shader_flags.space == SPACE_3_SPHERE_4_PLUS_4D){
-            code = code.replace("$SHADER_MODULE_ADDITIONAL_STRUCTS$", SHADER_MODULE_S3_STRUCTS);    
-            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_S3_INTERSECTIONS);    
+            code = code.replace("$SHADER_MODULE_ADDITIONAL_STRUCTS$", SHADER_MODULE_S3_STRUCTS);   
+            code = code.replace("$SHADER_MODULE_ADDITIONAL_FUNCTION_DECLARATIONS$", SHADER_MODULE_S3_FUNCTION_DECLARATIONS); 
+            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_S3_INTERSECTIONS); 
+            code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_S3_SHADING);       
+            code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_S3_RAY_GENERATION);   
+
+            //not used in s3
+            code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", "");        
+            code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", "");
+            code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", "");
+            code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", "");
         }
         else{
             code = code.replace("$SHADER_MODULE_ADDITIONAL_STRUCTS$", SHADER_MODULE_DEFAULT_STRUCTS);     
-            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS);   
-        }   
-        code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);   
-        code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_DEFAULT_SHADING);    
+            code = code.replace("$SHADER_MODULE_ADDITIONAL_FUNCTION_DECLARATIONS$", SHADER_MODULE_DEFAULT_FUNCTION_DECLARATIONS); 
+            code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS); 
+            code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_DEFAULT_SHADING);     
+            code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);    
+
+            //not used in s3
+            code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_DEFAULT_VOLUME_RENDERING);        
+            code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_OUT_OF_BOUNDS);
+            code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_DEFAULT_HANDLE_INSIDE);
+            code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS);
+        }           
         
-        
-        //not used in s3
-        code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_DEFAULT_VOLUME_RENDERING);        
-        code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_OUT_OF_BOUNDS);
-        code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_DEFAULT_HANDLE_INSIDE);
-        code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS);
+
 
         //shared
         code = code.replace("$SHADER_MODULE_SHARED_DATA_ACCESS$", SHADER_MODULE_SHARED_DATA_ACCESS);
@@ -255,6 +271,7 @@ class ShaderManager {
 
 
     PrepareRaytracingShaderMain(gl){
+        console.log("PrepareRaytracingShaderMain");
         var t_start = performance.now();
 
         //get variables
@@ -301,6 +318,7 @@ class ShaderManager {
     }
 
     PrepareRaytracingShaderSide(gl){
+        console.log("PrepareRaytracingShaderSide");
         var t_start = performance.now();
         input_formula_scalar
         //get variables

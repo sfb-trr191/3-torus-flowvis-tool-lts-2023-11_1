@@ -3,20 +3,18 @@ global.SHADER_MODULE_S3_INTERSECTIONS = `
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube)
 {			
 	Ray variableRay;
-	variableRay.origin = RepositionIntoFundamentalDomain(ray.origin);
+	variableRay.origin = ray.origin;
 	variableRay.direction = ray.direction;
 	variableRay.dir_inv = ray.dir_inv;
 	variableRay.rayDistance = 0.0;
     variableRay.local_cutoff = maxRayDistance;
-
-    Ray transitional_ray;
 			
 	int count = 0;
 	int hitCount = 0;
     float tmp_rayDistance = 0.0;
 
     return;
-
+    /*
 	while(true)
 	{
         tmp_rayDistance = variableRay.rayDistance;
@@ -25,17 +23,17 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         bool flag_ray_stays_inside = true;        
         float t = variableRay.local_cutoff;
 
-/*
-#ifdef SHOW_VOLUME_RENDERING
-        bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
-            && variableRay.rayDistance < max_volume_distance;
-        if(volume_flag)
-        {
-            float distance_end = t;
-            IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
-        }
-#endif
-*/
+
+//#ifdef SHOW_VOLUME_RENDERING
+//        bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity
+//            && variableRay.rayDistance < max_volume_distance;
+//        if(volume_flag)
+//        {
+//            float distance_end = t;
+//            IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+//        }
+//#endif
+
 
 		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
 			break;
@@ -57,17 +55,17 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		if(count >= maxIterationCount)
 			break;            
 	}	
+    */
 
 }
 
-
+/*
 void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
 {
 	hitCube.hitType = TYPE_IGNORE_CUBE;
 	hitCube.distance = 0.0;		
 	bool doesIntersect = false;
 	float nearest_t = 0.0;
-	vec3 normal_face;
 
 #ifdef SHOW_STREAMLINES
     {
@@ -75,30 +73,32 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, ray.local_cutoff+0.001, hit, hitCube);
     }
 #endif
-/*
-#ifdef SHOW_BOUNDING_BOX
-	{
-        bool check_bounds = is_main_renderer;
-        //bool check_bounds = false;
-        IntersectAxes(check_bounds, ray, ray.local_cutoff+0.001, hit, hitCube);
-	}
-#endif
 
-#ifdef SHOW_BOUNDING_BOX_PROJECTION
-    {
-        bool check_bounds = true;
-        IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
-    }
-#endif
+//#ifdef SHOW_BOUNDING_BOX
+//	{
+//        bool check_bounds = is_main_renderer;
+//        //bool check_bounds = false;
+//        IntersectAxes(check_bounds, ray, ray.local_cutoff+0.001, hit, hitCube);
+//	}
+//#endif
 
-#ifdef SHOW_SEEDS_INSTANCE
-    {
-		IntersectSeeds(ray, maxRayDistance, hit);
-    }
-#endif
-*/
+//#ifdef SHOW_BOUNDING_BOX_PROJECTION
+//    {
+//        bool check_bounds = true;
+//        IntersectProjectionFrame(check_bounds, ray, maxRayDistance, hit, hitCube);
+//    }
+//#endif
+
+//#ifdef SHOW_SEEDS_INSTANCE
+//    {
+//		IntersectSeeds(ray, maxRayDistance, hit);
+//    }
+//#endif
+
 }
+*/
 
+/*
 void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
 {		
 	bool copy = false;
@@ -106,9 +106,6 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 	int type = TYPE_STREAMLINE_SEGMENT;
 	float velocity = 0.0;
 	float cost = 0.0;
-
-	Sphere sphere;
-	sphere.radius = 0.1;
 
 	int nodeIndex = 0;
 	int iteration_counter = -1;
@@ -172,54 +169,21 @@ bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin,
 	bool segment_outside = tmax < 0.0 || tmin > ray_local_cutoff;
     return tmax > max(tmin, 0.0) && !segment_outside;
 }
-
-bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax) {    
-	GL_AABB aabb;
-	float radius = cylinder.radius;
-	aabb.min = min(cylinder.position_a, cylinder.position_b) + vec4(-radius, -radius, -radius, 0);
-	aabb.max = max(cylinder.position_a, cylinder.position_b) + vec4(radius, radius, radius, 0);
-    return IntersectGLAABB(aabb, r, ray_local_cutoff, tmin, tmax);
-}
-
-bool IntersectGLAABB(Sphere sphere, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax) {    
-	GL_AABB aabb;
-	float radius = sphere.radius;
-	vec4 position = vec4(sphere.center, 0);
-	aabb.min = position + vec4(-radius, -radius, -radius, 0);
-	aabb.max = position + vec4(radius, radius, radius, 0);
-    return IntersectGLAABB(aabb, r, ray_local_cutoff, tmin, tmax);
-}
-
+*/
+/*
 void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
 { 
     float tube_radius = GetTubeRadius(part_index);
-	/*
-	int lineSegmentID = glNode.objectIndex;
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, interactiveStreamline);
-	bool copy = false; 
-	int multiPolyID = 0; 
-	float v_b = 1.0; 
-	float cost_b_value = 0.0;
-
-	vec3 a = GetPosition(lineSegment.indexA, interactiveStreamline);
-
-	Sphere sphere;
-	sphere.radius = tube_radius;
-	sphere.center = a;
-	IntersectSphere(interactiveStreamline, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);
-
-	*/
-
-
+    
 	int lineSegmentID = glNode.objectIndex;
 	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
 	int multiPolyID = lineSegment.multiPolyID;
 	bool copy = (lineSegment.copy==1);
 	if(ignore_copy && copy)
 		return;
-        
-	vec3 a = GetPosition(lineSegment.indexA, part_index);
-	vec3 b = GetPosition(lineSegment.indexB, part_index);
+
+	vec4 a = GetPosition4D(lineSegment.indexA, part_index);
+	vec4 b = GetPosition4D(lineSegment.indexB, part_index);
 	float cost_a = GetCost(lineSegment.indexA, part_index);
 	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float cost_cutoff = max_streamline_cost;
@@ -281,8 +245,6 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 		}
 	}
 	IntersectSphere(part_index, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
-	
-	/**/
 }
 
 void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
@@ -375,20 +337,6 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 	float z_os = p_os.z;
 	float h = distance(a,b);
 	
-	/*
-	if(z_os > h || z_os < 0.0)
-	{
-		if(!bothInFront)
-			return;
-		return;
-		//We also need to check the other t if we are not rendering caps		
-		t = max(t_1, t_2);
-		p_os = ray_os.origin + t * ray_os.direction;
-		z_os = p_os.z;
-		if(z_os > h || z_os < 0.0)
-			return;
-	}
-	*/
 	if(z_os > h || z_os < 0.0)
 	{
 		return;
@@ -469,9 +417,9 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 	}
 }
 
-void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
+void Intersect3Sphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
 {
-	vec3 z = ray.origin - sphere.center;//e-c
+	vec4 z = ray.origin - sphere.center;//e-c
 	float a = dot(ray.direction, ray.direction);//unnecessary
 	float b = 2.0 * dot(ray.direction, z);
 	float c = dot(z, z) - sphere.radius * sphere.radius;
@@ -485,10 +433,8 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 	float t2 = (-b - root) * 0.5f;
 	//float distance = min(t1, t2);
 	//float distance = (-b - root) / (2.0f * a);
-	float distance_os = 0.0;
+	float distance_os = 0.0;//T BASED ON NORMALIZED RAY DIRECTION, THIS IS NOT THE REAL DISTANCE
 		
-
-
 	if(t1 < 0.0)
 	{
 		if(t2 < 0.0)
@@ -505,34 +451,6 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 	float distance_surface = ray.rayDistance + distance_os;
 		
 	vec3 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
-
-	/*
-	bool doOutOfBoundsCheck = false;
-	if(allowOutOfBoundSphere == 0)	
-		doOutOfBoundsCheck = true;	
-	else if(type != TYPE_CLICKED_SPHERE)	
-		doOutOfBoundsCheck = true;	
-
-	if(doOutOfBoundsCheck)
-	{
-		bool outOfBounds = CheckOutOfBounds(position_ws);	
-		if(outOfBounds)	
-			return;
-	}
-	else
-	{
-		bool outOfBounds = CheckOutOfBounds(sphere.center);	
-		if(outOfBounds)	
-			return;
-	}
-    */
-	if(check_bounds)
-	{
-		bool outOfBounds = CheckOutOfBounds(position_ws);	
-		if(outOfBounds)	
-			return;	
-	}	
-
 
 	if(growth == 1)
 	{
@@ -581,6 +499,6 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 		
 	}
 }
-
+*/
 
 `;
