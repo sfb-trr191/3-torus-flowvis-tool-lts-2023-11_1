@@ -46,4 +46,10 @@ struct Ray
     float segment_length;
 };
 
+struct IntersectionResult{
+    bool intersect;
+    vec3 intersection_3D;
+    float t;
+};
+
 `;

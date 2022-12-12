@@ -247,11 +247,10 @@ void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_Tr
 	float v_a = GetVelocity(lineSegment.indexA, part_index);
 	float v_b = GetVelocity(lineSegment.indexB, part_index);
 
-	/*
-	//CYLINDER AND SPHERE TEST
+	
+	//SPHERINDER AND SPHERE TEST
 	bool ignore_override = false;
-	IntersectCylinder(part_index, check_bounds, ray, ray_local_cutoff, glNode.objectIndex, hit, ignore_override);	
-    */
+    IntersectSpherinder(part_index, ray, ray_local_cutoff, lineSegmentID, hit, ignore_override);
 
 
     Sphere4D sphere4D;
@@ -282,177 +281,7 @@ void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_Tr
 	Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
     
 }
-/*
-void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
-{
-    float tube_radius = GetTubeRadius(part_index);
 
-	float r = tube_radius;// / 2.0;
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
-	vec3 a = GetPosition(lineSegment.indexA, part_index);
-	vec3 b = GetPosition(lineSegment.indexB, part_index);
-
-	
-	mat4 matrix = lineSegment.matrix;
-	mat4 matrix_inv = lineSegment.matrix_inv;
-	
-	//vec3 a_os = (matrix * vec4(a, 1)).xyz;
-	//vec3 b_os = (matrix * vec4(b, 1)).xyz;
-		
-	Ray ray_os;//Object Space of Cylinder
-	ray_os.origin = (matrix * vec4(ray.origin, 1)).xyz;
-	//ray_os.direction = (matrix_inv * vec4(ray.direction, 1)).xyz;
-	ray_os.direction = (matrix * vec4(ray.origin+ray.direction, 1)).xyz - ray_os.origin;
-	//ray_os.direction = normalize(ray_os.direction);
-		
-	//calculate discriminant in object space
-	float x_1 = ray_os.origin.x;
-	float x_2 = (ray_os.origin + ray_os.direction).x;
-	float y_1 = ray_os.origin.y;
-	float y_2 = (ray_os.origin + ray_os.direction).y;
-	float d_x =  x_2 - x_1;
-	float d_y =  y_2 - y_1;
-	//float d_r = sqrt(d_x*d_x + d_y*d_y);
-	//float d_r_squared = d_r * d_r;
-    float d_r_squared = d_x*d_x + d_y*d_y;
-	float D = x_1 * y_2 - x_2 * y_1;
-	float discriminant = r*r * d_r_squared - D*D;
-	if(discriminant < 0.0)
-		return;
-
-	
-
-	float d_r_squared_inv = 1.0/d_r_squared;
-	//calculate intersection points in object space	
-	float root = sqrt(discriminant);
-	float x_L = D * d_y;
-	float x_R = sign(d_y)*d_x*root;
-	//float y_L = -D * d_x;							//NOT NECESSARY
-	//float y_R = abs(d_y)*root;					//NOT NECESSARY
-	float p_x_1 = (x_L + x_R)/(d_r_squared);		
-	float p_x_2 = (x_L - x_R)/(d_r_squared);		
-	//vec2 p_x = vec2((x_L + x_R), (x_L - x_R)) * d_r_squared_inv;
-	//float p_y_1 = (y_L + y_R)/(d_r_squared);		//NOT NECESSARY
-	//float p_y_2 = (y_L - y_R)/(d_r_squared);		//NOT NECESSARY
-	//vec2 p_1 = vec2(p_x_1, p_y_1);				//NOT NECESSARY
-	//vec2 p_2 = vec2(p_x_2, p_y_2);				//NOT NECESSARY
-	
-	//calculate t in object space 
-	//equation: ray_os.origin.x + t * ray_os.direction.x = p_x_1
-	float t_1 = (p_x_1 - ray_os.origin.x) / ray_os.direction.x;
-	float t_2 = (p_x_2 - ray_os.origin.x) / ray_os.direction.x;
-	//float t_1 = (p_x[0] - ray_os.origin.x) / ray_os.direction.x;
-	//float t_2 = (p_x[1] - ray_os.origin.x) / ray_os.direction.x;
-	float t = 0.0;
-	bool bothInFront = false;
-	if(t_1 < 0.0)
-	{		
-		//t_1 is behind the camera
-		if(t_2 < 0.0)//both intersection points are behind the camera						
-			return;
-		//t_2 is in front of camera  
-		t = t_2;
-	}
-	else
-	{
-		if(t_2 < 0.0)//t_1 is in front of camera  
-			t = t_1;
-		else//both intersection points are in front of the camera	
-		{
-			t = min(t_1, t_2);
-			bothInFront = true;
-		}
-	}
-	
-	//calculate intersection point p in object space
-	//vec3 a_os = (matrix * vec4(a, 1)).xyz;		//NOT NECESSARY
-	//vec3 b_os = (matrix * vec4(b, 1)).xyz;		//NOT NECESSARY
-	//float z_min = a_os.z;
-	//float z_max = b_os.z;
-	vec3 p_os = ray_os.origin + t * ray_os.direction;
-	float z_os = p_os.z;
-	float h = distance(a,b);
-	
-	if(z_os > h || z_os < 0.0)
-	{
-		return;
-	}
-	
-	float distance_os = distance(ray_os.origin, p_os);				
-	float distance = ray.rayDistance + distance_os;
-			
-	bool copy = (lineSegment.copy == 1);
-	
-
-	vec3 position_ws = ray.origin + distance_os * ray.direction;	
-	if(check_bounds)
-	{
-		bool outOfBounds = CheckOutOfBounds(position_ws);	
-		if(outOfBounds)	
-			return;	
-	}	
-	
-	int multiPolyID = lineSegment.multiPolyID;
-
-	float cost_a = GetCost(lineSegment.indexA, part_index);
-	float cost_b = GetCost(lineSegment.indexB, part_index);
-	float local_percentage = z_os / h;
-	float cost = mix(cost_a, cost_b, local_percentage);
-	
-	if(growth == 1)
-	{
-		if(growth_id == -1 || growth_id == multiPolyID)
-		{
-			if(cost > max_streamline_cost)
-				return;
-		}
-	}
-	
-
-	if(distance_os > ray_local_cutoff)
-		return;
-
-    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance < hit.distance);
-    if(projection_index >= 0)
-    {
-        hit_condition = false;
-        if(hit.hitType==TYPE_NONE)
-            hit_condition = true;
-        else if(hit.hitType==TYPE_STREAMLINE_SEGMENT)
-        {
-            if(multiPolyID < hit.multiPolyID)
-                hit_condition = true;
-            else if(multiPolyID == hit.multiPolyID)
-                hit_condition = distance < hit.distance;
-        }
-    }
-	
-	//if (not hit) this is the first hit
-	//otherwise hit is true and we only need to check the distance
-	if(hit_condition)
-	{		
-        bool interactiveStreamline = part_index == 2 || part_index == 3;
-		//calculate intersection point in world space
-		//vec3 p = (matrix_inv * vec4(p_os, 1)).xyz;
-		//calculate tube center in world space (for normal calculation)
-		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;
-		//vec3 tube_center = mix(a, b, local_percentage);//alternative
-		float v_a = GetVelocity(lineSegment.indexA, part_index);
-		float v_b = GetVelocity(lineSegment.indexB, part_index);		
-		hit.hitType = TYPE_STREAMLINE_SEGMENT;
-		hit.distance_iteration = distance_os;	
-		hit.distance = ray.rayDistance + distance_os;	
-		hit.position = position_ws;	
-		hit.positionCenter = tube_center;
-		hit.normal = normalize(hit.position - tube_center);
-		hit.copy = copy;
-		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
-		hit.velocity = mix(v_a, v_b, local_percentage);
-		hit.cost = cost;
-		hit.ignore_override = ignore_override;
-	}
-}
-*/
 void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)
 {
 	vec4 z = ray.origin - sphere4D.center;//e-c
@@ -534,6 +363,150 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
 		hit.cost = cost;
 		
 	}
+}
+
+void IntersectSpherinder(int part_index, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
+{
+    float tube_radius = GetTubeRadius(part_index);
+
+    //rename
+    vec4 ray_origin_4D = ray.origin;
+    vec4 ray_direction_4D = ray.direction;
+    
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
+	int multiPolyID = lineSegment.multiPolyID;
+	bool copy = (lineSegment.copy==1);
+
+    vec4 spherinder_point_A = GetPosition4D(lineSegment.indexA, part_index);
+    vec4 spherinder_point_B = GetPosition4D(lineSegment.indexB, part_index);
+    
+
+    //get second point on line
+    vec4 ray_destination_4D = ray_origin_4D + ray_direction_4D;//glMatrix.vec4.add(ray_destination_4D, ray_origin_4D, ray_direction_4D);
+
+    //translate to origin
+    vec4 spherinder_point_B_translated = spherinder_point_B - spherinder_point_A; //glMatrix.vec4.subtract(spherinder_point_B_translated, spherinder_point_B, spherinder_point_A);
+    vec4 ray_origin_4D_translated = ray_origin_4D - spherinder_point_A; //glMatrix.vec4.subtract(ray_origin_4D_translated, ray_origin_4D, spherinder_point_A);
+    vec4 ray_destination_4D_translated = ray_destination_4D - spherinder_point_A; //glMatrix.vec4.subtract(ray_destination_4D_translated, ray_destination_4D, spherinder_point_A);
+
+    //get rotation matrix
+    mat4 M = lineSegment.matrix; //var M = math4D.getAligned4DRotationMatrix(spherinder_point_B_translated);
+
+    //rotate points
+    vec4 ray_origin_4D_rotated = M * ray_origin_4D_translated; //glMatrix.vec4.transformMat4(ray_origin_4D_rotated, ray_origin_4D_translated, M);
+    vec4 ray_destination_4D_rotated = M * ray_destination_4D_translated; //glMatrix.vec4.transformMat4(ray_destination_4D_rotated, ray_destination_4D_translated, M);
+
+    //get 3D points
+    vec3 ray_origin_3D = ray_origin_4D_rotated.xyz; //var ray_origin_3D = glMatrix.vec3.fromValues(ray_origin_4D_rotated[0], ray_origin_4D_rotated[1], ray_origin_4D_rotated[2]);
+    vec3 ray_destination_3D = ray_destination_4D_rotated.xyz; //var ray_destination_3D = glMatrix.vec3.fromValues(ray_destination_4D_rotated[0], ray_destination_4D_rotated[1], ray_destination_4D_rotated[2]);
+
+    //get 3D direction vector
+    vec3 ray_direction_3D = ray_destination_3D - ray_origin_3D; //glMatrix.vec3.subtract(ray_direction_3D, ray_destination_3D, ray_origin_3D);
+    vec3 sphere_center_3D = vec3(0,0,0); //var sphere_center_3D = glMatrix.vec3.fromValues(0, 0, 0);
+
+    //intersect sphere in 3D
+    IntersectionResult result;
+    result.intersect = false;
+    IntersectSphere(ray_origin_3D, ray_destination_3D, sphere_center_3D, tube_radius, result);
+
+    //if no sphere intersection --> no intersection
+    if(!result.intersect){
+        return;
+    }
+
+    //------------- 4D OBJECT SPACE -----------------
+
+    //get 4D rotated direction vector
+    vec4 ray_direction_4D_rotated = ray_destination_4D_rotated - ray_origin_4D_rotated; //glMatrix.vec4.subtract(ray_direction_4D_rotated, ray_destination_4D_rotated, ray_origin_4D_rotated);
+    //sphere intersection found, get w
+    vec4 intersection_4D_os = ray_origin_4D_rotated + (ray_direction_4D_rotated * result.t); //glMatrix.vec4.scaleAndAdd(intersection_4D_os, ray_origin_4D_rotated, ray_direction_4D_rotated, result.t);
+    float h = distance(spherinder_point_A, spherinder_point_B); //var h = glMatrix.vec4.distance(spherinder_point_A, spherinder_point_B);//spherinder_point_B_rotated[3];   
+    float w_os = intersection_4D_os[3]; //var w_os = intersection_4D_os[3];
+    if(w_os > h || w_os < 0.0)
+	{
+        //result.intersect = false;
+        //result.flag_outside_interval = true;
+		return;
+	}
+
+    //------------- 4D WORLD SPACE -----------------
+
+    //intersection in world space
+    vec4 intersection_4D_ws = ray_origin_4D + (ray_direction_4D * result.t); //glMatrix.vec4.scaleAndAdd(intersection_4D_ws, ray_origin_4D, ray_direction_4D, result.t);
+    //result.intersection_4D = intersection_4D_ws;
+
+    //get intersection center (nearest point on spherinder center line)
+    float t_spherinder = w_os / h; //var t_spherinder = w_os / h;
+    vec4 spherinder_direction = spherinder_point_B - spherinder_point_A; //glMatrix.vec4.subtract(spherinder_direction, spherinder_point_B, spherinder_point_A);
+    vec4 intersection_center_4D_ws = spherinder_point_A + (spherinder_direction * t_spherinder); //glMatrix.vec4.scaleAndAdd(intersection_center_4D_ws, spherinder_point_A, spherinder_direction, t_spherinder);
+    //result.intersection_center_4D = intersection_center_4D_ws;
+    
+    float distance_this_iteration = distance(ray_origin_4D, intersection_4D_ws);
+    float distance_total = ray.rayDistance + distance_this_iteration;
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_total < hit.distance);
+    if(hit_condition)
+	{		
+        bool interactiveStreamline = part_index == 2 || part_index == 3;
+
+		hit.hitType = TYPE_STREAMLINE_SEGMENT;
+		hit.distance_iteration = distance_this_iteration;	
+		hit.distance = distance_total;
+		hit.position = intersection_4D_ws;
+		hit.positionCenter = intersection_center_4D_ws;
+		hit.normal = normalize(intersection_4D_ws - intersection_center_4D_ws);
+		hit.copy = copy;
+		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
+		hit.velocity = -1.0;
+		hit.cost = -1.0;
+		
+	}
+}
+
+
+void IntersectSphere(vec3 ray_origin_3D, vec3 ray_destination_3D, vec3 sphere_center_3D, float sphere_radius, inout IntersectionResult result)
+{
+    result.intersect = false;
+    //get 3D direction vector
+    vec3 ray_direction_3D = ray_destination_3D - ray_origin_3D;//glMatrix.vec3.subtract(ray_direction_3D, ray_destination_3D, ray_origin_3D);
+    vec3 ray_direction_3D_normalized = normalize(ray_direction_3D); //glMatrix.vec3.normalize(ray_direction_3D_normalized, ray_direction_3D);
+    
+	vec3 z = ray_origin_3D - sphere_center_3D; //glMatrix.vec3.subtract(z, ray_origin_3D, sphere_center_3D);//vec3 z = ray.origin - sphere.center;//e-c
+	float a = dot(ray_direction_3D_normalized, ray_direction_3D_normalized); //var a = glMatrix.vec3.dot(ray_direction_3D_normalized, ray_direction_3D_normalized);//float a = dot(ray.direction, ray.direction);
+	float b = 2.0 * dot(ray_direction_3D_normalized, z); //var b = 2.0 * glMatrix.vec3.dot(ray_direction_3D_normalized, z);//float b = 2.0 * dot(ray.direction, z);
+	float c = dot(z, z) - sphere_radius*sphere_radius; //var c = glMatrix.vec3.dot(z, z) - sphere_radius*sphere_radius;//float c = dot(z, z) - sphere.radius * sphere.radius;
+
+	float discriminant = b*b - 4.0 * a *c;//var discriminant = b*b - 4.0 * a *c;//float discriminant = b*b - 4.0 * a *c;
+	if (discriminant < 0.0)
+		return;
+		
+    float root = sqrt(discriminant); //var root = Math.sqrt(discriminant);//float root = sqrt(discriminant);
+	float t1 = (-b + root) * 0.5; //var t1 = (-b + root) * 0.5;//float t1 = (-b + root) * 0.5f;
+	float t2 = (-b - root) * 0.5; //var t2 = (-b - root) * 0.5;//float t2 = (-b - root) * 0.5f;
+	float t_os = 0.0; //var t_os = 0.0;//T BASED ON NORMALIZED RAY DIRECTION, THIS IS NOT THE REAL DISTANCE
+		
+	if(t1 < 0.0)
+	{
+		if(t2 < 0.0)
+			return;
+        t_os = t2;
+	}
+	else if (t2 < 0.0)
+        t_os = t1;
+	else
+        t_os = min(t1, t2);
+	
+	//float distance_surface = ray.rayDistance + t_os;
+    //we normalize our 4D ray directions, meaning the 3D ray direction is not necessarily normalized
+    //we calculate the sphere intersection using a normalized 3D ray direction
+    //to get the real distance, the resulting t_os is scaled by the length of the 3D
+    float scaled_t = t_os / length(ray_direction_3D); //var scaled_t = t_os / glMatrix.vec3.length(ray_direction_3D);
+		
+    //calculate intersection point
+    vec3 intersection_3D = ray_origin_3D + (ray_direction_3D_normalized * t_os); //glMatrix.vec3.scaleAndAdd(intersection_3D, ray_origin_3D, ray_direction_3D_normalized, t_os);//vec3 intersection_3D = ray.origin + t_os * ray.direction;//intersection point in world space
+				
+    result.intersect = true;
+    result.intersection_3D = intersection_3D;
+    result.t = scaled_t;
 }
 
 
