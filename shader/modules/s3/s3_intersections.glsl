@@ -37,7 +37,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
     sphere4D.center = vec4(0.0, 2.0, 0.0, 1.0);
     sphere4D.radius = 0.5;
     Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, type, velocity, cost);
-
+    IntersectInstance(variableRay, hit);  
     return;
     /*
 	while(true)
@@ -84,18 +84,14 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
 }
 
-/*
-void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation hitCube)
+
+void IntersectInstance(Ray ray, inout HitInformation hit)
 {
-	hitCube.hitType = TYPE_IGNORE_CUBE;
-	hitCube.distance = 0.0;		
-	bool doesIntersect = false;
-	float nearest_t = 0.0;
 
 #ifdef SHOW_STREAMLINES
     {
-        bool check_bounds = true;
-	    IntersectInstance_Tree(PART_INDEX_DEFAULT, check_bounds, ray, ray.local_cutoff+0.001, hit, hitCube);
+        //bool check_bounds = true;
+	    IntersectInstance_Tree(PART_INDEX_DEFAULT, ray, ray.local_cutoff+0.001, hit);
     }
 #endif
 
@@ -121,10 +117,10 @@ void IntersectInstance(Ray ray, inout HitInformation hit, inout HitInformation h
 //#endif
 
 }
-*/
 
-/*
-void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube)
+
+
+void IntersectInstance_Tree(int part_index, Ray ray, float ray_local_cutoff, inout HitInformation hit)
 {		
 	bool copy = false;
 	int multiPolyID = 0;
@@ -146,27 +142,28 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 		float tmax;
 		bool hitAABB = IntersectGLAABB(glAABB, ray, ray_local_cutoff, tmin, tmax);
 		//hitAABB = true;
+
+        
 		if(hitAABB)
 		{
+            //hit.hitType = TYPE_STREAMLINE_SEGMENT;
+            //hit.normal = vec4(0, 1, 0, 0);
+            //hit.distance = 200000.0;
+            
 			nodeIndex = glNode.hitLink;
-			if(hitCube.hitType != TYPE_IGNORE_CUBE)
-			{
-				//ray intersects cube --> check if cube hit is inside this object
-				if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
-				{
-					HandleOutOfBound_LineSegment(part_index, ray, glNode.objectIndex, hitCube);//possible problem here					
-				}
-			}     
 
             if(glNode.type == TYPE_STREAMLINE_SEGMENT)	
 			{
+/*
 #ifdef HANDLE_INSIDE
                 {
                     HandleInside_LineSegment(part_index, ray, glNode.objectIndex, hit);
                 }
 #endif
-                IntersectLineSegment(part_index, check_bounds, ray, ray_local_cutoff, glNode, hit);	          						
+*/
+                IntersectLineSegment(part_index, ray, ray_local_cutoff, glNode, hit);	
 			}
+            
       				
 		}
 		else
@@ -174,7 +171,7 @@ void IntersectInstance_Tree(int part_index, bool check_bounds, Ray ray, float ra
 			nodeIndex = glNode.missLink;
 		}
 		if(nodeIndex <= 0)//end if next node is root
-			break;
+			break;  			    
 	}
 }
 
@@ -194,9 +191,9 @@ bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin,
 	bool segment_outside = tmax < 0.0 || tmin > ray_local_cutoff;
     return tmax > max(tmin, 0.0) && !segment_outside;
 }
-*/
-/*
-void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
+
+
+void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_TreeNode glNode, inout HitInformation hit)
 { 
     float tube_radius = GetTubeRadius(part_index);
     
@@ -222,12 +219,14 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 		
 	}
 
+
+
 	//OABB TEST
 	float h = distance(a,b);
 	mat4 matrix = lineSegment.matrix;
 	Ray ray_os;//Object Space of Cylinder
-	ray_os.origin = (matrix * vec4(ray.origin, 1)).xyz;
-	ray_os.direction = (matrix * vec4(ray.origin+ray.direction, 1)).xyz - ray_os.origin;
+	ray_os.origin = ray.origin-a;//(matrix * vec4(ray.origin, 1)).xyz;
+	ray_os.direction = (matrix * (ray_os.origin+ray.direction)) - ray_os.origin;
 	ray_os.dir_inv = 1.0/ray_os.direction;
 	GL_AABB glAABB_os;
 	glAABB_os.min = vec4(-tube_radius, -tube_radius, -tube_radius, 0);
@@ -235,27 +234,38 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 	float tmin;
 	float tmax;
 	bool hitAABB = IntersectGLAABB(glAABB_os, ray_os, ray_local_cutoff, tmin, tmax);
+    if(hitAABB)
+	{
+		//hit.hitType = TYPE_STREAMLINE_SEGMENT;
+        //hit.normal = vec4(1, 1, 0, 0);
+        //hit.distance = 100000.0;
+	}
 	if(!hitAABB)
 	{
 		//return;
 	}
 	float v_a = GetVelocity(lineSegment.indexA, part_index);
 	float v_b = GetVelocity(lineSegment.indexB, part_index);
-	
+
+	/*
 	//CYLINDER AND SPHERE TEST
 	bool ignore_override = false;
 	IntersectCylinder(part_index, check_bounds, ray, ray_local_cutoff, glNode.objectIndex, hit, ignore_override);	
-	Sphere sphere;
-	sphere.radius = tube_radius;
+    */
+
+
+    Sphere4D sphere4D;
+    sphere4D.radius = tube_radius;
 	//SPHERE A
 	if(lineSegment.isBeginning == 1 || copy)
 	{
-		sphere.center = a;
-		IntersectSphere(part_index, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_a, cost_a);
+        sphere4D.center = a;
+		Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_a, cost_a);
 	}
+    
 	//SPHERE B
-	sphere.center = b;
-	float cost_b_value = cost_b;
+    sphere4D.center = b;
+	float cost_b_value = cost_b;    
 	if(growth == 1)
 	{
 		if(growth_id == -1 || growth_id == multiPolyID)
@@ -263,15 +273,16 @@ void IntersectLineSegment(int part_index, bool check_bounds, Ray ray, float ray_
 			if(cost_b > cost_cutoff)
 			{
 				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
-				sphere.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
+				sphere4D.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
 				cost_b_value = cost_cutoff;
 				//sphere.radius = tube_radius * 1.1;		
 			}
 		}
-	}
-	IntersectSphere(part_index, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
+	}    
+	Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
+    
 }
-
+/*
 void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override)
 {
     float tube_radius = GetTubeRadius(part_index);
