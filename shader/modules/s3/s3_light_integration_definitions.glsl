@@ -53,7 +53,7 @@ vec4 RayLightFunctionPos(vec4 position, vec4 direction)
 	float P0 = light_transport_p0;
 	float P1 = light_transport_p1;
 	float P2 = light_transport_p2;
-	float P3 = 0.0;//light_transport_p3;
+	float P3 = light_transport_p3;
 
 	return vec4(P0,P1,P2,P3);	
 }
@@ -73,7 +73,7 @@ vec4 RayLightFunctionDir(vec4 position, vec4 direction)
 	float D0 = light_transport_d0;
 	float D1 = light_transport_d1;
 	float D2 = light_transport_d2;
-	float D3 = 0.0;//light_transport_d3;
+	float D3 = light_transport_d3;
 
 	return vec4(D0,D1,D2,D3);	
 }

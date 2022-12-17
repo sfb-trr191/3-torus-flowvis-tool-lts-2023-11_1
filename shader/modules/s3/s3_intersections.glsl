@@ -34,17 +34,17 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
     float velocity = 0.0;
     float cost = 0.0;
 
-    sphere4D.center = vec4(0.0, 2.0, 0.0, 1.0);
-    sphere4D.radius = 0.5;
-    Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, type, velocity, cost);
-    IntersectInstance(variableRay, hit);  
-    return;
-    /*
+    //sphere4D.center = vec4(0.0, 2.0, 0.0, 1.0);
+    //sphere4D.radius = 0.5;
+    //Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, type, velocity, cost);
+    //IntersectInstance(variableRay, hit);  
+    //return;
+    
 	while(true)
 	{
         tmp_rayDistance = variableRay.rayDistance;
         LightIntegrationPre(variableRay);  
-		IntersectInstance(variableRay, hit, hitCube);        
+		IntersectInstance(variableRay, hit);        
         bool flag_ray_stays_inside = true;        
         float t = variableRay.local_cutoff;
 
@@ -80,7 +80,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		if(count >= maxIterationCount)
 			break;            
 	}	
-    */
+    
 
 }
 
