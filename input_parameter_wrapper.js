@@ -124,6 +124,17 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_field_equation_d1", "d1");
         new InputWrapper(this, "input_field_equation_d2", "d2");
         new InputWrapper(this, "input_field_equation_d3", "d3");
+        //data - light integration
+        new InputWrapper(this, "select_light_integrator_type", "lis");
+        new InputWrapper(this, "input_light_integration_max_step_count", "lim");
+        new InputWrapper(this, "input_field_light_transport_p0", "lp0");
+        new InputWrapper(this, "input_field_light_transport_p1", "lp1");
+        new InputWrapper(this, "input_field_light_transport_p2", "lp2");
+        new InputWrapper(this, "input_field_light_transport_p3", "lp3");
+        new InputWrapper(this, "input_field_light_transport_d0", "ld0");
+        new InputWrapper(this, "input_field_light_transport_d1", "ld1");
+        new InputWrapper(this, "input_field_light_transport_d2", "ld2");
+        new InputWrapper(this, "input_field_light_transport_d3", "ld3");
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);

@@ -614,12 +614,12 @@ class Camera {
 
     UpdateShaderValues4D() {
         //console.log("UpdateShaderValues4D", this.name);
-        var T = glMatrix.vec3.create();
-        var t = glMatrix.vec3.create();
-        var t_n = glMatrix.vec3.create();
-        var b = glMatrix.vec3.create();
-        var b_n = glMatrix.vec3.create();
-        var v_n = glMatrix.vec3.create();
+        var T = glMatrix.vec4.create();
+        var t = glMatrix.vec4.create();
+        var t_n = glMatrix.vec4.create();
+        var b = glMatrix.vec4.create();
+        var b_n = glMatrix.vec4.create();
+        var v_n = glMatrix.vec4.create();
         //var top_left = glMatrix.vec3.create();
         //var bottom_left = glMatrix.vec3.create();
         //var top_right = glMatrix.vec3.create();
@@ -628,36 +628,36 @@ class Camera {
         var d = 1.0;//distance to plane
 
         var E = this.position;
-        glMatrix.vec3.add(T, this.position, this.forward);//T = this.position + this.forward;
+        glMatrix.vec4.add(T, this.position, this.forward);//T = this.position + this.forward;
         var m = this.height;
         var k = this.width;
         var w = this.up;
 
         //pre calculations
-        glMatrix.vec3.copy(t, this.forward);//t = T - E;//t should be same as forward
+        glMatrix.vec4.copy(t, this.forward);//t = T - E;//t should be same as forward
         //t = T - E;//this should be same as forward
-        glMatrix.vec3.normalize(t_n, t);//t_n should be same as forward
-        glMatrix.vec3.copy(b, this.right);//b should be the same as right
-        glMatrix.vec3.normalize(b_n, b);//b_n should be the same as right
-        glMatrix.vec3.normalize(v_n, this.up)//v_n should be the same as up
+        glMatrix.vec4.normalize(t_n, t);//t_n should be same as forward
+        glMatrix.vec4.copy(b, this.right);//b should be the same as right
+        glMatrix.vec4.normalize(b_n, b);//b_n should be the same as right
+        glMatrix.vec4.normalize(v_n, this.up)//v_n should be the same as up
         var theta_half = this.fov_theta / 2;
         var g_x = d * Math.tan(theta_half * Math.PI / 180.0);//TODO does M_PI work here?
         var g_y = g_x * m / (k * 1.0);//TODO is this correct syntax?
 
         //uniforms
-        glMatrix.vec3.scale(this.q_x, b_n, ((2 * g_x) / (k - 1)));//this.q_x = ((2 * g_x) / (k - 1)) * b_n;
-        glMatrix.vec3.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
+        glMatrix.vec4.scale(this.q_x, b_n, ((2 * g_x) / (k - 1)));//this.q_x = ((2 * g_x) / (k - 1)) * b_n;
+        glMatrix.vec4.scale(this.q_y, v_n, ((2 * g_y) / (m - 1)));//this.q_y = ((2 * g_y) / (m - 1)) * v_n;
 
         //this.p_1m = t_n * d - g_x * b_n - g_y * v_n;
         //p_1m is the bottom left reference pixel (as a direction relative to E), each other pixel is calculated by moving along the "shift vectors" q_x and q_y.
-        var t_n_times_d = glMatrix.vec3.create();
-        var g_x_times_b_n = glMatrix.vec3.create();
-        var g_y_times_v_n = glMatrix.vec3.create();
-        glMatrix.vec3.scale(t_n_times_d, t_n, d);//t_n * d
-        glMatrix.vec3.scale(g_x_times_b_n, b_n, g_x);//g_x * b_n
-        glMatrix.vec3.scale(g_y_times_v_n, v_n, g_y);//g_y * v_n
-        glMatrix.vec3.subtract(this.p_1m, t_n_times_d, g_x_times_b_n);
-        glMatrix.vec3.subtract(this.p_1m, this.p_1m, g_y_times_v_n);
+        var t_n_times_d = glMatrix.vec4.create();
+        var g_x_times_b_n = glMatrix.vec4.create();
+        var g_y_times_v_n = glMatrix.vec4.create();
+        glMatrix.vec4.scale(t_n_times_d, t_n, d);//t_n * d
+        glMatrix.vec4.scale(g_x_times_b_n, b_n, g_x);//g_x * b_n
+        glMatrix.vec4.scale(g_y_times_v_n, v_n, g_y);//g_y * v_n
+        glMatrix.vec4.subtract(this.p_1m, t_n_times_d, g_x_times_b_n);
+        glMatrix.vec4.subtract(this.p_1m, this.p_1m, g_y_times_v_n);
 
         //top_left = t_n * d - g_x * b_n + g_y * v_n;
         //bottom_left = t_n * d - g_x * b_n - g_y * v_n;
