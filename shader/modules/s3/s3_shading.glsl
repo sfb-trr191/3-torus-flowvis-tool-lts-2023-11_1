@@ -20,12 +20,57 @@ vec3 Get4DNormalColor(vec4 normal){
 }
 
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override)
-{			
-    vec3 resultColor = vec3(0.2,0,0);
+{	
+    /*		
     if(hit.hitType>TYPE_NONE)
 	{
-        resultColor = Get4DNormalColor(hit.normal);  
+        surface_color = Get4DNormalColor(hit.normal);  
 	}
+    */
+    vec3 surface_color = vec3(0, 0, 0);
+
+    if(hit.hitType>TYPE_NONE && hit.distance < maxRayDistance)
+	{	
+		//hit found
+        if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
+	    {
+            if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_NORMAL){
+                surface_color = Get4DNormalColor(hit.normal); 
+                return surface_color;
+            }
+            if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_POSITION){
+                vec4 mapped_position = map4(hit.position, vec4(-1,-1,-1,-1), vec4(1,1,1,1), vec4(0,0,0,0), vec4(1,1,1,1));	
+                surface_color = Get4DNormalColor(mapped_position); 
+                return surface_color;
+            }
+        }
+
+        vec3 lightColor = vec3(0, 0, 0);
+        vec3 viewDir = -ray.direction.xyz;
+        vec3 normal = hit.normal.xyz;	
+        //vec3 normalMapped = map(hit.normal, vec3(-1,-1,-1), vec3(1,1,1), vec3(0,0,0), vec3(1,1,1));	
+        //vec3 normalAbs = abs(hit.normal);	
+        for(int i=0; i<numDirLights; i++)
+        {
+            GL_DirLight light = GetDirLight(i);//blockDirLight[i];
+            lightColor += CalcDirLight(light, normal, viewDir);
+        }
+
+        vec3 objectColor = GetObjectColor(ray, hit);	
+        lightColor *= objectColor;
+        
+        float fogFactor = CalculateFogFactor(hit.distance);
+        
+        //formula: finalColor = (1.0 - f)*fogColor + f * lightColor
+        surface_color = mix(fogColor, lightColor, fogFactor);
+	}
+	else
+	{
+		//no hit found, use background color
+		surface_color = vec3(1, 1, 1);
+	}
+    
+    vec3 resultColor = surface_color;
 	return resultColor;
 }
 

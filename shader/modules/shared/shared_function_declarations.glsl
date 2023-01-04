@@ -27,6 +27,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit);
 
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir);
 vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax);
+vec4 map4(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax);
 
 void IntersectUnitCube(Ray ray, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
 void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);

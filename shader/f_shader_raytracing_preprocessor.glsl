@@ -186,6 +186,10 @@ vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {
   return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
 }
 
+vec4 map4(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {
+  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
 float GetTubeRadius(int part_index){
     return part_index == 0 ? tubeRadius : tubeRadiusOutside;
 }

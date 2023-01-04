@@ -90,50 +90,6 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 	return resultColor;
 }
 
-
-vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir)
-{	
-	float shininess = tubeShininess;
-	if(blinn_phong)
-	{
-
-  		vec3 lightDir = normalize(-light.direction.xyz);
-   		// diffuse shading
-		
-    	float diff = max(dot(normal, lightDir), 0.0);
-   		// specular shading
-    	vec3 reflectDir = reflect(-lightDir, normal);
-    	vec3 halfDir = normalize(lightDir + viewDir);
-    	//float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-    	float spec = pow(max(dot(halfDir, normal), 0.0), shininess);
-	
-    	// combine results
-    	vec3 ambient  = light.ambient.xyz;
-    	vec3 diffuse  = light.diffuse.xyz  * diff;
-    	vec3 specular = light.specular.xyz * spec;
-    	return (ambient + diffuse + specular);	
-	}
-	else
-	{
-		//PHONG
-
-   		vec3 lightDir = normalize(-light.direction.xyz);
-  	  	// diffuse shading
-		
-    	float diff = max(dot(normal, lightDir), 0.0);
-    	// specular shading
-    	vec3 reflectDir = reflect(-lightDir, normal);
-    	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	
-    	// combine results
-    	vec3 ambient  = light.ambient.xyz;
-    	vec3 diffuse  = light.diffuse.xyz  * diff;
-    	vec3 specular = light.specular.xyz * spec;
-    	return (ambient + diffuse + specular);	
-	}
-}  
-
-
 float GetScalar(vec3 position){
     float x = position.x;
 	float y = position.y;
