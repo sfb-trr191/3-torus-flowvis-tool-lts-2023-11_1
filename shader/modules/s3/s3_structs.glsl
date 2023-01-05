@@ -31,6 +31,7 @@ struct HitInformation
     
     int debug_value;
     float debug_value_f;
+    int sub_type;
 };
 
 struct Ray

@@ -369,6 +369,8 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
 		hit.velocity = velocity;
 		hit.cost = cost;
+        //hit.debug_value = 2;
+        hit.sub_type = SUBTYPE_3SPHERE;
 		
 	}
 }
@@ -482,6 +484,8 @@ void IntersectSpherinder(int part_index, Ray ray, float ray_local_cutoff, int li
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
 		hit.velocity = -1.0;
 		hit.cost = -1.0;
+        //hit.debug_value = 1;
+        hit.sub_type = SUBTYPE_SPHERINDER;
 		
 	}
 }

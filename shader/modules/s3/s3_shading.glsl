@@ -45,6 +45,15 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
                 surface_color = Get4DNormalColor(mapped_position); 
                 return surface_color;
             }
+            if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SUBTYPE){
+                if(hit.sub_type == SUBTYPE_3SPHERE){
+                    surface_color = vec3(1, 0, 0);
+                }
+                if(hit.sub_type == SUBTYPE_SPHERINDER){
+                    surface_color = vec3(0, 1, 0);
+                }
+                return surface_color;
+            }
         }
 
         vec3 lightColor = vec3(0, 0, 0);
@@ -73,6 +82,8 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 	}
     
     vec3 resultColor = surface_color;
+  
+
 	return resultColor;
 }
 

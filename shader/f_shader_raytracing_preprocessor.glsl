@@ -51,6 +51,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 {
     hit.was_copied_from_outside = false;
 	hit.hitType = TYPE_NONE;
+    hit.sub_type = SUBTYPE_NONE;
 	hit.distance = 0.0;	
     hit.distance_iteration = 0.0;
 	hit.transparentHit = false;
@@ -144,7 +145,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.multiPolyID = hit_outside.multiPolyID;
                 hit.velocity = hit_outside.velocity;
                 hit.cost = hit_outside.cost;
-                hit.debug_value = 1;//red
+                //hit.debug_value = 1;//red
             }
             else if(hit_outside.distance < hit.distance){
                 hit.was_copied_from_outside = true;
@@ -156,14 +157,14 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.multiPolyID = hit_outside.multiPolyID;
                 hit.velocity = hit_outside.velocity;
                 hit.cost = hit_outside.cost;
-                hit.debug_value = 2;//green
+                //hit.debug_value = 2;//green
             }
             else{
-                hit.debug_value = 3;//blue
+                //hit.debug_value = 3;//blue
             }
         }
         else{            
-            hit.debug_value = 4;//yellow
+            //hit.debug_value = 4;//yellow
         }
     }
     else{
