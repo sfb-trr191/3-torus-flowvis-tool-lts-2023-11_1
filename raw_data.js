@@ -54,6 +54,26 @@ class RawData {
             this.data[i].position[3] = 1;
     }
 
+    StereographicProjection() {
+        console.log("StereographicProjection");
+        var indices = [];
+        var excluded_index = 3;
+        for (var i=0; i<4; i++){
+            if( i != excluded_index){
+                indices.push(i);
+            }
+        }
+
+        for (var i = 0; i < this.data.length; i++)
+        {
+            for (var j = 0; j < 3; j++){
+                var index = indices[j];
+                this.data[i].position[j] = this.data[i].position[index] / (1-this.data[i].position[excluded_index]);
+            }
+            this.data[i].position[3] = 1;
+        }
+    }
+
     ConvertVeclocityToAngle() {
         console.log("ConvertVeclocityToAngle");
         for (var i = 0; i < this.data.length; i++)

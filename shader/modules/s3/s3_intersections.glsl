@@ -98,6 +98,11 @@ void IntersectInstance(Ray ray, inout HitInformation hit)
 	    IntersectInstance_Tree(PART_INDEX_DEFAULT, ray, ray.local_cutoff+0.001, hit);
     }
 #endif
+#ifdef SHOW_STREAMLINES_OUTSIDE
+    {
+	    IntersectInstance_Tree(PART_INDEX_OUTSIDE, ray, ray.local_cutoff+0.001, hit);
+    }
+#endif
 
 //#ifdef SHOW_BOUNDING_BOX
 //	{

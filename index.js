@@ -1107,6 +1107,9 @@ const cpu_intersect = require("./cpu_intersect");
         var streamline_method_projection = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value) : STREAMLINE_DRAW_METHOD_NONE;
         canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
         shader_manager.NotifySettingsChanged();
+
+        var space = streamline_context_static.streamline_generator.space;
+        side_camera.OnUpdateBehavior(space, draw_mode);
     }
 
     function onChangedCameraControl(){

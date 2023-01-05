@@ -339,6 +339,13 @@ class Camera {
         }
     }
 
+    OnUpdateBehavior(space, draw_mode){        
+        this.is4D = false;
+        if(space == SPACE_3_SPHERE_4_PLUS_4D && draw_mode != DRAW_MODE_STEREOGRAPHIC_PROJECTION){                 
+            this.is4D = true;
+        }
+    }
+
     set_control(mode){
         this.control_mode = mode;
     }

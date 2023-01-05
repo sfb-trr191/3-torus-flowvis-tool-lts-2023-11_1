@@ -12,6 +12,12 @@ class ShaderFlags {
 
         this.changed = true;
         this.space = space;
+        this.draw_mode = draw_mode;
+
+        if(draw_mode == DRAW_MODE_STEREOGRAPHIC_PROJECTION){
+            this.space = SPACE_3_TORUS;
+        }
+
         this.show_movable_axes = show_movable_axes;
         this.cut_at_cube_faces = cut_at_cube_faces;
         this.handle_inside = handle_inside;

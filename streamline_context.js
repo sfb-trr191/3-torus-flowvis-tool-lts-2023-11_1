@@ -171,6 +171,9 @@ class StreamlineContext {
                 break;
             case SPACE_3_SPHERE_4_PLUS_4D:
                 //do nothing
+                if(part_index == PART_INDEX_OUTSIDE){
+                    raw_data.StereographicProjection();
+                }
                 break;
             default:
                 console.log("Error unknonw space");

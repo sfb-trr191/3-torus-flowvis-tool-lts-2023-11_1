@@ -429,6 +429,9 @@ class CanvasWrapper {
             case DRAW_MODE_PROJECTION:
                 this.draw_mode_raytracing(gl, left_render_wrapper);
                 break;
+            case DRAW_MODE_STEREOGRAPHIC_PROJECTION:
+                this.draw_mode_raytracing(gl, left_render_wrapper);
+                break;
             default:
                 console.log("DRAW MODE ERROR", this.draw_mode);
                 break;
@@ -451,6 +454,9 @@ class CanvasWrapper {
         var save_old_state = true;
         switch (this.draw_mode) {
             case DRAW_MODE_DEFAULT:
+                this.camera.loadState("state_default", save_old_state);
+                break;
+            case DRAW_MODE_STEREOGRAPHIC_PROJECTION:
                 this.camera.loadState("state_default", save_old_state);
                 break;
             case DRAW_MODE_FTLE_SLICE:

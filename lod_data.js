@@ -377,7 +377,7 @@ class LODData {
     }
 
     CalculateMatrix(part_index, space, segment_index, projection_index){
-        if(space == SPACE_3_SPHERE_4_PLUS_4D){
+        if(space == SPACE_3_SPHERE_4_PLUS_4D && part_index == PART_INDEX_DEFAULT){
             return this.CalculateMatrix4D(part_index, segment_index, projection_index);
         }else{
             return this.CalculateMatrix3D(part_index, segment_index, projection_index);
