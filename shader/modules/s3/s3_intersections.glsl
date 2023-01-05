@@ -224,7 +224,7 @@ void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_Tr
 	}
 
 
-
+    /*
 	//OABB TEST
 	float h = distance(a,b);
 	mat4 matrix = lineSegment.matrix;
@@ -248,6 +248,7 @@ void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_Tr
 	{
 		//return;
 	}
+    */
 	float v_a = GetVelocity(lineSegment.indexA, part_index);
 	float v_b = GetVelocity(lineSegment.indexB, part_index);
 
@@ -316,8 +317,8 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
 		distance_os = min(t1, t2);
 
 
-	
-	float distance_surface = ray.rayDistance + distance_os;
+            
+	//float distance_surface = ray.rayDistance + distance_os;
 		
 	vec4 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
 
@@ -329,12 +330,15 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
 				return;
 		}
 	}
-	
+
+	float distance_this_iteration = distance_os;//distance(ray.origin, position_ws);
 		
-	if(distance_os > ray_local_cutoff)
+	if(distance_this_iteration > ray_local_cutoff)
 		return;
 		
-    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_surface < hit.distance);
+    
+    float distance_total = ray.rayDistance + distance_this_iteration;
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_total < hit.distance);
     if(projection_index >= 0)
     {
         hit_condition = false;
@@ -345,7 +349,7 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
             if(multiPolyID < hit.multiPolyID)
                 hit_condition = true;
             else if(multiPolyID == hit.multiPolyID)
-                hit_condition = distance_surface < hit.distance;
+                hit_condition = distance_total < hit.distance;
         }
     }
 	//if (not hit) this is the first hit
@@ -355,8 +359,8 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
         bool interactiveStreamline = part_index == 2 || part_index == 3;
 
 		hit.hitType = type;
-		hit.distance_iteration = distance_os;	
-		hit.distance = ray.rayDistance + distance_os;
+		hit.distance_iteration = distance_this_iteration;	
+		hit.distance = distance_total;
 		hit.position = position_ws;
 		hit.positionCenter = sphere4D.center;
 		hit.normal = normalize(hit.position - sphere4D.center);
@@ -431,6 +435,22 @@ void IntersectSpherinder(int part_index, Ray ray, float ray_local_cutoff, int li
         //result.intersect = false;
         //result.flag_outside_interval = true;
 		return;
+	}
+
+    //------------- COST CHECK -----------------
+
+    float cost_a = GetCost(lineSegment.indexA, part_index);
+	float cost_b = GetCost(lineSegment.indexB, part_index);
+	float local_percentage = w_os / h;
+	float cost = mix(cost_a, cost_b, local_percentage);
+
+    if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost > max_streamline_cost)
+				return;
+		}
 	}
 
     //------------- 4D WORLD SPACE -----------------

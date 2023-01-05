@@ -592,6 +592,7 @@ class CanvasWrapper {
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
+        console.log("this.limited_max_distance", this.name, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_light_integration_step_size, this.light_integration_step_size);  
         gl.uniform1i(this.location_raytracing.location_light_integration_max_step_count, this.light_integration_max_step_count);  
