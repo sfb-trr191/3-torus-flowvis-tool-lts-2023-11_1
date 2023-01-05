@@ -351,6 +351,10 @@ class Camera {
         glMatrix.vec4.negate(this.up, up_negated);
         this.right = new_vec4_from_input(this.input_camera_right_x, this.input_camera_right_y, this.input_camera_right_z, this.input_camera_right_w);
         this.changed = true;
+        console.log("0x55 this.position", this.position)
+        console.log("0x55 this.forward", this.forward)
+        console.log("0x55 this.up", this.up)
+        console.log("0x55 this.right", this.right)
     }
 
     WriteToInputFields() {

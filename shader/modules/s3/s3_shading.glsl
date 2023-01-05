@@ -28,6 +28,8 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 	}
     */
     vec3 surface_color = vec3(0, 0, 0);
+    
+    //return vec3(hit.debug_value_f, 0, 0);
 
     if(hit.hitType>TYPE_NONE && hit.distance < maxRayDistance)
 	{	

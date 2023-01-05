@@ -30,6 +30,7 @@ struct HitInformation
     bool was_copied_from_outside;
     
     int debug_value;
+    float debug_value_f;
 };
 
 struct Ray

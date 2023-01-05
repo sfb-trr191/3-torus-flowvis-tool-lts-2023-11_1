@@ -43,8 +43,10 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	while(true)
 	{
         tmp_rayDistance = variableRay.rayDistance;
+#ifdef INTEGRATE_LIGHT
         LightIntegrationPre(variableRay);  
-		IntersectInstance(variableRay, hit);        
+#endif  
+		IntersectInstance(variableRay, hit);             
         bool flag_ray_stays_inside = true;        
         float t = variableRay.local_cutoff;
 
@@ -71,10 +73,12 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		if(variableRay.rayDistance > (maxRayDistance + 1.8))
 			break;
 
+#ifdef INTEGRATE_LIGHT
         LightIntegrationPost(variableRay, flag_ray_stays_inside);  
         if(count >= light_integration_max_step_count){
             break;
         }
+#endif  
         
         count++;
 		if(count >= maxIterationCount)
@@ -121,7 +125,7 @@ void IntersectInstance(Ray ray, inout HitInformation hit)
 
 
 void IntersectInstance_Tree(int part_index, Ray ray, float ray_local_cutoff, inout HitInformation hit)
-{		
+{	
 	bool copy = false;
 	int multiPolyID = 0;
 	int type = TYPE_STREAMLINE_SEGMENT;

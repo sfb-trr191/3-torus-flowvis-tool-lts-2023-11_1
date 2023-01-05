@@ -423,6 +423,7 @@ const cpu_intersect = require("./cpu_intersect");
         canvas_wrapper_side.tube_radius_outside = bo_calculate_streamlines.input_parameters.max_radius_factor_highlight;
 
         main_camera.OnCalculateStreamlines(bo_calculate_streamlines.input_parameters.space);
+        side_camera.OnCalculateStreamlines(bo_calculate_streamlines.input_parameters.space);
 
         //streamline_context_static.CalculateStreamlines(gl, gl_side);
 
