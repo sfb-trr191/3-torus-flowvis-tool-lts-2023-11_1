@@ -45,6 +45,7 @@ class StreamlineGenerator {
     GenerateSeedsFromUI() {
         console.log("GenerateSeedsFromUI");
         //this.seeds = this.p_ui_seeds.createPointList();
+        this.p_ui_seeds.correctSeeds(this.space);
         this.p_ui_seeds.createPointList(this.space);
         this.seeds = this.p_ui_seeds.seed_positions;
         this.seed_directions = this.p_ui_seeds.seed_directions;

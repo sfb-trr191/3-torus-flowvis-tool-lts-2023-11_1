@@ -143,7 +143,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_step_size", PARAM_input_step_size);
         new InputWrapper(this, "input_streamline_calculation_inbetweens", "ibt");
         new InputWrapper(this, "segment_duplicator_iterations", PARAM_segment_duplicator_iterations);
-
+        new InputWrapper(this, "checkbox_correct_seeds_s3", "css3");        
         new InputWrapper(this, "input_tube_radius_fundamental", "tr");
         new InputWrapper(this, "input_max_radius_factor_highlight", "mrfh");
         //FTLE data

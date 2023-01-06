@@ -99,12 +99,13 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_step_size"));
         this.group_calculate.AddInput(document.getElementById("input_streamline_calculation_inbetweens"));
         this.group_calculate.AddInput(document.getElementById("segment_duplicator_iterations"));
+        this.group_calculate.AddCheckbox(document.getElementById("checkbox_correct_seeds_s3"));
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_direction"));        
         this.group_calculate.AddInput(document.getElementById("input_tube_radius_fundamental"));
         this.group_calculate.AddInput(document.getElementById("input_max_radius_factor_highlight"));        
     }
-
+    
     GenerateGroupCamera(){
         this.group_camera.AddInput(document.getElementById("input_camera_position_x"));
         this.group_camera.AddInput(document.getElementById("input_camera_position_y"));

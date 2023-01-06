@@ -6,6 +6,8 @@ const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, Streamli
 const BinaryArray = require("./binary_array");
 const { floor } = require("mathjs");
 const getStateDescription = require("./version").getStateDescription;
+const gram_schmidt = require("./gram_schmidt");
+const GramSchmidt2Vectors4Dimensions = gram_schmidt.GramSchmidt2Vectors4Dimensions;
 
 class UISeed {
     constructor(ui_seeds, index, is_phantom) {
@@ -153,6 +155,43 @@ class UISeed {
         this.node_input_y.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
         this.node_input_z.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
     }
+
+    /**
+     * Correct the seed so that:
+     * - The position is on S3 - achieved via normalization of the position
+     * - The direction is tangential to S3 - achieved by making it orthogonal to the normal via Gram-Schmidt
+     */
+    correctSeedS3(){
+        //retrieve values from UI
+        var x = this.node_input_x.value;
+        var y = this.node_input_y.value;
+        var z = this.node_input_z.value;
+        var w = this.node_input_w.value;
+        var v_x = this.node_input_v_x.value;
+        var v_y = this.node_input_v_y.value;
+        var v_z = this.node_input_v_z.value;
+        var v_w = this.node_input_v_w.value;
+        
+        //correct values
+        var seed = glMatrix.vec4.fromValues(x, y, z, w);
+        var seed_direction = glMatrix.vec4.fromValues(v_x, v_y, v_z, v_w);
+        var seed_normalized = glMatrix.vec4.create();
+        var seed_direction_normalized = glMatrix.vec4.create();
+        glMatrix.vec4.normalize(seed_normalized, seed);
+        glMatrix.vec4.normalize(seed_direction_normalized, seed_direction);
+        var base = GramSchmidt2Vectors4Dimensions(seed_normalized, seed_direction_normalized);
+
+        //set values in UI
+        this.node_input_x.value = base.v1[0].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_y.value = base.v1[1].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_z.value = base.v1[2].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_w.value = base.v1[3].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);        
+        this.node_input_v_x.value = base.v2[0].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_v_y.value = base.v2[1].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_v_z.value = base.v2[2].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+        this.node_input_v_w.value = base.v2[3].toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
+    }
+
 
     randomizeColor() {
         var r = Math.round(this.ui_seeds.rng_autoseed() * 255);
@@ -1143,6 +1182,25 @@ class UISeeds {
             console.log("i:", i, split[i]);
             this.list_multi_seeds[i].fromString(split[i]);
         }
+    }
+
+    correctSeeds(space){
+
+        switch (space) {
+            case SPACE_3_SPHERE_4_PLUS_4D:
+                var correct_seeds_s3 = document.getElementById("checkbox_correct_seeds_s3").checked;
+                if(correct_seeds_s3){
+                    for (var i = 0; i < this.list.length; i++) {
+                        var entry = this.list[i];
+                        entry.correctSeedS3();                                
+                    }
+                }
+                break;
+            default:
+                console.log("nothing to change");
+                break;
+        }
+
     }
 
     createPointList(space) {
