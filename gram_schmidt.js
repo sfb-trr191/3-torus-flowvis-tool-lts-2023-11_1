@@ -15,6 +15,8 @@ function GramSchmidt2Vectors4Dimensions(w1, w2){
 
     glMatrix.vec4.scaleAndAdd(v2, w2, v1, -fraction);
 
+    glMatrix.vec4.normalize(v1, v1);
+    glMatrix.vec4.normalize(v2, v2);
     var base = {};
     base.v1 = v1;
     base.v2 = v2;
@@ -43,6 +45,9 @@ function GramSchmidt3Vectors4Dimensions(w1, w2, w3){
     glMatrix.vec4.scaleAndAdd(v3, w3, v1, -fraction_1);
     glMatrix.vec4.scaleAndAdd(v3, v3, v2, -fraction_2);
 
+    glMatrix.vec4.normalize(v1, v1);
+    glMatrix.vec4.normalize(v2, v2);
+    glMatrix.vec4.normalize(v3, v3);
     var base = {};
     base.v1 = v1;
     base.v2 = v2;
