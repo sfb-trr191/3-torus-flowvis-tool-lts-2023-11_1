@@ -96,6 +96,7 @@ const TreeView = require("./tree_view");
 const UiTools = require("./ui_tools");
 const ExportWizard = require("./export_wizard");
 const Tests = require("./tests");
+const gram_schmidt = require("./gram_schmidt");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
 
@@ -177,6 +178,7 @@ const cpu_intersect = require("./cpu_intersect");
         console.log("onStart");
 
         //math4D.Test();
+        //gram_schmidt.Test();
         cpu_intersect.Test();
 
         var tests = new Tests();
