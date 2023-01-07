@@ -660,6 +660,7 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 		float v_a = GetVelocity(lineSegment.indexA, part_index);
 		float v_b = GetVelocity(lineSegment.indexB, part_index);		
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
+        hit.sub_type = SUBTYPE_CYLINDER;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_ws;	
@@ -772,6 +773,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
         bool interactiveStreamline = part_index == 2 || part_index == 3;
 
 		hit.hitType = type;
+        hit.sub_type = SUBTYPE_SPHERE;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;
@@ -1128,6 +1130,7 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 		//calculate tube center in world space (for normal calculation)
 		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;	
 		hit.hitType = TYPE_GL_CYLINDER;//change
+        hit.sub_type = SUBTYPE_CYLINDER;
         hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_ws;	
@@ -1189,6 +1192,7 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 	if((hit.hitType==TYPE_NONE) || (distance_surface < hit.distance))
 	{		
 		hit.hitType = type;
+        hit.sub_type = SUBTYPE_SPHERE;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;

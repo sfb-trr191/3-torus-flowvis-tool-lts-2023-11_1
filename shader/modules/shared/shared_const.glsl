@@ -10,6 +10,8 @@ const int TYPE_SEED = 4;
 const int SUBTYPE_NONE = 0;
 const int SUBTYPE_3SPHERE = 1;
 const int SUBTYPE_SPHERINDER = 2;
+const int SUBTYPE_SPHERE = 3;
+const int SUBTYPE_CYLINDER = 4;
 
 
 const int FOG_NONE = 0;

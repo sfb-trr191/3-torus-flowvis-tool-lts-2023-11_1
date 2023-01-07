@@ -1,5 +1,14 @@
 global.SHADER_MODULE_DEFAULT_SHADING = `
 
+vec3 Get3DNormalColor(vec3 normal){
+    vec3 color = vec3(0,0,0);
+    float red = abs(normal[0]);
+    float green = abs(normal[1]);
+    float blue = abs(normal[2]);
+    color = vec3(red,green,blue);
+    return color;
+}
+
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override)
 {			
 	ignore_override = ignore_override || hit.ignore_override;
@@ -30,6 +39,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		if(transfer)
 		{
 			hit.hitType = hitCube.hitType;
+			hit.sub_type = hitCube.sub_type;
 			hit.position = hitCube.position;
 			hit.positionCenter = hitCube.positionCenter;
 			hit.normal = hitCube.normal;
@@ -40,6 +50,30 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		}
         
 	}
+
+    //--------------------------------------------------------------------------------
+    if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
+    {
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_NORMAL){
+            surface_color = Get3DNormalColor(hit.normal); 
+            return surface_color;
+        }
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_POSITION){
+            vec3 mapped_position = map(hit.position, vec3(-1,-1,-1), vec3(1,1,1), vec3(0,0,0), vec3(1,1,1));	
+            surface_color = Get3DNormalColor(mapped_position); 
+            return surface_color;
+        }
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SUBTYPE){
+            if(hit.sub_type == SUBTYPE_SPHERE){
+                surface_color = vec3(1, 0, 0);
+            }
+            if(hit.sub_type == SUBTYPE_CYLINDER){
+                surface_color = vec3(0, 1, 0);
+            }
+            return surface_color;
+        }
+    }
+    //--------------------------------------------------------------------------------
 
 	if(hit.hitType>TYPE_NONE && hit.distance < maxRayDistance)
 	{	

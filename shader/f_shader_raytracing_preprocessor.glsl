@@ -138,6 +138,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
             if(hit.hitType == TYPE_NONE){
                 hit.was_copied_from_outside = true;
                 hit.hitType = hit_outside.hitType;
+                hit.sub_type = hit_outside.sub_type;
                 hit.position = hit_outside.position;
                 hit.positionCenter = hit_outside.positionCenter;
                 hit.normal = hit_outside.normal;
@@ -150,6 +151,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
             else if(hit_outside.distance < hit.distance){
                 hit.was_copied_from_outside = true;
                 hit.hitType = hit_outside.hitType;
+                hit.sub_type = hit_outside.sub_type;
                 hit.position = hit_outside.position;
                 hit.positionCenter = hit_outside.positionCenter;
                 hit.normal = hit_outside.normal;
@@ -172,6 +174,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
         if(hit_outside.hitType>TYPE_NONE){
             hit.was_copied_from_outside = true;
             hit.hitType = hit_outside.hitType;
+            hit.sub_type = hit_outside.sub_type;
             hit.position = hit_outside.position;
             hit.positionCenter = hit_outside.positionCenter;
             hit.normal = hit_outside.normal;
