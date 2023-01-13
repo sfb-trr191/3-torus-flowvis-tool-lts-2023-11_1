@@ -7,6 +7,8 @@ const { trackball3 } = require("./trackball3");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 const getStateDescription = require("./version").getStateDescription;
 const BinaryArray = require("./binary_array");
+const gram_schmidt = require("./gram_schmidt");
+const GramSchmidt4Vectors4Dimensions = gram_schmidt.GramSchmidt4Vectors4Dimensions;
 
 class GL_CameraData {
     constructor() {
@@ -1057,7 +1059,13 @@ class Camera {
     }
 
     moveLeft4D(deltaTime, slow) {        
-        console.warn("moveLeft4D not implemented yet");
+        var signum = -1;
+        var step_size = this.GetRK4StepSize(deltaTime, slow);
+        var results = this.RK4_Step_4Plus4D(this.position, this.right, step_size, signum);
+        this.position = results.currentPosition;
+        this.right = results.currentDirection;
+        this.changed = true;
+        this.PostCameraMovementCleanupS3();
     }
 
     moveRight(deltaTime, slow) {
@@ -1082,7 +1090,13 @@ class Camera {
     }
 
     moveRight4D(deltaTime, slow) {        
-        console.warn("moveRight4D not implemented yet");
+        var signum = 1;
+        var step_size = this.GetRK4StepSize(deltaTime, slow);
+        var results = this.RK4_Step_4Plus4D(this.position, this.right, step_size, signum);
+        this.position = results.currentPosition;
+        this.right = results.currentDirection;
+        this.changed = true;
+        this.PostCameraMovementCleanupS3();
     }
 
     move_left_right(delta_x, slow) {
@@ -1129,7 +1143,13 @@ class Camera {
     }
 
     moveForward4D(deltaTime, slow) {        
-        console.warn("moveForward4D not implemented yet");
+        var signum = 1;
+        var step_size = this.GetRK4StepSize(deltaTime, slow);
+        var results = this.RK4_Step_4Plus4D(this.position, this.forward, step_size, signum);
+        this.position = results.currentPosition;
+        this.forward = results.currentDirection;
+        this.changed = true;
+        this.PostCameraMovementCleanupS3();
     }
 
     moveBackward(deltaTime, slow) {
@@ -1151,7 +1171,13 @@ class Camera {
     }
 
     moveBackward4D(deltaTime, slow) {        
-        console.warn("moveBackward4D not implemented yet");
+        var signum = -1;
+        var step_size = this.GetRK4StepSize(deltaTime, slow);
+        var results = this.RK4_Step_4Plus4D(this.position, this.forward, step_size, signum);
+        this.position = results.currentPosition;
+        this.forward = results.currentDirection;
+        this.changed = true;
+        this.PostCameraMovementCleanupS3();
     }
 
     move_forward_backward(delta_y, slow) {
@@ -1284,7 +1310,13 @@ class Camera {
     }
 
     moveUp4D(deltaTime, slow) {
-        console.warn("moveUp4D not implemented yet");
+        var signum = -1;
+        var step_size = this.GetRK4StepSize(deltaTime, slow);
+        var results = this.RK4_Step_4Plus4D(this.position, this.up, step_size, signum);
+        this.position = results.currentPosition;
+        this.up = results.currentDirection;
+        this.changed = true;
+        this.PostCameraMovementCleanupS3();
     }
 
     moveDown(deltaTime, slow) {
@@ -1307,7 +1339,13 @@ class Camera {
     }
 
     moveDown4D(deltaTime, slow) {
-        console.warn("moveDown4D not implemented yet");
+        var signum = 1;
+        var step_size = this.GetRK4StepSize(deltaTime, slow);
+        var results = this.RK4_Step_4Plus4D(this.position, this.up, step_size, signum);
+        this.position = results.currentPosition;
+        this.up = results.currentDirection;
+        this.changed = true;
+        this.PostCameraMovementCleanupS3();
     }
 
     move_up_down(delta_y, slow) {
@@ -1541,6 +1579,143 @@ class Camera {
 
     SetLastMousePosition(pos){
         this.last_mouse_position = pos;
+    }
+
+    GetRK4StepSize(deltaTime, slow){
+        var v = slow ? this.velocity_slow : this.velocity;
+        return 0.001;
+    }
+
+    RK4_Step_4Plus4D(previousPosition, previousDirection, step_size, signum) {
+
+        var currentPosition = glMatrix.vec4.create();
+        var k1 = glMatrix.vec4.create();
+        var k2 = glMatrix.vec4.create();
+        var k3 = glMatrix.vec4.create();
+        var k4 = glMatrix.vec4.create();
+        var k1_2 = glMatrix.vec4.create();// k1_2 = k1/2
+        var k2_2 = glMatrix.vec4.create();// k2_2 = k2/2
+        var k1_6 = glMatrix.vec4.create();// k1_6 = k1/6
+        var k2_3 = glMatrix.vec4.create();// k2_3 = k2/3
+        var k3_3 = glMatrix.vec4.create();// k3_3 = k3/3
+        var k4_6 = glMatrix.vec4.create();// k4_6 = k4/6
+        var previous_plus_k1_2 = glMatrix.vec4.create();// previousPosition + k1/2
+        var previous_plus_k2_2 = glMatrix.vec4.create();// previousPosition + k2/2
+        var previous_plus_k3 = glMatrix.vec4.create();// previousPosition + k3
+
+        var currentDirection = glMatrix.vec4.create();
+        var l1 = glMatrix.vec4.create();
+        var l2 = glMatrix.vec4.create();
+        var l3 = glMatrix.vec4.create();
+        var l4 = glMatrix.vec4.create();
+        var l1_2 = glMatrix.vec4.create();// k1_2 = k1/2
+        var l2_2 = glMatrix.vec4.create();// k2_2 = k2/2
+        var l1_6 = glMatrix.vec4.create();// k1_6 = k1/6
+        var l2_3 = glMatrix.vec4.create();// k2_3 = k2/3
+        var l3_3 = glMatrix.vec4.create();// k3_3 = k3/3
+        var l4_6 = glMatrix.vec4.create();// k4_6 = k4/6
+        var previous_plus_l1_2 = glMatrix.vec4.create();// previousPosition + k1/2
+        var previous_plus_l2_2 = glMatrix.vec4.create();// previousPosition + k2/2
+        var previous_plus_l3 = glMatrix.vec4.create();// previousPosition + k3
+        
+        //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
+        glMatrix.vec4.scale(k1, this.f_3Sphere4Plus4D_position(previousPosition, previousDirection, signum), step_size);
+        glMatrix.vec4.scale(l1, this.f_3Sphere4Plus4D_direction(previousPosition, previousDirection, signum), step_size);
+
+        //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
+        glMatrix.vec4.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
+        glMatrix.vec4.scale(l1_2, l1, 1 / 2);// k1_2 = k1/2
+        glMatrix.vec4.add(previous_plus_k1_2, previousPosition, k1_2);// previousPosition + k1/2      
+        glMatrix.vec4.add(previous_plus_l1_2, previousDirection, l1_2);// previousPosition + k1/2            
+        glMatrix.vec4.scale(k2, this.f_3Sphere4Plus4D_position(previous_plus_k1_2, previous_plus_l1_2, signum), step_size);
+        glMatrix.vec4.scale(l2, this.f_3Sphere4Plus4D_direction(previous_plus_k1_2, previous_plus_l1_2, signum), step_size);
+
+        //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
+        glMatrix.vec4.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
+        glMatrix.vec4.scale(l2_2, l2, 1 / 2);// k2_2 = k2/2
+        glMatrix.vec4.add(previous_plus_k2_2, previousPosition, k2_2);// previousPosition + k2/2     
+        glMatrix.vec4.add(previous_plus_l2_2, previousDirection, l2_2);// previousPosition + k2/2  
+        glMatrix.vec4.scale(k3, this.f_3Sphere4Plus4D_position(previous_plus_k2_2, previous_plus_l2_2, signum), step_size);
+        glMatrix.vec4.scale(l3, this.f_3Sphere4Plus4D_direction(previous_plus_k2_2, previous_plus_l2_2, signum), step_size);
+
+        //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
+        glMatrix.vec4.add(previous_plus_k3, previousPosition, k3);// previousPosition + k3
+        glMatrix.vec4.add(previous_plus_l3, previousDirection, l3);// previousPosition + k3
+        glMatrix.vec4.scale(k4, this.f_3Sphere4Plus4D_position(previous_plus_k3, previous_plus_l3, signum), step_size);
+        glMatrix.vec4.scale(l4, this.f_3Sphere4Plus4D_direction(previous_plus_k3, previous_plus_l3, signum), step_size);
+
+        //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
+        glMatrix.vec4.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
+        glMatrix.vec4.scale(l1_6, l1, 1 / 6);// k1_6 = k1/6
+        glMatrix.vec4.scale(k2_3, k2, 1 / 3);// k2_3 = k2/3
+        glMatrix.vec4.scale(l2_3, l2, 1 / 3);// k2_3 = k2/3
+        glMatrix.vec4.scale(k3_3, k3, 1 / 3);// k3_3 = k3/3
+        glMatrix.vec4.scale(l3_3, l3, 1 / 3);// k3_3 = k3/3
+        glMatrix.vec4.scale(k4_6, k4, 1 / 6);// k4_6 = k4/6
+        glMatrix.vec4.scale(l4_6, l4, 1 / 6);// k4_6 = k4/6
+        glMatrix.vec4.add(currentPosition, previousPosition, k1_6);// previousPosition + k1 / 6 
+        glMatrix.vec4.add(currentDirection, previousDirection, l1_6);// previousPosition + k1 / 6 
+        glMatrix.vec4.add(currentPosition, currentPosition, k2_3);// previousPosition + k1 / 6 + k2 / 3
+        glMatrix.vec4.add(currentDirection, currentDirection, l2_3);// previousPosition + k1 / 6 + k2 / 3
+        glMatrix.vec4.add(currentPosition, currentPosition, k3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+        glMatrix.vec4.add(currentDirection, currentDirection, l3_3);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3
+        glMatrix.vec4.add(currentPosition, currentPosition, k4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+        glMatrix.vec4.add(currentDirection, currentDirection, l4_6);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+
+        var difference = glMatrix.vec4.create();
+        glMatrix.vec4.subtract(difference, currentPosition, previousPosition); 
+        var segment_length = glMatrix.vec4.length(difference);
+        
+        var result = {};
+        result.currentPosition = currentPosition;
+        result.currentDirection = currentDirection;
+        result.segment_length = segment_length;
+        return result;
+    }
+
+    f_3Sphere4Plus4D_position(vector_position, vector_direction, signum) {
+
+        var d0 = vector_direction[0];
+        var d1 = vector_direction[1];
+        var d2 = vector_direction[2];
+        var d3 = vector_direction[3];
+
+        var result = glMatrix.vec4.create();
+        result[0] = d0 * signum;
+        result[1] = d1 * signum;
+        result[2] = d2 * signum;
+        result[3] = d3 * signum;
+
+        return result;
+    }
+
+    f_3Sphere4Plus4D_direction(vector_position, vector_direction, signum) {
+
+        var p0 = vector_position[0];
+        var p1 = vector_position[1];
+        var p2 = vector_position[2];
+        var p3 = vector_position[3];
+
+        var result = glMatrix.vec4.create();
+        result[0] = -p0 * signum;
+        result[1] = -p1 * signum;
+        result[2] = -p2 * signum;
+        result[3] = -p3 * signum;
+
+        return result;
+    }
+
+    PostCameraMovementCleanupS3(){        
+        glMatrix.vec4.normalize(this.position, this.position);
+        glMatrix.vec4.normalize(this.forward, this.forward);
+        glMatrix.vec4.normalize(this.up, this.up);
+        glMatrix.vec4.normalize(this.right, this.right);
+
+        var base = GramSchmidt4Vectors4Dimensions(this.position, this.forward, this.up, this.right);
+        console.warn("base", base);
+        this.forward = base.v2;
+        this.up = base.v3;
+        this.right = base.v4;
     }
 }
 
