@@ -1065,6 +1065,9 @@ const cpu_intersect = require("./cpu_intersect");
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
             onChangedDrawMode();
         });
+        document.getElementById("select_side_mode_s3").addEventListener("change", (event) => {
+            onChangedDrawMode();
+        });
         document.getElementById("select_projection_index").addEventListener("change", (event) => {
             onChangedDrawMode();
         });
@@ -1106,16 +1109,21 @@ const cpu_intersect = require("./cpu_intersect");
     }    
 
     function onChangedDrawMode(){
+        /*
         var draw_mode = parseInt(document.getElementById("select_side_mode").value);
+        var draw_mode_s3 = parseInt(document.getElementById("select_side_mode_s3").value);
         var projection_index = parseInt(document.getElementById("select_projection_index").value);
         var show_streamlines = tree_view.IsVisibleInHierarchy(9);// ? STREAMLINE_DRAW_METHOD_FUNDAMENTAL : STREAMLINE_DRAW_METHOD_NONE;
         var streamline_method = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method").value) : STREAMLINE_DRAW_METHOD_NONE;
         var streamline_method_projection = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value) : STREAMLINE_DRAW_METHOD_NONE;
-        canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
+        //canvas_wrapper_side.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection);
+        */
+        canvas_wrapper_side.update_draw_mode_aux();
+        
         shader_manager.NotifySettingsChanged();
 
-        var space = streamline_context_static.streamline_generator.space;
-        side_camera.OnUpdateBehavior(space, draw_mode);
+        //var space = streamline_context_static.streamline_generator.space;
+        //side_camera.OnUpdateBehavior(space, draw_mode);
     }
 
     function onChangedCameraControl(){

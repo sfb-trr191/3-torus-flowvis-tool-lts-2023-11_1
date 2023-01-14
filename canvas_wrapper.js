@@ -141,7 +141,7 @@ class CanvasWrapper {
         this.aliasing = aliasing;
         this.shader_manager = shader_manager;
         this.global_data = global_data;
-        this.p_streamline_context_static = streamline_context_static;
+        this.streamline_context_static = streamline_context_static;
         this.p_ftle_manager = ftle_manager;
         this.tree_view = tree_view;
         this.aliasing_index = 0;
@@ -443,6 +443,24 @@ class CanvasWrapper {
         this.aliasing_index += 1;
     }
 
+    //only for aux view
+    update_draw_mode_aux(){
+        var draw_mode_default = parseInt(document.getElementById("select_side_mode").value);//3 torus
+        var draw_mode_s3 = parseInt(document.getElementById("select_side_mode_s3").value);//s3
+        var projection_index = parseInt(document.getElementById("select_projection_index").value);
+        var show_streamlines = this.tree_view.IsVisibleInHierarchy(9);
+        var streamline_method = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method").value) : STREAMLINE_DRAW_METHOD_NONE;
+        var streamline_method_projection = show_streamlines ? parseInt(document.getElementById("select_side_canvas_streamline_method_projection").value) : STREAMLINE_DRAW_METHOD_NONE;
+    
+        var space = this.streamline_context_static.streamline_generator.space;
+
+        var draw_mode = space == SPACE_3_SPHERE_4_PLUS_4D ? draw_mode_s3 : draw_mode_default;
+        this.set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection)
+        
+        this.camera.OnUpdateBehavior(space, draw_mode);
+
+    }
+
     set_draw_mode(draw_mode, projection_index, streamline_method, streamline_method_projection) {
         if (this.draw_mode == draw_mode && this.projection_index == projection_index && this.streamline_method == streamline_method && this.streamline_method_projection == streamline_method_projection)
             return;
@@ -495,7 +513,7 @@ class CanvasWrapper {
 
     UpdateShaderFlags(){
         this.shader_flags.Update(
-            this.p_streamline_context_static.streamline_generator.space,
+            this.streamline_context_static.streamline_generator.space,
             this.projection_index, 
             this.draw_mode, 
             this.max_iteration_count, 
@@ -657,7 +675,7 @@ class CanvasWrapper {
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
-        this.p_streamline_context_static.bind_lod(this.name, active_lod, gl,
+        this.streamline_context_static.bind_lod(this.name, active_lod, gl,
             this.shader_uniforms_raytracing,
             this.location_raytracing.location_texture_float,
             this.location_raytracing.location_texture_int);
