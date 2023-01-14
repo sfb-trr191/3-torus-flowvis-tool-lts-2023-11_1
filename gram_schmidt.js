@@ -99,6 +99,24 @@ function GramSchmidt4Vectors4Dimensions(w1, w2, w3, w4){
     base.v2 = v2;
     base.v3 = v3;
     base.v4 = v4;
+
+    /*
+    var dot12 = glMatrix.vec4.dot(base.v1, base.v2);
+    var dot13 = glMatrix.vec4.dot(base.v1, base.v3);
+    var dot14 = glMatrix.vec4.dot(base.v1, base.v4);
+    var dot23 = glMatrix.vec4.dot(base.v2, base.v3);
+    var dot24 = glMatrix.vec4.dot(base.v2, base.v4);
+    var dot34 = glMatrix.vec4.dot(base.v3, base.v4);
+
+    console.log("dot---------------");
+    console.log("dot12", dot12);
+    console.log("dot13", dot13);
+    console.log("dot14", dot14);
+    console.log("dot23", dot23);
+    console.log("dot24", dot24);
+    console.log("dot34", dot34);
+    */
+
     return base;
 }
 
