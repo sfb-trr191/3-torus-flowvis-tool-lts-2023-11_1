@@ -435,6 +435,9 @@ class CanvasWrapper {
             case DRAW_MODE_R4:
                 this.draw_mode_raytracing(gl, left_render_wrapper);
                 break;
+            case DRAW_MODE_S3:
+                this.draw_mode_raytracing(gl, left_render_wrapper);
+                break;
             default:
                 console.log("DRAW MODE ERROR", this.draw_mode);
                 break;
@@ -481,6 +484,9 @@ class CanvasWrapper {
                 this.camera.loadState("state_default", save_old_state);
                 if(this.streamline_method != STREAMLINE_DRAW_METHOD_NONE)
                     this.streamline_method = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;//overrides the part index
+                break;
+            case DRAW_MODE_S3:
+                //this.camera.loadState("state_default", save_old_state);
                 break;
             case DRAW_MODE_STEREOGRAPHIC_PROJECTION:
                 this.camera.loadState("state_default", save_old_state);

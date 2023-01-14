@@ -334,15 +334,20 @@ class Camera {
     }
 
     //camera behavior is changed when calculating streamlines
-    OnCalculateStreamlines(space){        
-        this.is4D = false;
+    OnCalculateStreamlines(space){       
         if(space == SPACE_3_SPHERE_4_PLUS_4D){                 
             this.is4D = true;
+            this.draw_mode = DRAW_MODE_S3;
+        }
+        else{             
+            this.is4D = false;
+            this.draw_mode = DRAW_MODE_DEFAULT;
         }
     }
 
     OnUpdateBehavior(space, draw_mode){        
         this.is4D = false;
+        this.draw_mode = draw_mode;
         if(space == SPACE_3_SPHERE_4_PLUS_4D && draw_mode != DRAW_MODE_STEREOGRAPHIC_PROJECTION){                 
             this.is4D = true;
         }
@@ -1038,8 +1043,14 @@ class Camera {
     }
 
     moveLeft(deltaTime, slow) {
-        if(this.is4D)
-            this.moveLeft4D(deltaTime, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveLeft_S3(deltaTime, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveLeft_R4(deltaTime, slow);
+            }
+        }
         else
             this.moveLeft3D(deltaTime, slow);
     }
@@ -1058,7 +1069,15 @@ class Camera {
         this.changed = true;
     }
 
-    moveLeft4D(deltaTime, slow) {        
+    moveLeft_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.right, -(deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveLeft_S3(deltaTime, slow) {        
         var signum = -1;
         var step_size = this.GetRK4StepSize(deltaTime, slow);
         var results = this.RK4_Step_4Plus4D(this.position, this.right, step_size, signum);
@@ -1069,8 +1088,14 @@ class Camera {
     }
 
     moveRight(deltaTime, slow) {
-        if(this.is4D)
-            this.moveRight4D(deltaTime, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveRight_S3(deltaTime, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveRight_R4(deltaTime, slow);
+            }
+        }
         else
             this.moveRight3D(deltaTime, slow);
     }
@@ -1089,7 +1114,15 @@ class Camera {
         this.changed = true;
     }
 
-    moveRight4D(deltaTime, slow) {        
+    moveRight_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.right, (deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveRight_S3(deltaTime, slow) {        
         var signum = 1;
         var step_size = this.GetRK4StepSize(deltaTime, slow);
         var results = this.RK4_Step_4Plus4D(this.position, this.right, step_size, signum);
@@ -1100,8 +1133,14 @@ class Camera {
     }
 
     move_left_right(delta_x, slow) {
-        if(this.is4D)
-            this.move_left_right4D(delta_x, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveLeftRight_S3(delta_x, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveLeftRight_R4(delta_x, slow);
+            }
+        }
         else
             this.move_left_right3D(delta_x, slow);
     }
@@ -1120,13 +1159,23 @@ class Camera {
         this.changed = true;
     }
 
-    move_left_right4D(delta_x, slow) {        
-        console.warn("move_left_right4D not implemented yet");
+    moveLeftRight_R4(delta_x, slow) {        
+        console.warn("moveLeftRight_R4 not implemented yet");
+    }
+
+    moveLeftRight_S3(delta_x, slow) {        
+        console.warn("moveLeftRight_S3 not implemented yet");
     }
 
     moveForward(deltaTime, slow) {
-        if(this.is4D)
-            this.moveForward4D(deltaTime, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveForward_S3(deltaTime, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveForward_R4(deltaTime, slow);
+            }
+        }
         else
             this.moveForward3D(deltaTime, slow);
     }
@@ -1142,7 +1191,15 @@ class Camera {
         this.changed = true;
     }
 
-    moveForward4D(deltaTime, slow) {        
+    moveForward_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.forward, (deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveForward_S3(deltaTime, slow) {        
         var signum = 1;
         var step_size = this.GetRK4StepSize(deltaTime, slow);
         var results = this.RK4_Step_4Plus4D(this.position, this.forward, step_size, signum);
@@ -1153,8 +1210,14 @@ class Camera {
     }
 
     moveBackward(deltaTime, slow) {
-        if(this.is4D)
-            this.moveBackward4D(deltaTime, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveBackward_S3(deltaTime, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveBackward_R4(deltaTime, slow);
+            }
+        }
         else
             this.moveBackward3D(deltaTime, slow);
     }
@@ -1170,7 +1233,15 @@ class Camera {
         this.changed = true;
     }
 
-    moveBackward4D(deltaTime, slow) {        
+    moveBackward_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.forward, -(deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveBackward_S3(deltaTime, slow) {        
         var signum = -1;
         var step_size = this.GetRK4StepSize(deltaTime, slow);
         var results = this.RK4_Step_4Plus4D(this.position, this.forward, step_size, signum);
@@ -1181,8 +1252,14 @@ class Camera {
     }
 
     move_forward_backward(delta_y, slow) {
-        if(this.is4D)
-            this.move_forward_backward4D(delta_y, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveForwardBackward_S3(delta_y, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveForwardBackward_R4(delta_y, slow);
+            }
+        }
         else
             this.move_forward_backward3D(delta_y, slow);
     }
@@ -1198,8 +1275,12 @@ class Camera {
         this.changed = true;
     }
 
-    move_forward_backward4D(delta_y, slow) {        
-        console.warn("move_forward_backward4D not implemented yet");
+    moveForwardBackward_R4(delta_x, slow) {        
+        console.warn("moveForwardBackward_R4 not implemented yet");
+    }
+
+    moveForwardBackward_S3(delta_y, slow) {        
+        console.warn("moveForwardBackward_S3 not implemented yet");
     }
 
     move_forward_backward_wheel(delta_y, x, y, slow){
@@ -1291,8 +1372,14 @@ class Camera {
     }
 
     moveUp(deltaTime, slow) {
-        if(this.is4D)
-            this.moveUp4D(deltaTime, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveUp_S3(deltaTime, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveUp_R4(deltaTime, slow);
+            }
+        }
         else
             this.moveUp3D(deltaTime, slow);
     }
@@ -1309,7 +1396,15 @@ class Camera {
         this.changed = true;
     }
 
-    moveUp4D(deltaTime, slow) {
+    moveUp_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.up, -(deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveUp_S3(deltaTime, slow) {
         var signum = -1;
         var step_size = this.GetRK4StepSize(deltaTime, slow);
         var results = this.RK4_Step_4Plus4D(this.position, this.up, step_size, signum);
@@ -1320,8 +1415,14 @@ class Camera {
     }
 
     moveDown(deltaTime, slow) {
-        if(this.is4D)
-            this.moveDown4D(deltaTime, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveDown_S3(deltaTime, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveDown_R4(deltaTime, slow);
+            }
+        }
         else
             this.moveDown3D(deltaTime, slow);
     }
@@ -1338,7 +1439,16 @@ class Camera {
         this.changed = true;
     }
 
-    moveDown4D(deltaTime, slow) {
+    
+    moveDown_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.up, (deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveDown_S3(deltaTime, slow) {
         var signum = 1;
         var step_size = this.GetRK4StepSize(deltaTime, slow);
         var results = this.RK4_Step_4Plus4D(this.position, this.up, step_size, signum);
@@ -1349,8 +1459,14 @@ class Camera {
     }
 
     move_up_down(delta_y, slow) {
-        if(this.is4D)
-            this.move_up_down4D(delta_y, slow);
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.moveUpDown_S3(delta_y, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveUpDown_R4(delta_y, slow);
+            }
+        }
         else
             this.move_up_down3D(delta_y, slow);
     }
@@ -1366,8 +1482,8 @@ class Camera {
         this.changed = true;
     }
 
-    move_up_down4D(delta_y, slow) {        
-        console.warn("move_up_down4D not implemented yet");
+    moveUpDown_S3(delta_y, slow) {        
+        console.warn("moveUpDown_S3 not implemented yet");
     }
 
     repositionCamera(is_projection, projection_index, allow_default) {
@@ -1712,7 +1828,6 @@ class Camera {
         glMatrix.vec4.normalize(this.right, this.right);
 
         var base = GramSchmidt4Vectors4Dimensions(this.position, this.forward, this.up, this.right);
-        console.warn("base", base);
         this.forward = base.v2;
         this.up = base.v3;
         this.right = base.v4;
