@@ -387,7 +387,7 @@ class HideManager {
         for (var i = 0; i < this.multi_consodtional_elements.length; i++) {
             this.multi_consodtional_elements[i].UpdateVisibility();
         }
-
+        //debugger;
         //var termination_method = parseInt(document.getElementById("select_streamline_termination_method").value);
         //document.getElementById("input_row_streamline_calculation_advection_time").className = (termination_method == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME) ? "input_row" : "hidden";
         //document.getElementById("input_row_streamline_calculation_arc_length").className = (termination_method == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH) ? "input_row" : "hidden";

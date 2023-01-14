@@ -64,6 +64,7 @@ const {
 const TabManager = require("./tab_manager");
 const InputChangedManager = require("./input_changed_manager");
 const HideManager = require("./hide_manager");
+const VisibilityManager = require("./visibility_manager");
 const Camera = require("./camera");
 const InputManager = require("./input_manager");
 const MouseManager = require("./mouse_manager");
@@ -133,6 +134,7 @@ const cpu_intersect = require("./cpu_intersect");
     var mouse_manager;
     var input_changed_manager;
     var hide_manager;
+    var visibility_manager;
     var lights;
     var streamline_context_static;//the static streamlines
     var streamline_context_dynamic;//interactive streamline placement
@@ -232,6 +234,7 @@ const cpu_intersect = require("./cpu_intersect");
         tree_view = new TreeView();
         tab_manager = new TabManager();
         hide_manager = new HideManager(tab_manager);
+        visibility_manager = new VisibilityManager();
         tab_manager.Link(hide_manager);
         ui_tools = new UiTools();
 
@@ -304,6 +307,7 @@ const cpu_intersect = require("./cpu_intersect");
 
         shader_manager = new ShaderManager();
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
+        visibility_manager.Link(streamline_context_static);
         ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
@@ -1334,6 +1338,8 @@ const cpu_intersect = require("./cpu_intersect");
         input_changed_manager.UpdateDefaultValuesRenderSettings();
 
         shader_manager.NotifySettingsChanged();
+
+        visibility_manager.UpdateVisibility();
     }
 
     function UpdateGlobalData() {
