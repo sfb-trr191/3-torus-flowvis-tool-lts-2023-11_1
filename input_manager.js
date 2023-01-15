@@ -1,6 +1,6 @@
 class InputManager {
 
-    NUMBER_OF_KEYS = 10;//only continuous keys
+    NUMBER_OF_KEYS = 12;//only continuous keys
 
     KEY_INDEX_W = 0;
     KEY_INDEX_A = 1;
@@ -12,6 +12,8 @@ class InputManager {
     KEY_INDEX_E = 7;
     KEY_INDEX_T = 8;
     KEY_INDEX_G = 9;
+    KEY_INDEX_X = 10;
+    KEY_INDEX_Y = 11;
 
     KEY_STATE_INACTIVE = 0;
     KEY_STATE_ACTIVE = 1;
@@ -54,6 +56,10 @@ class InputManager {
             this.key_states[this.KEY_INDEX_R] = this.KEY_STATE_ACTIVE;
         if (event.key == 'f')
             this.key_states[this.KEY_INDEX_F] = this.KEY_STATE_ACTIVE;
+        if (event.key == 'x')
+            this.key_states[this.KEY_INDEX_X] = this.KEY_STATE_ACTIVE;
+        if (event.key == 'y')
+            this.key_states[this.KEY_INDEX_Y] = this.KEY_STATE_ACTIVE;
         if (event.key == 'q')
             this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_ACTIVE;
         if (event.key == 'e')
@@ -87,6 +93,10 @@ class InputManager {
             this.key_states[this.KEY_INDEX_R] = this.KEY_STATE_INACTIVE;
         if (event.key == 'f')
             this.key_states[this.KEY_INDEX_F] = this.KEY_STATE_INACTIVE;
+        if (event.key == 'x')
+            this.key_states[this.KEY_INDEX_X] = this.KEY_STATE_INACTIVE;
+        if (event.key == 'y')
+            this.key_states[this.KEY_INDEX_Y] = this.KEY_STATE_INACTIVE;
         if (event.key == 'q')
             this.key_states[this.KEY_INDEX_Q] = this.KEY_STATE_INACTIVE;
         if (event.key == 'e')
@@ -149,6 +159,14 @@ class InputManager {
         if (this.isKeyDown(this.KEY_INDEX_F)) {
             var slow = false;
             camera.moveDown(delta_time, slow);
+        }
+        if (this.isKeyDown(this.KEY_INDEX_X)) {
+            var slow = false;
+            camera.moveFourthDimensionPos(delta_time, slow);
+        }
+        if (this.isKeyDown(this.KEY_INDEX_Y)) {
+            var slow = false;
+            camera.moveFourthDimensionNeg(delta_time, slow);
         }
         if (this.isKeyDown(this.KEY_INDEX_Q)) {
             var left_handed = false;

@@ -9,6 +9,7 @@ const getStateDescription = require("./version").getStateDescription;
 const BinaryArray = require("./binary_array");
 const gram_schmidt = require("./gram_schmidt");
 const GramSchmidt4Vectors4Dimensions = gram_schmidt.GramSchmidt4Vectors4Dimensions;
+const seedrandom = require("seedrandom");
 
 class GL_CameraData {
     constructor() {
@@ -285,6 +286,8 @@ class Camera {
         this.last_mouse_position = {"x":0, "y":0};
 
         this.InitTracknall2();
+
+        this.rng = seedrandom();
     }
 
     LinkInput(input_camera_position_x, input_camera_position_y, input_camera_position_z, input_camera_position_w,
@@ -1484,6 +1487,64 @@ class Camera {
 
     moveUpDown_S3(delta_y, slow) {        
         console.warn("moveUpDown_S3 not implemented yet");
+    }
+
+    moveFourthDimensionPos(deltaTime, slow) {
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                // do nothing
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveFourthDimensionPos_R4(deltaTime, slow);
+            }
+        }
+        else{
+            // do nothing
+        }
+    }
+
+    moveFourthDimensionPos_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.fromValues(this.rng(),this.rng(),this.rng(),this.rng());
+        glMatrix.vec4.normalize(change, change);
+
+        var base = GramSchmidt4Vectors4Dimensions(this.forward, this.right, this.up, change);
+        var direction = base.v4;
+
+        console.warn(base);
+
+        glMatrix.vec4.scale(change, direction, (deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
+    }
+
+    moveFourthDimensionNeg(deltaTime, slow) {
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                // do nothing
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.moveFourthDimensionNeg_R4(deltaTime, slow);
+            }
+        }
+        else{
+            // do nothing
+        }
+    }
+
+    moveFourthDimensionNeg_R4(deltaTime, slow) {
+        var v = slow ? this.velocity_slow : this.velocity;
+        var change = glMatrix.vec4.fromValues(this.rng(),this.rng(),this.rng(),this.rng());
+        glMatrix.vec4.normalize(change, change);
+
+        var base = GramSchmidt4Vectors4Dimensions(this.forward, this.right, this.up, change);
+        var direction = base.v4;
+
+        console.warn(base);
+
+        glMatrix.vec4.scale(change, direction, -(deltaTime * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+        this.changed = true;
     }
 
     repositionCamera(is_projection, projection_index, allow_default) {
