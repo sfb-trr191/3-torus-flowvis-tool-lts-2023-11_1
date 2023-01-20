@@ -19,6 +19,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
 	while(true)
 	{
+        variableRay.iteration_count = count;
         tmp_rayDistance = variableRay.rayDistance;
 
 #ifdef INTEGRATE_LIGHT
@@ -661,6 +662,7 @@ void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_loc
 		float v_b = GetVelocity(lineSegment.indexB, part_index);		
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
         hit.sub_type = SUBTYPE_CYLINDER;
+        hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_ws;	
@@ -774,6 +776,7 @@ void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local
 
 		hit.hitType = type;
         hit.sub_type = SUBTYPE_SPHERE;
+        hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;
@@ -1131,6 +1134,7 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;	
 		hit.hitType = TYPE_GL_CYLINDER;//change
         hit.sub_type = SUBTYPE_CYLINDER;
+        hit.iteration_count = ray.iteration_count;
         hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_ws;	
@@ -1193,6 +1197,7 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 	{		
 		hit.hitType = type;
         hit.sub_type = SUBTYPE_SPHERE;
+        hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;

@@ -32,6 +32,7 @@ struct HitInformation
     int debug_value;
     float debug_value_f;
     int sub_type;
+    int iteration_count;
 };
 
 struct Ray
@@ -46,6 +47,7 @@ struct Ray
     vec4 nextPosition;
     vec4 nextDirection;
     float segment_length;
+    int iteration_count;
 };
 
 struct IntersectionResult{

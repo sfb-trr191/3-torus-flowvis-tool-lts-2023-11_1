@@ -25,6 +25,7 @@ Ray GenerateRay(float x_offset, float y_offset)
 	ray.dir_inv = 1.0/ray.direction;
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
+    ray.iteration_count = 0;
 	return ray;
 }
 
@@ -58,6 +59,7 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 	ray.dir_inv = 1.0/ray.direction;
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
+    ray.iteration_count = 0;
 	return ray;
 }
 

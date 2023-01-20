@@ -31,6 +31,7 @@ struct HitInformation
     
     int debug_value;
     int sub_type;
+    int iteration_count;
 };
 
 struct Ray
@@ -45,6 +46,7 @@ struct Ray
     vec3 nextPosition;
     vec3 nextDirection;
     float segment_length;
+    int iteration_count;
 };
 
 `;

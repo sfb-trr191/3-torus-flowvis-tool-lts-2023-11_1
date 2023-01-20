@@ -42,6 +42,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
     
 	while(true)
 	{
+        variableRay.iteration_count = count;
         tmp_rayDistance = variableRay.rayDistance;
 #ifdef INTEGRATE_LIGHT
         LightIntegrationPre(variableRay);  
@@ -364,6 +365,7 @@ void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D 
         bool interactiveStreamline = part_index == 2 || part_index == 3;
 
 		hit.hitType = type;
+        hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_this_iteration;	
 		hit.distance = distance_total;
 		hit.position = position_ws;
@@ -480,6 +482,7 @@ void IntersectSpherinder(int part_index, Ray ray, float ray_local_cutoff, int li
         bool interactiveStreamline = part_index == 2 || part_index == 3;
 
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
+        hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_this_iteration;	
 		hit.distance = distance_total;
 		hit.position = intersection_4D_ws;

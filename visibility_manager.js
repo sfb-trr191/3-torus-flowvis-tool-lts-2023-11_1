@@ -49,6 +49,10 @@ class VisibilityManager {
             return true;
         if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_DISTANCE)
             return true;
+        if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_DISTANCE_ITERATION)
+            return true;         
+        if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_ITERATION_COUNT)
+            return true;        
         return false;
     }
 
