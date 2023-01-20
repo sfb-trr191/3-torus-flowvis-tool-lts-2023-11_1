@@ -54,6 +54,13 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
                 }
                 return surface_color;
             }
+            if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_DISTANCE){
+                float scalar = hit.distance;
+                float t = (scalar - min_scalar) / (max_scalar - min_scalar);
+                int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+                bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+                return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
+            }
         }
 
         vec3 lightColor = vec3(0, 0, 0);

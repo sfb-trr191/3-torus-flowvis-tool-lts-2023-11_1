@@ -268,7 +268,7 @@ class HideManager {
 
         this.group_shading_mode = new HideGroup("select_shading_mode_streamlines");
         this.group_shading_mode.AddInputRow("input_row_formula_scalar", SHADING_MODE_STREAMLINES_SCALAR, true);
-        this.group_shading_mode.AddInputRow("input_row_scalar_range", SHADING_MODE_STREAMLINES_SCALAR, true);
+        //this.group_shading_mode.AddInputRow("input_row_scalar_range", SHADING_MODE_STREAMLINES_SCALAR, true);
         this.groups.push(this.group_shading_mode);
 
         //---------- special conditions ----------
