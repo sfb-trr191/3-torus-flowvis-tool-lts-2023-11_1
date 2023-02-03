@@ -811,8 +811,12 @@ class Camera {
 
     UpdatePanning4D(x, y, x_canonical, y_canonical, left_handed) {
         //console.warn("UpdatePanning4D not implemented yet"); 
-        this.UpdatePanningTrackball4D(x_canonical, y_canonical, left_handed);
-          
+        if (this.draw_mode == DRAW_MODE_R4){
+            this.UpdatePanningTrackball4D(x_canonical, y_canonical, left_handed);
+        }       
+        if (this.draw_mode == DRAW_MODE_S3){
+            this.UpdatePanningRotateAroundCamera4D(x, y, left_handed);
+        }     
     }
 
     UpdatePanningRotateAroundCamera(x, y, left_handed) {
@@ -852,6 +856,50 @@ class Camera {
 
         glMatrix.vec3.transformQuat(this.forward, this.forward, quaternion);//forward = quaternion * QVector3D(0,0,1);
         glMatrix.vec3.transformQuat(this.up, this.up, quaternion);//up = quaternion * QVector3D(0,1,0);
+
+        this.xMouse_old = x;
+        this.yMouse_old = y;
+
+        this.changed = true;
+    }
+
+    UpdatePanningRotateAroundCamera4D(x, y, left_handed){
+        var invert = false;
+        var deltaX = x - this.xMouse_old;
+        var deltaY = y - this.yMouse_old;
+        if (invert) {
+            deltaX *= -1;
+            deltaY *= -1;
+        }
+
+        //camera is at origin for rotation around itself
+        var pos_cam = glMatrix.vec4.fromValues(0,0,0,0);
+
+        //three helper points offset by forward, up, and right vector respectively
+        var pos_cam_forward = glMatrix.vec4.create();
+        var pos_cam_up = glMatrix.vec4.create();
+        var pos_cam_right = glMatrix.vec4.create();
+        glMatrix.vec4.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec4.add(pos_cam_up, pos_cam, this.up);
+        glMatrix.vec4.add(pos_cam_right, pos_cam, this.right);
+
+
+        //rotate the position and three helper points
+        //deltaX is the horizontal mouse movement --> rotation in plane defined by camera forward and right
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, this.rotationSpeed * deltaX, this.forward, this.right);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, this.rotationSpeed * deltaX, this.forward, this.right);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, this.rotationSpeed * deltaX, this.forward, this.right);
+
+        //deltaY is the vertical mouse movement --> rotation in plane defined by camera forward and right
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, this.rotationSpeed * deltaY, this.forward, this.up);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, this.rotationSpeed * deltaY, this.forward, this.up);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, this.rotationSpeed * deltaY, this.forward, this.up);
+        
+        //glMatrix.vec4.subtract(this.right, pos_cam, this.right);
+
+        glMatrix.vec4.normalize(this.forward, pos_cam_forward);
+        glMatrix.vec4.normalize(this.up, pos_cam_up);
+        glMatrix.vec4.normalize(this.right, pos_cam_right);
 
         this.xMouse_old = x;
         this.yMouse_old = y;
@@ -1087,7 +1135,30 @@ class Camera {
     }
 
     RollLeft4D(deltaTime, left_handed) {        
-        console.warn("RollLeft4D not implemented yet");
+        var handedness = left_handed ? 1 : -1;
+
+        //camera is at origin for rotation around itself
+        var pos_cam = glMatrix.vec4.fromValues(0,0,0,0);
+
+        //three helper points offset by forward, up, and right vector respectively
+        var pos_cam_forward = glMatrix.vec4.create();
+        var pos_cam_up = glMatrix.vec4.create();
+        var pos_cam_right = glMatrix.vec4.create();
+        glMatrix.vec4.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec4.add(pos_cam_up, pos_cam, this.up);
+        glMatrix.vec4.add(pos_cam_right, pos_cam, this.right);
+
+        //rotate the position and three helper points
+        //rotation in plane defined by camera up and right
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, deltaTime * -this.rollspeed * handedness, this.up, this.right);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, deltaTime * -this.rollspeed * handedness, this.up, this.right);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, deltaTime * -this.rollspeed * handedness, this.up, this.right);
+        
+        glMatrix.vec4.normalize(this.forward, pos_cam_forward);
+        glMatrix.vec4.normalize(this.up, pos_cam_up);
+        glMatrix.vec4.normalize(this.right, pos_cam_right);
+
+        this.changed = true;        
     }
 
     RollRight(deltaTime, left_handed) {
@@ -1107,7 +1178,33 @@ class Camera {
     }
 
     RollRight4D(deltaTime, left_handed) {        
-        console.warn("RollRight4D not implemented yet");
+        var handedness = left_handed ? 1 : -1;
+
+        //camera is at origin for rotation around itself
+        var pos_cam = glMatrix.vec4.fromValues(0,0,0,0);
+
+        //three helper points offset by forward, up, and right vector respectively
+        var pos_cam_forward = glMatrix.vec4.create();
+        var pos_cam_up = glMatrix.vec4.create();
+        var pos_cam_right = glMatrix.vec4.create();
+        glMatrix.vec4.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec4.add(pos_cam_up, pos_cam, this.up);
+        glMatrix.vec4.add(pos_cam_right, pos_cam, this.right);
+
+
+        //rotate the position and three helper points
+        //rotation in plane defined by camera up and right
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, deltaTime * this.rollspeed * handedness, this.up, this.right);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, deltaTime * this.rollspeed * handedness, this.up, this.right);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, deltaTime * this.rollspeed * handedness, this.up, this.right);
+        
+        //glMatrix.vec4.subtract(this.right, pos_cam, this.right);
+
+        glMatrix.vec4.normalize(this.forward, pos_cam_forward);
+        glMatrix.vec4.normalize(this.up, pos_cam_up);
+        glMatrix.vec4.normalize(this.right, pos_cam_right);
+
+        this.changed = true;
     }
 
     moveLeft(deltaTime, slow) {
