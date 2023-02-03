@@ -4,12 +4,15 @@ const module_gl_matrix_extensions = require("./gl_matrix_extensions");
 const { tb_project_to_sphere, trackball } = require("./trackball");
 const { ndcToArcBall, trackball2, getRotationQuaternion } = require("./trackball2");
 const { trackball3 } = require("./trackball3");
+const { trackball4D } = require("./trackball4D");
 const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 const getStateDescription = require("./version").getStateDescription;
 const BinaryArray = require("./binary_array");
 const gram_schmidt = require("./gram_schmidt");
 const GramSchmidt4Vectors4Dimensions = gram_schmidt.GramSchmidt4Vectors4Dimensions;
 const seedrandom = require("seedrandom");
+const module_math4D = require("./math4D");
+const RotateVectorInPlane = module_math4D.RotateVectorInPlane;
 
 class GL_CameraData {
     constructor() {
@@ -807,7 +810,9 @@ class Camera {
     }
 
     UpdatePanning4D(x, y, x_canonical, y_canonical, left_handed) {
-        console.warn("UpdatePanning4D not implemented yet"); 
+        //console.warn("UpdatePanning4D not implemented yet"); 
+        this.UpdatePanningTrackball4D(x_canonical, y_canonical, left_handed);
+          
     }
 
     UpdatePanningRotateAroundCamera(x, y, left_handed) {
@@ -1003,6 +1008,66 @@ class Camera {
         this.changed = true;
 
         console.log("DCAM focus_point: ", focus_point)
+    }
+
+    UpdatePanningTrackball4D(x, y, left_handed){
+        console.warn("UpdatePanningTrackball4D"); 
+        //normalize forward, up, and right vectors just to be sure they really are normalized
+        glMatrix.vec4.normalize(this.forward, this.forward);
+        glMatrix.vec4.normalize(this.up, this.up);
+        glMatrix.vec4.normalize(this.right, this.right);
+
+        //calculate focus point
+        var forward_scaled = glMatrix.vec4.create();
+        var focus_point = glMatrix.vec4.create();
+        glMatrix.vec4.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec4.add(focus_point, this.position, forward_scaled);
+
+        //move camera so that position of focus point is at origin
+        //--> we are now in object space of the focus point
+        //the camera has arbitrary rotation but looks at the origin
+        var pos_cam = glMatrix.vec4.create();
+        glMatrix.vec4.subtract(pos_cam, this.position, focus_point);
+
+        //get the rotation plane and angle
+        var result = trackball4D(this.xMouse_old_canonical, this.yMouse_old_canonical, x, y, this.forward, this.up, this.right, pos_cam);
+        //result.x;
+        //result.y;
+        //result.theta;
+        var sensitivity = 1.0;
+        console.warn("result", result); 
+
+        //three helper points offset by forward, up, and right vector respectively
+        var pos_cam_forward = glMatrix.vec4.create();
+        var pos_cam_up = glMatrix.vec4.create();
+        var pos_cam_right = glMatrix.vec4.create();
+        glMatrix.vec4.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec4.add(pos_cam_up, pos_cam, this.up);
+        glMatrix.vec4.add(pos_cam_right, pos_cam, this.right);
+
+        //rotate the position and three helper points
+        pos_cam = RotateVectorInPlane(pos_cam, sensitivity * result.theta, result.x, result.y);
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, sensitivity * result.theta, result.x, result.y);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, sensitivity * result.theta, result.x, result.y);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, sensitivity * result.theta, result.x, result.y);
+
+        //calculate new forward, up, and right vectors from new position and helper points
+        glMatrix.vec4.subtract(this.forward, pos_cam_forward, pos_cam);
+        glMatrix.vec4.subtract(this.up, pos_cam_up, pos_cam);
+        glMatrix.vec4.subtract(this.right, pos_cam_right, pos_cam);
+
+        //normalize forward, up, and right vectors just to be sure they are still normalized
+        glMatrix.vec4.normalize(this.forward, this.forward);
+        glMatrix.vec4.normalize(this.up, this.up);
+        glMatrix.vec4.normalize(this.right, this.right);
+
+        //add the focus point to position
+        //--> we are now back in world space
+        glMatrix.vec4.add(this.position, pos_cam, focus_point);
+
+        this.xMouse_old_canonical = x;
+        this.yMouse_old_canonical = y;
+        this.changed = true;
     }
 
     RollLeft(deltaTime, left_handed) {

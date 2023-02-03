@@ -78,6 +78,31 @@ function getRzw(theta){
     return matrixCombined;
 }
 
+/**
+ * Rotates a vector v by angle theta in the plane spanned by x and y.
+ * 
+ * x and y are assumed to be orthogonal.
+ * 
+ * @param {*} v Vector to be rotated [glMatrix.vec4]
+ * @param {*} theta rotation angle [float]
+ * @param {*} x One unit vector of the plane [glMatrix.vec4]
+ * @param {*} y Other unit vector of the plane [glMatrix.vec4]
+ */
+function RotateVectorInPlane(v, theta, x, y){    
+    var v_dot_x = glMatrix.vec4.dot(v, x);
+    var v_dot_y = glMatrix.vec4.dot(v, y);
+    var scalar_1 = v_dot_x * Math.cos(theta) - v_dot_y * Math.sin(theta);
+    var scalar_2 = v_dot_y * Math.cos(theta) + v_dot_x * Math.sin(theta);
+    var result = glMatrix.vec4.create();
+    glMatrix.vec4.scale(result, x, scalar_1);
+    glMatrix.vec4.scaleAndAdd(result, result, y, scalar_2);
+    glMatrix.vec4.add(result, result, v);
+    glMatrix.vec4.scaleAndAdd(result, result, x, -v_dot_x);
+    glMatrix.vec4.scaleAndAdd(result, result, y, -v_dot_y);
+
+    return result;
+}
+
 function PrintPointAndResult(point){
     var mat = getAligned4DRotationMatrix(point); 
     var result = glMatrix.vec4.create();
@@ -104,6 +129,23 @@ function TestDistanceSecondPoint(point1, point2){
     console.log("dist", glMatrix.vec4.distance(point1, point2), glMatrix.vec4.distance(result1, result2));
 }
 
+function TestRotateVectorInPlane(){
+    console.log("---------------------------------------------------");
+    console.log("---------------------------------------------------");
+    console.log("---------------------------------------------------");
+    console.log("TestRotateVectorInPlane");
+    var v = glMatrix.vec4.fromValues(0,1,0.2,0);
+    var x = glMatrix.vec4.fromValues(0,1,0,0);
+    var y = glMatrix.vec4.fromValues(1,0,0,0);
+    var theta = 2 * Math.PI / 8;
+    var result = RotateVectorInPlane(v, theta, x, y);
+    console.log("v", v);
+    console.log("theta", theta);
+    console.log("x", x);
+    console.log("y", y);
+    console.log("result", result);
+}
+
 function Test() {
     //random points
     var rng = seedrandom();
@@ -127,9 +169,12 @@ function Test() {
         TestDistanceSecondPoint(point1, point2);
     }   
 
+    TestRotateVectorInPlane();
+
     debugger;
 }
 
 
 exports.getAligned4DRotationMatrix = getAligned4DRotationMatrix;
+exports.RotateVectorInPlane = RotateVectorInPlane;
 exports.Test = Test;
