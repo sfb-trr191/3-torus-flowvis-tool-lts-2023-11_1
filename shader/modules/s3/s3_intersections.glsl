@@ -261,36 +261,39 @@ void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_Tr
 	
 	//SPHERINDER AND SPHERE TEST
 	bool ignore_override = false;
-    IntersectSpherinder(part_index, ray, ray_local_cutoff, lineSegmentID, hit, ignore_override);
+    if(debug_render_spherinder){//debug_render_spherinder should be set to true
+        IntersectSpherinder(part_index, ray, ray_local_cutoff, lineSegmentID, hit, ignore_override);
+    }
 
+    if(debug_render_3Sphere){//debug_render_3Sphere should be set to true
+        Sphere4D sphere4D;
+        sphere4D.radius = tube_radius;
+        //SPHERE A
+        if(lineSegment.isBeginning == 1 || copy)
+        {
+            sphere4D.center = a;
+            Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_a, cost_a);
+        }
+        
+        //SPHERE B
+        sphere4D.center = b;
+        float cost_b_value = cost_b;    
+        if(growth == 1)
+        {
+            if(growth_id == -1 || growth_id == multiPolyID)
+            {
+                if(cost_b > cost_cutoff)
+                {
+                    float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
+                    sphere4D.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
+                    cost_b_value = cost_cutoff;
+                    //sphere.radius = tube_radius * 1.1;		
+                }
+            }
+        }    
+        Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
+    }
 
-    Sphere4D sphere4D;
-    sphere4D.radius = tube_radius;
-	//SPHERE A
-	if(lineSegment.isBeginning == 1 || copy)
-	{
-        sphere4D.center = a;
-		Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_a, cost_a);
-	}
-    
-	//SPHERE B
-    sphere4D.center = b;
-	float cost_b_value = cost_b;    
-	if(growth == 1)
-	{
-		if(growth_id == -1 || growth_id == multiPolyID)
-		{
-			if(cost_b > cost_cutoff)
-			{
-				float t = ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);
-				sphere4D.center = mix(a, b, t);//ExtractLinearPercentage(cost_a, cost_b, cost_cutoff);		
-				cost_b_value = cost_cutoff;
-				//sphere.radius = tube_radius * 1.1;		
-			}
-		}
-	}    
-	Intersect3Sphere(part_index, ray, ray_local_cutoff, sphere4D, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
-    
 }
 
 void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost)

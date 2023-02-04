@@ -1256,6 +1256,9 @@ const cpu_intersect = require("./cpu_intersect");
         canvas_wrapper_main.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
         canvas_wrapper_main.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
        
+        canvas_wrapper_main.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_main").checked;
+        canvas_wrapper_main.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_main").checked;
+
         canvas_wrapper_main.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_main.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
         canvas_wrapper_main.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);
@@ -1313,6 +1316,9 @@ const cpu_intersect = require("./cpu_intersect");
         canvas_wrapper_side.volume_rendering_termination_opacity = parseFloat(document.getElementById("input_volume_rendering_termination_opacity").value);
         canvas_wrapper_side.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
        
+        canvas_wrapper_side.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_aux").checked;
+        canvas_wrapper_side.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_aux").checked;
+
         canvas_wrapper_side.transfer_function_index_streamline_scalar = parseInt(document.getElementById("select_transfer_function_index_scalar").value);
         canvas_wrapper_side.transfer_function_index_ftle_forward = parseInt(document.getElementById("select_transfer_function_index_ftle_forward").value);
         canvas_wrapper_side.transfer_function_index_ftle_backward = parseInt(document.getElementById("select_transfer_function_index_ftle_backward").value);

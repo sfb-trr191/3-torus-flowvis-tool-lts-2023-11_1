@@ -65,4 +65,7 @@ uniform bool handle_inside;
 
 //**********************************************************
 
+uniform bool debug_render_spherinder;
+uniform bool debug_render_3Sphere;
+
 `;

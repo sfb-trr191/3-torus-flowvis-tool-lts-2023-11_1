@@ -63,7 +63,10 @@ class UniformLocationsRayTracing {
         this.location_transfer_function_index_streamline_scalar = gl.getUniformLocation(program, "transfer_function_index_streamline_scalar");
         this.location_transfer_function_index_ftle_forward = gl.getUniformLocation(program, "transfer_function_index_ftle_forward");
         this.location_transfer_function_index_ftle_backward = gl.getUniformLocation(program, "transfer_function_index_ftle_backward");
-                
+           
+        this.location_debug_render_spherinder = gl.getUniformLocation(program, "debug_render_spherinder");
+        this.location_debug_render_3Sphere = gl.getUniformLocation(program, "debug_render_3Sphere");
+        
     }
 }
 
@@ -169,6 +172,8 @@ class CanvasWrapper {
         this.show_bounding_box_projection = false;
         this.show_movable_axes = false;
         this.show_origin_axes = false;
+        this.debug_render_spherinder = true;
+        this.debug_render_3Sphere = true;
         this.draw_mode = DRAW_MODE_DEFAULT;
         this.draw_slice_index = 0;
         this.draw_slice_axes_order = DRAW_SLICE_AXES_ORDER_HX_VY;
@@ -678,6 +683,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_forward, this.transfer_function_index_ftle_forward);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);
         
+        gl.uniform1i(this.location_raytracing.location_debug_render_spherinder, this.debug_render_spherinder);
+        gl.uniform1i(this.location_raytracing.location_debug_render_3Sphere, this.debug_render_3Sphere);
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;
