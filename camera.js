@@ -1324,8 +1324,16 @@ class Camera {
         this.changed = true;
     }
 
-    moveLeftRight_R4(delta_x, slow) {        
-        console.warn("moveLeftRight_R4 not implemented yet");
+    moveLeftRight_R4(delta_x, slow) {       
+        console.warn("moveLeftRight_R4", change); 
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+
+        var change = glMatrix.vec4.create();
+
+        glMatrix.vec4.scale(change, this.right, (-delta_x * v));
+        glMatrix.vec4.add(this.position, this.position, change);
+
+        this.changed = true;
     }
 
     moveLeftRight_S3(delta_x, slow) {        
@@ -1441,7 +1449,14 @@ class Camera {
     }
 
     moveForwardBackward_R4(delta_x, slow) {        
-        console.warn("moveForwardBackward_R4 not implemented yet");
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+
+        var change = glMatrix.vec4.create();
+
+        glMatrix.vec4.scale(change, this.forward, (delta_x * v));
+        glMatrix.vec4.subtract(this.position, this.position, change);
+
+        this.changed = true;
     }
 
     moveForwardBackward_S3(delta_y, slow) {        
@@ -1450,7 +1465,12 @@ class Camera {
 
     move_forward_backward_wheel(delta_y, x, y, slow){
         if(this.is4D)
-            this.move_forward_backward_wheel4D(delta_y, x, y, slow);
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.move_forward_backward_wheelS3(delta_y, x, y, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.move_forward_backward_wheelR4(delta_y, x, y, slow);
+            }
         else
             this.move_forward_backward_wheel3D(delta_y, x, y, slow);
     }
@@ -1471,13 +1491,34 @@ class Camera {
         this.changed = true;
     }
 
-    move_forward_backward_wheel4D(delta_y, x, y, slow){
-        console.warn("move_forward_backward_wheel4D not implemented yet");
+    move_forward_backward_wheelR4(delta_y, x, y, slow){
+        var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
+
+        var change = glMatrix.vec4.create();
+
+        var direction = this.forward;
+        if(true){
+            direction = this.generate_ray_direction4D(x, y)
+        }
+
+        glMatrix.vec4.scale(change, direction, (delta_y * v));
+        glMatrix.vec4.subtract(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
+    move_forward_backward_wheelS3(delta_y, x, y, slow){
+        console.warn("move_forward_backward_wheelS3 not implemented yet");
     }
 
     move_forward_to_cursor(deltaTime, slow){
         if(this.is4D){
-            this.move_forward_or_backward_cursor4D(deltaTime, slow, -1);
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.move_forward_or_backward_cursorS3(deltaTime, slow, -1);                
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.move_forward_or_backward_cursorR4(deltaTime, slow, -1);
+            }
         }else{
             this.move_forward_or_backward_cursor3D(deltaTime, slow, -1);
         }
@@ -1485,7 +1526,12 @@ class Camera {
 
     move_backward_from_cursor(deltaTime, slow){
         if(this.is4D){
-            this.move_forward_or_backward_cursor4D(deltaTime, slow, 1);
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.move_forward_or_backward_cursorS3(deltaTime, slow, 1);                
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.move_forward_or_backward_cursorR4(deltaTime, slow, 1);
+            }
         }else{
             this.move_forward_or_backward_cursor3D(deltaTime, slow, 1);
         }
@@ -1509,8 +1555,26 @@ class Camera {
         this.changed = true;  
     }
 
-    move_forward_or_backward_cursor4D(deltaTime, slow, signum){
-        console.warn("move_forward_or_backward_cursor4D not implemented yet");
+    move_forward_or_backward_cursorR4(deltaTime, slow, signum){
+        var x = this.last_mouse_position["x"];
+        var y = this.last_mouse_position["y"];
+        var v = slow ? this.velocity_slow : this.velocity;
+
+        var change = glMatrix.vec4.create();
+
+        var direction = this.forward;
+        if(true){
+            direction = this.generate_ray_direction4D(x, y)
+        }
+
+        glMatrix.vec4.scale(change, direction, (signum * deltaTime * v));
+        glMatrix.vec4.subtract(this.position, this.position, change);
+
+        this.changed = true;  
+    }
+
+    move_forward_or_backward_cursorS3(deltaTime, slow, signum){
+        console.warn("move_forward_or_backward_cursorS3 not implemented yet");
     }
 
     generate_ray_direction(x, y){
@@ -1533,6 +1597,29 @@ class Camera {
 
         //vec3 r_ij = normalize(p_ij);
         glMatrix.vec3.normalize(r_ij, p_ij);
+        return r_ij;
+    }
+
+    generate_ray_direction4D(x, y){
+        console.log("generate_ray_direction: ", x, y);
+        var p_ij = glMatrix.vec4.create();
+        var r_ij = glMatrix.vec4.create();
+        var tmp = glMatrix.vec4.create();
+
+        //float i = gl_FragCoord[0];//x
+        var i = x;
+        //float j = float(height) - gl_FragCoord[1];//y
+        var j = y;
+
+        //vec3 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
+        glMatrix.vec4.copy(p_ij, this.p_1m);
+        glMatrix.vec4.scale(tmp, this.q_x, (i-1));
+        glMatrix.vec4.add(p_ij, p_ij, tmp);
+        glMatrix.vec4.scale(tmp, this.q_y, (j-1));
+        glMatrix.vec4.add(p_ij, p_ij, tmp);
+
+        //vec3 r_ij = normalize(p_ij);
+        glMatrix.vec4.normalize(r_ij, p_ij);
         return r_ij;
     }
 
@@ -1643,6 +1730,17 @@ class Camera {
         var change = glMatrix.vec3.create();
         glMatrix.vec3.scale(change, this.up, (delta_y * v * handedness));
         glMatrix.vec3.add(this.position, this.position, change);
+
+        this.changed = true;
+    }
+
+    moveUpDown_R4(delta_y, slow) {        
+        var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
+        var handedness = this.left_handed ? 1 : -1;
+
+        var change = glMatrix.vec4.create();
+        glMatrix.vec4.scale(change, this.up, (delta_y * v * handedness));
+        glMatrix.vec4.add(this.position, this.position, change);
 
         this.changed = true;
     }
