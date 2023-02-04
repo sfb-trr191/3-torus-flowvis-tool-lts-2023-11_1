@@ -62,16 +62,17 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 //        }
 //#endif
 
-
-		if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE)		
-			break;
 		
+        if(hit.hitType > TYPE_NONE || hitCube.hitType > TYPE_NONE){
+            if(variableRay.rayDistance >= hit.distance + 0.0)
+                break;
+        }
+
 		//update distance "traveled" using value from this instance
 		variableRay.rayDistance += t;
 
-		//stop at maxRayDistance + 1.8
-		//1.8 is a bit greater than sqrt(3) which is the max distance inside unit cube
-		if(variableRay.rayDistance > (maxRayDistance + 1.8))
+		//stop at maxRayDistance
+		if(variableRay.rayDistance > maxRayDistance)
 			break;
 
 #ifdef INTEGRATE_LIGHT
