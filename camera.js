@@ -1464,18 +1464,19 @@ class Camera {
     }
 
     move_forward_backward_wheel(delta_y, x, y, slow){
-        if(this.is4D)
+        if(this.is4D){
             if (this.draw_mode == DRAW_MODE_S3){
                 this.move_forward_backward_wheelS3(delta_y, x, y, slow);
             }
             else if (this.draw_mode == DRAW_MODE_R4){
                 this.move_forward_backward_wheelR4(delta_y, x, y, slow);
             }
+        }
         else
             this.move_forward_backward_wheel3D(delta_y, x, y, slow);
     }
 
-    move_forward_backward_wheel3D(delta_y, x, y, slow){
+    move_forward_backward_wheel3D(delta_y, x, y, slow){        
         var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
 
         var change = glMatrix.vec3.create();
