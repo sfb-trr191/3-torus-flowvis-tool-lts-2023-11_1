@@ -1290,6 +1290,13 @@ const cpu_intersect = require("./cpu_intersect");
         //canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
         //SIDE        
+
+        canvas_wrapper_side.camera.SetArea(-1, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
+        canvas_wrapper_side.cameraAreaProjection0.SetArea(0, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
+        canvas_wrapper_side.cameraAreaProjection1.SetArea(1, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
+        canvas_wrapper_side.cameraAreaProjection2.SetArea(2, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
+        canvas_wrapper_side.cameraAreaProjection3.SetArea(3, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
+
         canvas_wrapper_side.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);
         canvas_wrapper_side.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_aux").value);
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance_aux").value);

@@ -19,6 +19,10 @@ struct GL_CameraData
 	vec4 normal_right;	//only using 3 components, right frustum plane normal 
 	vec4 normal_top;	//only using 3 components, top frustum plane normal 
 	vec4 normal_bottom;	//only using 3 components, bottom frustum plane normal 
+    float area_start_x_percentage;
+    float area_start_y_percentage;
+    float area_height_percentage;
+    float area_width_percentage;
 };
 
 struct GL_TreeNode

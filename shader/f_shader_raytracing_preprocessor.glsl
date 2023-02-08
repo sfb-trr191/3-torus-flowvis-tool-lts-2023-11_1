@@ -96,8 +96,44 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
     }
 #endif
 
-	Ray ray = GenerateRay(x_offset, y_offset);	  
-	Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
+    GL_CameraData cam = GetActiveCamera();
+    
+    //multiple areas
+    float i = gl_FragCoord[0];//x
+	float j = float(height) - gl_FragCoord[1];//y
+    if(i < float(width) * cam.area_start_x_percentage){
+
+        float start = 0.0;
+        float area_height = 0.0;
+        for(int area_index=0; area_index<4; area_index++){
+
+            GL_CameraData cam_tmp = GetCameraForArea(area_index);
+            float area_height = float(height) * cam_tmp.area_height_percentage;
+            float area_height_min = float(height) * cam_tmp.area_start_y_percentage;
+            float area_height_max = area_height_min + area_height;
+            if(j >= area_height_min && j <= area_height_max){
+                Ray ray = GenerateRay(x_offset, y_offset, area_index);
+                Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
+                CombineHitInformation(ray, hit, hit_outside, hitCube);
+                vec3 resultColor = Shade(ray, hit, hitCube, false);
+                return resultColor;  
+            }
+        }
+
+      	vec3 resultColor = vec3(1.0, 1.0, 1.0);
+  	    return resultColor;  
+    }else{
+        Ray ray = GenerateRay(x_offset, y_offset, -1);
+        Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
+        CombineHitInformation(ray, hit, hit_outside, hitCube);
+        vec3 resultColor = Shade(ray, hit, hitCube, false);
+        return resultColor;
+    }
+   
+
+    //without multiple areas
+    Ray ray = GenerateRay(x_offset, y_offset);	  
+    Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
     CombineHitInformation(ray, hit, hit_outside, hitCube);
 	vec3 resultColor = Shade(ray, hit, hitCube, false);
   	return resultColor;
@@ -105,6 +141,23 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 
 GL_CameraData GetActiveCamera()
 {
+	return active_camera;
+}
+
+GL_CameraData GetCameraForArea(int area_index)
+{
+    if(area_index == 0){
+	    return cameraAreaProjection0;
+    }
+    if(area_index == 1){
+	    return cameraAreaProjection1;
+    }
+    if(area_index == 2){
+	    return cameraAreaProjection2;
+    }
+    if(area_index == 3){
+	    return cameraAreaProjection3;
+    }
 	return active_camera;
 }
 

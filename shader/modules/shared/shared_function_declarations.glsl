@@ -3,7 +3,16 @@ global.SHADER_MODULE_SHARED_FUNCTION_DECLARATIONS = `
 vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, inout HitInformation hit_outside);
 Ray GenerateRay(float x_offset, float y_offset);
 Ray GenerateRayWithPixelOffset(float x_offset, float y_offset);
+// x_offset intra pixel offset
+// y_offset intra pixel offset
+// area_x_start the offset in pixels where this area starts
+// area_y_start the offset in pixels where this area starts
+// area_width the width of this area
+// area_height the height of this area
+//Ray GenerateRay(float x_offset, float y_offset, float area_x_start, float area_y_start, float area_width, float area_height);
+Ray GenerateRay(float x_offset, float y_offset, int area_index);
 GL_CameraData GetActiveCamera();
+GL_CameraData GetCameraForArea(int area_index);
 vec3 RepositionIntoFundamentalDomain(vec3 position);
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);

@@ -1,7 +1,9 @@
+const glMatrix = require("gl-matrix");
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
 const ShaderUniforms = require("./shader_uniforms");
 const ShaderFlags = require("./shader_flags");
+const Camera = require("./camera");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
 
@@ -141,6 +143,10 @@ class CanvasWrapper {
         this.canvas_width = canvas_width;
         this.canvas_height = canvas_height;
         this.camera = camera;
+        this.cameraAreaProjection0 = new Camera(camera.name+"AreaProjection0", "special_data_camera_main", "current_state_name_main", null);
+        this.cameraAreaProjection1 = new Camera(camera.name+"AreaProjection1", "special_data_camera_main", "current_state_name_main", null);
+        this.cameraAreaProjection2 = new Camera(camera.name+"AreaProjection2", "special_data_camera_main", "current_state_name_main", null);
+        this.cameraAreaProjection3 = new Camera(camera.name+"AreaProjection3", "special_data_camera_main", "current_state_name_main", null);
         this.aliasing = aliasing;
         this.shader_manager = shader_manager;
         this.global_data = global_data;
@@ -212,6 +218,40 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
 
         this.shader_flags = new ShaderFlags();
+    }
+
+    InitAreaProjectionCameras(){
+        this.cameraAreaProjection0.position = glMatrix.vec4.fromValues(0.0, -2.5, 0.0, 0.0);
+        this.cameraAreaProjection0.forward = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 0.0);
+        this.cameraAreaProjection0.up = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 0.0);
+        this.cameraAreaProjection0.right = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+        this.cameraAreaProjection0.width = this.camera.width;
+        this.cameraAreaProjection0.height = this.camera.height;
+        this.cameraAreaProjection0.UpdateShaderValues4D();
+
+        this.cameraAreaProjection1.position = glMatrix.vec4.fromValues(0.0, 0.0, -2.5, 0.0);
+        this.cameraAreaProjection1.forward = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 0.0);
+        this.cameraAreaProjection1.up = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+        this.cameraAreaProjection1.right = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection1.width = this.camera.width;
+        this.cameraAreaProjection1.height = this.camera.height;
+        this.cameraAreaProjection1.UpdateShaderValues4D();
+
+        this.cameraAreaProjection2.position = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, -2.5);
+        this.cameraAreaProjection2.forward = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+        this.cameraAreaProjection2.up = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection2.right = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 0.0);
+        this.cameraAreaProjection2.width = this.camera.width;
+        this.cameraAreaProjection2.height = this.camera.height;
+        this.cameraAreaProjection2.UpdateShaderValues4D();
+
+        this.cameraAreaProjection3.position = glMatrix.vec4.fromValues(-2.5, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection3.forward = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection3.up = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 0.0);
+        this.cameraAreaProjection3.right = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 0.0);
+        this.cameraAreaProjection3.width = this.camera.width;
+        this.cameraAreaProjection3.height = this.camera.height;
+        this.cameraAreaProjection3.UpdateShaderValues4D();
     }
 
     ShowThumbnail(show){
@@ -626,6 +666,11 @@ class CanvasWrapper {
         //console.log(this.camera.width, this.camera.height);
         gl.useProgram(this.program_raytracing);
         this.camera.WriteToUniform(gl, this.program_raytracing, "active_camera");
+        this.InitAreaProjectionCameras();
+        this.cameraAreaProjection0.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection0");
+        this.cameraAreaProjection1.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection1");
+        this.cameraAreaProjection2.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection2");
+        this.cameraAreaProjection3.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection3");
         //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
         console.log("drawTextureRaytracing draw size", this.camera.width, "x", this.camera.height);
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);

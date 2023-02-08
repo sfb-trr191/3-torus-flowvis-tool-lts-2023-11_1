@@ -49,6 +49,11 @@ uniform int dim_z;//dim of volume texture
 uniform float max_streamline_cost;
 
 uniform GL_CameraData active_camera;
+uniform GL_CameraData cameraAreaProjection0;
+uniform GL_CameraData cameraAreaProjection1;
+uniform GL_CameraData cameraAreaProjection2;
+uniform GL_CameraData cameraAreaProjection3;
+
 
 //************************** redundant because of compiler directives ********************************
 

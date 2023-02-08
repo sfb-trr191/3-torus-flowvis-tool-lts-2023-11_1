@@ -25,6 +25,10 @@ class GL_CameraData {
         this.normal_right = glMatrix.vec4.create();
         this.normal_top = glMatrix.vec4.create();
         this.normal_bottom = glMatrix.vec4.create();
+        this.area_start_x_percentage;
+        this.area_start_y_percentage;
+        this.area_height_percentage;
+        this.area_width_percentage;
     }
 
     WriteToUniform(gl, program, uniform_variable_name) {
@@ -38,6 +42,11 @@ class GL_CameraData {
         var location_normal_top = gl.getUniformLocation(program, uniform_variable_name + ".normal_top");
         var location_normal_bottom = gl.getUniformLocation(program, uniform_variable_name + ".normal_bottom");
 
+        var location_area_start_x_percentage = gl.getUniformLocation(program, uniform_variable_name + ".area_start_x_percentage");
+        var location_area_start_y_percentage = gl.getUniformLocation(program, uniform_variable_name + ".area_start_y_percentage");
+        var location_area_height_percentage = gl.getUniformLocation(program, uniform_variable_name + ".area_height_percentage");
+        var location_area_width_percentage = gl.getUniformLocation(program, uniform_variable_name + ".area_width_percentage");
+
         gl.uniform4fv(location_q_x, this.q_x);
         gl.uniform4fv(location_q_y, this.q_y);
         gl.uniform4fv(location_p_1m, this.p_1m);
@@ -47,6 +56,11 @@ class GL_CameraData {
         gl.uniform4fv(location_normal_right, this.normal_right);
         gl.uniform4fv(location_normal_top, this.normal_top);
         gl.uniform4fv(location_normal_bottom, this.normal_bottom);
+        
+        gl.uniform1f(location_area_start_x_percentage, this.area_start_x_percentage);
+        gl.uniform1f(location_area_start_y_percentage, this.area_start_y_percentage);
+        gl.uniform1f(location_area_height_percentage, this.area_height_percentage);
+        gl.uniform1f(location_area_width_percentage, this.area_width_percentage);
 
         console.log("WriteToUniform this.E", this.E)
     }
@@ -248,6 +262,11 @@ class Camera {
         this.trackball_translation_sensitivity = 1.0;
         this.trackball_wheel_sensitivity = 0.001;
         this.trackball_focus_distance = 0.5;
+
+        this.area_start_x_percentage = 0.0;
+        this.area_start_y_percentage = 0.0;
+        this.area_height_percentage = 1.0;
+        this.area_width_percentage = 1.0;
 
         //panning
         this.allow_panning = true;
@@ -543,6 +562,10 @@ class Camera {
         glMatrix.vec4.copy(data.normal_right, this.normal_right);//data.normal_right = vec4fromvec3(this.normal_right, 0);
         glMatrix.vec4.copy(data.normal_top, this.normal_top);//data.normal_top = vec4fromvec3(this.normal_top, 0);
         glMatrix.vec4.copy(data.normal_bottom, this.normal_bottom);//data.normal_bottom = vec4fromvec3(this.normal_bottom, 0);
+        data.area_start_x_percentage = this.area_start_x_percentage;
+        data.area_start_y_percentage = this.area_start_y_percentage;
+        data.area_width_percentage = this.area_width_percentage;
+        data.area_height_percentage = this.area_height_percentage;
         return data;
     }
 
@@ -636,6 +659,56 @@ class Camera {
         //console.log("0x22 this.position", this.position);
     }
 
+    SetArea(area_index, show_4_projections, projection_width_percentage){
+        //big area
+        var area_height_percentage = 0.245;
+        if(area_index == -1){
+            if(show_4_projections){
+                this.area_width_percentage = 1.0 - projection_width_percentage;
+                this.area_height_percentage = 1.0;
+                this.area_start_x_percentage = projection_width_percentage;
+                this.area_start_y_percentage = 0.0;
+            }else{
+                this.area_width_percentage = 1.0;
+                this.area_height_percentage = 1.0;
+                this.area_start_x_percentage = 0.0;
+                this.area_start_y_percentage = 0.0;
+            }
+        }
+        else if(area_index == 0){
+            this.area_width_percentage = projection_width_percentage;
+            this.area_height_percentage = area_height_percentage;
+            this.area_start_x_percentage = 0.0;
+            this.area_start_y_percentage = 0.0;
+        }
+        else if(area_index == 1){
+            this.area_width_percentage = projection_width_percentage;
+            this.area_height_percentage = area_height_percentage;
+            this.area_start_x_percentage = 0.0;
+            this.area_start_y_percentage = 1 * (area_height_percentage + 0.01);
+        }
+        else if(area_index == 2){
+            this.area_width_percentage = projection_width_percentage;
+            this.area_height_percentage = area_height_percentage;
+            this.area_start_x_percentage = 0.0;
+            this.area_start_y_percentage = 2 * (area_height_percentage + 0.01);
+        }
+        else if(area_index == 3){
+            this.area_width_percentage = projection_width_percentage;
+            this.area_height_percentage = area_height_percentage;
+            this.area_start_x_percentage = 0.0;
+            this.area_start_y_percentage = 3 * (area_height_percentage + 0.01);
+        }
+    }
+
+    GetCurrentAreaWidthInPixels(){
+        return this.width * this.area_width_percentage;
+    }
+
+    GetCurrentAreaHeightInPixels(){
+        return this.height * this.area_height_percentage;
+    }
+
     UpdateShaderValues4D() {
         //console.log("UpdateShaderValues4D", this.name);
         var T = glMatrix.vec4.create();
@@ -653,8 +726,8 @@ class Camera {
 
         var E = this.position;
         glMatrix.vec4.add(T, this.position, this.forward);//T = this.position + this.forward;
-        var m = this.height;
-        var k = this.width;
+        var m = this.GetCurrentAreaHeightInPixels();
+        var k = this.GetCurrentAreaWidthInPixels();
         var w = this.up;
 
         //pre calculations
@@ -1608,7 +1681,7 @@ class Camera {
         var tmp = glMatrix.vec4.create();
 
         //float i = gl_FragCoord[0];//x
-        var i = x;
+        var i = x - (this.width * this.area_start_x_percentage);
         //float j = float(height) - gl_FragCoord[1];//y
         var j = y;
 
