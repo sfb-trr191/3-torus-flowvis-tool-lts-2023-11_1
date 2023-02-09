@@ -26,6 +26,7 @@ Ray GenerateRay(float x_offset, float y_offset)
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
+    ray.ray_projection_index = -1;
 	return ray;
 }
 
@@ -60,6 +61,7 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
+    ray.ray_projection_index = -1;
 	return ray;
 }
 
@@ -72,11 +74,13 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 Ray GenerateRay(float x_offset, float y_offset, int area_index)
 {	
     bool left_handed = false;//DUMMY
+    int ray_projection_index = -1;
 
 
 	GL_CameraData cam = GetActiveCamera();
     if(area_index >= 0){
         cam = GetCameraForArea(area_index);
+        ray_projection_index = area_index;
     }
     //float area_x_start = float(width) * 0.2;
     //float area_y_start = 0.0;
@@ -111,6 +115,7 @@ Ray GenerateRay(float x_offset, float y_offset, int area_index)
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
+    ray.ray_projection_index = ray_projection_index;
 	return ray;
 }
 /*

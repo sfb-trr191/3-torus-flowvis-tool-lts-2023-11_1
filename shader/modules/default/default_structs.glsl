@@ -47,6 +47,7 @@ struct Ray
     vec3 nextDirection;
     float segment_length;
     int iteration_count;
+    int ray_projection_index;
 };
 
 `;

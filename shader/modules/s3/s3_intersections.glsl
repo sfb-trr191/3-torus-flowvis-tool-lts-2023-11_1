@@ -12,6 +12,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	variableRay.dir_inv = ray.dir_inv;
 	variableRay.rayDistance = 0.0;
     variableRay.local_cutoff = maxRayDistance;
+    variableRay.ray_projection_index = ray.ray_projection_index;
 
     /*	
     if(IsVec4Similar(ray.origin, vec4(0.0, 0.0, 0.0, 1.0))){
@@ -209,14 +210,14 @@ void IntersectLineSegment(int part_index, Ray ray, float ray_local_cutoff, GL_Tr
     float tube_radius = GetTubeRadius(part_index);
     
 	int lineSegmentID = glNode.objectIndex;
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index, ray.ray_projection_index);
 	int multiPolyID = lineSegment.multiPolyID;
 	bool copy = (lineSegment.copy==1);
 	if(ignore_copy && copy)
 		return;
 
-	vec4 a = GetPosition4D(lineSegment.indexA, part_index);
-	vec4 b = GetPosition4D(lineSegment.indexB, part_index);
+	vec4 a = GetPosition4D(lineSegment.indexA, part_index, ray.ray_projection_index);
+	vec4 b = GetPosition4D(lineSegment.indexB, part_index, ray.ray_projection_index);
 	float cost_a = GetCost(lineSegment.indexA, part_index);
 	float cost_b = GetCost(lineSegment.indexB, part_index);
 	float cost_cutoff = max_streamline_cost;
@@ -394,12 +395,12 @@ void IntersectSpherinder(int part_index, Ray ray, float ray_local_cutoff, int li
     vec4 ray_origin_4D = ray.origin;
     vec4 ray_direction_4D = ray.direction;
     
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
+	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index, ray.ray_projection_index);
 	int multiPolyID = lineSegment.multiPolyID;
 	bool copy = (lineSegment.copy==1);
 
-    vec4 spherinder_point_A = GetPosition4D(lineSegment.indexA, part_index);
-    vec4 spherinder_point_B = GetPosition4D(lineSegment.indexB, part_index);
+    vec4 spherinder_point_A = GetPosition4D(lineSegment.indexA, part_index, ray.ray_projection_index);
+    vec4 spherinder_point_B = GetPosition4D(lineSegment.indexB, part_index, ray.ray_projection_index);
     
 
     //get second point on line

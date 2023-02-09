@@ -365,7 +365,7 @@ class LODData {
             vectorLineSegment[i].matrix = matrixCombined;
             vectorLineSegment[i].matrix_inv = matrixInverted;
             
-            for (var projection_index=0; projection_index<3; projection_index++){
+            for (var projection_index=0; projection_index<4; projection_index++){
                 var matrix = this.CalculateMatrix(part_index, space, i, projection_index);
                 var matrix_inv = glMatrix.mat4.create();
                 glMatrix.mat4.invert(matrix_inv, matrix);
@@ -385,6 +385,10 @@ class LODData {
     }
 
     CalculateMatrix3D(part_index, segment_index, projection_index){
+        if(projection_index >= 3){
+            return glMatrix.mat4.create();
+        }
+
         var raw_data = this.p_streamline_context.GetRawData(part_index);
         var vectorLineSegment = this.GetVectorLineSegment(part_index);
 
@@ -476,6 +480,8 @@ class LODData {
         var posB_ws = glMatrix.vec4.create();
         glMatrix.vec4.copy(posA_ws, raw_data.data[indexA].position);//vec4
         glMatrix.vec4.copy(posB_ws, raw_data.data[indexB].position);//vec4
+        posA_ws[projection_index] = 0;
+        posB_ws[projection_index] = 0;
 
         var point_B_translated = glMatrix.vec4.create();
         glMatrix.vec4.subtract(point_B_translated, posB_ws, posA_ws);

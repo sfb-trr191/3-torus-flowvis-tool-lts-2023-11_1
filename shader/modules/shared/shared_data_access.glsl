@@ -9,7 +9,7 @@ global.SHADER_MODULE_SHARED_DATA_ACCESS = `
 //DATA SIZES
 const int POSITION_DATA_FLOAT_COUNT = 8;
 const int POSITION_DATA_INT_COUNT = 0;
-const int LINE_SEGMENT_FLOAT_COUNT = 128;//32 for two matrices
+const int LINE_SEGMENT_FLOAT_COUNT = 160;//128;//32 for two matrices
 const int LINE_SEGMENT_INT_COUNT = 8;
 const int TREE_NODE_FLOAT_COUNT = 8;
 const int TREE_NODE_INT_COUNT = 4;
@@ -106,7 +106,7 @@ vec3 GetPosition(int index, int part_index)
     return position;
 }
 
-vec4 GetPosition4D(int index, int part_index)
+vec4 GetPosition4D(int index, int part_index, int ray_projection_index)
 {
     ivec3 pointer = GetIndex3D(GetStartIndexFloatPositionData(part_index) + index * POSITION_DATA_FLOAT_COUNT);
     float x = texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r;
@@ -114,8 +114,8 @@ vec4 GetPosition4D(int index, int part_index)
     float z = texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r;  
     float w = texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r;  
     vec4 position = vec4(x, y, z, w);
-    if(projection_index >=0)
-        position[projection_index] = 0.0;
+    if(ray_projection_index >=0)
+        position[ray_projection_index] = 0.0;
 
     return position;
 }
@@ -147,6 +147,57 @@ GL_LineSegment GetLineSegment(int index, int part_index)
 
 	pointer = GetIndex3D(GetStartIndexFloatLineSegments(part_index) + index * LINE_SEGMENT_FLOAT_COUNT
         + 32 * (projection_index+1));//projection_index = -1 is no projection (default)
+  	segment.matrix = mat4(
+		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(4,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(5,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(6,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(7,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(8,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(9,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(10,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(11,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(12,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(13,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(14,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(15,0,0), 0).r
+  	);
+	segment.matrix_inv = mat4(
+		texelFetch(texture_float, pointer+ivec3(16,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(17,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(18,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(19,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(20,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(21,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(22,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(23,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(24,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(25,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(26,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(27,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(28,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(29,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(30,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(31,0,0), 0).r
+  	);
+  return segment;
+}
+
+GL_LineSegment GetLineSegment(int index, int part_index, int ray_projection_index)
+{
+	GL_LineSegment segment;
+	ivec3 pointer = GetIndex3D(GetStartIndexIntLineSegments(part_index) + index * LINE_SEGMENT_INT_COUNT);
+	segment.indexA = texelFetch(texture_int, pointer+ivec3(0,0,0), 0).r;
+	segment.indexB = texelFetch(texture_int, pointer+ivec3(1,0,0), 0).r;
+	segment.multiPolyID = texelFetch(texture_int, pointer+ivec3(2,0,0), 0).r;
+	segment.copy = texelFetch(texture_int, pointer+ivec3(3,0,0), 0).r;
+	segment.isBeginning = texelFetch(texture_int, pointer+ivec3(4,0,0), 0).r;
+
+	pointer = GetIndex3D(GetStartIndexFloatLineSegments(part_index) + index * LINE_SEGMENT_FLOAT_COUNT
+        + 32 * (ray_projection_index+1));//projection_index = -1 is no projection (default)
   	segment.matrix = mat4(
 		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
 		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,

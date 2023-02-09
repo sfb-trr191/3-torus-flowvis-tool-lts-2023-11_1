@@ -71,9 +71,10 @@ float GetTubeRadius(int part_index);
 
 float GetCost(int index, int part_index);
 vec3 GetPosition(int index, int part_index);
-vec4 GetPosition4D(int index, int part_index);
+vec4 GetPosition4D(int index, int part_index, int ray_projection_index);
 float GetVelocity(int index, int part_index);
 GL_LineSegment GetLineSegment(int index, int part_index);
+GL_LineSegment GetLineSegment(int index, int part_index, int ray_projection_index);
 GL_TreeNode GetNode(int index, int part_index);
 GL_AABB GetAABB(int index, int part_index);
 GL_DirLight GetDirLight(int index);

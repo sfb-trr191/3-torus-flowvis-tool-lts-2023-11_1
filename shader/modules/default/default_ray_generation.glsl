@@ -26,6 +26,7 @@ Ray GenerateRay(float x_offset, float y_offset)
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
+    ray.ray_projection_index = -1;
 	return ray;
 }
 
@@ -60,7 +61,13 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 	ray.rayDistance = 0.0;
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
+    ray.ray_projection_index = -1;
 	return ray;
+}
+
+Ray GenerateRay(float x_offset, float y_offset, int area_index)
+{	
+	return GenerateRay(x_offset, y_offset);
 }
 
 `;
