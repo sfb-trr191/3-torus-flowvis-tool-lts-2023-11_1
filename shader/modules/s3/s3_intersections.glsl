@@ -149,7 +149,7 @@ void IntersectInstance_Tree(int part_index, Ray ray, float ray_local_cutoff, ino
 		//	break;//TODO
 
 		GL_TreeNode glNode = GetNode(nodeIndex, part_index);
-		GL_AABB glAABB = GetAABB(nodeIndex, part_index);
+		GL_AABB glAABB = GetAABB(nodeIndex, part_index, ray.ray_projection_index);
 		float tmin;
 		float tmax;
 		bool hitAABB = IntersectGLAABB(glAABB, ray, ray_local_cutoff, tmin, tmax);

@@ -277,6 +277,33 @@ GL_AABB GetAABB(int index, int part_index)
 	return aabb;
 }
 
+GL_AABB GetAABB(int index, int part_index, int ray_projection_index)
+{
+    float tube_radius = GetTubeRadius(part_index);
+
+	GL_AABB aabb;
+	ivec3 pointer = GetIndex3D(GetStartIndexFloatTreeNodes(part_index) + index * TREE_NODE_FLOAT_COUNT);
+	aabb.min = vec4(
+		texelFetch(texture_float, pointer+ivec3(0,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(1,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(2,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(3,0,0), 0).r//unnecessary
+	);
+	aabb.max = vec4(
+		texelFetch(texture_float, pointer+ivec3(4,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(5,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(6,0,0), 0).r,
+		texelFetch(texture_float, pointer+ivec3(7,0,0), 0).r//unnecessary
+	);
+
+    if(ray_projection_index >=0)
+    {
+        aabb.min[ray_projection_index] = -tube_radius;
+        aabb.max[ray_projection_index] = tube_radius;
+    }
+	return aabb;
+}
+
 ////////////////////////////////////////////////////////////////////
 //
 //               START REGION ACCESS GLOBAL TEXTURE

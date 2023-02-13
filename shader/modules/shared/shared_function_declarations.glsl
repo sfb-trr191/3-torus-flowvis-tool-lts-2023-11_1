@@ -77,6 +77,7 @@ GL_LineSegment GetLineSegment(int index, int part_index);
 GL_LineSegment GetLineSegment(int index, int part_index, int ray_projection_index);
 GL_TreeNode GetNode(int index, int part_index);
 GL_AABB GetAABB(int index, int part_index);
+GL_AABB GetAABB(int index, int part_index, int ray_projection_index);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
 vec3 GetStreamlineSeedPosition(int index);
