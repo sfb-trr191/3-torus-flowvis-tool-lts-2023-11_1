@@ -2227,6 +2227,45 @@ class Camera {
         this.up = base.v3;
         this.right = base.v4;
     }
+
+    RotateAroundCamera4DinDegrees(theta_x, theta_y){
+        theta_x = theta_x * Math.PI / 180;
+        theta_y = theta_y * Math.PI / 180;
+        this.RotateAroundCamera4D(theta_x, theta_y);
+    }
+
+    RotateAroundCamera4D(theta_x, theta_y){
+        //camera is at origin for rotation around itself
+        var pos_cam = glMatrix.vec4.fromValues(0,0,0,0);
+
+        //three helper points offset by forward, up, and right vector respectively
+        var pos_cam_forward = glMatrix.vec4.create();
+        var pos_cam_up = glMatrix.vec4.create();
+        var pos_cam_right = glMatrix.vec4.create();
+        glMatrix.vec4.add(pos_cam_forward, pos_cam, this.forward);
+        glMatrix.vec4.add(pos_cam_up, pos_cam, this.up);
+        glMatrix.vec4.add(pos_cam_right, pos_cam, this.right);
+
+
+        //rotate the position and three helper points
+        //theta_x --> rotation in plane defined by camera forward and right
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, theta_x, this.forward, this.right);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, theta_x, this.forward, this.right);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, theta_x, this.forward, this.right);
+
+        //theta_y --> rotation in plane defined by camera forward and right
+        pos_cam_forward = RotateVectorInPlane(pos_cam_forward, theta_y, this.forward, this.up);
+        pos_cam_up = RotateVectorInPlane(pos_cam_up, theta_y, this.forward, this.up);
+        pos_cam_right = RotateVectorInPlane(pos_cam_right, theta_y, this.forward, this.up);
+        
+        //glMatrix.vec4.subtract(this.right, pos_cam, this.right);
+
+        glMatrix.vec4.normalize(this.forward, pos_cam_forward);
+        glMatrix.vec4.normalize(this.up, pos_cam_up);
+        glMatrix.vec4.normalize(this.right, pos_cam_right);
+
+        this.changed = true;
+    }
 }
 
 module.exports = Camera;

@@ -221,34 +221,65 @@ class CanvasWrapper {
     }
 
     InitAreaProjectionCameras(){
-        this.cameraAreaProjection0.position = glMatrix.vec4.fromValues(0.0, -2.5, 0.0, 0.0);
+        /*
+        this.cameraAreaProjection0.position = glMatrix.vec4.fromValues(0.0, -2.5, -0.5, -0.5);
         this.cameraAreaProjection0.forward = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 0.0);
         this.cameraAreaProjection0.up = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 0.0);
         this.cameraAreaProjection0.right = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
         this.cameraAreaProjection0.width = this.camera.width;
         this.cameraAreaProjection0.height = this.camera.height;
         this.cameraAreaProjection0.UpdateShaderValues4D();
+        */
+       var forward_dist = 1.5;
+       var side_dist = 1.75;
+       var up_dist = 0.5;
+       var theta_x = 50;
+       var theta_y = 10;
 
-        this.cameraAreaProjection1.position = glMatrix.vec4.fromValues(0.0, 0.0, -2.5, 0.0);
-        this.cameraAreaProjection1.forward = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 0.0);
-        this.cameraAreaProjection1.up = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+
+
+
+        this.cameraAreaProjection0.position = glMatrix.vec4.fromValues(0.0, up_dist, forward_dist, -side_dist);
+        this.cameraAreaProjection0.forward = glMatrix.vec4.fromValues(0.0, 0.0, -1.0, 0.0);
+        this.cameraAreaProjection0.up = glMatrix.vec4.fromValues(0.0, -1.0, 0.0, 0.0);
+        this.cameraAreaProjection0.right = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+        this.cameraAreaProjection0.RotateAroundCamera4DinDegrees(theta_x, theta_y);       
+        this.cameraAreaProjection0.width = this.camera.width;
+        this.cameraAreaProjection0.height = this.camera.height;
+        this.cameraAreaProjection0.UpdateShaderValues4D();
+
+        this.cameraAreaProjection1.position = glMatrix.vec4.fromValues(-side_dist, 0.0, up_dist, forward_dist);
+        this.cameraAreaProjection1.forward = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, -1.0);
+        this.cameraAreaProjection1.up = glMatrix.vec4.fromValues(0.0, 0.0, -1.0, 0.0);
         this.cameraAreaProjection1.right = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection1.RotateAroundCamera4DinDegrees(theta_x, theta_y);       
         this.cameraAreaProjection1.width = this.camera.width;
         this.cameraAreaProjection1.height = this.camera.height;
         this.cameraAreaProjection1.UpdateShaderValues4D();
 
-        this.cameraAreaProjection2.position = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, -2.5);
-        this.cameraAreaProjection2.forward = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, 1.0);
-        this.cameraAreaProjection2.up = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
-        this.cameraAreaProjection2.right = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 0.0);
+        side_dist = 1.5;
+        up_dist = 0.0;
+        forward_dist = 1.5;
+        theta_x = 45;
+        theta_y = 0;
+        
+        this.cameraAreaProjection2.position = glMatrix.vec4.fromValues(-side_dist, up_dist, 0.0, forward_dist);
+        this.cameraAreaProjection2.forward = glMatrix.vec4.fromValues(0.0, 0.0, 0.0, -1.0);
+        this.cameraAreaProjection2.up = glMatrix.vec4.fromValues(0.0, -1.0, 0.0, 0.0);
+        this.cameraAreaProjection2.right = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection2.RotateAroundCamera4DinDegrees(theta_x, theta_y);       
         this.cameraAreaProjection2.width = this.camera.width;
         this.cameraAreaProjection2.height = this.camera.height;
         this.cameraAreaProjection2.UpdateShaderValues4D();
 
-        this.cameraAreaProjection3.position = glMatrix.vec4.fromValues(-2.5, 0.0, 0.0, 0.0);
-        this.cameraAreaProjection3.forward = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
-        this.cameraAreaProjection3.up = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 0.0);
-        this.cameraAreaProjection3.right = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 0.0);
+        this.cameraAreaProjection3.position = glMatrix.vec4.fromValues(-side_dist, up_dist, forward_dist, 0.0);
+        this.cameraAreaProjection3.forward = glMatrix.vec4.fromValues(0.0, 0.0, -1.0, 0.0);
+        this.cameraAreaProjection3.up = glMatrix.vec4.fromValues(0.0, -1.0, 0.0, 0.0);
+        this.cameraAreaProjection3.right = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 0.0);
+        this.cameraAreaProjection3.RotateAroundCamera4DinDegrees(theta_x, theta_y);     
+        //this.cameraAreaProjection3.RotateAroundCamera4DinDegrees(50, 10);     
+        //this.cameraAreaProjection3.RotateAroundCamera4DinDegrees(0, 10);         
+        //this.cameraAreaProjection3.RotateAroundCamera4DinDegrees(0, 20);
         this.cameraAreaProjection3.width = this.camera.width;
         this.cameraAreaProjection3.height = this.camera.height;
         this.cameraAreaProjection3.UpdateShaderValues4D();

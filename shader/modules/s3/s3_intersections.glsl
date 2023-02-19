@@ -107,6 +107,8 @@ void IntersectInstance(Ray ray, inout HitInformation hit)
     }
 #endif
 
+    IntersectSideProjectionAxes(ray, ray.local_cutoff, hit);
+
 //#ifdef SHOW_BOUNDING_BOX
 //	{
 //        bool check_bounds = is_main_renderer;
@@ -550,5 +552,140 @@ void IntersectSphere(vec3 ray_origin_3D, vec3 ray_destination_3D, vec3 sphere_ce
     result.t = scaled_t;
 }
 
+
+// AXES
+
+void IntersectSideProjectionAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit){
+    int ray_projection_index = ray.ray_projection_index;
+    //ray_projection_index = 3;
+    if(ray_projection_index >= 0){
+        for(int i=0; i<3; i++){
+            GL_Cylinder cylinder = GetCylinder(INDEX_CYLINDER_FIRST_SIDE_PROJECTION + i + (ray_projection_index * 3));
+            IntersectSpherinderGL_Cylinder(cylinder, ray, ray_local_cutoff, hit);
+        }
+    }
+    /*
+    Sphere4D sphere4D;
+    sphere4D.center = vec4(-2.0, 0.0, -0.05, 0.0);
+    sphere4D.radius = 0.05;
+    Intersect3Sphere(0, ray, ray_local_cutoff, sphere4D, hit, false, 0, TYPE_GL_CYLINDER, 0.0, 0.0);	
+    */
+}
+
+void IntersectSpherinderGL_Cylinder(GL_Cylinder cylinder, Ray ray, float ray_local_cutoff, inout HitInformation hit)
+{ 
+    float tube_radius = cylinder.radius;//GetTubeRadius(part_index);
+
+    //rename
+    vec4 ray_origin_4D = ray.origin;
+    vec4 ray_direction_4D = ray.direction;
+    
+	//GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index, ray.ray_projection_index);
+	//int multiPolyID = lineSegment.multiPolyID;
+	//bool copy = (lineSegment.copy==1);
+
+    vec4 spherinder_point_A = cylinder.position_a;// GetPosition4D(lineSegment.indexA, part_index, ray.ray_projection_index);
+    vec4 spherinder_point_B = cylinder.position_b;// GetPosition4D(lineSegment.indexB, part_index, ray.ray_projection_index);
+    
+
+    //get second point on line
+    vec4 ray_destination_4D = ray_origin_4D + ray_direction_4D;//glMatrix.vec4.add(ray_destination_4D, ray_origin_4D, ray_direction_4D);
+
+    //translate to origin
+    vec4 spherinder_point_B_translated = spherinder_point_B - spherinder_point_A; //glMatrix.vec4.subtract(spherinder_point_B_translated, spherinder_point_B, spherinder_point_A);
+    vec4 ray_origin_4D_translated = ray_origin_4D - spherinder_point_A; //glMatrix.vec4.subtract(ray_origin_4D_translated, ray_origin_4D, spherinder_point_A);
+    vec4 ray_destination_4D_translated = ray_destination_4D - spherinder_point_A; //glMatrix.vec4.subtract(ray_destination_4D_translated, ray_destination_4D, spherinder_point_A);
+
+    //get rotation matrix
+    mat4 M = cylinder.matrix;//lineSegment.matrix; //var M = math4D.getAligned4DRotationMatrix(spherinder_point_B_translated);
+
+    //rotate points
+    vec4 ray_origin_4D_rotated = M * ray_origin_4D_translated; //glMatrix.vec4.transformMat4(ray_origin_4D_rotated, ray_origin_4D_translated, M);
+    vec4 ray_destination_4D_rotated = M * ray_destination_4D_translated; //glMatrix.vec4.transformMat4(ray_destination_4D_rotated, ray_destination_4D_translated, M);
+
+    //get 3D points
+    vec3 ray_origin_3D = ray_origin_4D_rotated.xyz; //var ray_origin_3D = glMatrix.vec3.fromValues(ray_origin_4D_rotated[0], ray_origin_4D_rotated[1], ray_origin_4D_rotated[2]);
+    vec3 ray_destination_3D = ray_destination_4D_rotated.xyz; //var ray_destination_3D = glMatrix.vec3.fromValues(ray_destination_4D_rotated[0], ray_destination_4D_rotated[1], ray_destination_4D_rotated[2]);
+
+    //get 3D direction vector
+    vec3 ray_direction_3D = ray_destination_3D - ray_origin_3D; //glMatrix.vec3.subtract(ray_direction_3D, ray_destination_3D, ray_origin_3D);
+    vec3 sphere_center_3D = vec3(0,0,0); //var sphere_center_3D = glMatrix.vec3.fromValues(0, 0, 0);
+
+    //intersect sphere in 3D
+    IntersectionResult result;
+    result.intersect = false;
+    IntersectSphere(ray_origin_3D, ray_destination_3D, sphere_center_3D, tube_radius, result);
+
+    //if no sphere intersection --> no intersection
+    if(!result.intersect){
+        return;
+    }
+
+    //------------- 4D OBJECT SPACE -----------------
+
+    //get 4D rotated direction vector
+    vec4 ray_direction_4D_rotated = ray_destination_4D_rotated - ray_origin_4D_rotated; //glMatrix.vec4.subtract(ray_direction_4D_rotated, ray_destination_4D_rotated, ray_origin_4D_rotated);
+    //sphere intersection found, get w
+    vec4 intersection_4D_os = ray_origin_4D_rotated + (ray_direction_4D_rotated * result.t); //glMatrix.vec4.scaleAndAdd(intersection_4D_os, ray_origin_4D_rotated, ray_direction_4D_rotated, result.t);
+    float h = distance(spherinder_point_A, spherinder_point_B); //var h = glMatrix.vec4.distance(spherinder_point_A, spherinder_point_B);//spherinder_point_B_rotated[3];   
+    float w_os = intersection_4D_os[3]; //var w_os = intersection_4D_os[3];
+    if(w_os > h || w_os < 0.0)
+	{
+        //result.intersect = false;
+        //result.flag_outside_interval = true;
+		return;
+	}
+
+    //------------- COST CHECK -----------------
+    /*
+    float cost_a = GetCost(lineSegment.indexA, part_index);
+	float cost_b = GetCost(lineSegment.indexB, part_index);
+	float local_percentage = w_os / h;
+	float cost = mix(cost_a, cost_b, local_percentage);
+
+    if(growth == 1)
+	{
+		if(growth_id == -1 || growth_id == multiPolyID)
+		{
+			if(cost > max_streamline_cost)
+				return;
+		}
+	}
+    */
+    //------------- 4D WORLD SPACE -----------------
+
+    //intersection in world space
+    vec4 intersection_4D_ws = ray_origin_4D + (ray_direction_4D * result.t); //glMatrix.vec4.scaleAndAdd(intersection_4D_ws, ray_origin_4D, ray_direction_4D, result.t);
+    //result.intersection_4D = intersection_4D_ws;
+
+    //get intersection center (nearest point on spherinder center line)
+    float t_spherinder = w_os / h; //var t_spherinder = w_os / h;
+    vec4 spherinder_direction = spherinder_point_B - spherinder_point_A; //glMatrix.vec4.subtract(spherinder_direction, spherinder_point_B, spherinder_point_A);
+    vec4 intersection_center_4D_ws = spherinder_point_A + (spherinder_direction * t_spherinder); //glMatrix.vec4.scaleAndAdd(intersection_center_4D_ws, spherinder_point_A, spherinder_direction, t_spherinder);
+    //result.intersection_center_4D = intersection_center_4D_ws;
+    
+    float distance_this_iteration = distance(ray_origin_4D, intersection_4D_ws);
+    float distance_total = ray.rayDistance + distance_this_iteration;
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_total < hit.distance);
+    if(hit_condition)
+	{		
+		hit.hitType = TYPE_GL_CYLINDER;
+        hit.iteration_count = ray.iteration_count;
+		hit.distance_iteration = distance_this_iteration;	
+		hit.distance = distance_total;
+		hit.position = intersection_4D_ws;
+		hit.positionCenter = intersection_center_4D_ws;
+		hit.normal = normalize(intersection_4D_ws - intersection_center_4D_ws);
+		hit.copy = false;
+		hit.multiPolyID = -1;
+		hit.velocity = -1.0;
+		hit.cost = -1.0;
+        //hit.debug_value = 1;
+        hit.sub_type = SUBTYPE_SPHERINDER;
+		hit.objectColor = cylinder.color.xyz;
+		
+	}
+
+}
 
 `;

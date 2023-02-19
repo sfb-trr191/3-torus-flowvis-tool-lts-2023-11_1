@@ -273,7 +273,9 @@ class Cylinder {
     position_b = glMatrix.vec4.create();
     color = glMatrix.vec4.create();
     radius = 0.01;
-
+    
+    //NOT written to GL, doesnt count for size
+    is4D = false;//NOT written to GL
 
     constructor() {
         //this.matrix[0] = 2;//TODO remove: test inverse

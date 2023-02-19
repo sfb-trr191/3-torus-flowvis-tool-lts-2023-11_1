@@ -35,6 +35,7 @@ const int TRANSFER_FUNCTION_BINS = 512;
 const int TRANSFER_FUNCTION_LAST_BIN = TRANSFER_FUNCTION_BINS-1;
 
 const int INDEX_CYLINDER_FIRST_PROJECTION_FRAME = 66;
+const int INDEX_CYLINDER_FIRST_SIDE_PROJECTION = 78;
 
 const int PART_INDEX_DEFAULT = 0;//streamlines only in fundamental domain
 const int PART_INDEX_OUTSIDE = 1;//streamlines leave fundamental domain

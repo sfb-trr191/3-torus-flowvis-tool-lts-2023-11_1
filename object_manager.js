@@ -4,6 +4,8 @@ const vec4fromvec3 = module_gl_matrix_extensions.vec4fromvec3;
 const MovableAxesState = require("./movable_axes_state");
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 
+const module_math4D = require("./math4D");
+const getAligned4DRotationMatrix = module_math4D.getAligned4DRotationMatrix;
 
 class ObjectManager {
 
@@ -23,8 +25,10 @@ class ObjectManager {
         this.AddAxes(true);
         this.AddAxes(false);
         this.AddProjectionFrames();
+        this.AddAxesSideProjections();
         this.CalculateMatrices();
         console.log("this.cylinders: ", this.cylinders);
+        debugger;
     }
 
     AddAxes(is_main) {
@@ -79,8 +83,6 @@ class ObjectManager {
             glMatrix.vec4.fromValues(1, 1, 0, 1),
             glMatrix.vec4.fromValues(0, 1, 0, 1)
         );
-        console.log("this.cylinders: ", this.cylinders);
-
     }
 
     AddProjectionFrame(point_1, point_2, point_3, point_4) {
@@ -88,6 +90,7 @@ class ObjectManager {
         var color = glMatrix.vec4.fromValues(0.75, 0.75, 0.75, 1);
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = point_1;
         cylinder.position_b = point_2;
@@ -95,6 +98,7 @@ class ObjectManager {
         this.cylinders.push(cylinder);
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = point_2;
         cylinder.position_b = point_3;
@@ -102,6 +106,7 @@ class ObjectManager {
         this.cylinders.push(cylinder);
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = point_3;
         cylinder.position_b = point_4;
@@ -109,10 +114,135 @@ class ObjectManager {
         this.cylinders.push(cylinder);
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = point_4;
         cylinder.position_b = point_1;
         cylinder.color = color;
+        this.cylinders.push(cylinder);
+    }
+
+    AddAxesSideProjections(){
+        this.INDEX_CYLINDER_FIRST_SIDE_PROJECTION = this.cylinders.length;
+        console.log("INDEX_CYLINDER_FIRST_SIDE_PROJECTION: ", this.INDEX_CYLINDER_FIRST_SIDE_PROJECTION);
+        var RED = glMatrix.vec4.fromValues(1.0, 0.0, 0.0, 1.0);
+        var GREEN = glMatrix.vec4.fromValues(0.0, 1.0, 0.0, 1.0);
+        var BLUE = glMatrix.vec4.fromValues(0.0, 0.0, 1.0, 1.0);
+        var YELLOW = glMatrix.vec4.fromValues(1.0, 1.0, 0.0, 1.0);
+        var axis_length = 0.2; 
+        var offset = 1.4;
+
+
+        
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(0, 0, 0, -offset),//position
+            glMatrix.vec4.fromValues(0, 1, 0, 0),//dir_1
+            glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_2
+            glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_3
+            axis_length,
+            GREEN, BLUE, YELLOW
+        ); 
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(-offset, 0, 0, 0),//position
+            glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_1
+            glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_2
+            glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_3
+            axis_length,
+            BLUE, YELLOW, RED
+        );  
+        /* 
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(-offset, 0, 0, 0),//position
+            glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_1
+            glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_2
+            glMatrix.vec4.fromValues(0, 1, 0, 0),//dir_3
+            axis_length,
+            YELLOW, RED, GREEN
+        );   
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(-offset, 0, 0, 0),//position
+            glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_1
+            glMatrix.vec4.fromValues(0, 1, 0, 0),//dir_2
+            glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_3
+            axis_length,
+            RED, GREEN, BLUE
+        );      
+        */   
+
+
+
+
+
+        axis_length = 2.0;
+        /*
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(0, -1, -1, -1),//position
+            glMatrix.vec4.fromValues(0, 1, 0, 0),//dir_1
+            glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_2
+            glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_3
+            axis_length,
+            GREEN, BLUE, YELLOW
+        ); 
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(-1, 0, -1, -1),//position
+            glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_1
+            glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_2
+            glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_3
+            axis_length,
+            BLUE, YELLOW, RED
+        );  
+        */ 
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(-1, -1, 0, -1),//position
+            glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_1
+            glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_2
+            glMatrix.vec4.fromValues(0, 1, 0, 0),//dir_3
+            axis_length,
+            YELLOW, RED, GREEN
+        );   
+        this.AddAxesSideProjection(
+            glMatrix.vec4.fromValues(-1, -1, -1, 0),//position
+            glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_1
+            glMatrix.vec4.fromValues(0, 1, 0, 0),//dir_2
+            glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_3
+            axis_length,
+            RED, GREEN, BLUE
+        );      
+        debugger;
+    }
+
+    AddAxesSideProjection(position, dir_1, dir_2, dir_3, length, col_1, col_2, col_3){
+        var radius = 0.02;
+        var color = glMatrix.vec4.fromValues(0.75, 0.75, 0.75, 1);
+
+        var cylinder = new Cylinder;
+        var position_b = glMatrix.vec4.create();
+        glMatrix.vec4.scaleAndAdd(position_b, position, dir_1, length);
+        cylinder.is4D = true;
+        cylinder.radius = radius;
+        cylinder.position_a = position;
+        cylinder.position_b = position_b;
+        cylinder.color = col_1;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        var position_b = glMatrix.vec4.create();
+        glMatrix.vec4.scaleAndAdd(position_b, position, dir_2, length);
+        cylinder.is4D = true;
+        cylinder.radius = radius;
+        cylinder.position_a = position;
+        cylinder.position_b = position_b;
+        cylinder.color = col_2;
+        this.cylinders.push(cylinder);
+
+        var cylinder = new Cylinder;
+        var position_b = glMatrix.vec4.create();
+        glMatrix.vec4.scaleAndAdd(position_b, position, dir_3, length);
+        cylinder.is4D = true;
+        cylinder.radius = radius;
+        cylinder.position_a = position;
+        cylinder.position_b = position_b;
+        cylinder.color = col_3;
         this.cylinders.push(cylinder);
     }
 
@@ -210,6 +340,7 @@ class ObjectManager {
 
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = vec4fromvec3(position, 1);
         cylinder.position_b = vec4fromvec3(position_v_x, 1);
@@ -217,6 +348,7 @@ class ObjectManager {
         this.cylinders.push(cylinder);
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = vec4fromvec3(position, 1);
         cylinder.position_b = vec4fromvec3(position_v_y, 1);
@@ -224,6 +356,7 @@ class ObjectManager {
         this.cylinders.push(cylinder);
 
         var cylinder = new Cylinder;
+        cylinder.is4D = false;
         cylinder.radius = radius;
         cylinder.position_a = vec4fromvec3(position, 1);
         cylinder.position_b = vec4fromvec3(position_v_z, 1);
@@ -273,12 +406,18 @@ class ObjectManager {
     CalculateMatrices() {
         console.log("CalculateMatrices");
         for (var i = 0; i < this.cylinders.length; i++) {
-            this.CalculateMatrix(this.cylinders[i]);
+            var cylinder = this.cylinders[i];
+            if(cylinder.is4D){
+                this.CalculateMatrix4D(cylinder);
+            }
+            else{
+                this.CalculateMatrix3D(cylinder);
+            }
         }
         console.log("CalculateMatrices completed");
     }
 
-    CalculateMatrix(cylinder) {
+    CalculateMatrix3D(cylinder) {
 
         var matrixTranslation = glMatrix.mat4.create();
         var matrixRotation1 = glMatrix.mat4.create();
@@ -374,6 +513,32 @@ class ObjectManager {
         console.log("posA_2: ", a2);
         console.log("posB_2: ", b2);
         */
+    }
+
+    CalculateMatrix4D(cylinder){
+        console.log("CalculateMatrix4D");
+        var matrixInverted = glMatrix.mat4.create();
+        //var raw_data = this.p_streamline_context.GetRawData(part_index);
+        //var vectorLineSegment = this.GetVectorLineSegment(part_index);
+
+        //var lineSegment = vectorLineSegment[segment_index];
+        //var indexA = lineSegment.indexA;
+        //var indexB = lineSegment.indexB;
+        var posA_ws = cylinder.position_a;
+        var posB_ws = cylinder.position_b;
+        //glMatrix.vec4.copy(posA_ws, raw_data.data[indexA].position);//vec4
+        //glMatrix.vec4.copy(posB_ws, raw_data.data[indexB].position);//vec4
+        //posA_ws[projection_index] = 0;
+        //posB_ws[projection_index] = 0;
+
+        var point_B_translated = glMatrix.vec4.create();
+        glMatrix.vec4.subtract(point_B_translated, posB_ws, posA_ws);
+
+        var matrix = getAligned4DRotationMatrix(point_B_translated);
+        glMatrix.mat4.invert(matrixInverted, matrix);
+
+        cylinder.matrix = matrix;
+        cylinder.matrix_inv = matrixInverted;
     }
 
     Update() {
