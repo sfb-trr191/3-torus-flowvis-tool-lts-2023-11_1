@@ -557,12 +557,32 @@ void IntersectSphere(vec3 ray_origin_3D, vec3 ray_destination_3D, vec3 sphere_ce
 
 void IntersectSideProjectionAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit){
     int ray_projection_index = ray.ray_projection_index;
-    //ray_projection_index = 3;
+    //ray_projection_index = 0;//uncomment this for debugging axes
     if(ray_projection_index >= 0){
+        vec3 colors[3] = vec3[3](vec3(1, 0, 0),vec3(0, 1, 0),vec3(0, 0, 1));
+        vec4 positions[3] = vec4[3](vec4(0, 0, 0, 0),vec4(0, 0, 0, 0),vec4(0, 0, 0, 0));
+        vec4 position_a;
+        float radius;
         for(int i=0; i<3; i++){
             GL_Cylinder cylinder = GetCylinder(INDEX_CYLINDER_FIRST_SIDE_PROJECTION + i + (ray_projection_index * 3));
             IntersectSpherinderGL_Cylinder(cylinder, ray, ray_local_cutoff, hit);
+            
+            Sphere4D sphere4D;
+            sphere4D.center = cylinder.position_b;
+            sphere4D.radius = cylinder.radius;
+            Intersect3SphereAxis(ray, ray_local_cutoff, sphere4D, hit, cylinder.color.xyz);        
+
+            position_a = cylinder.position_a;//same for all 3 cylinders
+            radius = cylinder.radius;//same for all 3 cylinders
+
+            colors[i] = cylinder.color.xyz;
+            positions[i] = cylinder.position_b;
         }
+
+        Sphere4D sphere4D;
+        sphere4D.center = position_a;
+        sphere4D.radius = radius;
+        Intersect3SphereAxes(ray, ray_local_cutoff, sphere4D, hit, positions[0], colors[0], positions[1], colors[1], positions[2], colors[2]);
     }
     /*
     Sphere4D sphere4D;
@@ -570,6 +590,7 @@ void IntersectSideProjectionAxes(Ray ray, float ray_local_cutoff, inout HitInfor
     sphere4D.radius = 0.05;
     Intersect3Sphere(0, ray, ray_local_cutoff, sphere4D, hit, false, 0, TYPE_GL_CYLINDER, 0.0, 0.0);	
     */
+    
 }
 
 void IntersectSpherinderGL_Cylinder(GL_Cylinder cylinder, Ray ray, float ray_local_cutoff, inout HitInformation hit)
@@ -684,8 +705,140 @@ void IntersectSpherinderGL_Cylinder(GL_Cylinder cylinder, Ray ray, float ray_loc
         hit.sub_type = SUBTYPE_SPHERINDER;
 		hit.objectColor = cylinder.color.xyz;
 		
-	}
+	}   
+}
 
+void Intersect3SphereAxis(Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, vec3 color)
+{
+    vec4 z = ray.origin - sphere4D.center;//e-c
+    float a = dot(ray.direction, ray.direction);//unnecessary
+    float b = 2.0 * dot(ray.direction, z);
+    float c = dot(z, z) - sphere4D.radius * sphere4D.radius;
+
+    float discriminant = b*b - 4.0 * a *c;
+    if (discriminant < 0.0)
+        return;
+        
+    float root = sqrt(discriminant);
+    float t1 = (-b + root) * 0.5f;
+    float t2 = (-b - root) * 0.5f;
+    //float distance = min(t1, t2);
+    //float distance = (-b - root) / (2.0f * a);
+    float distance_os = 0.0;//T BASED ON NORMALIZED RAY DIRECTION, THIS IS NOT THE REAL DISTANCE
+        
+    if(t1 < 0.0)
+    {
+        if(t2 < 0.0)
+            return;
+        distance_os = t2;
+    }
+    else if (t2 < 0.0)
+        distance_os = t1;
+    else
+        distance_os = min(t1, t2);
+
+
+            
+    //float distance_surface = ray.rayDistance + distance_os;
+        
+    vec4 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
+    float distance_this_iteration = distance_os;//distance(ray.origin, position_ws);
+        
+    if(distance_this_iteration > ray_local_cutoff)
+        return;
+        
+    
+    float distance_total = ray.rayDistance + distance_this_iteration;
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_total < hit.distance);
+
+    //if (not hit) this is the first hit
+    //otherwise hit is true and we only need to check the distance
+    if(hit_condition)
+    {		
+        hit.hitType = TYPE_GL_CYLINDER;
+        hit.iteration_count = ray.iteration_count;
+        hit.distance_iteration = distance_this_iteration;	
+        hit.distance = distance_total;
+        hit.position = position_ws;
+        hit.positionCenter = sphere4D.center;
+        hit.normal = normalize(hit.position - sphere4D.center);
+        hit.copy = false;
+        hit.multiPolyID = -1;
+        hit.velocity = -1.0;
+        hit.cost = -1.0;
+        hit.sub_type = SUBTYPE_3SPHERE;		
+        hit.objectColor = color;
+    }
+}
+
+void Intersect3SphereAxes(Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, vec4 pos_1, vec3 col_1, vec4 pos_2, vec3 col_2, vec4 pos_3, vec3 col_3)
+{
+    vec4 z = ray.origin - sphere4D.center;//e-c
+    float a = dot(ray.direction, ray.direction);//unnecessary
+    float b = 2.0 * dot(ray.direction, z);
+    float c = dot(z, z) - sphere4D.radius * sphere4D.radius;
+
+    float discriminant = b*b - 4.0 * a *c;
+    if (discriminant < 0.0)
+        return;
+        
+    float root = sqrt(discriminant);
+    float t1 = (-b + root) * 0.5f;
+    float t2 = (-b - root) * 0.5f;
+    //float distance = min(t1, t2);
+    //float distance = (-b - root) / (2.0f * a);
+    float distance_os = 0.0;//T BASED ON NORMALIZED RAY DIRECTION, THIS IS NOT THE REAL DISTANCE
+        
+    if(t1 < 0.0)
+    {
+        if(t2 < 0.0)
+            return;
+        distance_os = t2;
+    }
+    else if (t2 < 0.0)
+        distance_os = t1;
+    else
+        distance_os = min(t1, t2);
+
+
+            
+    //float distance_surface = ray.rayDistance + distance_os;
+        
+    vec4 position_ws = ray.origin + distance_os * ray.direction;//intersection point in world space
+    float distance_this_iteration = distance_os;//distance(ray.origin, position_ws);
+        
+    if(distance_this_iteration > ray_local_cutoff)
+        return;
+        
+    
+    float distance_total = ray.rayDistance + distance_this_iteration;
+    bool hit_condition = (hit.hitType==TYPE_NONE) || (distance_total < hit.distance);
+
+    //if (not hit) this is the first hit
+    //otherwise hit is true and we only need to check the distance
+    if(hit_condition)
+    {	
+        hit.hitType = TYPE_GL_CYLINDER;
+        hit.iteration_count = ray.iteration_count;
+        hit.distance_iteration = distance_this_iteration;	
+        hit.distance = distance_total;
+        hit.position = position_ws;
+        hit.positionCenter = sphere4D.center;
+        hit.normal = normalize(hit.position - sphere4D.center);
+        hit.copy = false;
+        hit.multiPolyID = -1;
+        hit.velocity = -1.0;
+        hit.cost = -1.0;
+        hit.sub_type = SUBTYPE_3SPHERE;		
+
+        float d_1 = distance(pos_1, hit.position);
+		float d_2 = distance(pos_2, hit.position);
+		float d_3 = distance(pos_3, hit.position);
+		if(d_1 < d_2)		
+			hit.objectColor = d_1 < d_3 ? col_1 : col_3;
+		else
+			hit.objectColor = d_2 < d_3 ? col_2 : col_3;
+    }
 }
 
 `;
