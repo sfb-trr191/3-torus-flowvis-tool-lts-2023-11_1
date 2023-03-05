@@ -149,8 +149,7 @@ class ObjectManager {
             glMatrix.vec4.fromValues(1, 0, 0, 0),//dir_3
             axis_length,
             BLUE, YELLOW, RED
-        );  
-        /* 
+        );          
         this.AddAxesSideProjection(
             glMatrix.vec4.fromValues(-offset, 0, 0, 0),//position
             glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_1
@@ -167,7 +166,7 @@ class ObjectManager {
             axis_length,
             RED, GREEN, BLUE
         );      
-        */   
+         
 
 
 
@@ -191,7 +190,6 @@ class ObjectManager {
             axis_length,
             BLUE, YELLOW, RED
         );  
-        */ 
         this.AddAxesSideProjection(
             glMatrix.vec4.fromValues(-1, -1, 0, -1),//position
             glMatrix.vec4.fromValues(0, 0, 0, 1),//dir_1
@@ -207,7 +205,8 @@ class ObjectManager {
             glMatrix.vec4.fromValues(0, 0, 1, 0),//dir_3
             axis_length,
             RED, GREEN, BLUE
-        );      
+        );     
+        */  
         debugger;
     }
 
