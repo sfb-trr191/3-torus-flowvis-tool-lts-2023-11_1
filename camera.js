@@ -660,6 +660,10 @@ class Camera {
     }
 
     SetArea(area_index, show_4_projections, projection_width_percentage){
+        if(this.draw_mode != DRAW_MODE_R4){
+            show_4_projections = false;
+        }
+
         //big area
         var area_height_percentage = 0.245;
         if(area_index == -1){

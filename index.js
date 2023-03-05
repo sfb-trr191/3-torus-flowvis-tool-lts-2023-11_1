@@ -1063,19 +1063,24 @@ const cpu_intersect = require("./cpu_intersect");
 
     function addChangedSideMode() {
         document.getElementById("select_side_mode").addEventListener("change", (event) => {
-            onChangedDrawMode();
+            //onChangedDrawMode();
+            UpdateRenderSettings();
         });
         document.getElementById("select_side_mode_s3").addEventListener("change", (event) => {
-            onChangedDrawMode();
+            //onChangedDrawMode();
+            UpdateRenderSettings();
         });
         document.getElementById("select_projection_index").addEventListener("change", (event) => {
-            onChangedDrawMode();
+            //onChangedDrawMode();
+            UpdateRenderSettings();
         });
         document.getElementById("select_side_canvas_streamline_method").addEventListener("change", (event) => {
-            onChangedDrawMode();
+            //onChangedDrawMode();
+            UpdateRenderSettings();
         });
         document.getElementById("select_side_canvas_streamline_method_projection").addEventListener("change", (event) => {
-            onChangedDrawMode();
+            //onChangedDrawMode();
+            UpdateRenderSettings();
         });
 
         document.getElementById("slide_slice_index").addEventListener("change", (event) => {
@@ -1291,7 +1296,8 @@ const cpu_intersect = require("./cpu_intersect");
 
         //SIDE        
 
-        canvas_wrapper_side.camera.SetArea(-1, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
+        var show_4_projections = document.getElementById("checkbox_show_4_projections_main").checked;
+        canvas_wrapper_side.camera.SetArea(-1, show_4_projections, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
         canvas_wrapper_side.cameraAreaProjection0.SetArea(0, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
         canvas_wrapper_side.cameraAreaProjection1.SetArea(1, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
         canvas_wrapper_side.cameraAreaProjection2.SetArea(2, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
