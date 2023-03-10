@@ -28,7 +28,7 @@ class ObjectManager {
         this.AddAxesSideProjections();
         this.CalculateMatrices();
         console.log("this.cylinders: ", this.cylinders);
-        debugger;
+        //debugger;
     }
 
     AddAxes(is_main) {
@@ -207,7 +207,7 @@ class ObjectManager {
             RED, GREEN, BLUE
         );     
         */  
-        debugger;
+        //debugger;
     }
 
     AddAxesSideProjection(position, dir_1, dir_2, dir_3, length, col_1, col_2, col_3){

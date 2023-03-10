@@ -9,13 +9,15 @@ class MouseManager {
         this.canvas = canvas;
         this.camera = camera;
         this.side_canvas = side_canvas;
-        this.side_camera = side_camera;
+        this.side_camera = side_camera;      
         this.active_camera = camera;
         this.block_all_input = false;
     }
 
-    Link(ui_left_tool_bar){
+    Link(ui_left_tool_bar, canvas_wrapper_main, canvas_wrapper_side){
         this.ui_left_tool_bar = ui_left_tool_bar;
+        this.canvas_wrapper_main = canvas_wrapper_main;
+        this.canvas_wrapper_side = canvas_wrapper_side;  
     }
 
     initialize() {
@@ -38,21 +40,22 @@ class MouseManager {
 
     addOnMouseDown() {
         this.canvas.addEventListener("mousedown", (event) => {
-            this.onMouseDown(event, this.canvas, this.camera, this.side_camera);
+            this.onMouseDown(event, this.canvas, this.camera, this.canvas_wrapper_main, this.side_camera);
             this.ui_left_tool_bar.SelectLeft();
         });
         this.side_canvas.addEventListener("mousedown", (event) => {
-            this.onMouseDown(event, this.side_canvas, this.side_camera, this.camera);
+            this.onMouseDown(event, this.side_canvas, this.side_camera, this.canvas_wrapper_side, this.camera);
             this.ui_left_tool_bar.SelectRight();
         });
     }
 
-    onMouseDown(event, canvas, camera, other_camera){
+    onMouseDown(event, canvas, camera, canvas_wrapper, other_camera){
         if(this.block_all_input){
             return;
         }
         var shift_pressed = event.getModifierState("Shift");
         var ctrl_pressed = event.getModifierState("Control");
+        var pos = getMousePosition(this.canvas, event);
         var pos_percentage = getMousePositionPercentage(canvas, event)
         var pos_canonical = getMousePositionCanonical(canvas, event);
         console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
@@ -79,6 +82,7 @@ class MouseManager {
         camera.StartPanning(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
         this.active_camera = camera;
         other_camera.other_camera_is_panning = true;   
+        //canvas_wrapper.SetOutputPositionPercentage(pos_percentage.x, pos_percentage.y);
     }
 
     addOnMouseUp() {
@@ -122,12 +126,14 @@ class MouseManager {
             var pos_canonical = getMousePositionCanonical(this.canvas, event);
             this.camera.UpdateMouseMove(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, false);
             this.camera.SetLastMousePosition(pos);
+            this.canvas_wrapper_main.SetOutputPositionPercentage(pos_percentage.x, pos_percentage.y);
 
             var pos = getMousePosition(this.side_canvas, event);
             var pos_percentage = getMousePositionPercentage(this.side_canvas, event)
             var pos_canonical = getMousePositionCanonical(this.side_canvas, event);
             this.side_camera.UpdateMouseMove(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, false);
             this.side_camera.SetLastMousePosition(pos);
+            this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage.x, pos_percentage.y);
         });
     }
 

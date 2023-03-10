@@ -11,11 +11,22 @@ Ray GenerateRay(float x_offset, float y_offset)
 	vec4 q_x = cam.q_x;
 	vec4 q_y = cam.q_y;
 
-	float i = gl_FragCoord[0];//x
+    float frag_0 = gl_FragCoord[0];
+    float frag_1 = gl_FragCoord[1];
+    float width_f = float(width);
+    float height_f = float(height);
+    if(get_pixel_data_results){
+        frag_0 = output_x_percentage * width_f;
+        frag_1 = output_y_percentage * height_f;
+        x_offset = 0.5;
+        y_offset = 0.5;
+    }
+
+	float i = frag_0;//x
 	//float j = float(height) - gl_FragCoord[1];//y
-	float j = gl_FragCoord[1];//y
+	float j = frag_1;//y
 	//if(!left_handed)
-		j = float(height) - gl_FragCoord[1];//y
+		j = float(height) - frag_1;//y
 	vec4 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
 	vec4 r_ij = normalize(p_ij);
 	
@@ -27,6 +38,7 @@ Ray GenerateRay(float x_offset, float y_offset)
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
     ray.ray_projection_index = -1;
+    ray.direction = vec4(1,0,0,0);
 	return ray;
 }
 
@@ -41,16 +53,24 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
 	vec4 q_x = cam.q_x;
 	vec4 q_y = cam.q_y;
 
+    float frag_0 = gl_FragCoord[0];
+    float frag_1 = gl_FragCoord[1];
     float width_f = float(width);
     float height_f = float(height);
+    if(get_pixel_data_results){
+        frag_0 = output_x_percentage * width_f;
+        frag_1 = output_y_percentage * height_f;
+        x_offset = 0.5;
+        y_offset = 0.5;
+    }
 
-	float i = gl_FragCoord[0] - (x_axesPixelOffset * width_f * 0.5);//x
+	float i = frag_0 - (x_axesPixelOffset * width_f * 0.5);//x
 	//i = gl_FragCoord[0];//x
 	//float j = height - gl_FragCoord[1];//y
-	float j = gl_FragCoord[1] - (y_axesPixelOffset * height_f * 0.5);//y
+	float j = frag_1 - (y_axesPixelOffset * height_f * 0.5);//y
 	//j = gl_FragCoord[1];//y
 	//if(!left_handed)
-		j = height_f - gl_FragCoord[1] + (y_axesPixelOffset * height_f * 0.5);//y
+		j = height_f - frag_1 + (y_axesPixelOffset * height_f * 0.5);//y
 	vec4 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
 	vec4 r_ij = normalize(p_ij);
 	
@@ -62,6 +82,7 @@ Ray GenerateRayWithPixelOffset(float x_offset, float y_offset)
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
     ray.ray_projection_index = -1;
+    ray.direction = vec4(1,0,0,0);
 	return ray;
 }
 
@@ -99,11 +120,22 @@ Ray GenerateRay(float x_offset, float y_offset, int area_index)
     float area_width = float(width) * cam.area_width_percentage;
     float area_width_min = float(width) * cam.area_start_x_percentage;
 
-	float i = gl_FragCoord[0] - (cam.area_start_x_percentage * float(width));//x
-    float j = float(height) - gl_FragCoord[1];
+    float frag_0 = gl_FragCoord[0];
+    float frag_1 = gl_FragCoord[1];
+    float width_f = float(width);
+    float height_f = float(height);
+    if(get_pixel_data_results){
+        frag_0 = output_x_percentage * width_f;
+        frag_1 = (1.0-output_y_percentage) * height_f;
+        x_offset = 0.5;
+        y_offset = 0.5;
+    }
+
+	float i = frag_0 - (cam.area_start_x_percentage * float(width));//x
+    float j = float(height) - frag_1;
     //float t_i = (gl_FragCoord[0] - area_width_min) / area_width;
     float t_j = (j - area_height_min) / area_height;
-    j = float(height) - (gl_FragCoord[1]- (cam.area_start_y_percentage * float(height)));//y
+    j = float(height) - (frag_1- (cam.area_start_y_percentage * float(height)));//y
     j = t_j * area_height;//y
 	vec4 p_ij = p_1m + q_x * (i-1.0+x_offset) + q_y * (j-1.0+y_offset);
 	vec4 r_ij = normalize(p_ij);
@@ -116,6 +148,7 @@ Ray GenerateRay(float x_offset, float y_offset, int area_index)
     ray.local_cutoff = maxRayDistance;
     ray.iteration_count = 0;
     ray.ray_projection_index = ray_projection_index;
+
 	return ray;
 }
 /*

@@ -27,6 +27,7 @@ $SHADER_MODULE_ADDITIONAL_FUNCTION_DECLARATIONS$
 $SHADER_MODULE_RAY_GENERATION$
 $SHADER_MODULE_INTERSECTIONS$
 $SHADER_MODULE_SHADING$
+$SHADER_MODULE_OUTPUT_DATA$
 
 //not used in s3
 $SHADER_MODULE_VOLUME_RENDERING$
@@ -45,6 +46,9 @@ void main() {
     HitInformation hit_outside;
 	vec3 color = CalculateOneRay(offset_x, offset_y, hit, hit_outside);
 	outputColor = vec4(color, 1);
+    if(get_pixel_data_results){
+        outputColor = GetOutput(hit);
+    }
 }
 
 vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, inout HitInformation hit_outside)

@@ -1,6 +1,7 @@
 const glMatrix = require("gl-matrix");
 const DummyQuad = require("./dummy_quad");
 const RenderWrapper = require("./render_wrapper");
+const ComputeWrapper = require("./compute_wraper");
 const ShaderUniforms = require("./shader_uniforms");
 const ShaderFlags = require("./shader_flags");
 const Camera = require("./camera");
@@ -26,6 +27,9 @@ class UniformLocationsRayTracing {
         this.location_texture_ftle = gl.getUniformLocation(program, "texture_ftle");
         this.location_texture_ftle_differences = gl.getUniformLocation(program, "texture_ftle_differences");
         this.location_width = gl.getUniformLocation(program, "width");
+        this.location_get_pixel_data_results = gl.getUniformLocation(program, "get_pixel_data_results");
+        this.location_output_x_percentage = gl.getUniformLocation(program, "output_x_percentage");
+        this.location_output_y_percentage = gl.getUniformLocation(program, "output_y_percentage");        
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_offset_x = gl.getUniformLocation(program, "offset_x");
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
@@ -218,6 +222,10 @@ class CanvasWrapper {
         this.dummy_quad = new DummyQuad(gl);
 
         this.shader_flags = new ShaderFlags();
+
+        //this.ResultBuffer = new ResultBuffer(gl, 10);
+        this.compute_wrapper_pixel_results = new ComputeWrapper(gl, "pixel results", 10, 1);
+        //this.compute_wrapper_pixel_results.
     }
 
     InitAreaProjectionCameras(){
@@ -605,7 +613,12 @@ class CanvasWrapper {
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
-        this.drawTextureRaytracing(gl, left_render_wrapper);
+        var get_pixel_data_results = false;
+        this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+        if(true){
+            var get_pixel_data_results = true;
+            this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+        }
         this.drawTextureAverage(gl, left_render_wrapper);
         this.drawResampling(gl, left_render_wrapper);
         this.drawTextureSumCopy(gl, left_render_wrapper);
@@ -615,7 +628,7 @@ class CanvasWrapper {
         this.drawFTLESlice(gl, left_render_wrapper);
     }
 
-    drawTextureRaytracing(gl, render_wrapper, width, height) {
+    drawTextureRaytracing(gl, render_wrapper, get_pixel_data_results) {
         var projection_index = -1;
         var max_iteration_count = this.max_iteration_count;
         var tube_radius_factor_active = this.tube_radius_factor;
@@ -680,11 +693,30 @@ class CanvasWrapper {
         var tube_radius_active = this.tube_radius_fundamental * tube_radius_factor_active;
         var tube_radius_active_outside = this.tube_radius_fundamental * tube_radius_factor_active_outside;        
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
-        //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, this.camera.width, this.camera.height);
+        if(get_pixel_data_results){
+            console.warn("get_pixel_data_results", 
+                this.compute_wrapper_pixel_results.render_texture.texture_settings.width, 
+                this.compute_wrapper_pixel_results.render_texture.texture_settings.height)
+            //console.warn(this.compute_wrapper_pixel_results.frame_buffer)
+            //this.compute_wrapper_pixel_results
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_pixel_results.frame_buffer);
+            gl.viewport(0, 0, 
+                this.compute_wrapper_pixel_results.render_texture.texture_settings.width, 
+                this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
+        }
+        else{
+            gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
+            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, this.camera.width, this.camera.height);
+        }
+
         //console.log(this.camera.width, this.camera.height);
         gl.useProgram(this.program_raytracing);
+        gl.uniform1i(this.location_raytracing.location_get_pixel_data_results, get_pixel_data_results);
+        gl.uniform1f(this.location_raytracing.location_output_x_percentage, this.output_x_percentage);
+        gl.uniform1f(this.location_raytracing.location_output_y_percentage, this.output_y_percentage);
+
+        
         this.camera.WriteToUniform(gl, this.program_raytracing, "active_camera");
         this.InitAreaProjectionCameras();
         this.cameraAreaProjection0.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection0");
@@ -780,6 +812,34 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);*/
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
+
+        //var pixel = gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        //warn("pixel: ", pixel)
+
+        if(get_pixel_data_results){
+            var pixel = this.readPixelsRGBA(gl, this.compute_wrapper_pixel_results.render_texture.texture_settings.width, this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
+            
+        }
+    }
+
+    SetOutputPositionPercentage(output_x_percentage, output_y_percentage){
+        //console.warn("output ", this.name, output_x_percentage, output_y_percentage)
+        this.output_x_percentage = output_x_percentage;
+        this.output_y_percentage = output_y_percentage;
+    }
+
+    readPixelsRGBA(gl, dim_x, dim_y) {
+        var pixels = new Float32Array(dim_x * dim_y * 4);
+        var format = gl.RGBA;
+        var type = gl.FLOAT;
+        gl.readPixels(0, 0, dim_x, dim_y, format, type, pixels);
+        //console.warn(this.compute_wrapper_pixel_results)
+        console.warn("result", this.name, pixels[0], pixels[1], pixels[2])
+        console.warn("  multiPolyID", this.name, pixels[4])
+        console.warn("  position", this.name, pixels[8], pixels[9], pixels[10], pixels[11])
+        console.warn("  center", this.name, pixels[12], pixels[13], pixels[14], pixels[15])
+        //console.warn(pixels)
+        return pixels;
     }
 
     drawTextureAverage(gl, render_wrapper, width, height) {

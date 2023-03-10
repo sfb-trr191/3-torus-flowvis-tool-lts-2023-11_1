@@ -100,7 +100,8 @@ class ShaderManager {
             code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_S3_INTERSECTIONS); 
             code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_S3_SHADING);       
             code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_S3_RAY_GENERATION);   
-
+            code = code.replace("$SHADER_MODULE_OUTPUT_DATA$", SHADER_MODULE_S3_OUTPUT_DATA);   
+            
             //not used in s3
             code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", "");        
             code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", "");
@@ -112,7 +113,8 @@ class ShaderManager {
             code = code.replace("$SHADER_MODULE_ADDITIONAL_FUNCTION_DECLARATIONS$", SHADER_MODULE_DEFAULT_FUNCTION_DECLARATIONS); 
             code = code.replace("$SHADER_MODULE_INTERSECTIONS$", SHADER_MODULE_DEFAULT_INTERSECTIONS); 
             code = code.replace("$SHADER_MODULE_SHADING$", SHADER_MODULE_DEFAULT_SHADING);     
-            code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);    
+            code = code.replace("$SHADER_MODULE_RAY_GENERATION$", SHADER_MODULE_DEFAULT_RAY_GENERATION);  
+            code = code.replace("$SHADER_MODULE_OUTPUT_DATA$", SHADER_MODULE_DEFAULT_OUTPUT_DATA);     
 
             //not used in s3
             code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_DEFAULT_VOLUME_RENDERING);        

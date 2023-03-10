@@ -39,6 +39,7 @@ const shader_modules_default_intersections = require("./shader/modules/default/d
 const shader_modules_default_ray_generation = require("./shader/modules/default/default_ray_generation.glsl");
 const shader_modules_default_shading = require("./shader/modules/default/default_shading.glsl");
 const shader_modules_default_light_integration_definitions = require("./shader/modules/default/default_light_integration_definitions.glsl");
+const shader_modules_default_output_data = require("./shader/modules/default/default_output_data.glsl");
 //modules: s3
 const shader_modules_s3_structs = require("./shader/modules/s3/s3_structs.glsl");
 const shader_modules_s3_function_declarations = require("./shader/modules/s3/s3_function_declarations.glsl");
@@ -46,6 +47,7 @@ const shader_modules_s3_intersections = require("./shader/modules/s3/s3_intersec
 const shader_modules_s3_ray_generation = require("./shader/modules/s3/s3_ray_generation.glsl");
 const shader_modules_s3_shading = require("./shader/modules/s3/s3_shading.glsl");
 const shader_modules_s3_light_integration_definitions = require("./shader/modules/s3/s3_light_integration_definitions.glsl");
+const shader_modules_s3_output_data = require("./shader/modules/s3/s3_output_data.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");
@@ -295,7 +297,6 @@ const cpu_intersect = require("./cpu_intersect");
         ui_transfer_functions = new UITransferFunctions();
 
         ui_left_tool_bar = new UILeftToolBar(main_camera, side_camera);
-        mouse_manager.Link(ui_left_tool_bar);
 
         lights = new Lights();
         lights.GenerateDefaultLighting();
@@ -366,6 +367,7 @@ const cpu_intersect = require("./cpu_intersect");
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
         shader_manager.Link(canvas_wrapper_main, canvas_wrapper_side);
+        mouse_manager.Link(ui_left_tool_bar, canvas_wrapper_main, canvas_wrapper_side);
 
         tick_counter = 0;
         frame_counter = 0;

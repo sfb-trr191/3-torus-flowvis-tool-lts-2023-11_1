@@ -1,5 +1,9 @@
 global.SHADER_MODULE_SHARED_UNIFORMS = `
 
+uniform bool get_pixel_data_results;
+uniform float output_x_percentage;
+uniform float output_y_percentage;
+
 uniform float light_integration_step_size;
 uniform int light_integration_max_step_count;
 
