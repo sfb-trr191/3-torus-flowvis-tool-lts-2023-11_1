@@ -1,5 +1,15 @@
 const glMatrix = require("gl-matrix");
 
+exports.format4NumbersAsVectorString = function(x, y, z, w){
+    var s = "["
+    s+= x.toFixed(3) + ", "
+    s+= y.toFixed(3) + ", "
+    s+= z.toFixed(3) + ", "
+    s+= w.toFixed(3)
+    s+= "]"
+    return s;
+}
+
 exports.getMousePosition = function(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;

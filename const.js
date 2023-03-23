@@ -1,5 +1,7 @@
 global.URL_RELEASE = "https://sfb-trr191.github.io/3-torus-flowvis-tool/index.html";
 
+global.TYPE_STREAMLINE_SEGMENT = 1;
+
 global.FIXED_LENGTH_RANDOM_SEED_POSITION = 4;
 
 global.DRAW_MODE_NONE = 0;

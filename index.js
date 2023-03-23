@@ -737,7 +737,9 @@ const cpu_intersect = require("./cpu_intersect");
         }
         if(render){
             canvas_wrapper_main.draw(gl, data_changed, settings_changed);
+            canvas_wrapper_main.draw_retrieve(gl);
             canvas_wrapper_side.draw(gl_side, data_changed, settings_changed);
+            canvas_wrapper_side.draw_retrieve(gl_side);
             canvas_wrapper_transfer_function.draw(gl_transfer_function);
             fence_sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
             gl.flush();

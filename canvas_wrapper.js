@@ -7,6 +7,8 @@ const ShaderFlags = require("./shader_flags");
 const Camera = require("./camera");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
+const module_utilit = require("./utility");
+const format4NumbersAsVectorString = module_utilit.format4NumbersAsVectorString;
 
 class UniformLocationsRayTracing {
     constructor(gl, program, name) {
@@ -204,6 +206,11 @@ class CanvasWrapper {
         this.max_cost = 0;
         this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
         this.is_exporting = false;
+
+        this.output_x_percentage = 0;
+        this.output_y_percentage = 0;
+        this.output_x_percentage_old = 0;
+        this.output_y_percentage_old = 0;
 
 
         this.last_shader_formula_scalar = "";
@@ -454,6 +461,49 @@ class CanvasWrapper {
         this.camera.changed = false;  
     }
 
+    should_draw_retrieve(){
+        //console.warn(this.name + ": " + this.output_y_percentage)
+        //do not draw if the position didnt change
+        if(this.output_x_percentage == this.output_x_percentage_old && this.output_y_percentage == this.output_y_percentage_old){
+            return false;
+        }
+        this.output_x_percentage_old = this.output_x_percentage;
+        this.output_y_percentage_old = this.output_y_percentage;
+
+        //do not draw if not inside the canvas
+        if(this.output_x_percentage < 0 || this.output_x_percentage > 1 || this.output_y_percentage < 0 || this.output_y_percentage > 1)
+            return false;
+
+        return true;
+    }
+
+    draw_retrieve(gl){
+        if(!this.should_draw_retrieve())
+            return;
+
+
+        var left_render_wrapper = this.camera.IsPanningOrForced() ? this.render_wrapper_raytracing_panning_left : this.render_wrapper_raytracing_still_left
+        switch (this.draw_mode) {
+            case DRAW_MODE_DEFAULT:
+                break;
+            case DRAW_MODE_FTLE_SLICE:
+                return;//STOP HERE
+            case DRAW_MODE_PROJECTION:
+                break;
+            case DRAW_MODE_STEREOGRAPHIC_PROJECTION:
+                break;
+            case DRAW_MODE_R4:
+                break;
+            case DRAW_MODE_S3:
+                break;
+            default:
+                console.log("DRAW MODE ERROR", this.draw_mode);
+                return;//STOP HERE
+        }
+        var get_pixel_data_results = true;
+        this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+    }
+
     draw(gl, data_changed, settings_changed) {
         //automatically change resolution if not exporting
         if(!this.is_exporting){
@@ -615,10 +665,10 @@ class CanvasWrapper {
     draw_mode_raytracing(gl, left_render_wrapper) {
         var get_pixel_data_results = false;
         this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
-        if(true){
-            var get_pixel_data_results = true;
-            this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
-        }
+        //if(true){
+        //    var get_pixel_data_results = true;
+        //    this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+        //}
         this.drawTextureAverage(gl, left_render_wrapper);
         this.drawResampling(gl, left_render_wrapper);
         this.drawTextureSumCopy(gl, left_render_wrapper);
@@ -694,9 +744,9 @@ class CanvasWrapper {
         var tube_radius_active_outside = this.tube_radius_fundamental * tube_radius_factor_active_outside;        
 
         if(get_pixel_data_results){
-            console.warn("get_pixel_data_results", 
-                this.compute_wrapper_pixel_results.render_texture.texture_settings.width, 
-                this.compute_wrapper_pixel_results.render_texture.texture_settings.height)
+            //console.warn("get_pixel_data_results", 
+            //    this.compute_wrapper_pixel_results.render_texture.texture_settings.width, 
+            //    this.compute_wrapper_pixel_results.render_texture.texture_settings.height)
             //console.warn(this.compute_wrapper_pixel_results.frame_buffer)
             //this.compute_wrapper_pixel_results
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_pixel_results.frame_buffer);
@@ -711,6 +761,7 @@ class CanvasWrapper {
         }
 
         //console.log(this.camera.width, this.camera.height);
+        //console.warn("xy", this.output_x_percentage, this.output_y_percentage);
         gl.useProgram(this.program_raytracing);
         gl.uniform1i(this.location_raytracing.location_get_pixel_data_results, get_pixel_data_results);
         gl.uniform1f(this.location_raytracing.location_output_x_percentage, this.output_x_percentage);
@@ -834,10 +885,20 @@ class CanvasWrapper {
         var type = gl.FLOAT;
         gl.readPixels(0, 0, dim_x, dim_y, format, type, pixels);
         //console.warn(this.compute_wrapper_pixel_results)
-        console.warn("result", this.name, pixels[0], pixels[1], pixels[2])
-        console.warn("  multiPolyID", this.name, pixels[4])
-        console.warn("  position", this.name, pixels[8], pixels[9], pixels[10], pixels[11])
-        console.warn("  center", this.name, pixels[12], pixels[13], pixels[14], pixels[15])
+        //console.warn("result", this.name, pixels[0], pixels[1], pixels[2])
+        //console.warn("  multiPolyID", this.name, pixels[4])
+        //console.warn("  position", this.name, pixels[8], pixels[9], pixels[10], pixels[11])
+        //console.warn("  center", this.name, pixels[12], pixels[13], pixels[14], pixels[15])
+        var hit_type = ""
+        if (pixels[0] == TYPE_STREAMLINE_SEGMENT){
+            hit_type += "Streamline: " + pixels[4] + "     "
+        }
+        document.getElementById("paragraph_mouse_data_string").textContent = 
+            hit_type
+            + "click: "
+            + format4NumbersAsVectorString(pixels[8], pixels[9], pixels[10], pixels[11])
+            + "   center: "
+            + format4NumbersAsVectorString(pixels[12], pixels[13], pixels[14], pixels[15]);
         //console.warn(pixels)
         return pixels;
     }
