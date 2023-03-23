@@ -1972,9 +1972,9 @@ class Camera {
         var focus_point = this.CalculateFocusPoint();
 
         var epsilon = 0.000001;
-        this.forward = glMatrix.vec3.fromValues(1, epsilon, epsilon);
-        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
-        glMatrix.vec3.negate(this.up, up_negated);
+        this.forward = glMatrix.vec4.fromValues(1, epsilon, epsilon, epsilon);
+        var up_negated = glMatrix.vec4.fromValues(epsilon, epsilon, 1, epsilon);
+        glMatrix.vec4.negate(this.up, up_negated);
 
         if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
             this.position = this.CalculatePositionFromFocus(focus_point);
@@ -1988,9 +1988,9 @@ class Camera {
         var focus_point = this.CalculateFocusPoint();
 
         var epsilon = 0.000001;
-        this.forward = glMatrix.vec3.fromValues(-1, epsilon, epsilon);
-        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
-        glMatrix.vec3.negate(this.up, up_negated);
+        this.forward = glMatrix.vec4.fromValues(-1, epsilon, epsilon, epsilon);
+        var up_negated = glMatrix.vec4.fromValues(epsilon, epsilon, 1, epsilon);
+        glMatrix.vec4.negate(this.up, up_negated);
 
         if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
             this.position = this.CalculatePositionFromFocus(focus_point);
@@ -2004,9 +2004,9 @@ class Camera {
         var focus_point = this.CalculateFocusPoint();
 
         var epsilon = 0.000001;
-        this.forward = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
-        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
-        glMatrix.vec3.negate(this.up, up_negated);
+        this.forward = glMatrix.vec4.fromValues(epsilon, 1, epsilon, epsilon);
+        var up_negated = glMatrix.vec4.fromValues(epsilon, epsilon, 1, epsilon);
+        glMatrix.vec4.negate(this.up, up_negated);
 
         if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
             this.position = this.CalculatePositionFromFocus(focus_point);
@@ -2020,9 +2020,9 @@ class Camera {
         var focus_point = this.CalculateFocusPoint();
 
         var epsilon = 0.000001;
-        this.forward = glMatrix.vec3.fromValues(epsilon, -1, epsilon);
-        var up_negated = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
-        glMatrix.vec3.negate(this.up, up_negated);
+        this.forward = glMatrix.vec4.fromValues(epsilon, -1, epsilon, epsilon);
+        var up_negated = glMatrix.vec4.fromValues(epsilon, epsilon, 1, epsilon);
+        glMatrix.vec4.negate(this.up, up_negated);
 
         if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
             this.position = this.CalculatePositionFromFocus(focus_point);
@@ -2036,9 +2036,9 @@ class Camera {
         var focus_point = this.CalculateFocusPoint();
 
         var epsilon = 0.000001;
-        this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, 1);
-        var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
-        glMatrix.vec3.negate(this.up, up_negated);
+        this.forward = glMatrix.vec4.fromValues(epsilon, epsilon, 1, epsilon);
+        var up_negated = glMatrix.vec4.fromValues(epsilon, 1, epsilon, epsilon);
+        glMatrix.vec4.negate(this.up, up_negated);
 
         if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
             this.position = this.CalculatePositionFromFocus(focus_point);
@@ -2052,9 +2052,9 @@ class Camera {
         var focus_point = this.CalculateFocusPoint();
 
         var epsilon = 0.000001;
-        this.forward = glMatrix.vec3.fromValues(epsilon, epsilon, -1);
-        var up_negated = glMatrix.vec3.fromValues(epsilon, 1, epsilon);
-        glMatrix.vec3.negate(this.up, up_negated);
+        this.forward = glMatrix.vec4.fromValues(epsilon, epsilon, -1, epsilon);
+        var up_negated = glMatrix.vec4.fromValues(epsilon, 1, epsilon, epsilon);
+        glMatrix.vec4.negate(this.up, up_negated);
 
         if(this.control_mode != CAMERA_CONTROL_ROTATE_AROUND_CAMERA)
             this.position = this.CalculatePositionFromFocus(focus_point);
@@ -2062,33 +2062,33 @@ class Camera {
     }
 
     CalculateFocusPoint(){
-        var forward_scaled = glMatrix.vec3.create();
-        var focus_point = glMatrix.vec3.create();
-        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
-        glMatrix.vec3.add(focus_point, this.position, forward_scaled);
+        var forward_scaled = glMatrix.vec4.create();
+        var focus_point = glMatrix.vec4.create();
+        glMatrix.vec4.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec4.add(focus_point, this.position, forward_scaled);
         return focus_point;
     }
 
     CalculatePositionFromFocus(focus_point){
-        var forward_scaled = glMatrix.vec3.create();
-        var position = glMatrix.vec3.create();
-        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
-        glMatrix.vec3.subtract(position, focus_point, forward_scaled);
+        var forward_scaled = glMatrix.vec4.create();
+        var position = glMatrix.vec4.create();
+        glMatrix.vec4.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec4.subtract(position, focus_point, forward_scaled);
         return position;
     }
 
     //set camera focus to (0.5, 0.5, 0.5)
     FocusCenter(){
         //calculate focus point
-        var forward_scaled = glMatrix.vec3.create();
-        var focus_point = glMatrix.vec3.create();
-        var diff = glMatrix.vec3.create();
-        glMatrix.vec3.scale(forward_scaled, this.forward, this.trackball_focus_distance);
-        glMatrix.vec3.add(focus_point, this.position, forward_scaled);
+        var forward_scaled = glMatrix.vec4.create();
+        var focus_point = glMatrix.vec4.create();
+        var diff = glMatrix.vec4.create();
+        glMatrix.vec4.scale(forward_scaled, this.forward, this.trackball_focus_distance);
+        glMatrix.vec4.add(focus_point, this.position, forward_scaled);
 
-        var center = glMatrix.vec3.fromValues(0.5, 0.5, 0.5);
-        glMatrix.vec3.subtract(diff, focus_point, center);
-        glMatrix.vec3.subtract(this.position, this.position, diff);
+        var center = glMatrix.vec4.fromValues(0.5, 0.5, 0.5, 0);
+        glMatrix.vec4.subtract(diff, focus_point, center);
+        glMatrix.vec4.subtract(this.position, this.position, diff);
         this.changed = true;
     }
 
