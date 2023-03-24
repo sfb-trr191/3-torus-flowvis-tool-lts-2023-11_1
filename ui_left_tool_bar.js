@@ -30,9 +30,10 @@ class UISelectedCameraIndicator{
 
 class UILeftToolBar{
 
-    constructor(main_camera, side_camera){
+    constructor(main_camera, side_camera, mouse_manager){
         this.main_camera = main_camera;
         this.side_camera = side_camera;
+        this.mouse_manager = mouse_manager;
         this.ui_selected_camera_indicator = new UISelectedCameraIndicator();
         this.ui_selected_camera_indicator.SelectLeft();
         this.block_all_input = false;
@@ -126,6 +127,25 @@ class UILeftToolBar{
             if(this.IsRightCameraSelected())
                 this.side_camera.FocusCenter();
         });
+
+
+        this.button_control_camera = document.getElementById("button_control_camera");
+        this.button_control_camera.addEventListener("mousedown", (event) => {
+            if(this.block_all_input){
+                return;
+            }
+            mouse_manager.SetControlMode(CONTROL_MODE_CAMERA);
+        });
+
+        this.button_control_clcicked = document.getElementById("button_control_clcicked");
+        this.button_control_clcicked.addEventListener("mousedown", (event) => {
+            if(this.block_all_input){
+                return;
+            }
+            mouse_manager.SetControlMode(CONTROL_MODE_CLICKED_POSITION);            
+        });
+
+
     }   
 
     IsLeftCameraSelected(){

@@ -475,6 +475,11 @@
     - right: x+
     - up: y+
     - forward: z-"></button>
+
+
+
+                    <button type="button" id="button_control_camera" title="Use the mouse to control the camera."></button>
+                    <button type="button" id="button_control_clcicked" title="Use the mouse to control the clicked position."></button>
                 </fieldset>
 
                 <button type="button" id="button_render_settings">update render settings</button>
@@ -1379,8 +1384,33 @@
                             <span class="span_style_properties_legend_path">[Root/Main View/Visual Objects/Indicators/Clicked Position]</span>
                         </legend>  
                         <div class="group_properties_content">
-
-                        </div>    
+                            <div class="input_row">
+                                <label>position</label>
+                                <div id="div_input_clicked_position_main" class="vec4_grid">
+                                    <input id="input_clicked_position_main_x" class="x" type="text" value="0.0"
+                                        title="x component of the position.">
+                                    <input id="input_clicked_position_main_y" class="y" type="text" value="0.0"
+                                        title="y component of the position.">
+                                    <input id="input_clicked_position_main_z" class="z" type="text" value="0.0"
+                                        title="z component of the position.">
+                                    <input id="input_clicked_position_main_w" class="w" type="text" value="0.0"
+                                        title="z component of the position.">
+                                </div>
+                            </div>
+                            <div class="input_row">
+                                <label>center</label>
+                                <div id="div_input_clicked_center_main" class="vec4_grid">
+                                    <input id="input_clicked_center_main_x" class="x" type="text" value="0.0"
+                                        title="x component of the center.">
+                                    <input id="input_clicked_center_main_y" class="y" type="text" value="0.0"
+                                        title="y component of the center.">
+                                    <input id="input_clicked_center_main_z" class="z" type="text" value="0.0"
+                                        title="z component of the center.">
+                                    <input id="input_clicked_center_main_w" class="w" type="text" value="0.0"
+                                        title="z component of the center.">
+                                </div>
+                            </div>
+                        </div>      
                         <div class="group_properties_children">
 
                         </div>    
@@ -1540,7 +1570,7 @@
                                     <input id="input_side_camera_position_w" class="w" type="text" value="0.0"
                                         title="z component of the position.">
                                 </div>
-                            </div>
+                            </div>                            
                             <div class="input_row">
                                 <label>forward</label>
                                 <div id="div_input_side_camera_forward" class="vec4_grid">
@@ -1826,7 +1856,32 @@
                             <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/Indicators/Clicked Position]</span>
                         </legend>  
                         <div class="group_properties_content">
-
+                            <div class="input_row">
+                                <label>position</label>
+                                <div id="div_input_clicked_position_aux" class="vec4_grid">
+                                    <input id="input_clicked_position_aux_x" class="x" type="text" value="0.0"
+                                        title="x component of the position.">
+                                    <input id="input_clicked_position_aux_y" class="y" type="text" value="0.0"
+                                        title="y component of the position.">
+                                    <input id="input_clicked_position_aux_z" class="z" type="text" value="0.0"
+                                        title="z component of the position.">
+                                    <input id="input_clicked_position_aux_w" class="w" type="text" value="0.0"
+                                        title="z component of the position.">
+                                </div>
+                            </div>
+                            <div class="input_row">
+                                <label>center</label>
+                                <div id="div_input_clicked_center_aux" class="vec4_grid">
+                                        <input id="input_clicked_center_aux_x" class="x" type="text" value="0.0"
+                                            title="x component of the center.">
+                                        <input id="input_clicked_center_aux_y" class="y" type="text" value="0.0"
+                                            title="y component of the center.">
+                                        <input id="input_clicked_center_aux_z" class="z" type="text" value="0.0"
+                                            title="z component of the center.">
+                                        <input id="input_clicked_center_aux_w" class="w" type="text" value="0.0"
+                                            title="z component of the center.">                                    
+                                </div>
+                            </div> 
                         </div>    
                         <div class="group_properties_children">
 

@@ -296,7 +296,7 @@ const cpu_intersect = require("./cpu_intersect");
 
         ui_transfer_functions = new UITransferFunctions();
 
-        ui_left_tool_bar = new UILeftToolBar(main_camera, side_camera);
+        ui_left_tool_bar = new UILeftToolBar(main_camera, side_camera, mouse_manager);
 
         lights = new Lights();
         lights.GenerateDefaultLighting();

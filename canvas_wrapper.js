@@ -211,6 +211,7 @@ class CanvasWrapper {
         this.output_y_percentage = 0;
         this.output_x_percentage_old = 0;
         this.output_y_percentage_old = 0;
+        this.update_clicked_position = false;
 
 
         this.last_shader_formula_scalar = "";
@@ -233,6 +234,8 @@ class CanvasWrapper {
         //this.ResultBuffer = new ResultBuffer(gl, 10);
         this.compute_wrapper_pixel_results = new ComputeWrapper(gl, "pixel results", 10, 1);
         //this.compute_wrapper_pixel_results.
+
+        this.LinkElementsFromName();
     }
 
     InitAreaProjectionCameras(){
@@ -297,6 +300,34 @@ class CanvasWrapper {
         else{
             this.canvas.className = "canvas";
             this.thumbnail.className = "hidden";
+        }
+    }
+
+    LinkElementsFromName(){           
+        if(this.name == "main"){
+            this.linked_element_input_clicked_position_x = document.getElementById("input_clicked_position_main_x")
+            this.linked_element_input_clicked_position_y = document.getElementById("input_clicked_position_main_y")
+            this.linked_element_input_clicked_position_z = document.getElementById("input_clicked_position_main_z")
+            this.linked_element_input_clicked_position_w = document.getElementById("input_clicked_position_main_w")
+
+            this.linked_element_input_clicked_center_x = document.getElementById("input_clicked_center_main_x")
+            this.linked_element_input_clicked_center_y = document.getElementById("input_clicked_center_main_y")
+            this.linked_element_input_clicked_center_z = document.getElementById("input_clicked_center_main_z")
+            this.linked_element_input_clicked_center_w = document.getElementById("input_clicked_center_main_w")
+        }
+        else if (this.name == "side"){
+            this.linked_element_input_clicked_position_x = document.getElementById("input_clicked_position_aux_x")
+            this.linked_element_input_clicked_position_y = document.getElementById("input_clicked_position_aux_y")
+            this.linked_element_input_clicked_position_z = document.getElementById("input_clicked_position_aux_z")
+            this.linked_element_input_clicked_position_w = document.getElementById("input_clicked_position_aux_w")
+
+            this.linked_element_input_clicked_center_x = document.getElementById("input_clicked_center_aux_x")
+            this.linked_element_input_clicked_center_y = document.getElementById("input_clicked_center_aux_y")
+            this.linked_element_input_clicked_center_z = document.getElementById("input_clicked_center_aux_z")
+            this.linked_element_input_clicked_center_w = document.getElementById("input_clicked_center_aux_w")
+        }
+        else{
+            console.warn("UNKNOWN NAME:", this.name)
         }
     }
 
@@ -376,6 +407,11 @@ class CanvasWrapper {
 
     ShouldRenderColorBar() {
         return this.shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR;
+    }
+
+    ScheduleClickedPosition(){
+        console.warn("canvas_wrapper: ScheduleClickedPosition:", this.name)
+        this.update_clicked_position = true;
     }
 
     UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor) {
@@ -462,6 +498,9 @@ class CanvasWrapper {
     }
 
     should_draw_retrieve(){
+        if(this.update_clicked_position){
+            return true;
+        }
         //console.warn(this.name + ": " + this.output_y_percentage)
         //do not draw if the position didnt change
         if(this.output_x_percentage == this.output_x_percentage_old && this.output_y_percentage == this.output_y_percentage_old){
@@ -895,12 +934,32 @@ class CanvasWrapper {
         }
         document.getElementById("paragraph_mouse_data_string").textContent = 
             hit_type
-            + "click: "
+            + "intersection: "
             + format4NumbersAsVectorString(pixels[8], pixels[9], pixels[10], pixels[11])
             + "   center: "
             + format4NumbersAsVectorString(pixels[12], pixels[13], pixels[14], pixels[15]);
         //console.warn(pixels)
+
+        if(this.update_clicked_position){
+            console.warn("update_clicked_position")
+            this.updateClickedPosition(pixels)
+        }
+        this.update_clicked_position = false;
         return pixels;
+    }
+
+    updateClickedPosition(pixels){
+        console.warn(pixels)
+        var decimals = 6
+        this.linked_element_input_clicked_position_x.value = pixels[8].toFixed(decimals)
+        this.linked_element_input_clicked_position_y.value = pixels[9].toFixed(decimals)
+        this.linked_element_input_clicked_position_z.value = pixels[10].toFixed(decimals)
+        this.linked_element_input_clicked_position_w.value = pixels[11].toFixed(decimals)
+        
+        this.linked_element_input_clicked_center_x.value = pixels[12].toFixed(decimals)
+        this.linked_element_input_clicked_center_y.value = pixels[13].toFixed(decimals)
+        this.linked_element_input_clicked_center_z.value = pixels[14].toFixed(decimals)
+        this.linked_element_input_clicked_center_w.value = pixels[15].toFixed(decimals)
     }
 
     drawTextureAverage(gl, render_wrapper, width, height) {
