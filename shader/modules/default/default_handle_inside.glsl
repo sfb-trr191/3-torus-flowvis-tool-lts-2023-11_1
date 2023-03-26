@@ -1,17 +1,17 @@
 global.SHADER_MODULE_DEFAULT_HANDLE_INSIDE = `
 
-void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit)
+void HandleInside_LineSegment(bool dynamic, int part_index, Ray ray, int lineSegmentID, inout HitInformation hit)
 {	
     float tube_radius = GetTubeRadius(part_index);
 
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
+	GL_LineSegment lineSegment = GetLineSegment(dynamic, lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
 	if(ignore_copy && copy)
 		return;
 
-	float cost_a = GetCost(lineSegment.indexA, part_index);
-	float cost_b = GetCost(lineSegment.indexB, part_index);
+	float cost_a = GetCost(dynamic, lineSegment.indexA, part_index);
+	float cost_b = GetCost(dynamic, lineSegment.indexB, part_index);
 	float cost_cutoff = max_streamline_cost;
 	if(growth == 1)
 	{
@@ -24,15 +24,15 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 		
 	mat4 matrix = lineSegment.matrix;
 	mat4 matrix_inv = lineSegment.matrix_inv;
-	vec3 a = GetPosition(lineSegment.indexA, part_index);
-	vec3 b = GetPosition(lineSegment.indexB, part_index);
+	vec3 a = GetPosition(dynamic, lineSegment.indexA, part_index);
+	vec3 b = GetPosition(dynamic, lineSegment.indexB, part_index);
 	float h = distance(a,b);
-	HandleInside_Cylinder(part_index, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
+	HandleInside_Cylinder(dynamic, part_index, matrix, matrix_inv, h, hit, copy, multiPolyID, cost_a, cost_b, ray.origin, ray);
 		
 	Sphere sphere;
 	sphere.radius = tube_radius;	
 	sphere.center = a;
-	HandleInside_Sphere(part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);
+	HandleInside_Sphere(dynamic, part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);
 
 	sphere.center = b;
 	float cost_b_value = cost_b;
@@ -49,10 +49,10 @@ void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout 
 			}
 		}
 	}
-	HandleInside_Sphere(part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);	
+	HandleInside_Sphere(dynamic, part_index, sphere, hit, copy, multiPolyID, ray.origin, ray);	
 }
 
-void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
+void HandleInside_Cylinder(bool dynamic, int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray)
 {	
     float tube_radius = GetTubeRadius(part_index);
 	
@@ -101,7 +101,7 @@ void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h
 	}		
 }
 
-void HandleInside_Sphere(int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray)
+void HandleInside_Sphere(bool dynamic, int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray)
 {	
 
 	float distanceToCenter = distance(position, sphere.center);

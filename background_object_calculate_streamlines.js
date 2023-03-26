@@ -2,9 +2,10 @@ const JSZip = require("jszip");
 const FileSaver = require("file-saver");
 
 class BackgroundObjectCalculateStreamlines{
-    constructor(gl, gl_side){
+    constructor(gl, gl_side, sheduled_task){
         this.gl = gl;
         this.gl_side = gl_side;
+        this.sheduled_task = sheduled_task;
         this.input_parameters = new Object();
         this.current_streamline = new Object();
         this.finished = false;

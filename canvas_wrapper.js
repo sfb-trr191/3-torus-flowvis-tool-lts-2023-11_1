@@ -28,6 +28,10 @@ class UniformLocationsRayTracing {
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
         this.location_texture_ftle = gl.getUniformLocation(program, "texture_ftle");
         this.location_texture_ftle_differences = gl.getUniformLocation(program, "texture_ftle_differences");
+        this.location_texture_dynamic_float = gl.getUniformLocation(program, "texture_dynamic_float");
+        this.location_texture_dynamic_int = gl.getUniformLocation(program, "texture_dynamic_int");      
+
+        this.location_render_dynamic_streamline = gl.getUniformLocation(program, "render_dynamic_streamline");
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_get_pixel_data_results = gl.getUniformLocation(program, "get_pixel_data_results");
         this.location_output_x_percentage = gl.getUniformLocation(program, "output_x_percentage");
@@ -141,7 +145,7 @@ class UniformLocationsFTLESlice {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, ftle_manager, name, canvas, canvas_width, canvas_height, thumbnail, camera, aliasing, shader_manager, global_data, tree_view) {
+    constructor(gl, streamline_context_static, streamline_context_dynamic, ftle_manager, name, canvas, canvas_width, canvas_height, thumbnail, camera, aliasing, shader_manager, global_data, tree_view) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
@@ -157,6 +161,7 @@ class CanvasWrapper {
         this.shader_manager = shader_manager;
         this.global_data = global_data;
         this.streamline_context_static = streamline_context_static;
+        this.streamline_context_dynamic = streamline_context_dynamic;
         this.p_ftle_manager = ftle_manager;
         this.tree_view = tree_view;
         this.aliasing_index = 0;
@@ -206,6 +211,8 @@ class CanvasWrapper {
         this.max_cost = 0;
         this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
         this.is_exporting = false;
+        this.did_update_clicked_position = false;
+        this.render_dynamic_streamline = false;
 
         this.output_x_percentage = 0;
         this.output_y_percentage = 0;
@@ -495,6 +502,13 @@ class CanvasWrapper {
         this.camera.repositionCamera(this.draw_mode == DRAW_MODE_PROJECTION, this.projection_index, this.is_main_renderer);
         this.camera.UpdateShaderValues(); 
         this.camera.changed = false;  
+    }
+
+    
+    get_did_update_clicked_position_and_reset(){
+        var state = this.did_update_clicked_position;
+        this.did_update_clicked_position = false;
+        return state;
     }
 
     should_draw_retrieve(){
@@ -849,9 +863,15 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_origin_axes, this.show_origin_axes);
         gl.uniform1i(this.location_raytracing.location_show_streamlines, show_streamlines);
         gl.uniform1i(this.location_raytracing.location_show_streamlines_outside, show_streamlines_outside);
-
         
 
+        if(this.name == "main"){
+            this.render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
+        }else{
+            this.render_dynamic_streamline = false;
+        }
+
+        gl.uniform1i(this.location_raytracing.location_render_dynamic_streamline, this.render_dynamic_streamline);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, show_volume_rendering);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_forward, show_volume_rendering_forward);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
@@ -892,6 +912,11 @@ class CanvasWrapper {
         this.p_ftle_manager.bind(this.name, gl,
             this.location_raytracing.location_texture_ftle, gl.TEXTURE4, 4,
             this.location_raytracing.location_texture_ftle_differences, gl.TEXTURE5, 5);
+
+        this.streamline_context_dynamic.bind_lod(this.name, active_lod, gl,
+            this.shader_uniforms_raytracing,
+            this.location_raytracing.location_texture_dynamic_float,
+            this.location_raytracing.location_texture_dynamic_int);
             /*
         gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
@@ -949,6 +974,7 @@ class CanvasWrapper {
     }
 
     updateClickedPosition(pixels){
+        this.did_update_clicked_position = true;
         console.warn(pixels)
         var decimals = 6
         this.linked_element_input_clicked_position_x.value = pixels[8].toFixed(decimals)
@@ -1088,6 +1114,13 @@ class CanvasWrapper {
             program_shader_uniforms.registerUniform("start_index_float_line_segments"+part_index, "INT", -1);
             program_shader_uniforms.registerUniform("start_index_int_tree_nodes"+part_index, "INT", -1);
             program_shader_uniforms.registerUniform("start_index_float_tree_nodes"+part_index, "INT", -1);
+
+            program_shader_uniforms.registerUniform("start_index_dynamic_int_position_data"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_dynamic_float_position_data"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_dynamic_int_line_segments"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_dynamic_float_line_segments"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_dynamic_int_tree_nodes"+part_index, "INT", -1);
+            program_shader_uniforms.registerUniform("start_index_dynamic_float_tree_nodes"+part_index, "INT", -1);
         }
 
         program_shader_uniforms.registerUniform("start_index_int_dir_lights", "INT", -1);

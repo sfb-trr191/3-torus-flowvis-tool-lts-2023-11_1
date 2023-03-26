@@ -527,24 +527,32 @@ class LODData {
         console.log("UpdateDataTextures completed");
     }
 
-    bind(canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int) {
+    bind(context_name, canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int) {
+        console.warn("context_name", context_name)
         var data_textures = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_textures : this.data_textures_side;
 
-        gl.activeTexture(gl.TEXTURE0);                  // added this and following line to be extra sure which texture is being used...
+        var texture_float_binding = context_name == "static" ? gl.TEXTURE0 : gl.TEXTURE6;
+        var texture_int_binding = context_name == "static" ? gl.TEXTURE1 : gl.TEXTURE7;
+        var location_texture_float_value = context_name == "static" ? 0 : 6;
+        var location_texture_int_value = context_name == "static" ? 1 : 7;
+        var prefix = context_name == "static" ? "start_index_" : "start_index_dynamic_";
+
+
+        gl.activeTexture(texture_float_binding);                  // added this and following line to be extra sure which texture is being used...
         gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_float.texture);
-        gl.uniform1i(location_texture_float, 0);
-        gl.activeTexture(gl.TEXTURE1);
+        gl.uniform1i(location_texture_float, location_texture_float_value);
+        gl.activeTexture(texture_int_binding);
         gl.bindTexture(gl.TEXTURE_3D, data_textures.texture_int.texture);
-        gl.uniform1i(location_texture_int, 1);
+        gl.uniform1i(location_texture_int, location_texture_int_value);
 
         for(var part_index=0; part_index<this.list_part.length; part_index++){
-            shader_uniforms.setUniform("start_index_int_position_data"+part_index, this.data_unit.getIntStart("positions"+part_index));
-            shader_uniforms.setUniform("start_index_int_line_segments"+part_index, this.data_unit.getIntStart("line_segments"+part_index));
-            shader_uniforms.setUniform("start_index_int_tree_nodes"+part_index, this.data_unit.getIntStart("tree_nodes"+part_index));
+            shader_uniforms.setUniform(prefix+"int_position_data"+part_index, this.data_unit.getIntStart("positions"+part_index));
+            shader_uniforms.setUniform(prefix+"int_line_segments"+part_index, this.data_unit.getIntStart("line_segments"+part_index));
+            shader_uniforms.setUniform(prefix+"int_tree_nodes"+part_index, this.data_unit.getIntStart("tree_nodes"+part_index));
             
-            shader_uniforms.setUniform("start_index_float_position_data"+part_index, this.data_unit.getFloatStart("positions"+part_index));
-            shader_uniforms.setUniform("start_index_float_line_segments"+part_index, this.data_unit.getFloatStart("line_segments"+part_index));
-            shader_uniforms.setUniform("start_index_float_tree_nodes"+part_index, this.data_unit.getFloatStart("tree_nodes"+part_index));
+            shader_uniforms.setUniform(prefix+"float_position_data"+part_index, this.data_unit.getFloatStart("positions"+part_index));
+            shader_uniforms.setUniform(prefix+"float_line_segments"+part_index, this.data_unit.getFloatStart("line_segments"+part_index));
+            shader_uniforms.setUniform(prefix+"float_tree_nodes"+part_index, this.data_unit.getFloatStart("tree_nodes"+part_index));
         }
 
         shader_uniforms.updateUniforms();

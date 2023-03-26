@@ -308,6 +308,7 @@ const cpu_intersect = require("./cpu_intersect");
 
         shader_manager = new ShaderManager();
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
+        streamline_context_dynamic = new StreamlineContext("dynamic", lights, ui_seeds, gl, gl_side);
         visibility_manager.Link(streamline_context_static);
         ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
@@ -359,9 +360,9 @@ const cpu_intersect = require("./cpu_intersect");
 
         aliasing = new Aliasing();
 
-        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, ftle_manager, CANVAS_WRAPPER_MAIN,
+        canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, streamline_context_dynamic, ftle_manager, CANVAS_WRAPPER_MAIN,
             main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_thumbnail, main_camera, aliasing, shader_manager, global_data, tree_view);
-        canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, ftle_manager, CANVAS_WRAPPER_SIDE,
+        canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, streamline_context_dynamic, ftle_manager, CANVAS_WRAPPER_SIDE,
             side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, aux_thumbnail, side_camera, aliasing, shader_manager, global_data, tree_view);
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
@@ -420,8 +421,8 @@ const cpu_intersect = require("./cpu_intersect");
     }
 
     function state_streamline_calculation_setup(time_now){
-        console.log("#SC: state_streamline_calculation_setup");
-        bo_calculate_streamlines = new BackgroundObjectCalculateStreamlines(gl, gl_side);
+        console.warn("#SC: state_streamline_calculation_setup", sheduled_task);
+        bo_calculate_streamlines = new BackgroundObjectCalculateStreamlines(gl, gl_side, sheduled_task);
 
         //var t_start = performance.now();        
 
@@ -448,36 +449,40 @@ const cpu_intersect = require("./cpu_intersect");
 
     function state_streamline_calculation_setup_part_default(time_now){
         console.log("#SC: state_streamline_calculation_setup_part_default");
-        streamline_context_static.SetupPartDefault(bo_calculate_streamlines);
+        var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
+        context.SetupPartDefault(bo_calculate_streamlines);
         requestAnimationFrame(state_streamline_calculation_setup_new_streamline);
     }
 
     function state_streamline_calculation_setup_part_outside(time_now){
         console.log("#SC: state_streamline_calculation_setup_part_outside");
-        streamline_context_static.SetupPartOutside(bo_calculate_streamlines);
+        var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
+        context.SetupPartOutside(bo_calculate_streamlines);
         requestAnimationFrame(state_streamline_calculation_setup_new_streamline);
     }
 
     function state_streamline_calculation_setup_new_streamline(time_now){
         console.log("#SC: state_streamline_calculation_setup_new_streamline", bo_calculate_streamlines.next_streamline_index);
+        var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
         bo_calculate_streamlines.OnProgressChanged(bo_calculate_streamlines.next_streamline_index/(streamline_context_static.streamline_generator.seeds.length));
-        if(bo_calculate_streamlines.next_streamline_index == streamline_context_static.streamline_generator.seeds.length){
+        if(bo_calculate_streamlines.next_streamline_index == context.streamline_generator.seeds.length){
             requestAnimationFrame(state_streamline_calculation_finish_part);
             return;
         }
-        streamline_context_static.streamline_generator.SetupNextStreamline(bo_calculate_streamlines);
+        context.streamline_generator.SetupNextStreamline(bo_calculate_streamlines);
 
         requestAnimationFrame(state_streamline_calculation_continue_streamline);
     }
 
     function state_streamline_calculation_continue_streamline(time_now){
         console.log("#SC: state_streamline_calculation_continue_streamline", bo_calculate_streamlines.next_streamline_index);
+        var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
         if(bo_calculate_streamlines.current_streamline.finished){
             bo_calculate_streamlines.next_streamline_index++;            
             requestAnimationFrame(state_streamline_calculation_setup_new_streamline);
             return;
         }
-        streamline_context_static.streamline_generator.ContinueStreamline(bo_calculate_streamlines);
+        context.streamline_generator.ContinueStreamline(bo_calculate_streamlines);
 
         bo_calculate_streamlines.OnProgressChanged(bo_calculate_streamlines.streamline_part_progress);
         requestAnimationFrame(state_streamline_calculation_continue_streamline);
@@ -485,7 +490,8 @@ const cpu_intersect = require("./cpu_intersect");
 
     function state_streamline_calculation_finish_part(time_now){
         console.log("#SC: state_streamline_calculation_finish_part");     
-        streamline_context_static.FinishStreamlinesPart(bo_calculate_streamlines);
+        var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
+        context.FinishStreamlinesPart(bo_calculate_streamlines);
         if(bo_calculate_streamlines.part_index == PART_INDEX_DEFAULT){
             requestAnimationFrame(state_streamline_calculation_setup_part_outside);
             return;
@@ -495,6 +501,9 @@ const cpu_intersect = require("./cpu_intersect");
 
     function state_streamline_calculation_finished(time_now){
         console.log("#SC: state_streamline_calculation_finished");
+        var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
+        context.NotifyFinished();
+
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
 
@@ -648,7 +657,7 @@ const cpu_intersect = require("./cpu_intersect");
         }
 
         //handle sheduled task
-        if(sheduled_task == TASK_CALCULATE_STREAMLINES){
+        if(sheduled_task == TASK_CALCULATE_STREAMLINES || sheduled_task == TASK_CALCULATE_DYNAMIC_STREAMLINE){
             DeactivateInput();
             UpdateRenderSettings();
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
@@ -753,6 +762,20 @@ const cpu_intersect = require("./cpu_intersect");
 
             time_last_draw = time_now;
             current_fps = 1 / deltaTimeDraw;
+
+            if(canvas_wrapper_main.get_did_update_clicked_position_and_reset()){
+                if(streamline_context_static.streamline_generator.space == SPACE_3_TORUS){
+                    console.warn("MAIN DID UPDATE, SCHEDULE TASK: TASK_CALCULATE_DYNAMIC_STREAMLINE")
+                    sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+                }
+                else{
+                    console.warn("DYNAMIC STREAMLINE CALCULATION ONLY FOR 3-TORUS")
+                }
+            }
+            if(canvas_wrapper_side.get_did_update_clicked_position_and_reset()){
+                console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
+                //sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+            }
         }
 
         strong_tick_counter.innerHTML = tick_counter;

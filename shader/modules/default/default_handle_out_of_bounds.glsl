@@ -1,18 +1,18 @@
 global.SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS = `
 
 
-void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube)
+void HandleOutOfBound_LineSegment(bool dynamic, int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube)
 {	
     float tube_radius = GetTubeRadius(part_index);
 
-	GL_LineSegment lineSegment = GetLineSegment(lineSegmentID, part_index);
+	GL_LineSegment lineSegment = GetLineSegment(dynamic, lineSegmentID, part_index);
 	bool copy = (lineSegment.copy == 1);
 	int multiPolyID = lineSegment.multiPolyID;
 	if(ignore_copy && copy)
 		return;
 
-	float cost_a = GetCost(lineSegment.indexA, part_index);
-	float cost_b = GetCost(lineSegment.indexB, part_index);
+	float cost_a = GetCost(dynamic, lineSegment.indexA, part_index);
+	float cost_b = GetCost(dynamic, lineSegment.indexB, part_index);
 	float cost_cutoff = max_streamline_cost;
 	if(growth == 1)
 	{
@@ -24,15 +24,15 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 	}
 		
 	mat4 matrix = lineSegment.matrix;
-	vec3 a = GetPosition(lineSegment.indexA, part_index);
-	vec3 b = GetPosition(lineSegment.indexB, part_index);
+	vec3 a = GetPosition(dynamic, lineSegment.indexA, part_index);
+	vec3 b = GetPosition(dynamic, lineSegment.indexB, part_index);
 	float h = distance(a,b);
-	HandleOutOfBound_Cylinder(part_index, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
+	HandleOutOfBound_Cylinder(dynamic, part_index, matrix, h, hitCube, copy, multiPolyID, cost_a, cost_b);
 		
 	Sphere sphere;
 	sphere.radius = tube_radius;	
 	sphere.center = a;
-	HandleOutOfBound_Sphere(part_index, sphere, hitCube, copy, multiPolyID);
+	HandleOutOfBound_Sphere(dynamic, part_index, sphere, hitCube, copy, multiPolyID);
 
 	//sphere.center = b;
 	//HandleOutOfBound_Sphere(interactiveStreamline, sphere, hitCube, copy, multiPolyID);	
@@ -52,11 +52,11 @@ void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, in
 			}
 		}
 	}
-	HandleOutOfBound_Sphere(part_index, sphere, hitCube, copy, multiPolyID);	
+	HandleOutOfBound_Sphere(dynamic, part_index, sphere, hitCube, copy, multiPolyID);	
 	//IntersectSphere(interactiveStreamline, ray, sphere, hit, copy, multiPolyID, TYPE_STREAMLINE_SEGMENT, v_b, cost_b_value);	
 }
 
-void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
+void HandleOutOfBound_Cylinder(bool dynamic, int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b)
 {	
     float tube_radius = GetTubeRadius(part_index);
 	
@@ -96,7 +96,7 @@ void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitIn
 	}		
 }
 
-void HandleOutOfBound_Sphere(int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID)
+void HandleOutOfBound_Sphere(bool dynamic, int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID)
 {	
 
 	float distanceToCenter = distance(hitCube.position, sphere.center);

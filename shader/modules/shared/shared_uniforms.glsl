@@ -1,5 +1,6 @@
 global.SHADER_MODULE_SHARED_UNIFORMS = `
 
+uniform bool render_dynamic_streamline;
 uniform bool get_pixel_data_results;
 uniform float output_x_percentage;
 uniform float output_y_percentage;
@@ -17,6 +18,9 @@ uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
 uniform sampler3D texture_ftle;
 uniform sampler3D texture_ftle_differences;
+uniform sampler3D texture_dynamic_float;
+uniform isampler3D texture_dynamic_int;
+
 uniform float offset_x;
 uniform float offset_y;
 uniform float maxRayDistance;

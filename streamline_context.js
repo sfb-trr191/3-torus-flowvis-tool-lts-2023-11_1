@@ -33,6 +33,7 @@ class StreamlineContext {
             }
         }
         this.lod_0 = this.lod_list[0];
+        this.has_streamline_calculation_finished = false;
     }
 
     GetRawData(part_index) {
@@ -106,7 +107,7 @@ class StreamlineContext {
 
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.SetRules2Plus2D();
-        this.streamline_generator.GenerateSeedsFromUI();
+        this.streamline_generator.GenerateSeedsFromUI(this.name);
 
         //flag_calculate determines whether streamlines are calculated or cleared depending on the part index and the selected calculation method
         var flag_fundamental = bo_calculate_streamlines.input_parameters.streamline_calculation_method == STREAMLINE_CALCULATION_METHOD_BOTH
@@ -147,6 +148,10 @@ class StreamlineContext {
         for (var i = 0; i < this.lod_list.length; i++) {
             this.lod_list[i].LogState();
         }
+    }
+
+    NotifyFinished(){
+        this.has_streamline_calculation_finished = true;
     }
 
     FinishStreamlinesPart(bo_calculate_streamlines) {
@@ -214,7 +219,7 @@ class StreamlineContext {
 
     bind_lod(canvas_wrapper_name, lod_index, gl, shader_uniforms, location_texture_float, location_texture_int) {
         //console.log("bind_lod index: " + lod_index);
-        this.lod_list[lod_index].bind(canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int);
+        this.lod_list[lod_index].bind(this.name, canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int);
     }
 
 

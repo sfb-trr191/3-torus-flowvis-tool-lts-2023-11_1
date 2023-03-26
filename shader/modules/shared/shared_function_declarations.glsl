@@ -24,8 +24,8 @@ vec3 ApplyMoveOutOfBoundsFlags(vec3 position, MoveOutOfBoundsFlags flags);
 bool IntersectGLAABB(GL_AABB b, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(GL_Cylinder cylinder, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
 bool IntersectGLAABB(Sphere sphere, Ray r, float ray_local_cutoff, inout float tmin, inout float tmax);
-void IntersectCylinder(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
-void IntersectSphere(int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
+void IntersectCylinder(bool dynamic, int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
+void IntersectSphere(bool dynamic, int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
 float ExtractLinearPercentage(float a, float b, float value);
 
 //**********************************************************
@@ -40,12 +40,12 @@ vec4 map4(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax);
 
 void IntersectUnitCube(Ray ray, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
 void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
-void HandleOutOfBound_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube);
-void HandleOutOfBound_Cylinder(int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b);
-void HandleOutOfBound_Sphere(int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID);
-void HandleInside_LineSegment(int part_index, Ray ray, int lineSegmentID, inout HitInformation hit);
-void HandleInside_Cylinder(int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
-void HandleInside_Sphere(int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
+void HandleOutOfBound_LineSegment(bool dynamic, int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube);
+void HandleOutOfBound_Cylinder(bool dynamic, int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b);
+void HandleOutOfBound_Sphere(bool dynamic, int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID);
+void HandleInside_LineSegment(bool dynamic, int part_index, Ray ray, int lineSegmentID, inout HitInformation hit);
+void HandleInside_Cylinder(bool dynamic, int part_index, mat4 matrix, mat4 matrix_inv, float h, inout HitInformation hit, bool copy, int multiPolyID, float cost_a, float cost_b, vec3 position, Ray ray);
+void HandleInside_Sphere(bool dynamic, int part_index, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, vec3 position, Ray ray);
 
 void IntersectSeeds(Ray ray, float maxRayDistance, inout HitInformation hit);
 void IntersectProjectionFrame(bool check_bounds, Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube);
@@ -69,15 +69,15 @@ float GetTubeRadius(int part_index);
 
 //**********************************************************
 
-float GetCost(int index, int part_index);
-vec3 GetPosition(int index, int part_index);
-vec4 GetPosition4D(int index, int part_index, int ray_projection_index);
-float GetVelocity(int index, int part_index);
-GL_LineSegment GetLineSegment(int index, int part_index);
-GL_LineSegment GetLineSegment(int index, int part_index, int ray_projection_index);
-GL_TreeNode GetNode(int index, int part_index);
-GL_AABB GetAABB(int index, int part_index);
-GL_AABB GetAABB(int index, int part_index, int ray_projection_index);
+float GetCost(bool dynamic, int index, int part_index);
+vec3 GetPosition(bool dynamic, int index, int part_index);
+vec4 GetPosition4D(bool dynamic, int index, int part_index, int ray_projection_index);
+float GetVelocity(bool dynamic, int index, int part_index);
+GL_LineSegment GetLineSegment(bool dynamic, int index, int part_index);
+GL_LineSegment GetLineSegment(bool dynamic, int index, int part_index, int ray_projection_index);
+GL_TreeNode GetNode(bool dynamic, int index, int part_index);
+GL_AABB GetAABB(bool dynamic, int index, int part_index);
+GL_AABB GetAABB(bool dynamic, int index, int part_index, int ray_projection_index);
 GL_DirLight GetDirLight(int index);
 vec3 GetStreamlineColor(int index);
 vec3 GetStreamlineSeedPosition(int index);
@@ -96,7 +96,7 @@ void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 
 //**********************************************************
 
-void Intersect3Sphere(int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
+void Intersect3Sphere(bool dynamic, int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
 
 
 vec4 GetOutput(HitInformation hit);
