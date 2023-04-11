@@ -479,7 +479,8 @@
 
 
                     <button type="button" id="button_control_camera" title="Use the mouse to control the camera."></button>
-                    <button type="button" id="button_control_clcicked" title="Use the mouse to control the clicked position."></button>
+                    <button type="button" id="button_control_selected" title="Use the mouse to select a streamline."></button>
+                    <button type="button" id="button_control_dynamic" title="Use the mouse to control the dynamic streamline."></button>
                 </fieldset>
 
                 <button type="button" id="button_render_settings">update render settings</button>
@@ -1410,6 +1411,10 @@
                                         title="z component of the center.">
                                 </div>
                             </div>
+                            <div class="input_row">
+                                <label>streamline id</label>
+                                <input id="input_clicked_streamline_id_main" type="text" value="-1" title="The clicked streamline id.">
+                            </div>                            
                         </div>      
                         <div class="group_properties_children">
 
@@ -1881,6 +1886,10 @@
                                         <input id="input_clicked_center_aux_w" class="w" type="text" value="0.0"
                                             title="z component of the center.">                                    
                                 </div>
+                            </div> 
+                            <div class="input_row">
+                                <label>streamline id</label>
+                                <input id="input_clicked_streamline_id_aux" type="text" value="-1" title="The clicked streamline id.">
                             </div> 
                         </div>    
                         <div class="group_properties_children">

@@ -93,10 +93,14 @@ class MouseManager {
                 this.active_camera = camera;
                 other_camera.other_camera_is_panning = true;   
                 break;
-            case CONTROL_MODE_CLICKED_POSITION:
+            case CONTROL_MODE_DYNAMIC_STREAMLINE:
                 console.warn("mouse_manager:ScheduleClickedPosition")
                 canvas_wrapper.ScheduleClickedPosition();
                 break;
+            case CONTROL_MODE_SELECT_STREAMLINE:
+                console.warn("mouse_manager:ScheduleClickedPosition")
+                canvas_wrapper.ScheduleClickedPosition();
+                break;                
             default:
                 break;
         }
@@ -159,7 +163,11 @@ class MouseManager {
                     this.side_camera.SetLastMousePosition(pos_aux);
                     this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage_aux.x, pos_percentage_aux.y);
                     break;
-                case CONTROL_MODE_CLICKED_POSITION:
+                case CONTROL_MODE_DYNAMIC_STREAMLINE:
+                    this.canvas_wrapper_main.SetOutputPositionPercentage(pos_percentage_main.x, pos_percentage_main.y);
+                    this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage_aux.x, pos_percentage_aux.y);
+                    break;
+                case CONTROL_MODE_SELECT_STREAMLINE:
                     this.canvas_wrapper_main.SetOutputPositionPercentage(pos_percentage_main.x, pos_percentage_main.y);
                     this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage_aux.x, pos_percentage_aux.y);
                     break;

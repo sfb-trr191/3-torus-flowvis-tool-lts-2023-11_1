@@ -137,12 +137,20 @@ class UILeftToolBar{
             mouse_manager.SetControlMode(CONTROL_MODE_CAMERA);
         });
 
-        this.button_control_clcicked = document.getElementById("button_control_clcicked");
-        this.button_control_clcicked.addEventListener("mousedown", (event) => {
+        this.button_control_dynamic = document.getElementById("button_control_dynamic");
+        this.button_control_dynamic.addEventListener("mousedown", (event) => {
             if(this.block_all_input){
                 return;
             }
-            mouse_manager.SetControlMode(CONTROL_MODE_CLICKED_POSITION);            
+            mouse_manager.SetControlMode(CONTROL_MODE_DYNAMIC_STREAMLINE);            
+        });
+
+        this.button_control_selected = document.getElementById("button_control_selected");
+        this.button_control_selected.addEventListener("mousedown", (event) => {
+            if(this.block_all_input){
+                return;
+            }
+            mouse_manager.SetControlMode(CONTROL_MODE_SELECT_STREAMLINE);            
         });
 
 

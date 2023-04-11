@@ -765,8 +765,19 @@ const cpu_intersect = require("./cpu_intersect");
 
             if(canvas_wrapper_main.get_did_update_clicked_position_and_reset()){
                 if(streamline_context_static.streamline_generator.space == SPACE_3_TORUS){
-                    console.warn("MAIN DID UPDATE, SCHEDULE TASK: TASK_CALCULATE_DYNAMIC_STREAMLINE")
-                    sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+                    if(mouse_manager.control_mode == CONTROL_MODE_DYNAMIC_STREAMLINE){
+                        console.warn("MAIN DID UPDATE, SCHEDULE TASK: TASK_CALCULATE_DYNAMIC_STREAMLINE")
+                        sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+                    }
+                    if(mouse_manager.control_mode == CONTROL_MODE_SELECT_STREAMLINE){
+                        console.warn("MAIN DID UPDATE, NEW SELECTED STREAMLINE")
+                        var id = parseInt(document.getElementById("input_clicked_streamline_id_main").value)
+                        canvas_wrapper_main.selected_streamline_id = id
+                        canvas_wrapper_side.selected_streamline_id = id
+                        main_camera.changed = true;
+                        side_camera.changed = true;
+                    }
+                    
                 }
                 else{
                     console.warn("DYNAMIC STREAMLINE CALCULATION ONLY FOR 3-TORUS")

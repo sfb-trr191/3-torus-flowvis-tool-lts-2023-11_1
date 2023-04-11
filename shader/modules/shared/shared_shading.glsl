@@ -22,6 +22,15 @@ float CalculateFogFactor(float dist)
     return fogFactor;
 }
 
+vec3 ToGrayScale(vec3 rgb, float color_t)
+{
+	float gray = 0.21 * rgb[0] + 0.71 * rgb[1] + 0.07 * rgb[2];
+	return vec3(
+		rgb[0] * color_t + gray * (1.0 - color_t),
+		rgb[1] * color_t + gray * (1.0 - color_t),
+		rgb[2] * color_t + gray * (1.0 - color_t));	
+}
+
 vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 {
 	//return vec3(0.5,0.5,0.5);
@@ -45,8 +54,18 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
             }
             if(hit.dynamic)
                 return dynamic_streamline_color;
+
 		    int index = hit.multiPolyID;
-            return GetStreamlineColor(index);
+            vec3 color = GetStreamlineColor(index);
+            if(selected_streamline_id >= 0){
+                if(selected_streamline_id == hit.multiPolyID){
+                    color = vec3(1,0,0);
+                }else{
+                    //not the selected streamline --> change color to graycale
+                    color = ToGrayScale(color, gray_scale_factor);
+                }
+            }
+            return color;
         }
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR)
         {

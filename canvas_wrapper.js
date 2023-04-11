@@ -41,7 +41,9 @@ class UniformLocationsRayTracing {
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_cost = gl.getUniformLocation(program, "max_streamline_cost");   
-        this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");               
+        this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");      
+        this.location_selected_streamline_id = gl.getUniformLocation(program, "selected_streamline_id");    
+        this.location_gray_scale_factor = gl.getUniformLocation(program, "gray_scale_factor");  
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
@@ -222,6 +224,8 @@ class CanvasWrapper {
         this.update_clicked_position = false;
 
         this.dynamic_streamline_color = glMatrix.vec3.fromValues(1,1,0);
+        this.selected_streamline_id = -1;
+        this.gray_scale_factor = 0.5;
 
 
         this.last_shader_formula_scalar = "";
@@ -324,6 +328,8 @@ class CanvasWrapper {
             this.linked_element_input_clicked_center_y = document.getElementById("input_clicked_center_main_y")
             this.linked_element_input_clicked_center_z = document.getElementById("input_clicked_center_main_z")
             this.linked_element_input_clicked_center_w = document.getElementById("input_clicked_center_main_w")
+
+            this.linked_element_input_clicked_id = document.getElementById("input_clicked_streamline_id_main")
         }
         else if (this.name == "side"){
             this.linked_element_input_clicked_position_x = document.getElementById("input_clicked_position_aux_x")
@@ -335,6 +341,8 @@ class CanvasWrapper {
             this.linked_element_input_clicked_center_y = document.getElementById("input_clicked_center_aux_y")
             this.linked_element_input_clicked_center_z = document.getElementById("input_clicked_center_aux_z")
             this.linked_element_input_clicked_center_w = document.getElementById("input_clicked_center_aux_w")
+
+            this.linked_element_input_clicked_id = document.getElementById("input_clicked_streamline_id_aux")
         }
         else{
             console.warn("UNKNOWN NAME:", this.name)
@@ -844,8 +852,10 @@ class CanvasWrapper {
         console.log("this.limited_max_distance", this.name, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_light_integration_step_size, this.light_integration_step_size);  
-        gl.uniform1i(this.location_raytracing.location_light_integration_max_step_count, this.light_integration_max_step_count);  
-        
+        gl.uniform1i(this.location_raytracing.location_light_integration_max_step_count, this.light_integration_max_step_count);       
+
+        gl.uniform1i(this.location_raytracing.location_selected_streamline_id, this.selected_streamline_id);
+        gl.uniform1i(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);
         gl.uniform3f(this.location_raytracing.location_dynamic_streamline_color, this.dynamic_streamline_color[0], this.dynamic_streamline_color[1], this.dynamic_streamline_color[2]);
         gl.uniform1f(this.location_raytracing.location_max_cost, this.max_cost);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
@@ -990,6 +1000,8 @@ class CanvasWrapper {
         this.linked_element_input_clicked_center_y.value = pixels[13].toFixed(decimals)
         this.linked_element_input_clicked_center_z.value = pixels[14].toFixed(decimals)
         this.linked_element_input_clicked_center_w.value = pixels[15].toFixed(decimals)
+
+        this.linked_element_input_clicked_id.value = pixels[4]
     }
 
     drawTextureAverage(gl, render_wrapper, width, height) {
