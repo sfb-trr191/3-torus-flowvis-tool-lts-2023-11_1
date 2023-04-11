@@ -33,6 +33,7 @@ struct HitInformation
     float debug_value_f;
     int sub_type;
     int iteration_count;
+    bool dynamic;
 };
 
 struct Ray

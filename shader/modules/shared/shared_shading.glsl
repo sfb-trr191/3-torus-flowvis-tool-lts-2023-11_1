@@ -43,6 +43,8 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
                     return vec3(1,1,1);
                 }
             }
+            if(hit.dynamic)
+                return dynamic_streamline_color;
 		    int index = hit.multiPolyID;
             return GetStreamlineColor(index);
         }

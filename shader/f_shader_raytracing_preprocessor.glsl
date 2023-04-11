@@ -55,7 +55,8 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
 {
     hit.was_copied_from_outside = false;
 	hit.hitType = TYPE_NONE;
-    hit.sub_type = SUBTYPE_NONE;
+    hit.sub_type = SUBTYPE_NONE;    
+    hit.dynamic = false;
 	hit.distance = 0.0;	
     hit.distance_iteration = 0.0;
 	hit.transparentHit = false;
@@ -195,7 +196,8 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
             if(hit.hitType == TYPE_NONE){
                 hit.was_copied_from_outside = true;
                 hit.hitType = hit_outside.hitType;
-                hit.sub_type = hit_outside.sub_type;
+                hit.sub_type = hit_outside.sub_type;                
+                hit.dynamic = hit_outside.dynamic;
                 hit.position = hit_outside.position;
                 hit.positionCenter = hit_outside.positionCenter;
                 hit.normal = hit_outside.normal;
@@ -209,6 +211,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.was_copied_from_outside = true;
                 hit.hitType = hit_outside.hitType;
                 hit.sub_type = hit_outside.sub_type;
+                hit.dynamic = hit_outside.dynamic;
                 hit.position = hit_outside.position;
                 hit.positionCenter = hit_outside.positionCenter;
                 hit.normal = hit_outside.normal;
@@ -231,7 +234,8 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
         if(hit_outside.hitType>TYPE_NONE){
             hit.was_copied_from_outside = true;
             hit.hitType = hit_outside.hitType;
-            hit.sub_type = hit_outside.sub_type;
+            hit.sub_type = hit_outside.sub_type;            
+            hit.dynamic = hit_outside.dynamic;
             hit.position = hit_outside.position;
             hit.positionCenter = hit_outside.positionCenter;
             hit.normal = hit_outside.normal;

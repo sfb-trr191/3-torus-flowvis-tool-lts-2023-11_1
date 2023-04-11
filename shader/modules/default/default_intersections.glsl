@@ -672,7 +672,8 @@ void IntersectCylinder(bool dynamic, int part_index, bool check_bounds, Ray ray,
 		float v_a = GetVelocity(dynamic, lineSegment.indexA, part_index);
 		float v_b = GetVelocity(dynamic, lineSegment.indexB, part_index);		
 		hit.hitType = TYPE_STREAMLINE_SEGMENT;
-        hit.sub_type = SUBTYPE_CYLINDER;
+        hit.sub_type = SUBTYPE_CYLINDER;        
+        hit.dynamic = dynamic;
         hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
@@ -787,6 +788,7 @@ void IntersectSphere(bool dynamic, int part_index, bool check_bounds, Ray ray, f
 
 		hit.hitType = type;
         hit.sub_type = SUBTYPE_SPHERE;
+        hit.dynamic = dynamic;
         hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;
@@ -1145,7 +1147,8 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 		//calculate tube center in world space (for normal calculation)
 		vec3 tube_center = (matrix_inv * vec4(0,0, z_os, 1)).xyz;	
 		hit.hitType = TYPE_GL_CYLINDER;//change
-        hit.sub_type = SUBTYPE_CYLINDER;
+        hit.sub_type = SUBTYPE_CYLINDER;        
+        hit.dynamic = false;//for now, dynamic only contains streamlines, no objects
         hit.iteration_count = ray.iteration_count;
         hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;	
@@ -1209,6 +1212,7 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 	{		
 		hit.hitType = type;
         hit.sub_type = SUBTYPE_SPHERE;
+        hit.dynamic = false;//for now, dynamic only contains streamlines, no objects
         hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
 		hit.distance = ray.rayDistance + distance_os;

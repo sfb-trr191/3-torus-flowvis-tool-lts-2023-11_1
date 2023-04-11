@@ -53,7 +53,7 @@ uniform int dim_x;//dim of volume texture
 uniform int dim_y;//dim of volume texture
 uniform int dim_z;//dim of volume texture
 
-
+uniform vec3 dynamic_streamline_color;
 uniform float max_streamline_cost;
 
 uniform GL_CameraData active_camera;

@@ -388,6 +388,7 @@ void Intersect3Sphere(bool dynamic, int part_index, Ray ray, float ray_local_cut
 		hit.cost = cost;
         //hit.debug_value = 2;
         hit.sub_type = SUBTYPE_3SPHERE;
+        hit.dynamic = dynamic;
 		
 	}
 }
@@ -504,6 +505,7 @@ void IntersectSpherinder(bool dynamic, int part_index, Ray ray, float ray_local_
 		hit.cost = -1.0;
         //hit.debug_value = 1;
         hit.sub_type = SUBTYPE_SPHERINDER;
+        hit.dynamic = dynamic;
 		
 	}
 }
@@ -706,6 +708,7 @@ void IntersectSpherinderGL_Cylinder(GL_Cylinder cylinder, Ray ray, float ray_loc
 		hit.cost = -1.0;
         //hit.debug_value = 1;
         hit.sub_type = SUBTYPE_SPHERINDER;
+        hit.dynamic = false;//for now, dynamic only contains streamlines, no objects
 		hit.objectColor = cylinder.color.xyz;
 		
 	}   
@@ -770,6 +773,7 @@ void Intersect3SphereAxis(Ray ray, float ray_local_cutoff, Sphere4D sphere4D, in
         hit.velocity = -1.0;
         hit.cost = -1.0;
         hit.sub_type = SUBTYPE_3SPHERE;		
+        hit.dynamic = false;//for now, dynamic only contains streamlines, no objects
         hit.objectColor = color;
     }
 }
@@ -832,7 +836,8 @@ void Intersect3SphereAxes(Ray ray, float ray_local_cutoff, Sphere4D sphere4D, in
         hit.multiPolyID = -1;
         hit.velocity = -1.0;
         hit.cost = -1.0;
-        hit.sub_type = SUBTYPE_3SPHERE;		
+        hit.sub_type = SUBTYPE_3SPHERE;	
+        hit.dynamic = false;//for now, dynamic only contains streamlines, no objects	
 
         float d_1 = distance(pos_1, hit.position);
 		float d_2 = distance(pos_2, hit.position);

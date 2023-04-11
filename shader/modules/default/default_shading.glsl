@@ -40,6 +40,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		{
 			hit.hitType = hitCube.hitType;
 			hit.sub_type = hitCube.sub_type;
+            hit.dynamic = hitCube.dynamic;
 			hit.position = hitCube.position;
 			hit.positionCenter = hitCube.positionCenter;
 			hit.normal = hitCube.normal;
