@@ -10,7 +10,7 @@ vec4 GetOutput(HitInformation hit)
             if(hit.hitType == TYPE_STREAMLINE_SEGMENT){
                 return vec4(hit.multiPolyID, 0, 0, 0);
             }
-            return vec4(0, 0, 0, 0);
+            return vec4(-1, 0, 0, 0);
         case 2:
             return hit.position;
         case 3:
