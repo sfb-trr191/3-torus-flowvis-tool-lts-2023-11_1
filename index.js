@@ -783,8 +783,18 @@ const cpu_intersect = require("./cpu_intersect");
                 }
             }
             if(canvas_wrapper_side.get_did_update_clicked_position_and_reset()){
-                console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
-                //sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+                if(mouse_manager.control_mode == CONTROL_MODE_SELECT_STREAMLINE){
+                    console.warn("AUX DID UPDATE, NEW SELECTED STREAMLINE")
+                    var id = parseInt(document.getElementById("input_clicked_streamline_id_aux").value)
+                    canvas_wrapper_main.selected_streamline_id = id
+                    canvas_wrapper_side.selected_streamline_id = id
+                    main_camera.changed = true;
+                    side_camera.changed = true;
+                }
+                else{
+                    console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
+                    //sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+                }
             }
         }
 
