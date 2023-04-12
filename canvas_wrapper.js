@@ -751,7 +751,7 @@ class CanvasWrapper {
         }
 
         //disable render_dynamic_streamline if a streamline is selected
-        render_dynamic_streamline = render_dynamic_streamline && this.selected_streamline_id < 0;
+        //render_dynamic_streamline = render_dynamic_streamline && this.selected_streamline_id < 0;
         return render_dynamic_streamline
     }
 

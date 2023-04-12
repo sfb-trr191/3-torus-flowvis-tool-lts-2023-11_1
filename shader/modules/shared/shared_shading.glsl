@@ -56,24 +56,25 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 
 		    int index = hit.multiPolyID;
             vec3 color = GetStreamlineColor(index);
-            if(selected_streamline_id >= 0){
-                if(selected_streamline_id == hit.multiPolyID){
-                    //selected streamline --> special color
-                    color = vec3(1,0,0);
-                }else{
-                    //not the selected streamline --> change color to graycale
-                    color = ToGrayScale(color, gray_scale_factor);
-                }
-            }
-            else if(render_dynamic_streamline){
+            bool flag_grayscale = false;
+            if(render_dynamic_streamline){
+                flag_grayscale = true; 
                 if(hit.dynamic){
                     //dynamic streamline --> special color
-                    color = dynamic_streamline_color;
-                }else{
-                    //not the dynamic streamline --> change color to graycale
-                    color = ToGrayScale(color, gray_scale_factor);
-                }                
+                    return dynamic_streamline_color;
+                }         
             }
+            if(selected_streamline_id >= 0){
+                flag_grayscale = true; 
+                if(selected_streamline_id == hit.multiPolyID){
+                    //selected streamline --> special color
+                    return vec3(1,0,0);
+                }
+            }
+            if(flag_grayscale){
+                //not the dynamic or selected streamline but at least one of the modes is active --> change color to graycale
+                color = ToGrayScale(color, gray_scale_factor);
+            }     
             return color;
         }
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR)
