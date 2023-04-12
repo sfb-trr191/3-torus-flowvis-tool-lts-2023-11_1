@@ -155,9 +155,17 @@ button {
     background-image: url("../icons/focus_center.png");
 }
 
+#button_control_camera{
+    background-image: url("../icons/constrol_mode_camera.png");
+}
 
+#button_control_selected{
+    background-image: url("../icons/control_mode_select_streamline.png");
+}
 
-
+#button_control_dynamic{
+    background-image: url("../icons/control_mode_dynamic_streamline.png");
+}
 
 /*
 
