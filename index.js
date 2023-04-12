@@ -633,6 +633,13 @@ const cpu_intersect = require("./cpu_intersect");
         return false;
     }
 
+    function select_streamline(id){
+        canvas_wrapper_main.selected_streamline_id = id
+        canvas_wrapper_side.selected_streamline_id = id
+        main_camera.changed = true;
+        side_camera.changed = true;
+    }
+
     function on_update(time_now) {
         tick_counter++;
         var deltaTime = (time_now - time_last_tick) / 1000;
@@ -767,10 +774,7 @@ const cpu_intersect = require("./cpu_intersect");
                 if(mouse_manager.control_mode == CONTROL_MODE_SELECT_STREAMLINE){
                     console.warn("MAIN DID UPDATE, NEW SELECTED STREAMLINE")
                     var id = parseInt(document.getElementById("input_clicked_streamline_id_main").value)
-                    canvas_wrapper_main.selected_streamline_id = id
-                    canvas_wrapper_side.selected_streamline_id = id
-                    main_camera.changed = true;
-                    side_camera.changed = true;
+                    select_streamline(id);
                 }
                 if(streamline_context_static.streamline_generator.space == SPACE_3_TORUS){
                     if(mouse_manager.control_mode == CONTROL_MODE_DYNAMIC_STREAMLINE){
@@ -786,10 +790,7 @@ const cpu_intersect = require("./cpu_intersect");
                 if(mouse_manager.control_mode == CONTROL_MODE_SELECT_STREAMLINE){
                     console.warn("AUX DID UPDATE, NEW SELECTED STREAMLINE")
                     var id = parseInt(document.getElementById("input_clicked_streamline_id_aux").value)
-                    canvas_wrapper_main.selected_streamline_id = id
-                    canvas_wrapper_side.selected_streamline_id = id
-                    main_camera.changed = true;
-                    side_camera.changed = true;
+                    select_streamline(id);
                 }
                 else{
                     console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")

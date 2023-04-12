@@ -215,7 +215,7 @@ class CanvasWrapper {
         this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
         this.is_exporting = false;
         this.did_update_clicked_position = false;
-        this.render_dynamic_streamline = false;
+        this.show_dynamic_streamline = false;//set by ui --> does not mean that render_dynamic_streamline is true
 
         this.output_x_percentage = 0;
         this.output_y_percentage = 0;
@@ -742,6 +742,19 @@ class CanvasWrapper {
         this.drawFTLESlice(gl, left_render_wrapper);
     }
 
+    should_render_dynamic_streamline(){
+        var render_dynamic_streamline = false;
+        if(this.name == "main"){
+            render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
+        }else{
+            render_dynamic_streamline = false;
+        }
+
+        //disable render_dynamic_streamline if a streamline is selected
+        render_dynamic_streamline = render_dynamic_streamline && this.selected_streamline_id < 0;
+        return render_dynamic_streamline
+    }
+
     drawTextureRaytracing(gl, render_wrapper, get_pixel_data_results) {
         var projection_index = -1;
         var max_iteration_count = this.max_iteration_count;
@@ -878,14 +891,8 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_show_streamlines, show_streamlines);
         gl.uniform1i(this.location_raytracing.location_show_streamlines_outside, show_streamlines_outside);
         
-
-        if(this.name == "main"){
-            this.render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
-        }else{
-            this.render_dynamic_streamline = false;
-        }
-
-        gl.uniform1i(this.location_raytracing.location_render_dynamic_streamline, this.render_dynamic_streamline);
+        var render_dynamic_streamline = this.should_render_dynamic_streamline();
+        gl.uniform1i(this.location_raytracing.location_render_dynamic_streamline, render_dynamic_streamline);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, show_volume_rendering);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_forward, show_volume_rendering_forward);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
