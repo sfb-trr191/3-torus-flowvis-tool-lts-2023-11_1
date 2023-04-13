@@ -32,7 +32,7 @@ class MouseManager {
     }
 
     SetControlMode(control_mode){
-        console.log("control_mode:", control_mode);
+        console.warn("MouseManager control_mode:", control_mode);
         this.control_mode = control_mode
     }
 

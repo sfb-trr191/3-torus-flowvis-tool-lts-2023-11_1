@@ -109,6 +109,13 @@ class InputManager {
         //HANDLING NON CONTINUOUS KEYS
         if (event.key == 'p')
             camera.TogglePanningForced();
+        if (event.key == '1')
+            document.getElementById("button_control_camera").click();
+        if (event.key == '2')
+            document.getElementById("button_control_selected").click();
+        if (event.key == '3')
+            document.getElementById("button_control_dynamic").click();
+
     }
 
     addOnFocusOut() {

@@ -130,7 +130,7 @@ class UILeftToolBar{
 
 
         this.button_control_camera = document.getElementById("button_control_camera");
-        this.button_control_camera.addEventListener("mousedown", (event) => {
+        this.button_control_camera.addEventListener("click", (event) => {
             if(this.block_all_input){
                 return;
             }
@@ -138,7 +138,7 @@ class UILeftToolBar{
         });
 
         this.button_control_dynamic = document.getElementById("button_control_dynamic");
-        this.button_control_dynamic.addEventListener("mousedown", (event) => {
+        this.button_control_dynamic.addEventListener("click", (event) => {
             if(this.block_all_input){
                 return;
             }
@@ -146,7 +146,7 @@ class UILeftToolBar{
         });
 
         this.button_control_selected = document.getElementById("button_control_selected");
-        this.button_control_selected.addEventListener("mousedown", (event) => {
+        this.button_control_selected.addEventListener("click", (event) => {
             if(this.block_all_input){
                 return;
             }
