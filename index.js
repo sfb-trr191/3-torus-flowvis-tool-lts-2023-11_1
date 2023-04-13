@@ -665,6 +665,7 @@ const cpu_intersect = require("./cpu_intersect");
 
         //handle sheduled task
         if(sheduled_task == TASK_CALCULATE_STREAMLINES || sheduled_task == TASK_CALCULATE_DYNAMIC_STREAMLINE){
+            streamline_context_dynamic.has_streamline_calculation_finished = false;
             DeactivateInput();
             UpdateRenderSettings();
             document.getElementById("wrapper_dialog_calculating").className = "wrapper";
