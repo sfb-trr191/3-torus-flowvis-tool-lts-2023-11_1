@@ -668,8 +668,10 @@ const cpu_intersect = require("./cpu_intersect");
             streamline_context_dynamic.has_streamline_calculation_finished = false;
             DeactivateInput();
             UpdateRenderSettings();
-            document.getElementById("wrapper_dialog_calculating").className = "wrapper";
-            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            if(sheduled_task == TASK_CALCULATE_STREAMLINES){
+                document.getElementById("wrapper_dialog_calculating").className = "wrapper";
+                document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            }
             requestAnimationFrame(state_streamline_calculation_setup);
             return;  
         }        
