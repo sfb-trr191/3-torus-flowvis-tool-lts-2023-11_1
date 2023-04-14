@@ -747,7 +747,8 @@ class CanvasWrapper {
         if(this.name == "main"){
             render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
         }else{
-            render_dynamic_streamline = false;
+            render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
+            
         }
 
         //disable render_dynamic_streamline if a streamline is selected

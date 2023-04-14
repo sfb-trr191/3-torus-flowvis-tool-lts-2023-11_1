@@ -185,6 +185,10 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         bool check_bounds = false;
         bool dynamic = false;
 	    IntersectInstance_Tree(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
+        if(render_dynamic_streamline){
+            dynamic = true;
+            IntersectInstance_Tree(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
+        }
     }
 #endif
 
@@ -942,7 +946,11 @@ void IntersectSeeds(Ray ray, float maxRayDistance, inout HitInformation hit){
 		{
             bool dynamic = false;
 			IntersectSphere(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-		}		
+		    if(render_dynamic_streamline){
+                dynamic = true;
+                IntersectSphere(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
+            }
+        }		
 	}	
 }
 
