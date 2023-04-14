@@ -56,6 +56,7 @@ uniform int dim_z;//dim of volume texture
 uniform int selected_streamline_id;
 uniform float gray_scale_factor;
 uniform vec3 dynamic_streamline_color;
+uniform vec4 dynamic_seed_position;
 uniform float max_streamline_cost;
 
 uniform GL_CameraData active_camera;

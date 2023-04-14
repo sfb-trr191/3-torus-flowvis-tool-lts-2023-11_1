@@ -97,6 +97,10 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
         
 	}
 	if(hit.hitType == TYPE_SEED){
+        if(hit.dynamic){
+            //dynamic streamline --> special color
+            return dynamic_streamline_color;
+        }  
 		int index = hit.multiPolyID;
         return GetStreamlineColor(index);
 	}

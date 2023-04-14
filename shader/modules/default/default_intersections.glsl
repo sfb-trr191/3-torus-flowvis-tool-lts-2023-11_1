@@ -946,12 +946,22 @@ void IntersectSeeds(Ray ray, float maxRayDistance, inout HitInformation hit){
 		{
             bool dynamic = false;
 			IntersectSphere(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-		    if(render_dynamic_streamline){
-                dynamic = true;
-                IntersectSphere(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
-            }
         }		
 	}	
+    if(render_dynamic_streamline){
+		sphere.center = dynamic_seed_position.xyz;	
+    	int multiPolyID = 0; 
+
+		float tmin;
+		float tmax;
+		bool hitAABB = IntersectGLAABB(sphere, ray, maxRayDistance, tmin, tmax);
+		if(hitAABB)
+		{
+            bool dynamic = true;
+			IntersectSphere(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, ray_local_cutoff, sphere, hit, copy, multiPolyID, type, velocity, cost);
+        }
+    
+    }
 }
 
 void IntersectMovableAxes(Ray ray, float ray_local_cutoff, inout HitInformation hit, inout HitInformation hitCube){

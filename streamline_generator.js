@@ -32,6 +32,8 @@ class StreamlineGenerator {
         this.linked_element_input_clicked_position_aux_y = document.getElementById("input_clicked_position_aux_y")
         this.linked_element_input_clicked_position_aux_z = document.getElementById("input_clicked_position_aux_z")
         this.linked_element_input_clicked_position_aux_w = document.getElementById("input_clicked_position_aux_w")
+
+        this.dynamic_seed_position = glMatrix.vec4.fromValues(0,0,0,0);
     }
 
     GenerateExampleSeeds() {
@@ -62,15 +64,15 @@ class StreamlineGenerator {
             this.seed_signums = this.p_ui_seeds.seed_signums;
         }else{
             console.warn("this.linked_element_input_clicked_position_main_x", this.linked_element_input_clicked_position_main_x)
-            var clicked_main = glMatrix.vec4.fromValues(
+            this.dynamic_seed_position = glMatrix.vec4.fromValues(
                 parseFloat(this.linked_element_input_clicked_position_main_x.value),
                 parseFloat(this.linked_element_input_clicked_position_main_y.value),
                 parseFloat(this.linked_element_input_clicked_position_main_z.value),
                 parseFloat(this.linked_element_input_clicked_position_main_w.value),)
 
             this.seeds = [
-                clicked_main, 
-                clicked_main];
+                this.dynamic_seed_position, 
+                this.dynamic_seed_position];
             this.seed_directions = [DIRECTION_BOTH, DIRECTION_BOTH];
             this.seed_signums = [1, -1];
             /*

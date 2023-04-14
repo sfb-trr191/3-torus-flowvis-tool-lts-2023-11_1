@@ -41,7 +41,8 @@ class UniformLocationsRayTracing {
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_cost = gl.getUniformLocation(program, "max_streamline_cost");   
-        this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");      
+        this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");    
+        this.location_dynamic_seed_position = gl.getUniformLocation(program, "dynamic_seed_position");            
         this.location_selected_streamline_id = gl.getUniformLocation(program, "selected_streamline_id");    
         this.location_gray_scale_factor = gl.getUniformLocation(program, "gray_scale_factor");  
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
@@ -224,9 +225,9 @@ class CanvasWrapper {
         this.update_clicked_position = false;
 
         this.dynamic_streamline_color = glMatrix.vec3.fromValues(1,1,0);
+        this.dynamic_seed_position = glMatrix.vec3.fromValues(0,0,0);
         this.selected_streamline_id = -1;
         this.gray_scale_factor = 0.5;
-
 
         this.last_shader_formula_scalar = "";
 
@@ -748,7 +749,7 @@ class CanvasWrapper {
             render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
         }else{
             render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
-            
+
         }
 
         //disable render_dynamic_streamline if a streamline is selected
@@ -871,6 +872,11 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_selected_streamline_id, this.selected_streamline_id);
         gl.uniform1i(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);
         gl.uniform3f(this.location_raytracing.location_dynamic_streamline_color, this.dynamic_streamline_color[0], this.dynamic_streamline_color[1], this.dynamic_streamline_color[2]);
+        gl.uniform4f(this.location_raytracing.location_dynamic_seed_position, 
+            this.streamline_context_dynamic.streamline_generator.dynamic_seed_position[0], 
+            this.streamline_context_dynamic.streamline_generator.dynamic_seed_position[1], 
+            this.streamline_context_dynamic.streamline_generator.dynamic_seed_position[2], 
+            this.streamline_context_dynamic.streamline_generator.dynamic_seed_position[3]);        
         gl.uniform1f(this.location_raytracing.location_max_cost, this.max_cost);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
