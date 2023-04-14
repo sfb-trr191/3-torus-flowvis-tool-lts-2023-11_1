@@ -91,6 +91,7 @@ const InputParameterWrapper = require("./input_parameter_wrapper");
 const module_utility = require("./utility");
 const setCSS = module_utility.setCSS;
 const lerp = module_utility.lerp;
+const getColorVectorFromElementID = module_utility.getColorVectorFromElementID;
 const ExportObject = require("./export");
 const module_data_conversion = require("./data_conversion");
 const conversionTest = module_data_conversion.conversionTest;
@@ -1290,6 +1291,9 @@ const cpu_intersect = require("./cpu_intersect");
         var light_integration_step_size = parseFloat(document.getElementById("input_light_integration_step_size").value);
         var light_integration_max_step_count = parseInt(document.getElementById("input_light_integration_max_step_count").value);
         //MAIN
+             
+        canvas_wrapper_main.selected_streamline_color = getColorVectorFromElementID("input_colors_selected");
+        canvas_wrapper_main.dynamic_streamline_color = getColorVectorFromElementID("input_colors_dynamic");
         canvas_wrapper_main.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);        
         canvas_wrapper_main.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_main").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
@@ -1347,6 +1351,8 @@ const cpu_intersect = require("./cpu_intersect");
 
         //SIDE        
 
+        canvas_wrapper_side.selected_streamline_color = getColorVectorFromElementID("input_colors_selected");
+        canvas_wrapper_side.dynamic_streamline_color = getColorVectorFromElementID("input_colors_dynamic");
         var show_4_projections = document.getElementById("checkbox_show_4_projections_main").checked;
         canvas_wrapper_side.camera.SetArea(-1, show_4_projections, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
         canvas_wrapper_side.cameraAreaProjection0.SetArea(0, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));

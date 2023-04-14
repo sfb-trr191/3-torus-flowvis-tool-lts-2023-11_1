@@ -142,3 +142,13 @@ exports.regexIntToFloat = function(input_string) {
     });
 }
 
+exports.getColorVectorFromElementID = function(element_id) {
+    var element_value = document.getElementById(element_id).value;
+    console.log("element: ", element_value);
+    const r = parseInt(element_value.substr(1, 2), 16) / 255
+    const g = parseInt(element_value.substr(3, 2), 16) / 255
+    const b = parseInt(element_value.substr(5, 2), 16) / 255
+    console.log(`red: ${r}, green: ${g}, blue: ${b}`)
+    return glMatrix.vec3.fromValues(r, g, b);
+}
+

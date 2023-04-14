@@ -68,7 +68,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
                 flag_grayscale = true; 
                 if(selected_streamline_id == hit.multiPolyID){
                     //selected streamline --> special color
-                    return vec3(1,0,0);
+                    return selected_streamline_color;
                 }
             }
             if(flag_grayscale){
