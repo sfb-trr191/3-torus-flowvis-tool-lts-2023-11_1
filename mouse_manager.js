@@ -55,6 +55,28 @@ class MouseManager {
         });
     }
 
+    onMouseDownControlModeCamera(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical){    
+        camera.StartPanning(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
+        this.active_camera = camera;
+        other_camera.other_camera_is_panning = true;   
+    }
+
+    onMouseDownControlModeDynamic(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical){
+        if((!shift_pressed) && (!ctrl_pressed)){
+            //Left Mouse button
+            canvas_wrapper.ScheduleClickedPosition(this.control_mode);
+        }
+        
+    }
+
+    onMouseDownControlModeSelect(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical){
+        if((!shift_pressed) && (!ctrl_pressed)){
+            //Left Mouse button
+            canvas_wrapper.ScheduleClickedPosition(this.control_mode);
+        }
+        
+    }
+
     onMouseDown(event, canvas, camera, canvas_wrapper, other_camera){
         if(this.block_all_input){
             return;
@@ -85,21 +107,15 @@ class MouseManager {
                 //unsupported button
                 return;
         } 
-
-
         switch(this.control_mode){
             case CONTROL_MODE_CAMERA:
-                camera.StartPanning(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
-                this.active_camera = camera;
-                other_camera.other_camera_is_panning = true;   
+                this.onMouseDownControlModeCamera(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical);
                 break;
             case CONTROL_MODE_DYNAMIC_STREAMLINE:
-                console.warn("mouse_manager:ScheduleClickedPosition")
-                canvas_wrapper.ScheduleClickedPosition(this.control_mode);
+                this.onMouseDownControlModeDynamic(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical);
                 break;
             case CONTROL_MODE_SELECT_STREAMLINE:
-                console.warn("mouse_manager:ScheduleClickedPosition")
-                canvas_wrapper.ScheduleClickedPosition(this.control_mode);
+                this.onMouseDownControlModeSelect(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical);
                 break;                
             default:
                 break;
