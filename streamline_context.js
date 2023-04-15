@@ -5,11 +5,12 @@ const LODData = require("./lod_data");
 
 class StreamlineContext {
 
-    constructor(name, p_lights, ui_seeds, gl, gl_side) {
+    constructor(name, p_lights, ui_seeds, gl, gl_side, dynamic_streamline) {
         console.log("Generate context: " + name);
         this.name = name;
         this.p_lights = p_lights;
         this.ui_seeds = ui_seeds;
+        this.dynamic_streamline = dynamic_streamline;
         this.list_raw_data = [];
         for (var i = 0; i < NUMBER_OF_LOD_PARTS; i++) {
             this.list_raw_data.push(new RawData());

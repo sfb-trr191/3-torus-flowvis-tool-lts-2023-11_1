@@ -8,6 +8,7 @@ class StreamlineGenerator {
     constructor(p_streamline_context) {
         this.p_streamline_context = p_streamline_context;
         this.p_ui_seeds = p_streamline_context.ui_seeds;
+        this.p_dynamic_streamline = p_streamline_context.dynamic_streamline;
         this.seeds = [];
         this.num_points_per_streamline = 10;
         this.step_size = 0.0125;
@@ -22,13 +23,6 @@ class StreamlineGenerator {
         this.termination_condition = STREAMLINE_TERMINATION_CONDITION_POINTS;
         this.termination_advection_time = 0;
         this.termination_arc_length = 0;
-
-        this.linked_element_input_dynamic_position_x = document.getElementById("input_dynamic_position_x");
-        this.linked_element_input_dynamic_position_y = document.getElementById("input_dynamic_position_y");
-        this.linked_element_input_dynamic_position_z = document.getElementById("input_dynamic_position_z");
-        this.linked_element_input_dynamic_position_w = document.getElementById("input_dynamic_position_w");
-
-        this.dynamic_seed_position = glMatrix.vec4.fromValues(0,0,0,0);
     }
 
     GenerateExampleSeeds() {
@@ -58,15 +52,10 @@ class StreamlineGenerator {
             this.seed_directions = this.p_ui_seeds.seed_directions;
             this.seed_signums = this.p_ui_seeds.seed_signums;
         }else{
-            this.dynamic_seed_position = glMatrix.vec4.fromValues(
-                parseFloat(this.linked_element_input_dynamic_position_x.value),
-                parseFloat(this.linked_element_input_dynamic_position_y.value),
-                parseFloat(this.linked_element_input_dynamic_position_z.value),
-                parseFloat(this.linked_element_input_dynamic_position_w.value),)
-
+            this.p_dynamic_streamline.fromUI();
             this.seeds = [
-                this.dynamic_seed_position, 
-                this.dynamic_seed_position];
+                this.p_dynamic_streamline.position, 
+                this.p_dynamic_streamline.position];
             this.seed_directions = [DIRECTION_BOTH, DIRECTION_BOTH];
             this.seed_signums = [1, -1];
         }

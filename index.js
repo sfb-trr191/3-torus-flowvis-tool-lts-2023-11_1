@@ -107,6 +107,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 
 const math4D = require("./math4D");
 const cpu_intersect = require("./cpu_intersect");
+const DynamicStreamline = require("./dynamic_streamline");
 
 ; (function () {
     "use strict"
@@ -142,6 +143,7 @@ const cpu_intersect = require("./cpu_intersect");
     var lights;
     var streamline_context_static;//the static streamlines
     var streamline_context_dynamic;//interactive streamline placement
+    var dynamic_streamline;
     var ftle_manager;
 
     var aliasing;
@@ -310,8 +312,9 @@ const cpu_intersect = require("./cpu_intersect");
         global_data = new GlobalData(gl, gl_side, gl_transfer_function, lights, ui_seeds, transfer_function_manager, object_manager);
 
         shader_manager = new ShaderManager();
-        streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side);
-        streamline_context_dynamic = new StreamlineContext("dynamic", lights, ui_seeds, gl, gl_side);
+        dynamic_streamline = new DynamicStreamline();
+        streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side, null);
+        streamline_context_dynamic = new StreamlineContext("dynamic", lights, ui_seeds, gl, gl_side, dynamic_streamline);
         visibility_manager.Link(streamline_context_static);
         ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
 
