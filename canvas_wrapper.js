@@ -150,10 +150,11 @@ class UniformLocationsFTLESlice {
 
 class CanvasWrapper {
 
-    constructor(gl, streamline_context_static, streamline_context_dynamic, ftle_manager, name, canvas, canvas_width, canvas_height, thumbnail, camera, aliasing, shader_manager, global_data, tree_view) {
+    constructor(gl, streamline_context_static, streamline_context_dynamic, ftle_manager, name, canvas, canvas_width, canvas_height, thumbnail, camera, aliasing, shader_manager, global_data, tree_view, pixel_results) {
         console.log("Construct CanvasWrapper: ", name)
         this.name = name;
         this.canvas = canvas;
+        this.pixel_results = pixel_results;
         this.thumbnail = thumbnail;
         this.canvas_width = canvas_width;
         this.canvas_height = canvas_height;
@@ -224,6 +225,7 @@ class CanvasWrapper {
         this.output_x_percentage_old = 0;
         this.output_y_percentage_old = 0;
         this.update_clicked_position = false;
+        this.update_clicked_position_control_mode = CONTROL_MODE_SELECT_STREAMLINE;
 
         this.selected_streamline_color = glMatrix.vec3.fromValues(1,0,0);
         this.dynamic_streamline_color = glMatrix.vec3.fromValues(1,1,0);
@@ -321,6 +323,10 @@ class CanvasWrapper {
     }
 
     LinkElementsFromName(){           
+        this.linked_element_input_dynamic_position_x = document.getElementById("input_dynamic_position_x");
+        this.linked_element_input_dynamic_position_y = document.getElementById("input_dynamic_position_y");
+        this.linked_element_input_dynamic_position_z = document.getElementById("input_dynamic_position_z");
+        this.linked_element_input_dynamic_position_w = document.getElementById("input_dynamic_position_w");
         if(this.name == "main"){
             this.linked_element_input_clicked_position_x = document.getElementById("input_clicked_position_main_x")
             this.linked_element_input_clicked_position_y = document.getElementById("input_clicked_position_main_y")
@@ -430,9 +436,15 @@ class CanvasWrapper {
         return this.shading_mode_streamlines == SHADING_MODE_STREAMLINES_SCALAR;
     }
 
-    ScheduleClickedPosition(){
+    ScheduleClickedPosition(control_mode){
         console.warn("canvas_wrapper: ScheduleClickedPosition:", this.name)
         this.update_clicked_position = true;
+        this.update_clicked_position_control_mode = control_mode
+    }
+
+    ScheduleClickedDynamicPosition(){
+        console.warn("canvas_wrapper: ScheduleClickedDynamicPosition:", this.name)
+        this.update_clicked_dynamic_position = true;
     }
 
     UpdateResolutionFactor(gl, still_resolution_factor, panning_resolution_factor) {
@@ -963,8 +975,17 @@ class CanvasWrapper {
         //warn("pixel: ", pixel)
 
         if(get_pixel_data_results){
-            var pixel = this.readPixelsRGBA(gl, this.compute_wrapper_pixel_results.render_texture.texture_settings.width, this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
-            
+            this.readPixelsRGBA(gl, this.compute_wrapper_pixel_results.render_texture.texture_settings.width, this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
+            this.pixel_results.setHitString();
+            if(this.update_clicked_position){
+                if(this.update_clicked_position_control_mode == CONTROL_MODE_SELECT_STREAMLINE){
+                    this.updateClickedPositionSelectStreamline()
+                }
+                else if(this.update_clicked_position_control_mode == CONTROL_MODE_DYNAMIC_STREAMLINE){
+                    this.updateClickedPositionDynamicStreamline()
+                }
+                this.update_clicked_position = false;
+            }
         }
     }
 
@@ -979,46 +1000,32 @@ class CanvasWrapper {
         var format = gl.RGBA;
         var type = gl.FLOAT;
         gl.readPixels(0, 0, dim_x, dim_y, format, type, pixels);
-        //console.warn(this.compute_wrapper_pixel_results)
-        //console.warn("result", this.name, pixels[0], pixels[1], pixels[2])
-        //console.warn("  multiPolyID", this.name, pixels[4])
-        //console.warn("  position", this.name, pixels[8], pixels[9], pixels[10], pixels[11])
-        //console.warn("  center", this.name, pixels[12], pixels[13], pixels[14], pixels[15])
-        var hit_type = ""
-        if (pixels[0] == TYPE_STREAMLINE_SEGMENT){
-            hit_type += "Streamline: " + pixels[4] + "     "
-        }
-        document.getElementById("paragraph_mouse_data_string").textContent = 
-            hit_type
-            + "intersection: "
-            + format4NumbersAsVectorString(pixels[8], pixels[9], pixels[10], pixels[11])
-            + "   center: "
-            + format4NumbersAsVectorString(pixels[12], pixels[13], pixels[14], pixels[15]);
-        //console.warn(pixels)
-
-        if(this.update_clicked_position){
-            console.warn("update_clicked_position")
-            this.updateClickedPosition(pixels)
-        }
-        this.update_clicked_position = false;
-        return pixels;
+        this.pixel_results.setData(pixels);        
     }
 
-    updateClickedPosition(pixels){
+    updateClickedPositionSelectStreamline(){
         this.did_update_clicked_position = true;
-        console.warn(pixels)
         var decimals = 6
-        this.linked_element_input_clicked_position_x.value = pixels[8].toFixed(decimals)
-        this.linked_element_input_clicked_position_y.value = pixels[9].toFixed(decimals)
-        this.linked_element_input_clicked_position_z.value = pixels[10].toFixed(decimals)
-        this.linked_element_input_clicked_position_w.value = pixels[11].toFixed(decimals)
+        this.linked_element_input_clicked_position_x.value = this.pixel_results.position[0].toFixed(decimals);
+        this.linked_element_input_clicked_position_y.value = this.pixel_results.position[1].toFixed(decimals);
+        this.linked_element_input_clicked_position_z.value = this.pixel_results.position[2].toFixed(decimals);
+        this.linked_element_input_clicked_position_w.value = this.pixel_results.position[3].toFixed(decimals);
         
-        this.linked_element_input_clicked_center_x.value = pixels[12].toFixed(decimals)
-        this.linked_element_input_clicked_center_y.value = pixels[13].toFixed(decimals)
-        this.linked_element_input_clicked_center_z.value = pixels[14].toFixed(decimals)
-        this.linked_element_input_clicked_center_w.value = pixels[15].toFixed(decimals)
+        this.linked_element_input_clicked_center_x.value = this.pixel_results.center[0].toFixed(decimals);
+        this.linked_element_input_clicked_center_y.value = this.pixel_results.center[1].toFixed(decimals);
+        this.linked_element_input_clicked_center_z.value = this.pixel_results.center[2].toFixed(decimals);
+        this.linked_element_input_clicked_center_w.value = this.pixel_results.center[3].toFixed(decimals);
 
-        this.linked_element_input_clicked_id.value = pixels[4]
+        this.linked_element_input_clicked_id.value = this.pixel_results.streamline_id;
+    }
+
+    updateClickedPositionDynamicStreamline(){
+        this.did_update_clicked_position = true;
+        var decimals = 6
+        this.linked_element_input_dynamic_position_x.value = this.pixel_results.position[0].toFixed(decimals);
+        this.linked_element_input_dynamic_position_y.value = this.pixel_results.position[1].toFixed(decimals);
+        this.linked_element_input_dynamic_position_z.value = this.pixel_results.position[2].toFixed(decimals);
+        this.linked_element_input_dynamic_position_w.value = this.pixel_results.position[3].toFixed(decimals);
     }
 
     drawTextureAverage(gl, render_wrapper, width, height) {

@@ -331,6 +331,7 @@ class TreeView{
         var node_data = this.generateNode(this, "Data", "group_properties_root_data", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_equations = this.generateNode(this, "Equations", "group_properties_root_data_equations", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_streamline_calculation = this.generateNode(this, "Streamline Calculation", "group_properties_root_data_streamline_calculation", NO_EYE, null, EYE_DEFAULT_VISIBLE);
+        var node_streamline_calculation_dynamic = this.generateNode(this, "Dynamic Streamline", "group_properties_root_data_streamline_calculation_dynamic", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_ftle_calculation = this.generateNode(this, "FTLE Calculation", "group_properties_root_data_ftle_calculation", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_lighting = this.generateNode(this, "Lighting", "group_properties_root_lighting", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_transfer_functions = this.generateNode(this, "Transfer Functions", "group_properties_root_transfer_functions", NO_EYE, null, EYE_DEFAULT_VISIBLE);
@@ -368,6 +369,7 @@ class TreeView{
         node_root.addChild(node_data);        
         node_data.addChild(node_equations);
         node_data.addChild(node_streamline_calculation);
+        node_streamline_calculation.addChild(node_streamline_calculation_dynamic);
         node_data.addChild(node_ftle_calculation);
         node_root.addChild(node_view);      
         node_view.addChild(node_lighting);

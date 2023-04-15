@@ -95,11 +95,11 @@ class MouseManager {
                 break;
             case CONTROL_MODE_DYNAMIC_STREAMLINE:
                 console.warn("mouse_manager:ScheduleClickedPosition")
-                canvas_wrapper.ScheduleClickedPosition();
+                canvas_wrapper.ScheduleClickedPosition(this.control_mode);
                 break;
             case CONTROL_MODE_SELECT_STREAMLINE:
                 console.warn("mouse_manager:ScheduleClickedPosition")
-                canvas_wrapper.ScheduleClickedPosition();
+                canvas_wrapper.ScheduleClickedPosition(this.control_mode);
                 break;                
             default:
                 break;

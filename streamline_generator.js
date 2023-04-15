@@ -23,15 +23,10 @@ class StreamlineGenerator {
         this.termination_advection_time = 0;
         this.termination_arc_length = 0;
 
-        this.linked_element_input_clicked_position_main_x = document.getElementById("input_clicked_position_main_x")
-        this.linked_element_input_clicked_position_main_y = document.getElementById("input_clicked_position_main_y")
-        this.linked_element_input_clicked_position_main_z = document.getElementById("input_clicked_position_main_z")
-        this.linked_element_input_clicked_position_main_w = document.getElementById("input_clicked_position_main_w")
-
-        this.linked_element_input_clicked_position_aux_x = document.getElementById("input_clicked_position_aux_x")
-        this.linked_element_input_clicked_position_aux_y = document.getElementById("input_clicked_position_aux_y")
-        this.linked_element_input_clicked_position_aux_z = document.getElementById("input_clicked_position_aux_z")
-        this.linked_element_input_clicked_position_aux_w = document.getElementById("input_clicked_position_aux_w")
+        this.linked_element_input_dynamic_position_x = document.getElementById("input_dynamic_position_x");
+        this.linked_element_input_dynamic_position_y = document.getElementById("input_dynamic_position_y");
+        this.linked_element_input_dynamic_position_z = document.getElementById("input_dynamic_position_z");
+        this.linked_element_input_dynamic_position_w = document.getElementById("input_dynamic_position_w");
 
         this.dynamic_seed_position = glMatrix.vec4.fromValues(0,0,0,0);
     }
@@ -63,25 +58,17 @@ class StreamlineGenerator {
             this.seed_directions = this.p_ui_seeds.seed_directions;
             this.seed_signums = this.p_ui_seeds.seed_signums;
         }else{
-            console.warn("this.linked_element_input_clicked_position_main_x", this.linked_element_input_clicked_position_main_x)
             this.dynamic_seed_position = glMatrix.vec4.fromValues(
-                parseFloat(this.linked_element_input_clicked_position_main_x.value),
-                parseFloat(this.linked_element_input_clicked_position_main_y.value),
-                parseFloat(this.linked_element_input_clicked_position_main_z.value),
-                parseFloat(this.linked_element_input_clicked_position_main_w.value),)
+                parseFloat(this.linked_element_input_dynamic_position_x.value),
+                parseFloat(this.linked_element_input_dynamic_position_y.value),
+                parseFloat(this.linked_element_input_dynamic_position_z.value),
+                parseFloat(this.linked_element_input_dynamic_position_w.value),)
 
             this.seeds = [
                 this.dynamic_seed_position, 
                 this.dynamic_seed_position];
             this.seed_directions = [DIRECTION_BOTH, DIRECTION_BOTH];
             this.seed_signums = [1, -1];
-            /*
-            this.p_ui_seeds.correctSeeds(this.space);
-            this.p_ui_seeds.createPointList(this.space);
-            this.seeds = this.p_ui_seeds.seed_positions;
-            this.seed_directions = this.p_ui_seeds.seed_directions;
-            this.seed_signums = this.p_ui_seeds.seed_signums;
-            */
         }
         console.log("seeds");
         console.warn(this.seeds);

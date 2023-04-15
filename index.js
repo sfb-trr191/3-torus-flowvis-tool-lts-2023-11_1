@@ -100,6 +100,7 @@ const TreeView = require("./tree_view");
 const UiTools = require("./ui_tools");
 const ExportWizard = require("./export_wizard");
 const Tests = require("./tests");
+const PixelResults = require("./pixel_results");
 const gram_schmidt = require("./gram_schmidt");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 
@@ -147,6 +148,7 @@ const cpu_intersect = require("./cpu_intersect");
     var transfer_function_manager;
     var object_manager;
     var shader_manager;
+    var pixel_results;
     var canvas_wrapper_main;
     var canvas_wrapper_side;
     var canvas_wrapper_transfer_function;
@@ -361,10 +363,12 @@ const cpu_intersect = require("./cpu_intersect");
 
         aliasing = new Aliasing();
 
+        pixel_results = new PixelResults();
+
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, streamline_context_dynamic, ftle_manager, CANVAS_WRAPPER_MAIN,
-            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_thumbnail, main_camera, aliasing, shader_manager, global_data, tree_view);
+            main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_thumbnail, main_camera, aliasing, shader_manager, global_data, tree_view, pixel_results);
         canvas_wrapper_side = new CanvasWrapper(gl_side, streamline_context_static, streamline_context_dynamic, ftle_manager, CANVAS_WRAPPER_SIDE,
-            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, aux_thumbnail, side_camera, aliasing, shader_manager, global_data, tree_view);
+            side_canvas, CANVAS_SIDE_WIDTH, CANVAS_SIDE_HEIGHT, aux_thumbnail, side_camera, aliasing, shader_manager, global_data, tree_view, pixel_results);
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
