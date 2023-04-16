@@ -44,7 +44,7 @@ class StreamlineGenerator {
     }
 
     GenerateSeedsFromUI(name) {
-        console.warn("GenerateSeedsFromUI", name);
+        //console.warn("GenerateSeedsFromUI", name);
         if(name == "static"){
             this.p_ui_seeds.correctSeeds(this.space);
             this.p_ui_seeds.createPointList(this.space);
@@ -59,10 +59,10 @@ class StreamlineGenerator {
             this.seed_directions = [DIRECTION_BOTH, DIRECTION_BOTH];
             this.seed_signums = [1, -1];
         }
-        console.log("seeds");
-        console.warn(this.seeds);
-        console.warn(this.seed_directions);
-        console.warn(this.seed_signums);
+        //console.log("seeds");
+        //console.warn(this.seeds);
+        //console.warn(this.seed_directions);
+        //console.warn(this.seed_signums);
     }    
 
     SetRulesTorus() {

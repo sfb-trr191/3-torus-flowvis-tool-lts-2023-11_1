@@ -263,9 +263,10 @@ const DynamicStreamline = require("./dynamic_streamline");
         side_camera = new Camera("side_camera", "special_data_camera_aux", "current_state_name_aux", input_changed_manager);
 
 
+        dynamic_streamline = new DynamicStreamline();
         input_manager = new InputManager(main_canvas, main_camera, side_canvas, side_camera);
         input_manager.initialize();
-        mouse_manager = new MouseManager(main_canvas, main_camera, side_canvas, side_camera);
+        mouse_manager = new MouseManager(main_canvas, main_camera, side_canvas, side_camera, dynamic_streamline);
         mouse_manager.initialize();
 
         //buildErrorDictionary();
@@ -312,7 +313,6 @@ const DynamicStreamline = require("./dynamic_streamline");
         global_data = new GlobalData(gl, gl_side, gl_transfer_function, lights, ui_seeds, transfer_function_manager, object_manager);
 
         shader_manager = new ShaderManager();
-        dynamic_streamline = new DynamicStreamline();
         streamline_context_static = new StreamlineContext("static", lights, ui_seeds, gl, gl_side, null);
         streamline_context_dynamic = new StreamlineContext("dynamic", lights, ui_seeds, gl, gl_side, dynamic_streamline);
         visibility_manager.Link(streamline_context_static);
@@ -429,7 +429,7 @@ const DynamicStreamline = require("./dynamic_streamline");
     }
 
     function state_streamline_calculation_setup(time_now){
-        console.warn("#SC: state_streamline_calculation_setup", sheduled_task);
+        //console.warn("#SC: state_streamline_calculation_setup", sheduled_task);
         bo_calculate_streamlines = new BackgroundObjectCalculateStreamlines(gl, gl_side, sheduled_task);
 
         //var t_start = performance.now();        
@@ -799,7 +799,7 @@ const DynamicStreamline = require("./dynamic_streamline");
             }
             if(canvas_wrapper_side.get_did_update_clicked_position_and_reset()){
                 if(mouse_manager.control_mode == CONTROL_MODE_SELECT_STREAMLINE){
-                    console.warn("AUX DID UPDATE, NEW SELECTED STREAMLINE")
+                    //console.warn("AUX DID UPDATE, NEW SELECTED STREAMLINE")
                     var id = parseInt(document.getElementById("input_clicked_streamline_id_aux").value)
                     select_streamline(id);
                 }
@@ -807,6 +807,11 @@ const DynamicStreamline = require("./dynamic_streamline");
                     console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
                     //sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
                 }
+            }
+            if(dynamic_streamline.changed){
+                dynamic_streamline.changed = false;
+                //console.warn("DYNAMIC STREAMLINE DID UPDATE, SCHEDULE TASK: TASK_CALCULATE_DYNAMIC_STREAMLINE")
+                sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
             }
         }
 

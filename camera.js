@@ -1136,7 +1136,7 @@ class Camera {
     }
 
     UpdatePanningTrackball4D(x, y, left_handed){
-        console.warn("UpdatePanningTrackball4D"); 
+        //console.warn("UpdatePanningTrackball4D"); 
         //normalize forward, up, and right vectors just to be sure they really are normalized
         glMatrix.vec4.normalize(this.forward, this.forward);
         glMatrix.vec4.normalize(this.up, this.up);

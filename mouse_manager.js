@@ -5,7 +5,7 @@ const getMousePosition = module_utility.getMousePosition;
 
 class MouseManager {
 
-    constructor(canvas, camera, side_canvas, side_camera) {
+    constructor(canvas, camera, side_canvas, side_camera, dynamic_streamline) {
         this.canvas = canvas;
         this.camera = camera;
         this.side_canvas = side_canvas;
@@ -13,6 +13,7 @@ class MouseManager {
         this.active_camera = camera;
         this.block_all_input = false;
         this.control_mode = CONTROL_MODE_CAMERA;
+        this.dynamic_streamline = dynamic_streamline;
     }
 
     Link(ui_left_tool_bar, canvas_wrapper_main, canvas_wrapper_side){
@@ -65,6 +66,9 @@ class MouseManager {
         if((!shift_pressed) && (!ctrl_pressed)){
             //Left Mouse button
             canvas_wrapper.ScheduleClickedPosition(this.control_mode);
+        }
+        else{              
+            this.dynamic_streamline.StartPanning(pos_percentage.x, pos_percentage.y, pos_canonical.x, pos_canonical.y, shift_pressed, ctrl_pressed);
         }
         
     }
@@ -132,6 +136,7 @@ class MouseManager {
             }
             this.camera.StopPanning();
             this.side_camera.StopPanning();
+            this.dynamic_streamline.StopPanning();
             this.camera.other_camera_is_panning = false;
             this.side_camera.other_camera_is_panning = false;
         });
@@ -180,6 +185,11 @@ class MouseManager {
                     this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage_aux.x, pos_percentage_aux.y);
                     break;
                 case CONTROL_MODE_DYNAMIC_STREAMLINE:
+                    //curretnly using main camera
+                    this.dynamic_streamline.UpdateMouseMove(this.camera, pos_percentage_main.x, pos_percentage_main.y, pos_canonical_main.x, pos_canonical_main.y, false);
+                    this.dynamic_streamline.repositionDefault();
+                    this.dynamic_streamline.toUI();
+                    //this.camera.SetLastMousePosition(pos_main);
                     this.canvas_wrapper_main.SetOutputPositionPercentage(pos_percentage_main.x, pos_percentage_main.y);
                     this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage_aux.x, pos_percentage_aux.y);
                     break;

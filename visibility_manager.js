@@ -15,7 +15,7 @@ class VisibilityManager {
     }
 
     UpdateVisibility() {        
-        console.warn("UpdateVisibility");
+        //console.warn("UpdateVisibility");
         this.UpdateInputRow("input_row_side_canvas_streamline_method", this.ShouldShow_input_row_side_canvas_streamline_method());
         this.UpdateInputRow("input_row_side_mode", this.ShouldShow_input_row_side_mode());
         this.UpdateInputRow("input_row_side_mode_s3", this.ShouldShow_input_row_side_mode_s3());

@@ -528,7 +528,7 @@ class LODData {
     }
 
     bind(context_name, canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int) {
-        console.warn("context_name", context_name)
+        //console.warn("context_name", context_name)
         var data_textures = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_textures : this.data_textures_side;
 
         var texture_float_binding = context_name == "static" ? gl.TEXTURE0 : gl.TEXTURE6;
