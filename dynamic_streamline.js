@@ -176,18 +176,19 @@ class DynamicStreamline {
         //var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
         var v = 0.1
 
-        var change = glMatrix.vec3.create();
-        glMatrix.vec3.scale(change, camera.forward, (delta_y * v));
-        glMatrix.vec3.subtract(this.position, this.position, change);
-        //TODO: use below for move towards camera
-        /*
+        //var change = glMatrix.vec3.create();
+        //glMatrix.vec3.scale(change, camera.forward, (delta_y * v));
+        //glMatrix.vec3.subtract(this.position, this.position, change);
+
         var change = glMatrix.vec3.create();
         var direction = glMatrix.vec3.create();
-        glMatrix.vec3.subtract(direction, this.position, camera.position);
+        var best_translated_camera_point = this.unit_cube_translator.SelectCopyWithSmallestDistance(this.position, camera.forward, camera.position);
+
+        glMatrix.vec3.subtract(direction, this.position, best_translated_camera_point);
         glMatrix.vec3.normalize(direction, direction);
         glMatrix.vec3.scale(change, direction, (delta_y * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
-        */
+        
     }
 
     move_forward_backward_wheel(camera, delta_y, x, y, slow){
