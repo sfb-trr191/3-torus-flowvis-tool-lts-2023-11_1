@@ -26,9 +26,9 @@ class PixelResults {
         }
         document.getElementById("paragraph_mouse_data_string").textContent = 
             start_string
-            + "intersection: "
-            + format4NumbersAsVectorString(this.position[0], this.position[1], this.position[2], this.position[3])
-            + "   center: "
+            //+ "intersection: "
+            //+ format4NumbersAsVectorString(this.position[0], this.position[1], this.position[2], this.position[3])
+            + "position: "
             + format4NumbersAsVectorString(this.center[0], this.center[1], this.center[2], this.center[3]);
     }
 }
