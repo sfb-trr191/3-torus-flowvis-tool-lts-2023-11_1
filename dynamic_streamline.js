@@ -1,4 +1,5 @@
 const glMatrix = require("gl-matrix");
+const UnitCubeTranslator = require("./unit_cube_translator");
 
 class DynamicStreamline {
 
@@ -14,6 +15,11 @@ class DynamicStreamline {
         this.yMouse_old = -1;
         
         this.changed = false;
+    }
+
+    LinkAndCompleteInitialization(streamline_context_dynamic){
+        //this.streamline_context_dynamic = streamline_context_dynamic;
+        this.unit_cube_translator = new UnitCubeTranslator(streamline_context_dynamic);
     }
 
     fromUI(){
@@ -206,7 +212,10 @@ class DynamicStreamline {
 
         var change = glMatrix.vec3.create();
         var direction = glMatrix.vec3.create();
-        glMatrix.vec3.subtract(direction, this.position, camera.position);
+        //var best_translated_camera_point = this.unit_cube_translator.SelectCopyWithSmallestAngle(this.position, camera.forward, camera.position);
+        var best_translated_camera_point = this.unit_cube_translator.SelectCopyWithSmallestDistance(this.position, camera.forward, camera.position);
+        
+        glMatrix.vec3.subtract(direction, this.position, best_translated_camera_point);
         glMatrix.vec3.normalize(direction, direction);
         glMatrix.vec3.scale(change, direction, (delta_y * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
