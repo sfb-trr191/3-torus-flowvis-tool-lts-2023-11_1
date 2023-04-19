@@ -71,7 +71,7 @@ class DynamicStreamline {
 
 
 
-    UpdateMouseMove(mouse, x, y, x_canonical, y_canonical, left_handed){
+    UpdateMouseMove(camera, x, y, x_canonical, y_canonical, left_handed){
         //check if currently in panning mode
         if (!this.panning)
             return;
@@ -84,18 +84,18 @@ class DynamicStreamline {
         var deltaY = y - this.yMouse_old;
 
         if(this.paning_shift){
-            this.move_left_right(mouse, deltaX, slow);
-            this.move_up_down(mouse, deltaY, slow);
+            this.move_left_right(camera, deltaX, slow);
+            this.move_up_down(camera, deltaY, slow);
         }
         else if(this.paning_control){
-            this.move_forward_backward(mouse, deltaY, slow);
+            this.move_forward_backward(camera, deltaY, slow);
         }
 
         this.xMouse_old = x;
         this.yMouse_old = y;
     }
 
-    move_left_right(mouse, delta_x, slow) {
+    move_left_right(camera, delta_x, slow) {
         /*
         if(this.is4D){
             if (this.draw_mode == DRAW_MODE_S3){
@@ -107,17 +107,17 @@ class DynamicStreamline {
         }
         else
         */
-            this.move_left_right3D(mouse, delta_x, slow);
+            this.move_left_right3D(camera, delta_x, slow);
     }
 
-    move_left_right3D(mouse, delta_x, slow){
+    move_left_right3D(camera, delta_x, slow){
         //var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
         var v = -0.1
 
         var left = glMatrix.vec3.create();
         var change = glMatrix.vec3.create();
 
-        glMatrix.vec3.cross(left, mouse.forward, mouse.up);
+        glMatrix.vec3.cross(left, camera.forward, camera.up);
         glMatrix.vec3.normalize(left, left);
         glMatrix.vec3.scale(change, left, (delta_x * v));
         glMatrix.vec3.add(this.position, this.position, change);
@@ -125,7 +125,7 @@ class DynamicStreamline {
         this.changed = true;
     }
 
-    move_up_down(mouse, delta_y, slow) {
+    move_up_down(camera, delta_y, slow) {
         /*
         if(this.is4D){
             if (this.draw_mode == DRAW_MODE_S3){
@@ -137,21 +137,21 @@ class DynamicStreamline {
         }
         else
         */
-            this.move_up_down3D(mouse, delta_y, slow);
+            this.move_up_down3D(camera, delta_y, slow);
     }
 
-    move_up_down3D(mouse, delta_y, slow){
+    move_up_down3D(camera, delta_y, slow){
         //var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
         var v = -0.1
         var handedness = this.left_handed ? 1 : -1;
 
         var change = glMatrix.vec3.create();
-        glMatrix.vec3.scale(change, mouse.up, (delta_y * v * handedness));
+        glMatrix.vec3.scale(change, camera.up, (delta_y * v * handedness));
         glMatrix.vec3.add(this.position, this.position, change);
 
     }
 
-    move_forward_backward(delta_y, slow) {
+    move_forward_backward(camera, delta_y, slow) {
         /*
         if(this.is4D){
             if (this.draw_mode == DRAW_MODE_S3){
@@ -163,16 +163,52 @@ class DynamicStreamline {
         }
         else
         */
-        this.move_forward_backward3D(delta_y, slow);
+        this.move_forward_backward3D(camera, delta_y, slow);
     }
 
-    move_forward_backward3D(mouse, delta_y, slow){
+    move_forward_backward3D(camera, delta_y, slow){
         //var v = slow ? this.trackball_translation_sensitivity : this.trackball_translation_sensitivity;
         var v = 0.1
 
         var change = glMatrix.vec3.create();
+        glMatrix.vec3.scale(change, camera.forward, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+        //TODO: use below for move towards camera
+        /*
+        var change = glMatrix.vec3.create();
+        var direction = glMatrix.vec3.create();
+        glMatrix.vec3.subtract(direction, this.position, camera.position);
+        glMatrix.vec3.normalize(direction, direction);
+        glMatrix.vec3.scale(change, direction, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+        */
+    }
 
-        glMatrix.vec3.scale(change, mouse.forward, (delta_y * v));
+    move_forward_backward_wheel(camera, delta_y, x, y, slow){
+        /*
+        if(this.is4D){
+            if (this.draw_mode == DRAW_MODE_S3){
+                this.move_forward_backward_wheelS3(delta_y, x, y, slow);
+            }
+            else if (this.draw_mode == DRAW_MODE_R4){
+                this.move_forward_backward_wheelR4(delta_y, x, y, slow);
+            }
+        }
+        else
+        */
+        this.move_forward_backward_wheel3D(camera, delta_y, x, y, slow);
+    }
+
+    move_forward_backward_wheel3D(camera, delta_y, x, y, slow){        
+        //var v = slow ? this.trackball_wheel_sensitivity : this.trackball_wheel_sensitivity;
+        this.changed = true;
+        var v = 0.00025;
+
+        var change = glMatrix.vec3.create();
+        var direction = glMatrix.vec3.create();
+        glMatrix.vec3.subtract(direction, this.position, camera.position);
+        glMatrix.vec3.normalize(direction, direction);
+        glMatrix.vec3.scale(change, direction, (delta_y * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
     }
 }

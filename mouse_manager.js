@@ -218,7 +218,19 @@ class MouseManager {
         }
         var slow = false;
         var pos = getMousePosition(canvas, event);
-        camera.move_forward_backward_wheel(event.deltaY, pos.x, pos.y, slow);
+
+        switch(this.control_mode){
+            case CONTROL_MODE_CAMERA:
+                camera.move_forward_backward_wheel(event.deltaY, pos.x, pos.y, slow);
+                break;
+            case CONTROL_MODE_DYNAMIC_STREAMLINE:
+                this.dynamic_streamline.move_forward_backward_wheel(this.camera, event.deltaY, pos.x, pos.y, slow);
+                this.dynamic_streamline.repositionDefault();
+                this.dynamic_streamline.toUI();
+                break;
+            default:
+                break;
+        }
     }
 
     /**
