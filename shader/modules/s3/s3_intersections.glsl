@@ -502,7 +502,7 @@ void IntersectSpherinder(bool dynamic, int part_index, Ray ray, float ray_local_
 		hit.copy = copy;
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
 		hit.velocity = -1.0;
-		hit.cost = -1.0;
+		hit.cost = cost;
         //hit.debug_value = 1;
         hit.sub_type = SUBTYPE_SPHERINDER;
         hit.dynamic = dynamic;

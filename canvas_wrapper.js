@@ -975,7 +975,9 @@ class CanvasWrapper {
 
         if(get_pixel_data_results){
             this.readPixelsRGBA(gl, this.compute_wrapper_pixel_results.render_texture.texture_settings.width, this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
-            this.pixel_results.setHitString();
+            this.pixel_results.setHitString(
+                this.streamline_context_static.streamline_generator.termination_condition,
+                this.streamline_context_static.streamline_generator.termination_max_value);
             if(this.update_clicked_position){
                 if(this.update_clicked_position_control_mode == CONTROL_MODE_SELECT_STREAMLINE){
                     this.updateClickedPositionSelectStreamline()

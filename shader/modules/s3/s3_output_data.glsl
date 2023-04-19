@@ -8,7 +8,7 @@ vec4 GetOutput(HitInformation hit)
             return vec4(hit.hitType, output_x_percentage, output_y_percentage, 0);
         case 1:
             if(hit.hitType == TYPE_STREAMLINE_SEGMENT){
-                return vec4(hit.multiPolyID, 0, 0, 0);
+                return vec4(hit.multiPolyID, hit.cost, 0, 0);
             }
             return vec4(-1, 0, 0, 0);
         case 2:
