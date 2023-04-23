@@ -98,6 +98,11 @@ class TreeViewNode {
         this.tree_view.onEyeChanged();
     }
 
+    setEnabled(){
+        this.eye_enabled = true;
+        this.tree_view.onEyeChanged();
+    }
+
     updateEyeState(){
         if(!this.has_eye){
             return;
@@ -412,6 +417,10 @@ class TreeView{
         if(eye_index !== null)
             this.dict_eye_id_to_node[eye_index] = node;
         return node;
+    }
+
+    setEnabled(eye_index){
+        this.dict_eye_id_to_node[eye_index].setEnabled();
     }
 
     onEyeChanged(){

@@ -680,6 +680,9 @@ const DynamicStreamline = require("./dynamic_streamline");
             if(sheduled_task == TASK_CALCULATE_STREAMLINES){
                 document.getElementById("wrapper_dialog_calculating").className = "wrapper";
                 document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            }else if(sheduled_task == TASK_CALCULATE_DYNAMIC_STREAMLINE){
+                tree_view.setEnabled(17);
+                tree_view.setEnabled(18);
             }
             requestAnimationFrame(state_streamline_calculation_setup);
             return;  
