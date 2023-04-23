@@ -342,6 +342,7 @@ class TreeView{
         var node_main_camera = this.generateNode(this, "Camera", "group_properties_root_main_view_camera", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_main_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_main_view_visual_objects", EYE, 0, EYE_DEFAULT_VISIBLE);
         var node_main_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_main_view_visual_objects_streamlines", EYE, 1, EYE_DEFAULT_VISIBLE);
+        var node_main_streamlines_dynamic = this.generateNode(this, "Dynamic", "group_properties_root_main_view_visual_objects_streamlines_dynamic", EYE, 17, EYE_DEFAULT_VISIBLE);
         var node_main_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_main_view_visual_objects_ftle_volume", EYE, 2, EYE_DEFAULT_INVISIBLE);
         var node_main_indicators = this.generateNode(this, "Indicators", "group_properties_root_main_view_visual_objects_indicators", EYE, 3, EYE_DEFAULT_VISIBLE);
         var node_main_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_main_view_visual_objects_indicators_bounding_axes", EYE, 4, EYE_DEFAULT_INVISIBLE);
@@ -353,6 +354,7 @@ class TreeView{
         var node_aux_camera = this.generateNode(this, "Camera", "group_properties_root_aux_view_camera", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_aux_visual_objects = this.generateNode(this, "Visual Objects", "group_properties_root_aux_view_visual_objects", EYE, 8, EYE_DEFAULT_VISIBLE);
         var node_aux_streamlines = this.generateNode(this, "Streamlines", "group_properties_root_aux_view_visual_objects_streamlines", EYE, 9, EYE_DEFAULT_VISIBLE);
+        var node_aux_streamlines_dynamic = this.generateNode(this, "Dynamic", "group_properties_root_aux_view_visual_objects_streamlines_dynamic", EYE, 18, EYE_DEFAULT_VISIBLE);
         var node_aux_ftle = this.generateNode(this, "FTLE Volume", "group_properties_root_aux_view_visual_objects_ftle_volume", EYE, 10, EYE_DEFAULT_INVISIBLE);
         var node_aux_indicators = this.generateNode(this, "Indicators", "group_properties_root_aux_view_visual_objects_indicators", EYE, 11, EYE_DEFAULT_VISIBLE);
         var node_aux_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes", EYE, 12, EYE_DEFAULT_VISIBLE);
@@ -380,6 +382,7 @@ class TreeView{
         node_main_visual_objects.addChild(node_main_streamlines);
         node_main_visual_objects.addChild(node_main_ftle);
         node_main_visual_objects.addChild(node_main_indicators);
+        node_main_streamlines.addChild(node_main_streamlines_dynamic);
         node_main_indicators.addChild(node_main_bounding_axes);
         node_main_indicators.addChild(node_main_top_right_axes);
         node_main_indicators.addChild(node_main_clicked_position);
@@ -390,6 +393,7 @@ class TreeView{
         node_aux_visual_objects.addChild(node_aux_streamlines);
         node_aux_visual_objects.addChild(node_aux_ftle);
         node_aux_visual_objects.addChild(node_aux_indicators);
+        node_aux_streamlines.addChild(node_aux_streamlines_dynamic);
         node_aux_indicators.addChild(node_aux_bounding_axes);
         node_aux_bounding_axes.addChild(node_aux_origin_axes);        
         node_aux_indicators.addChild(node_aux_top_right_axes);

@@ -757,17 +757,12 @@ class CanvasWrapper {
     }
 
     should_render_dynamic_streamline(){
-        var render_dynamic_streamline = false;
-        if(this.name == "main"){
-            render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
-        }else{
-            render_dynamic_streamline = this.streamline_context_dynamic.has_streamline_calculation_finished;
-
-        }
+        var flag1 = this.show_dynamic_streamline;
+        var flag2 = this.streamline_context_dynamic.has_streamline_calculation_finished;
 
         //disable render_dynamic_streamline if a streamline is selected
         //render_dynamic_streamline = render_dynamic_streamline && this.selected_streamline_id < 0;
-        return render_dynamic_streamline
+        return flag1 && flag2
     }
 
     drawTextureRaytracing(gl, render_wrapper, get_pixel_data_results) {
