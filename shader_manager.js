@@ -1,4 +1,7 @@
 const ShaderContainer = require("./shader_container");
+const module_utility = require("./utility");
+const GetFormula = module_utility.GetFormula;
+const GetFormulaFloat = module_utility.GetFormulaFloat;
 
 class ShaderManager {
     constructor() {
@@ -34,6 +37,12 @@ class ShaderManager {
     GetShader(shader_formula_scalar, 
         light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3,
         light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+        shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+        shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+        shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+        shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+        shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+        shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
         shader_flags) {
         var code = F_SHADER_RAYTRACING_PREPROCESSOR;
 
@@ -78,6 +87,29 @@ class ShaderManager {
         code = code.replace("light_transport_d1", light_transport_d1);
         code = code.replace("light_transport_d2", light_transport_d2);
         code = code.replace("light_transport_d3", light_transport_d3);
+
+        code = code.replace("shader_rule_x_pos_x", shader_rule_x_pos_x);
+        code = code.replace("shader_rule_x_pos_y", shader_rule_x_pos_y);
+        code = code.replace("shader_rule_x_pos_z", shader_rule_x_pos_z);        
+        code = code.replace("shader_rule_x_neg_x", shader_rule_x_neg_x);
+        code = code.replace("shader_rule_x_neg_y", shader_rule_x_neg_y);
+        code = code.replace("shader_rule_x_neg_z", shader_rule_x_neg_z);
+
+        code = code.replace("shader_rule_y_pos_x", shader_rule_y_pos_x);
+        code = code.replace("shader_rule_y_pos_y", shader_rule_y_pos_y);
+        code = code.replace("shader_rule_y_pos_z", shader_rule_y_pos_z);        
+        code = code.replace("shader_rule_y_neg_x", shader_rule_y_neg_x);
+        code = code.replace("shader_rule_y_neg_y", shader_rule_y_neg_y);
+        code = code.replace("shader_rule_y_neg_z", shader_rule_y_neg_z);
+
+        code = code.replace("shader_rule_z_pos_x", shader_rule_z_pos_x);
+        code = code.replace("shader_rule_z_pos_y", shader_rule_z_pos_y);
+        code = code.replace("shader_rule_z_pos_z", shader_rule_z_pos_z);        
+        code = code.replace("shader_rule_z_neg_x", shader_rule_z_neg_x);
+        code = code.replace("shader_rule_z_neg_y", shader_rule_z_neg_y);
+        code = code.replace("shader_rule_z_neg_z", shader_rule_z_neg_z);
+
+
         console.log("code:", code);
         return code;
     }
@@ -164,7 +196,13 @@ class ShaderManager {
 
     GetShaderKey(shader_formula_scalar_float, 
         light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
-        light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3, 
+        light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+        shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+        shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+        shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+        shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+        shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+        shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
         shader_flags){
         var key = shader_flags.space + ";" + shader_formula_scalar_float;
         if(shader_flags.show_volume_rendering)
@@ -202,7 +240,26 @@ class ShaderManager {
             key += ";"+light_transport_d2 
             key += ";"+light_transport_d3 
         }
-
+        if(true){//TODO: optimize this: we dont need this everywhere
+            key += ";"+shader_rule_x_pos_x 
+            key += ";"+shader_rule_x_pos_y 
+            key += ";"+shader_rule_x_pos_z 
+            key += ";"+shader_rule_x_neg_x 
+            key += ";"+shader_rule_x_neg_y 
+            key += ";"+shader_rule_x_neg_z 
+            key += ";"+shader_rule_y_pos_x 
+            key += ";"+shader_rule_y_pos_y 
+            key += ";"+shader_rule_y_pos_z 
+            key += ";"+shader_rule_y_neg_x 
+            key += ";"+shader_rule_y_neg_y 
+            key += ";"+shader_rule_y_neg_z 
+            key += ";"+shader_rule_z_pos_x 
+            key += ";"+shader_rule_z_pos_y 
+            key += ";"+shader_rule_z_pos_z 
+            key += ";"+shader_rule_z_neg_x 
+            key += ";"+shader_rule_z_neg_y 
+            key += ";"+shader_rule_z_neg_z 
+        }
         console.log("code:", key);       
         return key;
     }
@@ -214,11 +271,23 @@ class ShaderManager {
     ShouldPrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float,  
         light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
         light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+        shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+        shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+        shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+        shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+        shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+        shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
         shader_flags){
         //get shader key
         var shader_key = this.GetShaderKey(shader_formula_scalar_float, 
             light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
             light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3, 
+            shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+            shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+            shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+            shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+            shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+            shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
             shader_flags);
         return ! (shader_key in dict_shaders);
     }
@@ -226,6 +295,12 @@ class ShaderManager {
     PrepareRaytracingShader(gl, dict_shaders, shader_formula_scalar_float,  
         light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
         light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+        shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+        shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+        shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+        shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+        shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+        shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
         shader_flags){
         //the return container
         var container;
@@ -234,6 +309,12 @@ class ShaderManager {
         var shader_key = this.GetShaderKey(shader_formula_scalar_float, 
             light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
             light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+            shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+            shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+            shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+            shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+            shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+            shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
             shader_flags);
 
         //get old container if possible
@@ -247,6 +328,12 @@ class ShaderManager {
             var f_source = this.GetShader(shader_formula_scalar_float, 
                 light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
                 light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+                shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+                shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+                shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+                shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+                shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+                shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
                 shader_flags);
             container = new ShaderContainer(gl, f_source, V_SHADER_RAYTRACING);
             dict_shaders[shader_key] = container;
@@ -257,15 +344,36 @@ class ShaderManager {
     ShouldPrepareRaytracingShaderMain(gl){
 
         //get variables
-        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
-        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
-        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
-        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
-        var light_transport_p3 = this.GetFormula("input_field_light_transport_p3");
-        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
-        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
-        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
-        var light_transport_d3 = this.GetFormula("input_field_light_transport_d3");
+        var shader_formula_scalar_float = GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = GetFormula("input_field_light_transport_p2");
+        var light_transport_p3 = GetFormula("input_field_light_transport_p3");
+        var light_transport_d0 = GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = GetFormula("input_field_light_transport_d2");
+        var light_transport_d3 = GetFormula("input_field_light_transport_d3");
+
+        var shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
+        var shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
+        var shader_rule_x_pos_z = GetFormula("input_field_shader_rule_x_pos_z");
+        var shader_rule_x_neg_x = GetFormula("input_field_shader_rule_x_neg_x");
+        var shader_rule_x_neg_y = GetFormula("input_field_shader_rule_x_neg_y");
+        var shader_rule_x_neg_z = GetFormula("input_field_shader_rule_x_neg_z");
+
+        var shader_rule_y_pos_x = GetFormula("input_field_shader_rule_y_pos_x");
+        var shader_rule_y_pos_y = GetFormula("input_field_shader_rule_y_pos_y");
+        var shader_rule_y_pos_z = GetFormula("input_field_shader_rule_y_pos_z");
+        var shader_rule_y_neg_x = GetFormula("input_field_shader_rule_y_neg_x");
+        var shader_rule_y_neg_y = GetFormula("input_field_shader_rule_y_neg_y");
+        var shader_rule_y_neg_z = GetFormula("input_field_shader_rule_y_neg_z");
+
+        var shader_rule_z_pos_x = GetFormula("input_field_shader_rule_z_pos_x");
+        var shader_rule_z_pos_y = GetFormula("input_field_shader_rule_z_pos_y");
+        var shader_rule_z_pos_z = GetFormula("input_field_shader_rule_z_pos_z");
+        var shader_rule_z_neg_x = GetFormula("input_field_shader_rule_z_neg_x");
+        var shader_rule_z_neg_y = GetFormula("input_field_shader_rule_z_neg_y");
+        var shader_rule_z_neg_z = GetFormula("input_field_shader_rule_z_neg_z");
 
         this.canvas_wrapper_main.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_main.shader_flags;
@@ -273,6 +381,12 @@ class ShaderManager {
         this.flag_prepare_main = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float,  
             light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
             light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+            shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+            shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+            shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+            shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+            shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+            shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
             shader_flags);
         return this.flag_prepare_main;
     }
@@ -283,15 +397,36 @@ class ShaderManager {
         var t_start = performance.now();
 
         //get variables
-        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
-        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
-        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
-        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
-        var light_transport_p3 = this.GetFormula("input_field_light_transport_p3");
-        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
-        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
-        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
-        var light_transport_d3 = this.GetFormula("input_field_light_transport_d3");
+        var shader_formula_scalar_float = GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = GetFormula("input_field_light_transport_p2");
+        var light_transport_p3 = GetFormula("input_field_light_transport_p3");
+        var light_transport_d0 = GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = GetFormula("input_field_light_transport_d2");
+        var light_transport_d3 = GetFormula("input_field_light_transport_d3");
+
+        var shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
+        var shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
+        var shader_rule_x_pos_z = GetFormula("input_field_shader_rule_x_pos_z");
+        var shader_rule_x_neg_x = GetFormula("input_field_shader_rule_x_neg_x");
+        var shader_rule_x_neg_y = GetFormula("input_field_shader_rule_x_neg_y");
+        var shader_rule_x_neg_z = GetFormula("input_field_shader_rule_x_neg_z");
+
+        var shader_rule_y_pos_x = GetFormula("input_field_shader_rule_y_pos_x");
+        var shader_rule_y_pos_y = GetFormula("input_field_shader_rule_y_pos_y");
+        var shader_rule_y_pos_z = GetFormula("input_field_shader_rule_y_pos_z");
+        var shader_rule_y_neg_x = GetFormula("input_field_shader_rule_y_neg_x");
+        var shader_rule_y_neg_y = GetFormula("input_field_shader_rule_y_neg_y");
+        var shader_rule_y_neg_z = GetFormula("input_field_shader_rule_y_neg_z");
+
+        var shader_rule_z_pos_x = GetFormula("input_field_shader_rule_z_pos_x");
+        var shader_rule_z_pos_y = GetFormula("input_field_shader_rule_z_pos_y");
+        var shader_rule_z_pos_z = GetFormula("input_field_shader_rule_z_pos_z");
+        var shader_rule_z_neg_x = GetFormula("input_field_shader_rule_z_neg_x");
+        var shader_rule_z_neg_y = GetFormula("input_field_shader_rule_z_neg_y");
+        var shader_rule_z_neg_z = GetFormula("input_field_shader_rule_z_neg_z");
 
         this.canvas_wrapper_main.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_main.shader_flags;
@@ -300,6 +435,12 @@ class ShaderManager {
         this.container_main = this.PrepareRaytracingShader(gl, this.dict_shaders_main, shader_formula_scalar_float,  
             light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
             light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+            shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+            shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+            shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+            shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+            shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+            shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
             shader_flags);
         
         var t_stop = performance.now();
@@ -309,15 +450,36 @@ class ShaderManager {
     ShouldPrepareRaytracingShaderSide(gl){
 
         //get variables
-        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
-        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
-        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
-        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
-        var light_transport_p3 = this.GetFormula("input_field_light_transport_p3");
-        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
-        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
-        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
-        var light_transport_d3 = this.GetFormula("input_field_light_transport_d3");
+        var shader_formula_scalar_float = GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = GetFormula("input_field_light_transport_p2");
+        var light_transport_p3 = GetFormula("input_field_light_transport_p3");
+        var light_transport_d0 = GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = GetFormula("input_field_light_transport_d2");
+        var light_transport_d3 = GetFormula("input_field_light_transport_d3");
+
+        var shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
+        var shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
+        var shader_rule_x_pos_z = GetFormula("input_field_shader_rule_x_pos_z");
+        var shader_rule_x_neg_x = GetFormula("input_field_shader_rule_x_neg_x");
+        var shader_rule_x_neg_y = GetFormula("input_field_shader_rule_x_neg_y");
+        var shader_rule_x_neg_z = GetFormula("input_field_shader_rule_x_neg_z");
+
+        var shader_rule_y_pos_x = GetFormula("input_field_shader_rule_y_pos_x");
+        var shader_rule_y_pos_y = GetFormula("input_field_shader_rule_y_pos_y");
+        var shader_rule_y_pos_z = GetFormula("input_field_shader_rule_y_pos_z");
+        var shader_rule_y_neg_x = GetFormula("input_field_shader_rule_y_neg_x");
+        var shader_rule_y_neg_y = GetFormula("input_field_shader_rule_y_neg_y");
+        var shader_rule_y_neg_z = GetFormula("input_field_shader_rule_y_neg_z");
+
+        var shader_rule_z_pos_x = GetFormula("input_field_shader_rule_z_pos_x");
+        var shader_rule_z_pos_y = GetFormula("input_field_shader_rule_z_pos_y");
+        var shader_rule_z_pos_z = GetFormula("input_field_shader_rule_z_pos_z");
+        var shader_rule_z_neg_x = GetFormula("input_field_shader_rule_z_neg_x");
+        var shader_rule_z_neg_y = GetFormula("input_field_shader_rule_z_neg_y");
+        var shader_rule_z_neg_z = GetFormula("input_field_shader_rule_z_neg_z");
 
         this.canvas_wrapper_side.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_side.shader_flags;
@@ -325,6 +487,12 @@ class ShaderManager {
         this.flag_prepare_side = this.ShouldPrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float,  
             light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
             light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+            shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+            shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+            shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+            shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+            shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+            shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
             shader_flags);
         return this.flag_prepare_side;
     }
@@ -334,15 +502,36 @@ class ShaderManager {
         var t_start = performance.now();
         input_formula_scalar
         //get variables
-        var shader_formula_scalar_float = this.GetFormulaFloat("input_formula_scalar");
-        var light_transport_p0 = this.GetFormula("input_field_light_transport_p0");
-        var light_transport_p1 = this.GetFormula("input_field_light_transport_p1");
-        var light_transport_p2 = this.GetFormula("input_field_light_transport_p2");
-        var light_transport_p3 = this.GetFormula("input_field_light_transport_p3");
-        var light_transport_d0 = this.GetFormula("input_field_light_transport_d0");
-        var light_transport_d1 = this.GetFormula("input_field_light_transport_d1");
-        var light_transport_d2 = this.GetFormula("input_field_light_transport_d2");
-        var light_transport_d3 = this.GetFormula("input_field_light_transport_d3");
+        var shader_formula_scalar_float = GetFormulaFloat("input_formula_scalar");
+        var light_transport_p0 = GetFormula("input_field_light_transport_p0");
+        var light_transport_p1 = GetFormula("input_field_light_transport_p1");
+        var light_transport_p2 = GetFormula("input_field_light_transport_p2");
+        var light_transport_p3 = GetFormula("input_field_light_transport_p3");
+        var light_transport_d0 = GetFormula("input_field_light_transport_d0");
+        var light_transport_d1 = GetFormula("input_field_light_transport_d1");
+        var light_transport_d2 = GetFormula("input_field_light_transport_d2");
+        var light_transport_d3 = GetFormula("input_field_light_transport_d3");
+
+        var shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
+        var shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
+        var shader_rule_x_pos_z = GetFormula("input_field_shader_rule_x_pos_z");
+        var shader_rule_x_neg_x = GetFormula("input_field_shader_rule_x_neg_x");
+        var shader_rule_x_neg_y = GetFormula("input_field_shader_rule_x_neg_y");
+        var shader_rule_x_neg_z = GetFormula("input_field_shader_rule_x_neg_z");
+
+        var shader_rule_y_pos_x = GetFormula("input_field_shader_rule_y_pos_x");
+        var shader_rule_y_pos_y = GetFormula("input_field_shader_rule_y_pos_y");
+        var shader_rule_y_pos_z = GetFormula("input_field_shader_rule_y_pos_z");
+        var shader_rule_y_neg_x = GetFormula("input_field_shader_rule_y_neg_x");
+        var shader_rule_y_neg_y = GetFormula("input_field_shader_rule_y_neg_y");
+        var shader_rule_y_neg_z = GetFormula("input_field_shader_rule_y_neg_z");
+
+        var shader_rule_z_pos_x = GetFormula("input_field_shader_rule_z_pos_x");
+        var shader_rule_z_pos_y = GetFormula("input_field_shader_rule_z_pos_y");
+        var shader_rule_z_pos_z = GetFormula("input_field_shader_rule_z_pos_z");
+        var shader_rule_z_neg_x = GetFormula("input_field_shader_rule_z_neg_x");
+        var shader_rule_z_neg_y = GetFormula("input_field_shader_rule_z_neg_y");
+        var shader_rule_z_neg_z = GetFormula("input_field_shader_rule_z_neg_z");
 
         this.canvas_wrapper_side.UpdateShaderFlags();
         var shader_flags = this.canvas_wrapper_side.shader_flags;
@@ -351,6 +540,12 @@ class ShaderManager {
         this.container_side = this.PrepareRaytracingShader(gl, this.dict_shaders_side, shader_formula_scalar_float,  
             light_transport_p0, light_transport_p1, light_transport_p2, light_transport_p3, 
             light_transport_d0, light_transport_d1, light_transport_d2, light_transport_d3,
+            shader_rule_x_pos_x, shader_rule_x_pos_y, shader_rule_x_pos_z,
+            shader_rule_x_neg_x, shader_rule_x_neg_y, shader_rule_x_neg_z,
+            shader_rule_y_pos_x, shader_rule_y_pos_y, shader_rule_y_pos_z,
+            shader_rule_y_neg_x, shader_rule_y_neg_y, shader_rule_y_neg_z,
+            shader_rule_z_pos_x, shader_rule_z_pos_y, shader_rule_z_pos_z,
+            shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
             shader_flags);
         
         var t_stop = performance.now();
@@ -364,18 +559,7 @@ class ShaderManager {
         this.settings_changed = false;
     }
 
-    GetFormula(element_id){
-        var shader_formula = document.getElementById(element_id).value;
-        return shader_formula;
-    }
 
-    GetFormulaFloat(element_id){
-        var shader_formula = document.getElementById(element_id).value;
-        var shader_formula_float = shader_formula.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
-            return ($2 == ".") ? $0 : $0 + ".0";
-        });
-        return shader_formula_float;
-    }
 
 }
 

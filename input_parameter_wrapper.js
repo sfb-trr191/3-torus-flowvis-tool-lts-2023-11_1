@@ -136,6 +136,28 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_field_light_transport_d1", "ld1");
         new InputWrapper(this, "input_field_light_transport_d2", "ld2");
         new InputWrapper(this, "input_field_light_transport_d3", "ld3");
+        //data - rules
+        new InputWrapper(this, "input_field_shader_rule_x_pos_x", "rxpx");
+        new InputWrapper(this, "input_field_shader_rule_x_pos_y", "rxpy");
+        new InputWrapper(this, "input_field_shader_rule_x_pos_z", "rxpz");
+        new InputWrapper(this, "input_field_shader_rule_x_neg_x", "rxnx");
+        new InputWrapper(this, "input_field_shader_rule_x_neg_y", "rxny");
+        new InputWrapper(this, "input_field_shader_rule_x_neg_z", "rxnz");
+
+        new InputWrapper(this, "input_field_shader_rule_y_pos_x", "rypx");
+        new InputWrapper(this, "input_field_shader_rule_y_pos_y", "rypy");
+        new InputWrapper(this, "input_field_shader_rule_y_pos_z", "rypz");
+        new InputWrapper(this, "input_field_shader_rule_y_neg_x", "rynx");
+        new InputWrapper(this, "input_field_shader_rule_y_neg_y", "ryny");
+        new InputWrapper(this, "input_field_shader_rule_y_neg_z", "rynz");
+
+        new InputWrapper(this, "input_field_shader_rule_z_pos_x", "rzpx");
+        new InputWrapper(this, "input_field_shader_rule_z_pos_y", "rzpy");
+        new InputWrapper(this, "input_field_shader_rule_z_pos_z", "rzpz");
+        new InputWrapper(this, "input_field_shader_rule_z_neg_x", "rznx");
+        new InputWrapper(this, "input_field_shader_rule_z_neg_y", "rzny");
+        new InputWrapper(this, "input_field_shader_rule_z_neg_z", "rznz");
+
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);

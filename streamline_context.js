@@ -102,12 +102,13 @@ class StreamlineContext {
         this.streamline_generator.inbetweens = bo_calculate_streamlines.input_parameters.inbetweens;
         this.segment_duplicator.iterations = bo_calculate_streamlines.input_parameters.segment_duplicator_iterations;
 
-        if(this.streamline_generator.space == SPACE_3_SPHERE_4_PLUS_4D){
-            bo_calculate_streamlines.generate_copies = false;
-        }
+
 
         this.streamline_generator.SetRulesTorus();
-        this.streamline_generator.SetRules2Plus2D();
+        this.streamline_generator.SetRules2Plus2D();    
+        if(this.streamline_generator.space == SPACE_3_TORUS){
+            this.streamline_generator.SetRulesFromUI_xyz();
+        }    
         this.streamline_generator.GenerateSeedsFromUI(this.name);
 
         //flag_calculate determines whether streamlines are calculated or cleared depending on the part index and the selected calculation method

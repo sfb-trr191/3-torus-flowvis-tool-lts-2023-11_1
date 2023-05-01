@@ -152,3 +152,16 @@ exports.getColorVectorFromElementID = function(element_id) {
     return glMatrix.vec3.fromValues(r, g, b);
 }
 
+exports.GetFormula = function(element_id){
+    var shader_formula = document.getElementById(element_id).value;
+    return shader_formula;
+}
+
+exports.GetFormulaFloat = function(element_id){
+    var shader_formula = document.getElementById(element_id).value;
+    var shader_formula_float = shader_formula.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
+        return ($2 == ".") ? $0 : $0 + ".0";
+    });
+    return shader_formula_float;
+}
+

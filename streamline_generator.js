@@ -2,6 +2,8 @@ const glMatrix = require("gl-matrix");
 const RawDataEntry = require("./raw_data_entry");
 const math = require("mathjs");
 const module_utility = require("./utility");
+const GetFormula = module_utility.GetFormula;
+const GetFormulaFloat = module_utility.GetFormulaFloat;
 
 class StreamlineGenerator {
 
@@ -137,6 +139,29 @@ class StreamlineGenerator {
         this.shader_rule_v_y_neg_y = "y";		    //if v_y<1 : y=___
         this.shader_rule_v_y_neg_v_x = "v_x";	    //if v_y<1 : v_x=___
         this.shader_rule_v_y_neg_v_y = "v_y+1";	    //if v_y<1 : v_y=___
+    }
+
+    SetRulesFromUI_xyz(){
+        this.shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
+        this.shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
+        this.shader_rule_x_pos_z = GetFormula("input_field_shader_rule_x_pos_z");
+        this.shader_rule_x_neg_x = GetFormula("input_field_shader_rule_x_neg_x");
+        this.shader_rule_x_neg_y = GetFormula("input_field_shader_rule_x_neg_y");
+        this.shader_rule_x_neg_z = GetFormula("input_field_shader_rule_x_neg_z");
+
+        this.shader_rule_y_pos_x = GetFormula("input_field_shader_rule_y_pos_x");
+        this.shader_rule_y_pos_y = GetFormula("input_field_shader_rule_y_pos_y");
+        this.shader_rule_y_pos_z = GetFormula("input_field_shader_rule_y_pos_z");
+        this.shader_rule_y_neg_x = GetFormula("input_field_shader_rule_y_neg_x");
+        this.shader_rule_y_neg_y = GetFormula("input_field_shader_rule_y_neg_y");
+        this.shader_rule_y_neg_z = GetFormula("input_field_shader_rule_y_neg_z");
+
+        this.shader_rule_z_pos_x = GetFormula("input_field_shader_rule_z_pos_x");
+        this.shader_rule_z_pos_y = GetFormula("input_field_shader_rule_z_pos_y");
+        this.shader_rule_z_pos_z = GetFormula("input_field_shader_rule_z_pos_z");
+        this.shader_rule_z_neg_x = GetFormula("input_field_shader_rule_z_neg_x");
+        this.shader_rule_z_neg_y = GetFormula("input_field_shader_rule_z_neg_y");
+        this.shader_rule_z_neg_z = GetFormula("input_field_shader_rule_z_neg_z");
     }
 
     SetupCalculateRawStreamlines(bo_calculate_streamlines){

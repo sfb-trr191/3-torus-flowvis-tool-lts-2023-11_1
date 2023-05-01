@@ -52,41 +52,41 @@ vec3 MoveOutOfBounds(vec3 position)
 	
 	if(x > 1.0-epsilon_move_ray)
 	{
-		x = x-1.0;
-		y = y;
-		z = z;
+		x = shader_rule_x_pos_x;
+		y = shader_rule_x_pos_y;
+		z = shader_rule_x_pos_z;
 	}
 	else if(x < 0.0+epsilon_move_ray)
 	{
-		x = x+1.0;
-		y = y;
-		z = z;
+		x = shader_rule_x_neg_x;
+		y = shader_rule_x_neg_y;
+		z = shader_rule_x_neg_z;
 	}
 
 	if(y > 1.0-epsilon_move_ray)
 	{
-		x = x;
-		y = y-1.0;
-		z = z;
+		x = shader_rule_y_pos_x;
+		y = shader_rule_y_pos_y;
+		z = shader_rule_y_pos_z;
 	}
 	else if(y < 0.0+epsilon_move_ray)
 	{
-		x = x;
-		y = y+1.0;
-		z = z;
+		x = shader_rule_y_neg_x;
+		y = shader_rule_y_neg_y;
+		z = shader_rule_y_neg_z;
 	}
 
 	if(z > 1.0-epsilon_move_ray)
 	{
-		x = x;
-		y = y;
-		z = z-1.0;
+		x = shader_rule_z_pos_x;
+		y = shader_rule_z_pos_y;
+		z = shader_rule_z_pos_z;
 	}
 	else if(z < 0.0+epsilon_move_ray)
 	{
-		x = x;
-		y = y;
-		z = z+1.0;
+		x = shader_rule_z_neg_x;
+		y = shader_rule_z_neg_y;
+		z = shader_rule_z_neg_z;
 	}
 
 	return vec3(x,y,z);
