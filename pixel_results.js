@@ -22,30 +22,36 @@ class PixelResults {
     }
 
     setHitString(termination_condition, termination_max_value){
+        var SEPARATOR = "&nbsp;&nbsp;&nbsp;&nbsp;"
         var start_string = ""
         var stop_string = ""
         if (this.hit_type == TYPE_STREAMLINE_SEGMENT){
-            start_string += "Streamline: " + this.streamline_id + "     "
+            start_string += "Streamline: " + this.streamline_id + SEPARATOR
         }
         var position_string = "position: " + format4NumbersAsVectorString(this.center[0], this.center[1], this.center[2], this.center[3]);
         if (this.hit_type == TYPE_STREAMLINE_SEGMENT){
-            stop_string += "   "
+            var termination_string = ""
             if(termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME){
-                stop_string += "time: "
+                termination_string = "time: "
             }
             if(termination_condition == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH){
-                stop_string += "length: "
+                termination_string = "length: "
             }
             if(termination_condition == STREAMLINE_TERMINATION_CONDITION_POINTS){
-                stop_string += "points: "
+                termination_string = "points: "
             }
+            var termination_string_normalized = "normalized " + termination_string
+            stop_string += SEPARATOR
+            stop_string += termination_string
             stop_string += (this.cost * termination_max_value).toFixed(3)
-            stop_string += "   normalized: " + this.cost.toFixed(3)
+            stop_string += SEPARATOR
+            stop_string += termination_string_normalized
+            stop_string += this.cost.toFixed(3)
         }
         if (this.hit_type == TYPE_NONE){
             var position_string = ""
         }
-        document.getElementById("paragraph_mouse_data_string").textContent = 
+        document.getElementById("paragraph_mouse_data_string").innerHTML = 
             start_string
             + position_string
             + stop_string
