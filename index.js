@@ -920,7 +920,14 @@ const DynamicStreamline = require("./dynamic_streamline");
             console.log("onClickCalculateFTLE");
             CalculateFTLE();
         });
-
+        document.getElementById("button_transfer_dynamic_seed").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickTransferSeed");
+            ui_seeds.addDynamicSeed();
+            sheduled_task = TASK_CALCULATE_STREAMLINES;
+        });
     }
 
     function addOnClickUpdateRenderSettings() {

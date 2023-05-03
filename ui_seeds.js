@@ -156,6 +156,17 @@ class UISeed {
         this.node_input_z.value = this.ui_seeds.rng_autoseed().toFixed(FIXED_LENGTH_RANDOM_SEED_POSITION);
     }
 
+    copyFromDynamic() {
+        var field_x = document.getElementById("input_dynamic_position_x");
+        var field_y = document.getElementById("input_dynamic_position_y");
+        var field_z = document.getElementById("input_dynamic_position_z");
+        var field_w = document.getElementById("input_dynamic_position_w");
+        this.node_input_x.value = field_x.value;
+        this.node_input_y.value = field_y.value;
+        this.node_input_z.value = field_z.value;
+        this.node_input_w.value = field_w.value;
+    }
+
     /**
      * Correct the seed so that:
      * - The position is on S3 - achieved via normalization of the position
@@ -1004,6 +1015,15 @@ class UISeeds {
         this.changed_count = true;
         this.UpdateCSS();
     }
+
+    addDynamicSeed() {
+        var new_seed = new UISeed(this, this.list.length, false);
+        new_seed.copyFromDynamic();
+        this.list.push(new_seed);
+        this.element.appendChild(new_seed.node);
+        this.changed_count = true;
+        this.UpdateCSS();
+    } 
 
     addMultiSeed() {
         var new_seed = new UIMultiSeed(this, this.list_multi_seeds.length);
