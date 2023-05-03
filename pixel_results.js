@@ -21,6 +21,7 @@ class PixelResults {
         this.center = glMatrix.vec4.fromValues(pixels[12], pixels[13], pixels[14], pixels[15]);
     }
 
+    //WARNING: uses innerHTML, do not allow user input
     setHitString(termination_condition, termination_max_value){
         var SEPARATOR = "&nbsp;&nbsp;&nbsp;&nbsp;"
         var start_string = ""
@@ -51,7 +52,7 @@ class PixelResults {
         if (this.hit_type == TYPE_NONE){
             var position_string = ""
         }
-        document.getElementById("paragraph_mouse_data_string").innerHTML = 
+        document.getElementById("paragraph_mouse_data_string").innerHTML = //WARNING: uses innerHTML, do not allow user input
             start_string
             + position_string
             + stop_string
