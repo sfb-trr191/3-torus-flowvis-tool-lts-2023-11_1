@@ -13,6 +13,7 @@ const GramSchmidt4Vectors4Dimensions = gram_schmidt.GramSchmidt4Vectors4Dimensio
 const seedrandom = require("seedrandom");
 const module_math4D = require("./math4D");
 const RotateVectorInPlane = module_math4D.RotateVectorInPlane;
+const math = require("mathjs");
 
 class GL_CameraData {
     constructor() {
@@ -336,6 +337,10 @@ class Camera {
         this.input_camera_right_y = input_camera_right_y;
         this.input_camera_right_z = input_camera_right_z;
         this.input_camera_right_w = input_camera_right_w;
+    }
+
+    LinkStreamlinegenerator(streamline_generator){
+        this.streamline_generator = streamline_generator;
     }
 
     SetDefaultValuesMain(){
@@ -1894,7 +1899,11 @@ class Camera {
                 this.repositionCameraProjection(projection_index);
             }
             else if (allow_default) {
-                this.repositionCameraDefault();
+                if (this.streamline_generator.space == SPACE_3_TORUS){
+                    this.position = this.MoveOutOfBounds3Torus(this.position)
+                }else{
+                    this.repositionCameraDefault();
+                }
             }
         }
     }
@@ -2269,6 +2278,58 @@ class Camera {
         glMatrix.vec4.normalize(this.right, pos_cam_right);
 
         this.changed = true;
+    }
+
+    MoveOutOfBounds3Torus(position) {
+        //user friendly variables
+        var x = position[0];
+        var y = position[1];
+        var z = position[2];
+        //additional "constant" variables for this calculation
+        var x0 = x;
+        var y0 = y;
+        var z0 = z;
+
+        let scope = {
+            x: x,
+            y: y,
+            z: z,
+        };
+
+        if (x > 1) {
+            scope.x = math.evaluate(this.streamline_generator.shader_rule_x_pos_x, scope);
+            scope.y = math.evaluate(this.streamline_generator.shader_rule_x_pos_y, scope);
+            scope.z = math.evaluate(this.streamline_generator.shader_rule_x_pos_z, scope);
+        }
+        else if (x < 0) {
+            scope.x = math.evaluate(this.streamline_generator.shader_rule_x_neg_x, scope);
+            scope.y = math.evaluate(this.streamline_generator.shader_rule_x_neg_y, scope);
+            scope.z = math.evaluate(this.streamline_generator.shader_rule_x_neg_z, scope);
+        }
+
+        if (y > 1) {
+            scope.x = math.evaluate(this.streamline_generator.shader_rule_y_pos_x, scope);
+            scope.y = math.evaluate(this.streamline_generator.shader_rule_y_pos_y, scope);
+            scope.z = math.evaluate(this.streamline_generator.shader_rule_y_pos_z, scope);
+        }
+        else if (y < 0) {
+            scope.x = math.evaluate(this.streamline_generator.shader_rule_y_neg_x, scope);
+            scope.y = math.evaluate(this.streamline_generator.shader_rule_y_neg_y, scope);
+            scope.z = math.evaluate(this.streamline_generator.shader_rule_y_neg_z, scope);
+        }
+
+        if (z > 1) {
+            scope.x = math.evaluate(this.streamline_generator.shader_rule_z_pos_x, scope);
+            scope.y = math.evaluate(this.streamline_generator.shader_rule_z_pos_y, scope);
+            scope.z = math.evaluate(this.streamline_generator.shader_rule_z_pos_z, scope);
+        }
+        else if (z < 0) {
+            scope.x = math.evaluate(this.streamline_generator.shader_rule_z_neg_x, scope);
+            scope.y = math.evaluate(this.streamline_generator.shader_rule_z_neg_y, scope);
+            scope.z = math.evaluate(this.streamline_generator.shader_rule_z_neg_z, scope);
+        }
+
+        return glMatrix.vec4.fromValues(scope.x, scope.y, scope.z, position[3]);
     }
 }
 

@@ -321,7 +321,7 @@ const DynamicStreamline = require("./dynamic_streamline");
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.SetDefaultValuesMain();
-
+        main_camera.LinkStreamlinegenerator(streamline_context_static.streamline_generator);
         main_camera.LinkInput(
             document.getElementById("input_camera_position_x"),
             document.getElementById("input_camera_position_y"),
@@ -342,6 +342,7 @@ const DynamicStreamline = require("./dynamic_streamline");
 
         side_camera.SetRenderSizes(512, 384, 256, 192);
         side_camera.SetDefaultValuesAux();
+        side_camera.LinkStreamlinegenerator(streamline_context_static.streamline_generator);
         //side_camera.position = glMatrix.vec3.fromValues(0.500000, -0.750000, 1.200000);
         //side_camera.forward = glMatrix.vec3.fromValues(-0.023683, 0.813820, -0.580633);
         //side_camera.up = glMatrix.vec3.fromValues(-0.008492, -0.580940, -0.813903);
