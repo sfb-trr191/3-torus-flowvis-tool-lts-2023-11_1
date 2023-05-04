@@ -190,6 +190,206 @@ class FTLEManager {
         gl.uniform1i(location_texture_ftle_differences, texture_ftle_differences_index);
     }
 
+    initialize_statemachine(bo) {//bo = bo_calculate_ftle        
+        this.enterState(FTLE_STATE_INITIALIZATION);
+        this.finished = false;
+        this.dim_x = bo.input_parameters.dim_x;
+        this.dim_y = bo.input_parameters.dim_y;
+        this.dim_z = bo.input_parameters.dim_z;
+        this.UpdateExtendedDims(bo.gl);
+        this.advection_time = bo.input_parameters.advection_time;
+        this.step_size = bo.input_parameters.step_size;
+        this.highest_iteration_count = 0;
+        this.enterState(FTLE_STATE_FLOW_MAP_SETUP);
+    }
+
+    enterState(state){
+        console.warn("enter state:", state)
+        this.state = state;        
+    }
+
+    execute_statemachine(bo){//bo = bo_calculate_ftle      
+        switch (this.state) {
+            case FTLE_STATE_FLOW_MAP_SETUP:
+                this.execute_flow_map_setup(bo);
+                break;
+            case FTLE_STATE_FLOW_MAP_COMPUTE:
+                this.execute_flow_map_compute(bo);
+                break;
+            case FTLE_STATE_FLOW_MAP_FINISH:
+                this.execute_flow_map_finish(bo);
+                break;
+            case FTLE_STATE_FLOW_MAP_FINITE_DIFFEREMCES_COMPUTE:
+                this.execute_flow_map_compute_finite_differences_compute(bo);
+                break;                
+            case FTLE_STATE_FTLE:
+                this.execute_ftle(bo);
+                break; 
+            case FTLE_STATE_FTLE_NORMALS:
+                this.execute_ftle_normals(bo);
+                break; 
+            case FTLE_STATE_FINISH:
+                this.execute_finish(bo);
+                break;
+            default:
+                break;
+        }
+    }
+
+    execute_flow_map_setup(bo){//bo = bo_calculate_ftle
+        this.data_texture_flowmap.initDimensions(bo.gl, this.dim_x_extended, this.dim_y_extended, 2*this.dim_z_extended);
+        this.ReplaceComputeFlowMapSliceShader(bo.gl);
+
+        bo.tmp.i = 0;
+        bo.tmp.finished_forward = false;
+        this.enterState(FTLE_STATE_FLOW_MAP_COMPUTE);
+    }
+
+    execute_flow_map_compute(bo){//bo = bo_calculate_ftle
+        if(!bo.tmp.finished_forward){
+            if(bo.tmp.i == this.dim_z_extended){
+                bo.tmp.finished_forward = true
+                bo.tmp.i = 0;
+            }else{
+                this.computeFlowMapSlice(bo.gl, bo.tmp.i, true);
+                bo.tmp.i += 1;
+                var progress = bo.tmp.i / (2 * this.dim_z_extended)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_1");
+            }
+        }
+        else{
+            if(bo.tmp.i == this.dim_z_extended){
+                this.enterState(FTLE_STATE_FLOW_MAP_FINISH);
+            }else{
+                this.computeFlowMapSlice(bo.gl, bo.tmp.i, false);
+                bo.tmp.i += 1;
+                var progress = (this.dim_z_extended + bo.tmp.i) / (2 * this.dim_z_extended)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_1");
+            }
+        }
+    }
+
+    execute_flow_map_finish(bo){//bo = bo_calculate_ftle
+        this.data_texture_flowmap.update(bo.gl);
+
+        bo.tmp.h2_x = 2 / (this.dim_x - 1);
+        bo.tmp.h2_y = 2 / (this.dim_y - 1);
+        bo.tmp.h2_z = 2 / (this.dim_z - 1);
+        bo.tmp.h2 = bo.tmp.h2_x;
+        bo.tmp.direction = 0;
+        bo.tmp.data_texture = this.data_texture_flowmap_diff_x;
+        bo.tmp.finished_forward = false;
+        bo.tmp.i = 0;
+        this.enterState(FTLE_STATE_FLOW_MAP_FINITE_DIFFEREMCES_COMPUTE);
+    }
+
+    execute_flow_map_compute_finite_differences_compute(bo){//bo = bo_calculate_ftle
+        if(!bo.tmp.finished_forward){
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.finished_forward = true;
+                bo.tmp.i = 0;
+            }else{
+                if(bo.tmp.i == 0){
+                    bo.tmp.data_texture.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+                }
+                this.computeFlowMapFiniteDifferencesSlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, true)
+                bo.tmp.i += 1;
+                var progress = ((bo.tmp.direction * 2 * this.dim_z) + bo.tmp.i) / (6 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_2");
+            }
+        }
+        else{
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.data_texture.update(bo.gl);
+                bo.tmp.finished_forward = false;
+                bo.tmp.direction += 1;
+                bo.tmp.i = 0;
+                if(bo.tmp.direction == 1){
+                    bo.tmp.h2 = bo.tmp.h2_y;
+                    bo.tmp.data_texture = this.data_texture_flowmap_diff_y;
+                }
+                if(bo.tmp.direction == 2){
+                    bo.tmp.h2 = bo.tmp.h2_z;
+                    bo.tmp.data_texture = this.data_texture_flowmap_diff_z;
+                }
+                if(bo.tmp.direction == 3){
+                    bo.tmp.finished_forward = false;
+                    bo.tmp.i = 0;
+                    this.enterState(FTLE_STATE_FTLE);
+                }
+            }else{
+                this.computeFlowMapFiniteDifferencesSlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, false)
+                bo.tmp.i += 1;
+                var progress = ((bo.tmp.direction * 2 * this.dim_z) + this.dim_z + bo.tmp.i) / (6 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_2");
+            }
+        }
+    }
+
+    execute_ftle(bo){//bo = bo_calculate_ftle
+        if(!bo.tmp.finished_forward){
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.finished_forward = true
+                bo.tmp.i = 0;
+            }else{
+                if(bo.tmp.i == 0){                    
+                    this.data_texture_ftle.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+                }
+                this.computeFTLESlice(bo.gl, bo.tmp.i, true);
+                bo.tmp.i += 1;
+                var progress = bo.tmp.i / (2 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_3");
+            }
+        }
+        else{
+            if(bo.tmp.i == this.dim_z){
+                this.data_texture_ftle.update(bo.gl);
+                bo.tmp.finished_forward = false;
+                bo.tmp.i = 0;
+                this.enterState(FTLE_STATE_FTLE_NORMALS);
+            }else{
+                this.computeFTLESlice(bo.gl, bo.tmp.i, false);
+                bo.tmp.i += 1;
+                var progress = (this.dim_z + bo.tmp.i) / (2 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_3");
+            }
+        }
+    }
+    
+    execute_ftle_normals(bo){//bo = bo_calculate_ftle
+        if(!bo.tmp.finished_forward){
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.finished_forward = true
+                bo.tmp.i = 0;
+            }else{
+                if(bo.tmp.i == 0){                    
+                    this.data_texture_ftle_differences.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+                }
+                this.computeFTLENormalsSlice(bo.gl, bo.tmp.i, this.data_texture_ftle_differences, bo.tmp.h2_x, bo.tmp.h2_y, bo.tmp.h2_z, true);
+                bo.tmp.i += 1;
+                var progress = bo.tmp.i / (2 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_4");
+            }
+        }
+        else{
+            if(bo.tmp.i == this.dim_z){
+                this.data_texture_ftle_differences.update(bo.gl);
+                this.enterState(FTLE_STATE_FINISH);
+            }else{
+                this.computeFTLENormalsSlice(bo.gl, bo.tmp.i, this.data_texture_ftle_differences, bo.tmp.h2_x, bo.tmp.h2_y, bo.tmp.h2_z, false);
+                bo.tmp.i += 1;
+                var progress = (this.dim_z + bo.tmp.i) / (2 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_4");
+            }
+        }
+    }
+
+    execute_finish(bo){//bo = bo_calculate_ftle
+        this.data_texture_ftle_side.copyFrom(bo.gl_side, this.data_texture_ftle);
+        this.data_texture_ftle_differences_side.copyFrom(bo.gl_side, this.data_texture_ftle_differences);
+        this.finished = true;
+    }
+
     compute(gl, gl_side, dim_x, dim_y, dim_z, advection_time, step_size) {
         this.dim_x = dim_x;
         this.dim_y = dim_y;

@@ -408,6 +408,11 @@ legend {
     display: grid;
 }
 
+#dialog_progress_ftle {
+    height:200px;
+    margin-top:-100px;
+}
+
 .canvas_wrapper{   
     display: grid;
     grid-template-columns: minmax(0, 100%);

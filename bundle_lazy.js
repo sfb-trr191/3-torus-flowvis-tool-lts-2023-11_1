@@ -147,6 +147,7 @@ global.TASK_CALCULATE_STREAMLINES = 1;
 global.TASK_EXPORT_THUMBNAIL = 2;
 global.TASK_EXPORT_LATEX = 3;
 global.TASK_CALCULATE_DYNAMIC_STREAMLINE = 4;
+global.TASK_CALCULATE_FTLE = 5;
 
 
 global.CAMERA_CONTROL_NONE = 0;
@@ -160,6 +161,15 @@ global.TYPE_UINT8 = "UI8";
 global.TYPE_UINT16 = "UI16";
 global.TYPE_UINT32 = "UI32";
 global.TYPE_FLOAT32 = "F32";
+
+global.FTLE_STATE_INITIALIZATION = 0;
+global.FTLE_STATE_FLOW_MAP_SETUP = 1;
+global.FTLE_STATE_FLOW_MAP_COMPUTE = 2;
+global.FTLE_STATE_FLOW_MAP_FINISH = 3;
+global.FTLE_STATE_FLOW_MAP_FINITE_DIFFEREMCES_COMPUTE = 4;
+global.FTLE_STATE_FTLE = 5;
+global.FTLE_STATE_FTLE_NORMALS = 6;
+global.FTLE_STATE_FINISH = 100;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){
 const module_const = require("./const");

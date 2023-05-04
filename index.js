@@ -108,6 +108,7 @@ const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_R
 const math4D = require("./math4D");
 const cpu_intersect = require("./cpu_intersect");
 const DynamicStreamline = require("./dynamic_streamline");
+const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftle");
 
 ; (function () {
     "use strict"
@@ -182,6 +183,7 @@ const DynamicStreamline = require("./dynamic_streamline");
     var block_all_input = false;
 
     var bo_calculate_streamlines;
+    var bo_calculate_ftle;
 
     function onStart(evt) {
         console.log("onStart");
@@ -431,10 +433,7 @@ const DynamicStreamline = require("./dynamic_streamline");
     }
 
     function state_streamline_calculation_setup(time_now){
-        //console.warn("#SC: state_streamline_calculation_setup", sheduled_task);
         bo_calculate_streamlines = new BackgroundObjectCalculateStreamlines(gl, gl_side, sheduled_task);
-
-        //var t_start = performance.now();        
 
         canvas_wrapper_main.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
         canvas_wrapper_side.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
@@ -443,17 +442,6 @@ const DynamicStreamline = require("./dynamic_streamline");
 
         main_camera.OnCalculateStreamlines(bo_calculate_streamlines.input_parameters.space);
         side_camera.OnCalculateStreamlines(bo_calculate_streamlines.input_parameters.space);
-
-        //streamline_context_static.CalculateStreamlines(gl, gl_side);
-
-        //var t_stop = performance.now();
-        //console.log("Performance: calculated streamlines in: ", Math.ceil(t_stop-t_start), "ms");
-
-        //var errors = streamline_context_static.streamline_generator.streamline_error_counter;
-        //if(errors > 0){
-        //    alert("Warning: There were " + errors + " errors during streamline calculation. The respective streamlines are terminated where the error occured. Make sure the equations do not result in infinity or NaN values.");
-        //}
-
         requestAnimationFrame(state_streamline_calculation_setup_part_default);
     }
 
@@ -524,6 +512,50 @@ const DynamicStreamline = require("./dynamic_streamline");
         document.getElementById("wrapper_dialog_calculating").className = "hidden";
         requestAnimationFrame(on_update);
     }
+
+
+
+    function state_ftle_setup(time_now){
+        console.warn("#SC: state_ftle_setup");
+        
+        bo_calculate_ftle = new BackgroundObjectCalculateFTLE(gl, gl_side, sheduled_task);
+        ftle_manager.initialize_statemachine(bo_calculate_ftle);
+
+        requestAnimationFrame(state_ftle);
+    }
+
+    function state_ftle(time_now){
+        console.warn("#SC: state_ftle");
+        ftle_manager.execute_statemachine(bo_calculate_ftle);
+        if(ftle_manager.finished){
+            requestAnimationFrame(state_ftle_calculation_finished);
+        }else{
+            requestAnimationFrame(state_ftle);
+        }
+    }
+
+    function state_ftle_calculation_finished(time_now){
+        console.warn("#SC: state_ftle_calculation_finished");
+        data_changed = true;
+        sheduled_task = TASK_NONE;
+
+        //ui update slider
+        var dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
+        var slider = document.getElementById("slide_slice_index");
+        var value = Math.min(slider.value, dim_z - 1);
+        slider.max = dim_z - 1;
+        slider.value = value;
+        canvas_wrapper_side.draw_slice_index = value;
+
+        //ui deactivate progress dialog
+        document.getElementById("wrapper_dialog_calculating_ftle").className = "hidden";
+        document.getElementById("wrapper_transparent_overlay").className = "hidden";
+
+        requestAnimationFrame(on_update);
+    }
+
+
+
 
 
 
@@ -687,7 +719,15 @@ const DynamicStreamline = require("./dynamic_streamline");
             }
             requestAnimationFrame(state_streamline_calculation_setup);
             return;  
-        }        
+        }  
+        if(sheduled_task == TASK_CALCULATE_FTLE){
+            DeactivateInput();
+            UpdateRenderSettings();
+            document.getElementById("wrapper_dialog_calculating_ftle").className = "wrapper";
+            document.getElementById("wrapper_transparent_overlay").className = "wrapper";
+            requestAnimationFrame(state_ftle_setup);
+            return;  
+        }             
         if(sheduled_task == TASK_EXPORT_THUMBNAIL){
             DeactivateInput();
             UpdateURL();
@@ -918,7 +958,8 @@ const DynamicStreamline = require("./dynamic_streamline");
                 return;
             }
             console.log("onClickCalculateFTLE");
-            CalculateFTLE();
+            sheduled_task = TASK_CALCULATE_FTLE;
+            //CalculateFTLE();
         });
         document.getElementById("button_transfer_dynamic_seed").addEventListener("click", (event) => {
             if(block_all_input){
@@ -1249,6 +1290,7 @@ const DynamicStreamline = require("./dynamic_streamline");
         canvas_wrapper_transfer_function.updateBuffers();
     }
 
+    /*
     function CalculateFTLE() {
         var dim_x = parseInt(document.getElementById("input_ftle_dim_x").value);
         var dim_y = parseInt(document.getElementById("input_ftle_dim_y").value);
@@ -1267,6 +1309,7 @@ const DynamicStreamline = require("./dynamic_streamline");
 
         console.log("draw_slice_index", value);
     }
+    */
 
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
