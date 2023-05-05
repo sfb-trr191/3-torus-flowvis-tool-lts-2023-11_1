@@ -205,19 +205,20 @@ class MouseManager {
 
     addOnMouseWheel() {
         this.canvas.addEventListener("wheel", (event) => {
-            this.onMouseWheel(event, this.canvas, this.camera, this.side_camera);
+            this.onMouseWheel(event, this.canvas, this.canvas_wrapper_main, this.camera, this.side_camera);
         });
         this.side_canvas.addEventListener("wheel", (event) => {
-            this.onMouseWheel(event, this.side_canvas, this.side_camera, this.camera);
+            this.onMouseWheel(event, this.side_canvas, this.canvas_wrapper_side, this.side_camera, this.camera);
         });
     }
 
-    onMouseWheel(event, canvas, camera, other_camera){
+    onMouseWheel(event, canvas, canvas_wrapper, camera, other_camera){
         if(this.block_all_input){
             return;
         }
         var slow = false;
         var pos = getMousePosition(canvas, event);
+        canvas_wrapper.setRetreiveOnce();
 
         switch(this.control_mode){
             case CONTROL_MODE_CAMERA:

@@ -254,6 +254,11 @@ class CanvasWrapper {
         //this.compute_wrapper_pixel_results.
 
         this.LinkElementsFromName();
+        this.force_draw_retrieve_once = false;
+    }
+
+    setRetreiveOnce(){
+        this.force_draw_retrieve_once = true;
     }
 
     InitAreaProjectionCameras(){
@@ -540,6 +545,9 @@ class CanvasWrapper {
         if(this.update_clicked_position){
             return true;
         }
+        if(this.force_draw_retrieve_once){
+            return true;
+        }
         //console.warn(this.name + ": " + this.output_y_percentage)
         //do not draw if the position didnt change
         if(this.output_x_percentage == this.output_x_percentage_old && this.output_y_percentage == this.output_y_percentage_old){
@@ -558,6 +566,7 @@ class CanvasWrapper {
     draw_retrieve(gl){
         if(!this.should_draw_retrieve())
             return;
+        this.force_draw_retrieve_once = false;
 
 
         var left_render_wrapper = this.camera.IsPanningOrForced() ? this.render_wrapper_raytracing_panning_left : this.render_wrapper_raytracing_still_left
