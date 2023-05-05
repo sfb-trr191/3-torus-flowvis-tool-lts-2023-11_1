@@ -343,6 +343,10 @@ class Camera {
         this.streamline_generator = streamline_generator;
     }
 
+    LinkPixelResults(pixel_results){
+        this.pixel_results = pixel_results;
+    }
+
     SetDefaultValuesMain(){
         this.position = glMatrix.vec4.fromValues(0.5, 0.5, 0.5, 0);
         this.forward = glMatrix.vec4.fromValues(0.000001, 1.000000, 0.000001, 0);

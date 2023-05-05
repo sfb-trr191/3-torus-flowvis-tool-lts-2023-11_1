@@ -4,6 +4,7 @@ struct HitInformation
 {
 	vec3 position;
 	vec3 positionCenter;
+	vec3 light_direction;//direction of the light at the hit position
 	vec3 normal;
 	vec3 objectColor;//for GL_Cylinder
 	//bool terminate;

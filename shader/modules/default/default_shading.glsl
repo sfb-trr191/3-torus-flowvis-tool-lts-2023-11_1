@@ -43,6 +43,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
             hit.dynamic = hitCube.dynamic;
 			hit.position = hitCube.position;
 			hit.positionCenter = hitCube.positionCenter;
+            hit.light_direction = hitCube.light_direction;
 			hit.normal = hitCube.normal;
 			hit.distance = hitCube.distance;
 			hit.multiPolyID = hitCube.multiPolyID;

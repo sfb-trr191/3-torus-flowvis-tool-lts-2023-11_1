@@ -200,6 +200,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.dynamic = hit_outside.dynamic;
                 hit.position = hit_outside.position;
                 hit.positionCenter = hit_outside.positionCenter;
+                hit.light_direction = hit_outside.light_direction;
                 hit.normal = hit_outside.normal;
                 hit.distance = hit_outside.distance;
                 hit.multiPolyID = hit_outside.multiPolyID;
@@ -214,6 +215,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
                 hit.dynamic = hit_outside.dynamic;
                 hit.position = hit_outside.position;
                 hit.positionCenter = hit_outside.positionCenter;
+                hit.light_direction = hit_outside.light_direction;
                 hit.normal = hit_outside.normal;
                 hit.distance = hit_outside.distance;
                 hit.multiPolyID = hit_outside.multiPolyID;
@@ -238,6 +240,7 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
             hit.dynamic = hit_outside.dynamic;
             hit.position = hit_outside.position;
             hit.positionCenter = hit_outside.positionCenter;
+            hit.light_direction = hit_outside.light_direction;
             hit.normal = hit_outside.normal;
             hit.distance = hit_outside.distance;
             hit.multiPolyID = hit_outside.multiPolyID;

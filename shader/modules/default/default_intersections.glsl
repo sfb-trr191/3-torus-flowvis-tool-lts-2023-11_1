@@ -683,6 +683,7 @@ void IntersectCylinder(bool dynamic, int part_index, bool check_bounds, Ray ray,
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_ws;	
 		hit.positionCenter = tube_center;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(hit.position - tube_center);
 		hit.copy = copy;
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
@@ -798,6 +799,7 @@ void IntersectSphere(bool dynamic, int part_index, bool check_bounds, Ray ray, f
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;
 		hit.positionCenter = sphere.center;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(hit.position - sphere.center);
 		//hit.normal = normalize(sphere.center - hit.position);
 		hit.copy = copy;
@@ -1172,6 +1174,7 @@ void IntersectCylinder(bool check_bounds, GL_Cylinder cylinder, Ray ray, float r
 		hit.distance = ray.rayDistance + distance_os;	
 		hit.position = position_ws;	
 		hit.positionCenter = tube_center;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(hit.position - tube_center);
 		hit.copy = false;//copy;
 		hit.multiPolyID = -1;//interactiveStreamline ? -1 : multiPolyID;
@@ -1236,6 +1239,7 @@ void IntersectSphereAxis(bool check_bounds, Ray ray, float ray_local_cutoff, Sph
 		hit.distance = ray.rayDistance + distance_os;
 		hit.position = position_ws;
 		hit.positionCenter = sphere.center;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(hit.position - sphere.center);
 		//hit.normal = normalize(sphere.center - hit.position);
 		hit.copy = false;//copy;

@@ -380,6 +380,7 @@ void Intersect3Sphere(bool dynamic, int part_index, Ray ray, float ray_local_cut
 		hit.distance = distance_total;
 		hit.position = position_ws;
 		hit.positionCenter = sphere4D.center;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(hit.position - sphere4D.center);
 		//hit.normal = normalize(sphere.center - hit.position);
 		hit.copy = copy;
@@ -498,6 +499,7 @@ void IntersectSpherinder(bool dynamic, int part_index, Ray ray, float ray_local_
 		hit.distance = distance_total;
 		hit.position = intersection_4D_ws;
 		hit.positionCenter = intersection_center_4D_ws;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(intersection_4D_ws - intersection_center_4D_ws);
 		hit.copy = copy;
 		hit.multiPolyID = interactiveStreamline ? -1 : multiPolyID;
@@ -701,6 +703,7 @@ void IntersectSpherinderGL_Cylinder(GL_Cylinder cylinder, Ray ray, float ray_loc
 		hit.distance = distance_total;
 		hit.position = intersection_4D_ws;
 		hit.positionCenter = intersection_center_4D_ws;
+        hit.light_direction = ray.direction;
 		hit.normal = normalize(intersection_4D_ws - intersection_center_4D_ws);
 		hit.copy = false;
 		hit.multiPolyID = -1;
@@ -767,6 +770,7 @@ void Intersect3SphereAxis(Ray ray, float ray_local_cutoff, Sphere4D sphere4D, in
         hit.distance = distance_total;
         hit.position = position_ws;
         hit.positionCenter = sphere4D.center;
+        hit.light_direction = ray.direction;
         hit.normal = normalize(hit.position - sphere4D.center);
         hit.copy = false;
         hit.multiPolyID = -1;
@@ -831,6 +835,7 @@ void Intersect3SphereAxes(Ray ray, float ray_local_cutoff, Sphere4D sphere4D, in
         hit.distance = distance_total;
         hit.position = position_ws;
         hit.positionCenter = sphere4D.center;
+        hit.light_direction = ray.direction;
         hit.normal = normalize(hit.position - sphere4D.center);
         hit.copy = false;
         hit.multiPolyID = -1;

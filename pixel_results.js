@@ -10,6 +10,7 @@ class PixelResults {
         this.cost = 0;
         this.position = glMatrix.vec4.fromValues(0, 0, 0, 0);
         this.center = glMatrix.vec4.fromValues(0, 0, 0, 0);
+        this.light_direction = glMatrix.vec4.fromValues(0, 0, 0, 0);
     }
 
 
@@ -19,6 +20,7 @@ class PixelResults {
         this.cost = pixels[5];
         this.position = glMatrix.vec4.fromValues(pixels[8], pixels[9], pixels[10], pixels[11]);
         this.center = glMatrix.vec4.fromValues(pixels[12], pixels[13], pixels[14], pixels[15]);
+        this.light_direction = glMatrix.vec4.fromValues(pixels[16], pixels[17], pixels[18], pixels[19]);
     }
 
     //WARNING: uses innerHTML, do not allow user input

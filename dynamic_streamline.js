@@ -212,14 +212,24 @@ class DynamicStreamline {
         var v = 0.00025;
 
         var change = glMatrix.vec3.create();
-        var direction = glMatrix.vec3.create();
+        var direction = camera.pixel_results.light_direction;
+
+        glMatrix.vec3.normalize(direction, direction);
+        glMatrix.vec3.scale(change, direction, (delta_y * v));
+        glMatrix.vec3.subtract(this.position, this.position, change);
+
+        this.position = camera.MoveOutOfBounds3Torus(this.position);
+
+
+
+        /* old
         //var best_translated_camera_point = this.unit_cube_translator.SelectCopyWithSmallestAngle(this.position, camera.forward, camera.position);
-        var best_translated_camera_point = this.unit_cube_translator.SelectCopyWithSmallestDistance(this.position, camera.forward, camera.position);
-        
+        var best_translated_camera_point = this.unit_cube_translator.SelectCopyWithSmallestDistance(this.position, camera.forward, camera.position);        
         glMatrix.vec3.subtract(direction, this.position, best_translated_camera_point);
         glMatrix.vec3.normalize(direction, direction);
         glMatrix.vec3.scale(change, direction, (delta_y * v));
         glMatrix.vec3.subtract(this.position, this.position, change);
+        */
     }
 }
 

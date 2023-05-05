@@ -15,6 +15,8 @@ vec4 GetOutput(HitInformation hit)
             return hit.position;
         case 3:
             return hit.positionCenter;
+        case 4:
+            return hit.light_direction;       
         default:
             return vec4(0, 0, 0, 0);
     }

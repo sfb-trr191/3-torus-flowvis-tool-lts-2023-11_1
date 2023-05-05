@@ -371,6 +371,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         aliasing = new Aliasing();
 
         pixel_results = new PixelResults();
+        main_camera.LinkPixelResults(pixel_results);
+        side_camera.LinkPixelResults(pixel_results);
 
         canvas_wrapper_main = new CanvasWrapper(gl, streamline_context_static, streamline_context_dynamic, ftle_manager, CANVAS_WRAPPER_MAIN,
             main_canvas, CANVAS_MAIN_WIDTH, CANVAS_MAIN_HEIGHT, main_thumbnail, main_camera, aliasing, shader_manager, global_data, tree_view, pixel_results);
