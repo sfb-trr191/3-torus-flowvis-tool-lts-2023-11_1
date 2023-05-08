@@ -211,9 +211,12 @@ class InputParameterWrapper {
         //settings - volume rendering
         new InputWrapper(this, "select_show_volume_main", "vl"); 
         new InputWrapper(this, "select_show_volume_side", "vr"); 
+        new InputWrapper(this, "checkbox_correct_volume_opacity", "cvo"); 
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
-        new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto");         
+        new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto"); 
+        new InputWrapper(this, "input_volume_rendering_opacity_factor", "vof"); 
+                
         //settings - quality        
         new InputWrapper(this, "input_still_resolution_factor", "rfs");   
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   

@@ -37,6 +37,7 @@ uniform int projection_index;
 
 uniform bool is_main_renderer;
 uniform bool show_origin_axes;
+uniform bool correct_volume_opacity;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;
 uniform float volume_rendering_opacity_factor;

@@ -64,7 +64,8 @@ class UniformLocationsRayTracing {
         this.location_show_movable_axes = gl.getUniformLocation(program, "show_movable_axes");
         this.location_show_origin_axes = gl.getUniformLocation(program, "show_origin_axes");
         this.location_show_streamlines = gl.getUniformLocation(program, "show_streamlines");
-        this.location_show_streamlines_outside = gl.getUniformLocation(program, "show_streamlines_outside");
+        this.location_show_streamlines_outside = gl.getUniformLocation(program, "show_streamlines_outside");        
+        this.location_correct_volume_opacity = gl.getUniformLocation(program, "correct_volume_opacity");
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_show_volume_rendering_forward = gl.getUniformLocation(program, "show_volume_rendering_forward");
         this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
@@ -205,6 +206,7 @@ class CanvasWrapper {
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
         this.volume_rendering_mode = 0;
+        this.correct_volume_opacity = false;
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
         this.volume_rendering_distance_between_points = 0.01;
@@ -919,6 +921,7 @@ class CanvasWrapper {
         var render_dynamic_streamline = this.should_render_dynamic_streamline();
         gl.uniform1i(this.location_raytracing.location_render_dynamic_streamline, render_dynamic_streamline);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, show_volume_rendering);
+        gl.uniform1i(this.location_raytracing.location_correct_volume_opacity, this.correct_volume_opacity);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_forward, show_volume_rendering_forward);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);

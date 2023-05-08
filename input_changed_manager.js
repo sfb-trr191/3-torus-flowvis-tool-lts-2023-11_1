@@ -156,6 +156,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_scalar"));  
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_forward"));  
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_backward")); 
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_correct_volume_opacity"));
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));       
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     

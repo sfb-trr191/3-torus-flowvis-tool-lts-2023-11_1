@@ -70,12 +70,20 @@ void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer
     vec3 combined_color = rgba_forward.rgb;
     float combined_alpha = rgba_forward.a * volume_rendering_opacity_factor;//volume_rendering_opacity_factor (experimental)
 
+    //opacity correction:
+    float alpha_corrected = combined_alpha;
+    if(correct_volume_opacity){
+        float delta = volume_rendering_distance_between_points;
+        float alpha_exponent = delta / volume_rendering_reference_distance;
+        alpha_corrected = 1.0 - pow(1.0-combined_alpha, alpha_exponent);
+    }
+
     //apply compositing: alpha_out = alpha_in + (1-alpha_in) * alpha;        
     float alpha_in = hit.vol_accumulated_opacity;
-    hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * combined_alpha;
+    hit.vol_accumulated_opacity = alpha_in + (1.0-alpha_in) * alpha_corrected;
     //apply compositing: C_out = C_in + (1-alpha_in) * C';        
     vec3 C_in = hit.vol_accumulated_color;
-    hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * combined_alpha;
+    hit.vol_accumulated_color = C_in + (1.0-alpha_in) * combined_color * alpha_corrected;
 }
 
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)

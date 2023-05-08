@@ -62,5 +62,6 @@ const bool blinn_phong = true;//DUMMY
 
 const float x_axesPixelOffset = 0.85;
 const float y_axesPixelOffset = 0.75;
+const float volume_rendering_reference_distance = 0.001;//reference sampling distance required for opacity correction
 
 `;
