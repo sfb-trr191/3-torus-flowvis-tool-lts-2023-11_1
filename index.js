@@ -193,6 +193,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         cpu_intersect.Test();
 
         var tests = new Tests();
+        //tests.LogarithmicScaling();
+        //return;
        
         window["URL_VERSION_YEAR"] = window["VERSION_YEAR"];
         window["URL_VERSION_MONTH"] = window["VERSION_MONTH"];

@@ -2,6 +2,7 @@ const glMatrix = require("gl-matrix");
 const module_utility = require("./utility");
 const rgbToHex = module_utility.rgbToHex;
 const lerp = module_utility.lerp;
+const LogToLinear = module_utility.LogToLinear;
 const { PositionData, LineSegment, TreeNode, DirLight, StreamlineColor, StreamlineSeed, Cylinder } = require("./data_types");
 const BinaryArray = require("./binary_array");
 const getStateDescription = require("./version").getStateDescription;
@@ -330,7 +331,9 @@ class TransferFunction {
         this.list_color_points.pop();
     }
 
-    fillBins() {
+    fillBins() {        
+        var use_log_scale = document.getElementById("checkbox_transfer_function_log_scale").checked;
+        var log_scale_d = parseFloat(document.getElementById("input_transfer_function_log_scale_d").value);        
         this.list_colors = [];
         for (var i = 0; i < this.bin_count; i++) {
             var t = i / (this.bin_count - 1);
@@ -342,7 +345,7 @@ class TransferFunction {
             var opacity = this.interpolateOpacity(index_low, index_high, t);
             var c = new StreamlineColor();
             c.color = color;
-            c.opacity = opacity;
+            c.opacity = use_log_scale ? LogToLinear(opacity, log_scale_d) : opacity;
             this.list_colors.push(c);
             //console.log(i, " t:", t, "color:", color, "opacity:", opacity);
         }

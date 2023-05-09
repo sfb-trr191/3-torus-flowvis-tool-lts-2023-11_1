@@ -165,3 +165,11 @@ exports.GetFormulaFloat = function(element_id){
     return shader_formula_float;
 }
 
+exports.LogToLinear = function(alpha_log, d){
+    var a = Math.max(Math.log(d),1);
+    var term_1 = Math.pow(Math.E, -a*(1-alpha_log));
+    var term_2 = Math.pow(Math.E, -a);
+    var alpha_linear = (term_1 - term_2) / (1 - term_2);
+    return alpha_linear;
+}
+

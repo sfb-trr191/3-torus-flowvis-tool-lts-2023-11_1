@@ -94,6 +94,20 @@ class Tests {
 
         return result;
     }
+
+    LogarithmicScaling(){
+        var d = 100;
+        var a = Math.max(Math.log(d),1);
+
+        var alpha_log = 0;
+        for(var i=0; i<11; i++){
+            alpha_log = (i/10.0);
+            var term_1 = Math.pow(Math.E, -a*(1-alpha_log));
+            var term_2 = Math.pow(Math.E, -a);
+            var alpha_linear = (term_1 - term_2) / (1 - term_2);
+            console.log(alpha_log, alpha_linear);
+        }  
+    }
 }
 
 
