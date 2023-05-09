@@ -166,7 +166,10 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_trackball_translation_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_wheel_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_left"));     
-        this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_right"));      
+        this.group_render_settings.AddInput(document.getElementById("input_trackball_focus_distance_right"));  
+
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_transfer_function_log_scale"));  
+        this.group_render_settings.AddInput(document.getElementById("input_transfer_function_log_scale_d"));    
     }
 
     LinkUISeeds(ui_seeds){

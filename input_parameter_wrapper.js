@@ -216,6 +216,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto"); 
         new InputWrapper(this, "input_volume_rendering_opacity_factor", "vof"); 
+        new InputWrapper(this, "checkbox_transfer_function_log_scale", "tls");
+        new InputWrapper(this, "input_transfer_function_log_scale_d", "tld");
                 
         //settings - quality        
         new InputWrapper(this, "input_still_resolution_factor", "rfs");   
