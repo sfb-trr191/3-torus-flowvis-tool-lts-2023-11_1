@@ -212,13 +212,14 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_show_volume_main", "vl"); 
         new InputWrapper(this, "select_show_volume_side", "vr"); 
         new InputWrapper(this, "checkbox_correct_volume_opacity", "cvo"); 
+        new InputWrapper(this, "checkbox_volume_skip_first_fundamental_domain_main", "sfd"); 
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
+        new InputWrapper(this, "input_volume_rendering_min_distance_main", "vmd2"); 
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto"); 
         new InputWrapper(this, "input_volume_rendering_opacity_factor", "vof"); 
         new InputWrapper(this, "checkbox_transfer_function_log_scale", "tls");
-        new InputWrapper(this, "input_transfer_function_log_scale_d", "tld");
-                
+        new InputWrapper(this, "input_transfer_function_log_scale_d", "tld");        
         //settings - quality        
         new InputWrapper(this, "input_still_resolution_factor", "rfs");   
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   

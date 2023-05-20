@@ -1368,6 +1368,9 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);        
         canvas_wrapper_main.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_main").value);
         canvas_wrapper_main.max_volume_distance = parseFloat(document.getElementById("input_volume_rendering_max_distance").value);
+        canvas_wrapper_main.min_volume_distance = parseFloat(document.getElementById("input_volume_rendering_min_distance_main").value);
+        canvas_wrapper_main.volume_skip_first_fundamental_domain = document.getElementById("checkbox_volume_skip_first_fundamental_domain_main").checked;
+        
         canvas_wrapper_main.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_main.tube_radius_factor_projection_highlight = document.getElementById("input_tube_radius_factor_projection_highlight").value;
@@ -1435,6 +1438,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
         canvas_wrapper_side.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);
         canvas_wrapper_side.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_aux").value);
+        canvas_wrapper_side.min_volume_distance = 0;
+        canvas_wrapper_side.volume_skip_first_fundamental_domain = false;
         canvas_wrapper_side.max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance_aux").value);
         canvas_wrapper_side.tube_radius_factor = document.getElementById("input_tube_radius_factor_aux").value;
         canvas_wrapper_side.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;

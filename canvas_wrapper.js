@@ -47,6 +47,8 @@ class UniformLocationsRayTracing {
         this.location_selected_streamline_id = gl.getUniformLocation(program, "selected_streamline_id");    
         this.location_gray_scale_factor = gl.getUniformLocation(program, "gray_scale_factor");  
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
+        this.location_min_volume_distance = gl.getUniformLocation(program, "min_volume_distance");
+        this.location_volume_skip_first_fundamental_domain = gl.getUniformLocation(program, "volume_skip_first_fundamental_domain");        
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
         this.location_tube_radius_outside = gl.getUniformLocation(program, "tubeRadiusOutside");        
@@ -216,6 +218,8 @@ class CanvasWrapper {
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
         this.max_volume_distance = 0;// 0=same as limited_max_distance
+        this.min_volume_distance = 0;// 0=same as limited_max_distance
+        this.volume_skip_first_fundamental_domain = false;
         this.max_cost = 0;
         this.seed_visualization_mode = SEED_VISUALIZATION_MODE_NONE;
         this.is_exporting = false;
@@ -899,6 +903,8 @@ class CanvasWrapper {
             this.streamline_context_dynamic.streamline_generator.p_dynamic_streamline.position[3]);        
         gl.uniform1f(this.location_raytracing.location_max_cost, this.max_cost);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
+        gl.uniform1f(this.location_raytracing.location_min_volume_distance, this.min_volume_distance);
+        gl.uniform1f(this.location_raytracing.location_volume_skip_first_fundamental_domain, this.volume_skip_first_fundamental_domain);        
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
         gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);

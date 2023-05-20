@@ -7,9 +7,22 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
     while(sample_index_iteration < 10000){
         //check termination condition
         float sample_distance_iteration = float(sample_index_iteration) * delta;
-        bool max_range_reached = ray.rayDistance + sample_distance_iteration > max_volume_distance;
+        float current_distance = ray.rayDistance + sample_distance_iteration;
+        bool max_range_reached = current_distance > max_volume_distance;
+        bool min_range_reached = current_distance >= min_volume_distance;
+        bool skip_first_fundamental_domain = ray.iteration_count == 0 && volume_skip_first_fundamental_domain;
         if(max_range_reached)
             break;
+        if(!min_range_reached){
+            //prepare next sample
+            sample_index_iteration++;
+            continue;
+        }
+        if(skip_first_fundamental_domain){
+            //prepare next sample
+            sample_index_iteration++;
+            continue;
+        }
 
         bool has_hit = hit.hitType > TYPE_NONE;
         bool has_hit_cube = hitCube.hitType > TYPE_NONE;
