@@ -86,7 +86,8 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("input_field_equation_v"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_w"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_a"));
-        this.group_calculate.AddInput(document.getElementById("input_field_equation_b"));
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_b"));        
+        this.group_calculate.AddInput(document.getElementById("input_field_equation_parameter_s"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_p0"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_p1"));
         this.group_calculate.AddInput(document.getElementById("input_field_equation_p2"));

@@ -70,3 +70,11 @@ new_vec4_from_input_name = function (field_name_0, field_name_1, field_name_2, f
     var v3 = document.getElementById(field_name_3).value;
     return glMatrix.vec4.fromValues(v0, v1, v2, v3);
 }
+
+apply_magnetic_3sphere_i = function (out, vec4) {
+    out[0] = - vec4[1];
+    out[1] = vec4[0];
+    out[2] = - vec4[3];
+    out[3] = vec4[2];
+    return out;
+};

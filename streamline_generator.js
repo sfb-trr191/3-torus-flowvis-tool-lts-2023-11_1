@@ -340,18 +340,26 @@ class StreamlineGenerator {
 
         //var total_points = raw_data.num_points;
         var positionData = raw_data.data[startIndex];
-        var startPosition = glMatrix.vec4.fromValues(positionData.position[0], positionData.position[1], positionData.position[2]);
-        var startDirection = glMatrix.vec3.fromValues(positionData.direction[0], positionData.direction[1], positionData.direction[2]);
+        var startPosition = glMatrix.vec4.fromValues(positionData.position[0], positionData.position[1], positionData.position[2], positionData.position[3]);
+        var startDirection = glMatrix.vec4.fromValues(positionData.direction[0], positionData.direction[1], positionData.direction[2], positionData.direction[3]);
         //var signum = (positionData.u_v_w_signum[3] > 0) ? 1 : -1;
         var signum = positionData.flag;
 
-        var f_start = this.f_3Sphere4Plus4D_position(startPosition, startDirection, signum);
-        raw_data.data[startIndex].flag = signum;
-        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
+        //this part is for the magnetic streamlines
+        var startPositionSwapped = glMatrix.vec4.create();
+        apply_magnetic_3sphere_i(startPositionSwapped, startPosition);
 
         tmp.startIndex = startIndex;
         tmp.signum = signum;
         tmp.i=1;
+        tmp.delta = glMatrix.vec4.dot(startDirection, startPositionSwapped);//this part is for the magnetic streamlines
+        tmp.s = bo_calculate_streamlines.input_parameters.parameter_s;//this part is for the magnetic streamlines
+
+        console.warn("delta", tmp.delta, "s", tmp.s)
+
+        var f_start = this.f_3Sphere4Plus4D_position(startPosition, startDirection, tmp);
+        raw_data.data[startIndex].flag = signum;
+        raw_data.data[startIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_start[0], f_start[1], f_start[2], 1);
 
         console.log("-------------------");
         console.log("START position", raw_data.data[startIndex].position);
@@ -1020,30 +1028,30 @@ class StreamlineGenerator {
             //multiple rk4 steps
             for (var sub_step_index = 0; sub_step_index <= this.inbetweens; sub_step_index++) {
                 //CALCULATE: vec3 k1 = step_size * f(substep_previousPosition, signum);
-                glMatrix.vec4.scale(k1, this.f_3Sphere4Plus4D_position(substep_previousPosition, substep_previousDirection, signum), sub_step_size);
-                glMatrix.vec4.scale(l1, this.f_3Sphere4Plus4D_direction(substep_previousPosition, substep_previousDirection, signum), sub_step_size);
+                glMatrix.vec4.scale(k1, this.f_3Sphere4Plus4D_position(substep_previousPosition, substep_previousDirection, tmp), sub_step_size);
+                glMatrix.vec4.scale(l1, this.f_3Sphere4Plus4D_direction(substep_previousPosition, substep_previousDirection, tmp), sub_step_size);
 
                 //CALCULATE: vec3 k2 = step_size * f(substep_previousPosition + k1/2, signum);
                 glMatrix.vec4.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2
                 glMatrix.vec4.scale(l1_2, l1, 1 / 2);// k1_2 = k1/2
                 glMatrix.vec4.add(previous_plus_k1_2, substep_previousPosition, k1_2);// substep_previousPosition + k1/2      
                 glMatrix.vec4.add(previous_plus_l1_2, substep_previousDirection, l1_2);// substep_previousPosition + k1/2            
-                glMatrix.vec4.scale(k2, this.f_3Sphere4Plus4D_position(previous_plus_k1_2, previous_plus_l1_2, signum), sub_step_size);
-                glMatrix.vec4.scale(l2, this.f_3Sphere4Plus4D_direction(previous_plus_k1_2, previous_plus_l1_2, signum), sub_step_size);
+                glMatrix.vec4.scale(k2, this.f_3Sphere4Plus4D_position(previous_plus_k1_2, previous_plus_l1_2, tmp), sub_step_size);
+                glMatrix.vec4.scale(l2, this.f_3Sphere4Plus4D_direction(previous_plus_k1_2, previous_plus_l1_2, tmp), sub_step_size);
 
                 //CALCULATE: vec3 k3 = step_size * f(substep_previousPosition + k2/2, signum);
                 glMatrix.vec4.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
                 glMatrix.vec4.scale(l2_2, l2, 1 / 2);// k2_2 = k2/2
                 glMatrix.vec4.add(previous_plus_k2_2, substep_previousPosition, k2_2);// substep_previousPosition + k2/2     
                 glMatrix.vec4.add(previous_plus_l2_2, substep_previousDirection, l2_2);// substep_previousPosition + k2/2  
-                glMatrix.vec4.scale(k3, this.f_3Sphere4Plus4D_position(previous_plus_k2_2, previous_plus_l2_2, signum), sub_step_size);
-                glMatrix.vec4.scale(l3, this.f_3Sphere4Plus4D_direction(previous_plus_k2_2, previous_plus_l2_2, signum), sub_step_size);
+                glMatrix.vec4.scale(k3, this.f_3Sphere4Plus4D_position(previous_plus_k2_2, previous_plus_l2_2, tmp), sub_step_size);
+                glMatrix.vec4.scale(l3, this.f_3Sphere4Plus4D_direction(previous_plus_k2_2, previous_plus_l2_2, tmp), sub_step_size);
 
                 //CALCULATE: vec3 k4 = step_size * f(substep_previousPosition + k3, signum);
                 glMatrix.vec4.add(previous_plus_k3, substep_previousPosition, k3);// substep_previousPosition + k3
                 glMatrix.vec4.add(previous_plus_l3, substep_previousDirection, l3);// substep_previousPosition + k3
-                glMatrix.vec4.scale(k4, this.f_3Sphere4Plus4D_position(previous_plus_k3, previous_plus_l3, signum), sub_step_size);
-                glMatrix.vec4.scale(l4, this.f_3Sphere4Plus4D_direction(previous_plus_k3, previous_plus_l3, signum), sub_step_size);
+                glMatrix.vec4.scale(k4, this.f_3Sphere4Plus4D_position(previous_plus_k3, previous_plus_l3, tmp), sub_step_size);
+                glMatrix.vec4.scale(l4, this.f_3Sphere4Plus4D_direction(previous_plus_k3, previous_plus_l3, tmp), sub_step_size);
 
                 //CALCULATE: vec3 substep_currentPosition = substep_previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
                 glMatrix.vec4.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
@@ -1079,8 +1087,8 @@ class StreamlineGenerator {
 
             //TODO: should length be both vectors combined or only position vector
             var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
-            var f_previous = this.f_3Sphere4Plus4D_position(previousPosition, previousDirection, signum);
-            var f_current = this.f_3Sphere4Plus4D_direction(currentPosition, currentDirection, signum);
+            var f_previous = this.f_3Sphere4Plus4D_position(previousPosition, previousDirection, tmp);
+            var f_current = this.f_3Sphere4Plus4D_direction(currentPosition, currentDirection, tmp);
             var v_previous = glMatrix.vec4.length(f_previous);
             var v_current = glMatrix.vec4.length(f_current);
             var v_average = (v_previous + v_current) * 0.5;
@@ -1336,7 +1344,10 @@ class StreamlineGenerator {
         return result;
     }
 
-    f_3Sphere4Plus4D_position(vector_position, vector_direction,signum) {
+    f_3Sphere4Plus4D_position(vector_position, vector_direction, current_streamline) {
+        var signum = current_streamline.signum;
+        var delta = current_streamline.delta;//for magnetic streamlines
+        var s = current_streamline.s;//for magnetic streamlines
         let scope = {
             p0: vector_position[0],
             p1: vector_position[1],
@@ -1345,7 +1356,9 @@ class StreamlineGenerator {
             d0: vector_direction[0],
             d1: vector_direction[1],
             d2: vector_direction[2],
-            d3: vector_direction[3]
+            d3: vector_direction[3],
+            delta : delta,
+            s : s
         };
         //console.log("scope: ", scope);
         //console.log("this.shader_formula_u: ", this.shader_formula_u);
@@ -1372,7 +1385,10 @@ class StreamlineGenerator {
         return result;
     }
 
-    f_3Sphere4Plus4D_direction(vector_position, vector_direction, signum) {
+    f_3Sphere4Plus4D_direction(vector_position, vector_direction, current_streamline) {
+        var signum = current_streamline.signum;
+        var delta = current_streamline.delta;//for magnetic streamlines
+        var s = current_streamline.s;//for magnetic streamlines
         let scope = {
             p0: vector_position[0],
             p1: vector_position[1],
@@ -1381,7 +1397,9 @@ class StreamlineGenerator {
             d0: vector_direction[0],
             d1: vector_direction[1],
             d2: vector_direction[2],
-            d3: vector_direction[3]
+            d3: vector_direction[3],
+            delta : delta,
+            s : s
         };
         //console.log("scope: ", scope);
         //console.log("this.shader_formula_u: ", this.shader_formula_u);

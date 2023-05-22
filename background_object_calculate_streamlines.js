@@ -19,7 +19,8 @@ class BackgroundObjectCalculateStreamlines{
         this.input_parameters.shader_formula_v = document.getElementById("input_field_equation_v").value;
         this.input_parameters.shader_formula_w = document.getElementById("input_field_equation_w").value;
         this.input_parameters.shader_formula_a = document.getElementById("input_field_equation_a").value;
-        this.input_parameters.shader_formula_b = document.getElementById("input_field_equation_b").value;
+        this.input_parameters.shader_formula_b = document.getElementById("input_field_equation_b").value;        
+        this.input_parameters.parameter_s = parseFloat(document.getElementById("input_field_equation_parameter_s").value);
         this.input_parameters.shader_formula_p0 = document.getElementById("input_field_equation_p0").value;
         this.input_parameters.shader_formula_p1 = document.getElementById("input_field_equation_p1").value;
         this.input_parameters.shader_formula_p2 = document.getElementById("input_field_equation_p2").value;

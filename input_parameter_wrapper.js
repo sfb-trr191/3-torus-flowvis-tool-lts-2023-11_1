@@ -112,6 +112,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_streamline_calculation_advection_time", "stt");
         new InputWrapper(this, "input_streamline_calculation_arc_length", "stl");
         //data - equations
+        new InputWrapper(this, "input_field_equation_parameter_s", "eps");
         new InputWrapper(this, "input_field_equation_u", PARAM_input_field_equation_u);
         new InputWrapper(this, "input_field_equation_v", PARAM_input_field_equation_v);
         new InputWrapper(this, "input_field_equation_w", PARAM_input_field_equation_w);
