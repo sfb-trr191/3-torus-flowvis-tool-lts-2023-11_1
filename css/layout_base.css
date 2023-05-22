@@ -297,6 +297,17 @@ legend {
     gap: 0px; 
 }
 
+.math-left-align{
+    display: inline-block
+}
+
+.math-left-align mjx-container{
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+
+
 .horizontal_div_3 {
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr;
