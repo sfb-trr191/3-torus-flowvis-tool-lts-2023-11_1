@@ -355,7 +355,7 @@ class StreamlineGenerator {
         tmp.delta = glMatrix.vec4.dot(startDirection, startPositionSwapped);//this part is for the magnetic streamlines
         tmp.s = bo_calculate_streamlines.input_parameters.parameter_s;//this part is for the magnetic streamlines
 
-        console.warn("delta", tmp.delta, "s", tmp.s)
+        //console.warn("delta", tmp.delta, "s", tmp.s)
 
         var f_start = this.f_3Sphere4Plus4D_position(startPosition, startDirection, tmp);
         raw_data.data[startIndex].flag = signum;

@@ -1114,7 +1114,22 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             console.log("onClickSetExample5");
             SetExample5();
         });
+
+        document.getElementById("fieldset_load_example_6").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample6");
+            SetExample6();
+        });
         
+        document.getElementById("fieldset_load_example_7").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickSetExample7");
+            SetExample7();
+        });
     }
 
     function addOnClickUpdateURL() {
@@ -1771,6 +1786,34 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         hide_manager.UpdateVisibility();
     }
   
+    function SetExample6(){
+        document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
+        document.getElementById("input_field_equation_p0").value = "d0";
+        document.getElementById("input_field_equation_p1").value = "d1";
+        document.getElementById("input_field_equation_p2").value = "d2";
+        document.getElementById("input_field_equation_p3").value = "d3";
+        document.getElementById("input_field_equation_d0").value = "-p0";
+        document.getElementById("input_field_equation_d1").value = "-p1";
+        document.getElementById("input_field_equation_d2").value = "-p2";
+        document.getElementById("input_field_equation_d3").value = "-p3";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
+
+    function SetExample7(){
+        document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
+        document.getElementById("input_field_equation_parameter_s").value = "0.5";
+        document.getElementById("input_field_equation_p0").value = "d0";
+        document.getElementById("input_field_equation_p1").value = "d1";
+        document.getElementById("input_field_equation_p2").value = "d2";
+        document.getElementById("input_field_equation_p3").value = "d3";
+        document.getElementById("input_field_equation_d0").value = "-s*d1-(1-s*delta)*p0";
+        document.getElementById("input_field_equation_d1").value = "s*d0-(1-s*delta)*p1";
+        document.getElementById("input_field_equation_d2").value = "-s*d3-(1-s*delta)*p2";
+        document.getElementById("input_field_equation_d3").value = "s*d2-(1-s*delta)*p3";
+        document.getElementById("wrapper_dialog_load_field").className = "hidden";
+        hide_manager.UpdateVisibility();
+    }
 
     function testWebGPU() {
         async function demo() {
