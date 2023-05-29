@@ -185,6 +185,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     var bo_calculate_streamlines;
     var bo_calculate_ftle;
 
+    var old_space;//this variable contains the space of the previous streamline calculation. a change in space may trigger for example changes to the camera.
+
     function onStart(evt) {
         console.log("onStart");
 
@@ -413,6 +415,9 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         writeCurrentResolutionToUI();//required here to show correct thumbnail size
         canvas_wrapper_main.ShowThumbnail(true);
         canvas_wrapper_side.ShowThumbnail(true);
+
+        old_space = parseInt(document.getElementById("select_space").value);
+
         setTimeout(on_start_step_2, 200);
     }
 
@@ -509,6 +514,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();
 
+        check_space_change();//reposition camera if necessary
+
         UpdateRenderSettings();
         UpdateGlobalData();
         UpdateURL();
@@ -517,7 +524,25 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         requestAnimationFrame(on_update);
     }
 
+    function check_space_change(){
+        var new_space = parseInt(document.getElementById("select_space").value);
+        if( new_space != old_space ){
+            space_changed(new_space);
+        }
+        old_space = new_space;
+    }
 
+    function space_changed(space){
+        console.warn("SPACE CHANGED", space)
+        switch (space) {
+            case SPACE_3_SPHERE_4_PLUS_4D:     
+                main_camera.SetToDefaultCameraValues_S3();           
+                break;        
+            default:
+                main_camera.SetToDefaultCameraValues_InsideFD();
+                break;
+        }
+    }
 
     function state_ftle_setup(time_now){
         console.warn("#SC: state_ftle_setup");

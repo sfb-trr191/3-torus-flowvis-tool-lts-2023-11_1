@@ -2074,6 +2074,20 @@ class Camera {
         this.changed = true;
     }
 
+    SetToDefaultCameraValues_S3(){
+        this.position = glMatrix.vec4.fromValues(0,0,0,1);
+        this.forward = glMatrix.vec4.fromValues(0,0,-1,0);
+        var up_negated = glMatrix.vec4.fromValues(0,1,0,0);
+        this.right = glMatrix.vec4.fromValues(1,0,0,0);
+        glMatrix.vec4.negate(this.up, up_negated);
+        this.changed = true;
+    }
+
+    SetToDefaultCameraValues_InsideFD(){
+        this.SetOrientation_Xpos_Zpos_Ypos();
+        this.position = glMatrix.vec4.fromValues(0.5,0.5,0.5,0);
+    }
+
     CalculateFocusPoint(){
         var forward_scaled = glMatrix.vec4.create();
         var focus_point = glMatrix.vec4.create();
