@@ -103,6 +103,7 @@ const Tests = require("./tests");
 const PixelResults = require("./pixel_results");
 const gram_schmidt = require("./gram_schmidt");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
+const ExampleManager = require("./example_manager");
 
 
 const math4D = require("./math4D");
@@ -140,6 +141,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     var mouse_manager;
     var input_changed_manager;
     var hide_manager;
+    var example_manager;
     var visibility_manager;
     var lights;
     var streamline_context_static;//the static streamlines
@@ -236,7 +238,6 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         addOnClickAddSeed();
         addOnClickRandomizeSeedPositions();
         addOnClickUpdateURL();
-        addOnClickSetMagneticField();
         addOnClickTabs();
         addChangedSideMode();
         addChangedCameraControl();
@@ -244,10 +245,12 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         //testWebGPU();
         //testEigenvalueDecomposition();
 
+        example_manager = new ExampleManager();
         tree_view = new TreeView();
         tab_manager = new TabManager();
         hide_manager = new HideManager(tab_manager);
         visibility_manager = new VisibilityManager();
+        example_manager.Link(hide_manager);
         tab_manager.Link(hide_manager);
         ui_tools = new UiTools();
 
@@ -1070,93 +1073,6 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         */
     }
 
-    function addOnClickSetMagneticField() {
-        document.getElementById("button_open_dialog_load").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            document.getElementById("wrapper_dialog_load_field").className = "wrapper";
-        });
-        document.getElementById("button_dialog_load_cancel").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        });
-
-        document.getElementById("fieldset_load_magnetic_field").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetMagneticField");
-            SetMagneticField();
-        });
-
-        document.getElementById("fieldset_load_double_pndulum").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetMagneticField");
-            SetDoublePendulum();
-        });
-        
-        document.getElementById("fieldset_load_example_1").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample1");
-            SetExample1();
-        });
-
-        document.getElementById("fieldset_load_example_2").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample2");
-            SetExample2();
-        });
-
-        document.getElementById("fieldset_load_example_3").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample3");
-            SetExample3();
-        });
-
-        document.getElementById("fieldset_load_example_4").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample4");
-            SetExample4();
-        });
-        
-        document.getElementById("fieldset_load_example_5").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample5");
-            SetExample5();
-        });
-
-        document.getElementById("fieldset_load_example_6").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample6");
-            SetExample6();
-        });
-        
-        document.getElementById("fieldset_load_example_7").addEventListener("click", (event) => {
-            if(block_all_input){
-                return;
-            }
-            console.log("onClickSetExample7");
-            SetExample7();
-        });
-    }
-
     function addOnClickUpdateURL() {
         document.getElementById("button_update_url").addEventListener("click", (event) => {
             if(block_all_input){
@@ -1750,95 +1666,6 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         string_new_version + string_upgrade_version;
     }
 
-    function SetMagneticField(){
-        document.getElementById("select_space").value = "1";
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetDoublePendulum(){
-        document.getElementById("select_space").value = "2";
-        document.getElementById("input_field_equation_a").value = "sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_x*v_x - sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_y*v_y";
-        document.getElementById("input_field_equation_b").value = "-2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetExample1(){
-        document.getElementById("select_space").value = "1";
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "0";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetExample2(){
-        document.getElementById("select_space").value = "1";
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "1";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetExample3(){
-        document.getElementById("select_space").value = "1";
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "cos(2 * PI * x)";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetExample4(){
-        document.getElementById("select_space").value = "1";
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "sin(2 * PI * x) + cos(2 * PI * y)";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetExample5(){
-        document.getElementById("select_space").value = "1";
-        document.getElementById("input_field_equation_u").value = "2 * sin(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * y) + 2 * cos (2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "cos(2 * PI * x)";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-  
-    function SetExample6(){
-        document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
-        document.getElementById("input_field_equation_p0").value = "d0";
-        document.getElementById("input_field_equation_p1").value = "d1";
-        document.getElementById("input_field_equation_p2").value = "d2";
-        document.getElementById("input_field_equation_p3").value = "d3";
-        document.getElementById("input_field_equation_d0").value = "-p0";
-        document.getElementById("input_field_equation_d1").value = "-p1";
-        document.getElementById("input_field_equation_d2").value = "-p2";
-        document.getElementById("input_field_equation_d3").value = "-p3";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
-
-    function SetExample7(){
-        document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
-        document.getElementById("input_field_equation_parameter_s").value = "0.5";
-        document.getElementById("input_field_equation_p0").value = "d0";
-        document.getElementById("input_field_equation_p1").value = "d1";
-        document.getElementById("input_field_equation_p2").value = "d2";
-        document.getElementById("input_field_equation_p3").value = "d3";
-        document.getElementById("input_field_equation_d0").value = "-s*d1-(1-s*delta)*p0";
-        document.getElementById("input_field_equation_d1").value = "s*d0-(1-s*delta)*p1";
-        document.getElementById("input_field_equation_d2").value = "-s*d3-(1-s*delta)*p2";
-        document.getElementById("input_field_equation_d3").value = "s*d2-(1-s*delta)*p3";
-        document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        hide_manager.UpdateVisibility();
-    }
 
     function testWebGPU() {
         async function demo() {
@@ -1945,6 +1772,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         mouse_manager.DeactivateInput();
         ui_left_tool_bar.DeactivateInput();
         ui_tools.DeactivateInput();
+        example_manager.DeactivateInput();
         block_all_input = true;
     }
 
@@ -1952,6 +1780,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         mouse_manager.ActivateInput();
         ui_left_tool_bar.ActivateInput();
         ui_tools.ActivateInput();
+        example_manager.ActivateInput();
         block_all_input = false;
     }
 
