@@ -84,6 +84,10 @@
                 <div class="progress_bar" id="progress_bar_calculate_ftle_4">                         
                 </div>
             </div>
+            <div class="progress_bar_border">
+                <div class="progress_bar" id="progress_bar_calculate_ftle_5">                         
+                </div>
+            </div>
         </div>
     </div>
     <div id="wrapper_dialog_prepare_left_shader" class="hidden">
@@ -1267,7 +1271,20 @@
                                         <label>correct opacity</label>
                                         <input id="checkbox_correct_volume_opacity" type="checkbox" value="true" checked="true" title="">
                                     </div>   
-        
+                                    <div class="input_row">
+                                        <label>direct ftle</label>
+                                        <input id="checkbox_volume_rendering_use_original_ftle_field" type="checkbox" value="true" checked="true" title="">
+                                    </div>   
+                                    <div class="input_row" id="input_row_volume_rendering_opacity_factor">
+                                        <label>min scalar</label>
+                                        <input id="input_volume_rendering_overrite_min_scalar_ftle" type="text" value="0.0"
+                                            title="Experimental.">
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_opacity_factor">
+                                        <label>max scalar</label>
+                                        <input id="input_volume_rendering_overrite_max_scalar_ftle" type="text" value="1.0"
+                                            title="Experimental.">
+                                    </div>
                                 </div>
                             </fieldset>
 

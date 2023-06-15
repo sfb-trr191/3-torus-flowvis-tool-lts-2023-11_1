@@ -78,7 +78,13 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
 }
 
 void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit){
-    vec4 rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);         
+    vec4 rgba_forward;
+    if(volume_rendering_use_original_ftle_field){
+        rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);    
+    }
+    else{
+        rgba_forward = GetDirectRidgeVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);      
+    }      
 
     vec3 combined_color = rgba_forward.rgb;
     float combined_alpha = rgba_forward.a * volume_rendering_opacity_factor;//volume_rendering_opacity_factor (experimental)
@@ -102,7 +108,7 @@ void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)
 {
     float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
-    vec3 sample_normal = normalize(InterpolateVec3(texture_ftle_differences, sample_position, z_offset));
+    vec3 sample_normal = normalize(InterpolateVec3(texture_ftle_gradient, sample_position, z_offset));
 
     //apply transfer function
     float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
@@ -123,6 +129,63 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
     }
     lightColor *= color;
     return vec4(lightColor, alpha);
+}
+
+vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)
+{
+    float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
+    vec3 sample_jacoby_direction_x = InterpolateVec3(texture_ftle_jacoby_direction_x, sample_position, z_offset);
+    vec3 sample_jacoby_direction_y = InterpolateVec3(texture_ftle_jacoby_direction_y, sample_position, z_offset);
+    vec3 sample_jacoby_direction_z = InterpolateVec3(texture_ftle_jacoby_direction_z, sample_position, z_offset);
+    vec3 sample_gradient = InterpolateVec3(texture_ftle_gradient, sample_position, z_offset);
+    vec3 sample_gradient_normalized = normalize(sample_gradient);
+
+    mat3 sample_hessian = BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
+    vec3 new_vec = sample_hessian * sample_gradient;
+    vec3 new_vec_normalized = normalize(new_vec);
+
+    float dot_new_grad = dot(new_vec_normalized, sample_gradient_normalized);
+
+    //apply transfer function
+    //float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+    //float t = abs(normalize(sample_jacoby_direction_x).x);
+    float t = (abs(dot_new_grad) - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+    vec4 rgba = GetScalarColor(bin, transfer_function_index);
+    vec3 color = rgba.rgb;
+    float alpha = rgba.a;
+
+    //apply phong shading
+    vec3 lightColor = vec3(0, 0, 0);
+    vec3 viewDir = -ray.direction;
+    vec3 normal = sample_gradient_normalized;	
+    for(int i=0; i<numDirLights; i++)
+    {
+        GL_DirLight light = GetDirLight(i);
+        lightColor += CalcDirLight(light, normal, viewDir);
+    }
+    lightColor *= color;
+    return vec4(lightColor, alpha);
+}
+
+mat3 BuildJacoby(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z)
+{
+    mat3 matrix;//column major order, matrix[0] references the first column
+    matrix[0] = sample_jacoby_direction_x;
+    matrix[1] = sample_jacoby_direction_y;
+    matrix[2] = sample_jacoby_direction_z;
+    return matrix;
+}
+
+mat3 BuildHessian(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z)
+{
+    //the hessian is the transpose of the jacobian of the gradient
+    mat3 matrix;//column major order, matrix[0] references the first column
+    matrix[0] = vec3(sample_jacoby_direction_x.x, sample_jacoby_direction_y.x, sample_jacoby_direction_z.x);
+    matrix[1] = vec3(sample_jacoby_direction_x.y, sample_jacoby_direction_y.y, sample_jacoby_direction_z.y);
+    matrix[2] = vec3(sample_jacoby_direction_x.z, sample_jacoby_direction_y.z, sample_jacoby_direction_z.z);
+    return matrix;
 }
 
 ////////////////////////////////////////////////////////////////////

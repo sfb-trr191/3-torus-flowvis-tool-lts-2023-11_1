@@ -31,7 +31,8 @@ class BackgroundObjectCalculateFTLE{
         document.getElementById("progress_bar_calculate_ftle_1").style.width = width + '%';     
         document.getElementById("progress_bar_calculate_ftle_2").style.width = width + '%';    
         document.getElementById("progress_bar_calculate_ftle_3").style.width = width + '%';     
-        document.getElementById("progress_bar_calculate_ftle_4").style.width = width + '%';   
+        document.getElementById("progress_bar_calculate_ftle_4").style.width = width + '%';     
+        document.getElementById("progress_bar_calculate_ftle_5").style.width = width + '%';   
          
     }
 

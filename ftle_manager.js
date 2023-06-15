@@ -68,6 +68,35 @@ class UniformLocationsComputeFTLENormals {
     }
 }
 
+class UniformLocationsCompute2zGradientSlice {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsCompute2zGradientSlice: ", name)
+        this.location_texture_scalar_fields = gl.getUniformLocation(program, "texture_scalar_fields");
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_h2_x = gl.getUniformLocation(program, "h2_x");
+        this.location_h2_y = gl.getUniformLocation(program, "h2_y");
+        this.location_h2_z = gl.getUniformLocation(program, "h2_z");
+        this.location_is_forward = gl.getUniformLocation(program, "is_forward");
+    }
+}
+
+class UniformLocationsCompute2zJacobyColumnSlice {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsCompute2zJacobyColumnSlice: ", name)
+        this.location_texture_vector_fields = gl.getUniformLocation(program, "texture_vector_fields");        
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_direction = gl.getUniformLocation(program, "direction");
+        this.location_h2 = gl.getUniformLocation(program, "h2");
+        this.location_is_forward = gl.getUniformLocation(program, "is_forward");
+    }
+}
+
 class FTLEManager {
 
     constructor(gl, gl_side, p_streamline_context, p_shader_manager) {
@@ -89,12 +118,18 @@ class FTLEManager {
         this.data_texture_flowmap_diff_y = new DataTexture3D_RGBA(gl);
         this.data_texture_flowmap_diff_z = new DataTexture3D_RGBA(gl);
         this.data_texture_ftle = new DataTexture3D_R(gl);
-        this.data_texture_ftle_differences = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_gradient = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_jacoby_direction_x = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_jacoby_direction_y = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_jacoby_direction_z = new DataTexture3D_RGBA(gl);
         this.ftle_max_value = 0;
         this.ftle_min_value = 0;
 
         this.data_texture_ftle_side = new DataTexture3D_R(gl_side);
-        this.data_texture_ftle_differences_side = new DataTexture3D_RGBA(gl_side);
+        this.data_texture_ftle_gradient_side = new DataTexture3D_RGBA(gl_side);
+        this.data_texture_ftle_jacoby_direction_x_side = new DataTexture3D_RGBA(gl_side);
+        this.data_texture_ftle_jacoby_direction_y_side = new DataTexture3D_RGBA(gl_side);
+        this.data_texture_ftle_jacoby_direction_z_side = new DataTexture3D_RGBA(gl_side);
 
         this.program_compute_flowmap_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
@@ -108,12 +143,26 @@ class FTLEManager {
         this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
 
+        /*
         this.program_compute_ftle_normals = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_ftle_normals, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FTLE_NORMALS);
         this.location_compute_ftle_normals = new UniformLocationsComputeFTLENormals(gl, this.program_compute_ftle_normals);
         this.shader_uniforms_compute_ftle_normals = this.loadShaderUniformsComputeFTLENormals(gl, this.program_compute_ftle_normals);
         this.attribute_location_dummy_program_compute_ftle_normals = gl.getAttribLocation(this.program_compute_ftle_normals, "a_position");
-        
+        */
+
+        this.program_compute_2z_gradient_slice = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_2z_gradient_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_GRADIENT_SLICE);
+        this.location_compute_compute_2z_gradient_slice = new UniformLocationsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
+        this.shader_uniforms_compute_compute_2z_gradient_slice = this.loadShaderUniformsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
+        this.attribute_location_dummy_program_compute_2z_gradient_slice = gl.getAttribLocation(this.program_compute_2z_gradient_slice, "a_position");
+    
+        this.program_compute_2z_jacoby_column_slice = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE);
+        this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
+        this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
+        this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
+
         this.dummy_quad = new DummyQuad(gl);
     }
 
@@ -176,18 +225,44 @@ class FTLEManager {
     }
 
     bind(canvas_wrapper_name, gl, 
-        location_texture_ftle, texture_ftle_active, texture_ftle_index, 
-        location_texture_ftle_differences, texture_ftle_differences_active, texture_ftle_differences_index) {
-        var data_texture_ftle = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle : this.data_texture_ftle_side;
-        var data_texture_ftle_differences = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_differences : this.data_texture_ftle_differences_side;
+        location_texture_ftle, texture_ftle_index, 
+        location_texture_ftle_gradient, texture_ftle_gradient_index, 
+        location_texture_ftle_jacoby_direction_x, texture_ftle_jacoby_direction_x_index, 
+        location_texture_ftle_jacoby_direction_y, texture_ftle_jacoby_direction_y_index, 
+        location_texture_ftle_jacoby_direction_z, texture_ftle_jacoby_direction_z_index) {
 
-        gl.activeTexture(texture_ftle_active);
+        var data_texture_ftle = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle : this.data_texture_ftle_side;
+        var data_texture_ftle_gradient = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_gradient : this.data_texture_ftle_gradient_side;
+
+        var data_texture_ftle_jacoby_direction_x = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_jacoby_direction_x : this.data_texture_ftle_jacoby_direction_x_side;
+        var data_texture_ftle_jacoby_direction_y = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_jacoby_direction_y : this.data_texture_ftle_jacoby_direction_y_side;
+        var data_texture_ftle_jacoby_direction_z = canvas_wrapper_name == CANVAS_WRAPPER_MAIN ? this.data_texture_ftle_jacoby_direction_z : this.data_texture_ftle_jacoby_direction_z_side;
+
+        gl.activeTexture(gl.TEXTURE0 + texture_ftle_index);
         gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle.texture.texture);
         gl.uniform1i(location_texture_ftle, texture_ftle_index);
 
+        gl.activeTexture(gl.TEXTURE0 + texture_ftle_gradient_index);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_gradient.texture.texture);
+        gl.uniform1i(location_texture_ftle_gradient, texture_ftle_gradient_index);
+
+        gl.activeTexture(gl.TEXTURE0 + texture_ftle_jacoby_direction_x_index);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_jacoby_direction_x.texture.texture);
+        gl.uniform1i(location_texture_ftle_jacoby_direction_x, texture_ftle_jacoby_direction_x_index);
+
+        gl.activeTexture(gl.TEXTURE0 + texture_ftle_jacoby_direction_y_index);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_jacoby_direction_y.texture.texture);
+        gl.uniform1i(location_texture_ftle_jacoby_direction_y, texture_ftle_jacoby_direction_y_index);
+
+        gl.activeTexture(gl.TEXTURE0 + texture_ftle_jacoby_direction_z_index);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_jacoby_direction_z.texture.texture);
+        gl.uniform1i(location_texture_ftle_jacoby_direction_z, texture_ftle_jacoby_direction_z_index);
+
+        /*
         gl.activeTexture(texture_ftle_differences_active);
-        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_differences.texture.texture);
-        gl.uniform1i(location_texture_ftle_differences, texture_ftle_differences_index);
+        gl.bindTexture(gl.TEXTURE_3D, data_texture_ftle_gradient.texture.texture);
+        gl.uniform1i(location_texture_ftle_gradient, texture_ftle_differences_index);
+        */
     }
 
     initialize_statemachine(bo) {//bo = bo_calculate_ftle        
@@ -225,8 +300,11 @@ class FTLEManager {
             case FTLE_STATE_FTLE:
                 this.execute_ftle(bo);
                 break; 
-            case FTLE_STATE_FTLE_NORMALS:
-                this.execute_ftle_normals(bo);
+            case FTLE_STATE_FTLE_GRADIENT:
+                this.execute_ftle_gradient(bo);
+                break; 
+            case FTLE_STATE_FTLE_JACOBY:
+                this.execute_ftle_jacoby(bo);
                 break; 
             case FTLE_STATE_FINISH:
                 this.execute_finish(bo);
@@ -346,7 +424,7 @@ class FTLEManager {
                 this.data_texture_ftle.update(bo.gl);
                 bo.tmp.finished_forward = false;
                 bo.tmp.i = 0;
-                this.enterState(FTLE_STATE_FTLE_NORMALS);
+                this.enterState(FTLE_STATE_FTLE_GRADIENT);
             }else{
                 this.computeFTLESlice(bo.gl, bo.tmp.i, false);
                 bo.tmp.i += 1;
@@ -356,16 +434,16 @@ class FTLEManager {
         }
     }
     
-    execute_ftle_normals(bo){//bo = bo_calculate_ftle
+    execute_ftle_gradient(bo){//bo = bo_calculate_ftle
         if(!bo.tmp.finished_forward){
             if(bo.tmp.i == this.dim_z){
                 bo.tmp.finished_forward = true
                 bo.tmp.i = 0;
             }else{
                 if(bo.tmp.i == 0){                    
-                    this.data_texture_ftle_differences.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+                    this.data_texture_ftle_gradient.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
                 }
-                this.computeFTLENormalsSlice(bo.gl, bo.tmp.i, this.data_texture_ftle_differences, bo.tmp.h2_x, bo.tmp.h2_y, bo.tmp.h2_z, true);
+                this.computeFTLEGradientSlice(bo.gl, bo.tmp.i, this.data_texture_ftle_gradient, bo.tmp.h2_x, bo.tmp.h2_y, bo.tmp.h2_z, true);
                 bo.tmp.i += 1;
                 var progress = bo.tmp.i / (2 * this.dim_z)
                 bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_4");
@@ -373,10 +451,20 @@ class FTLEManager {
         }
         else{
             if(bo.tmp.i == this.dim_z){
-                this.data_texture_ftle_differences.update(bo.gl);
-                this.enterState(FTLE_STATE_FINISH);
+                this.data_texture_ftle_gradient.update(bo.gl);
+                //prepare next state
+                bo.tmp.h2_x = 2 / (this.dim_x - 1);
+                bo.tmp.h2_y = 2 / (this.dim_y - 1);
+                bo.tmp.h2_z = 2 / (this.dim_z - 1);
+                bo.tmp.h2 = bo.tmp.h2_x;
+                bo.tmp.direction = 0;
+                bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_x;
+                bo.tmp.finished_forward = false;
+                bo.tmp.i = 0;
+
+                this.enterState(FTLE_STATE_FTLE_JACOBY);
             }else{
-                this.computeFTLENormalsSlice(bo.gl, bo.tmp.i, this.data_texture_ftle_differences, bo.tmp.h2_x, bo.tmp.h2_y, bo.tmp.h2_z, false);
+                this.computeFTLEGradientSlice(bo.gl, bo.tmp.i, this.data_texture_ftle_gradient, bo.tmp.h2_x, bo.tmp.h2_y, bo.tmp.h2_z, false);
                 bo.tmp.i += 1;
                 var progress = (this.dim_z + bo.tmp.i) / (2 * this.dim_z)
                 bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_4");
@@ -384,12 +472,69 @@ class FTLEManager {
         }
     }
 
+    execute_ftle_jacoby(bo){//bo = bo_calculate_ftle
+        if(!bo.tmp.finished_forward){
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.finished_forward = true;
+                bo.tmp.i = 0;
+            }else{
+                if(bo.tmp.i == 0){
+                    bo.tmp.data_texture.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+                }
+                this.computeFTLEJacobySlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, true)
+                bo.tmp.i += 1;
+                var progress = ((bo.tmp.direction * 2 * this.dim_z) + bo.tmp.i) / (6 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_5");
+            }
+        }
+        else{
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.data_texture.update(bo.gl);
+                bo.tmp.finished_forward = false;
+                bo.tmp.direction += 1;
+                bo.tmp.i = 0;
+                if(bo.tmp.direction == 1){
+                    bo.tmp.h2 = bo.tmp.h2_y;
+                    bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_y;
+                }
+                if(bo.tmp.direction == 2){
+                    bo.tmp.h2 = bo.tmp.h2_z;
+                    bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_z;
+                }
+                if(bo.tmp.direction == 3){
+                    bo.tmp.finished_forward = false;
+                    bo.tmp.i = 0;
+                    this.enterState(FTLE_STATE_FINISH);
+                }
+            }else{
+                this.computeFTLEJacobySlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, false)
+                bo.tmp.i += 1;
+                var progress = ((bo.tmp.direction * 2 * this.dim_z) + this.dim_z + bo.tmp.i) / (6 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_5");
+            }
+        }
+    }
+
     execute_finish(bo){//bo = bo_calculate_ftle
         this.data_texture_ftle_side.copyFrom(bo.gl_side, this.data_texture_ftle);
-        this.data_texture_ftle_differences_side.copyFrom(bo.gl_side, this.data_texture_ftle_differences);
+        this.data_texture_ftle_gradient_side.copyFrom(bo.gl_side, this.data_texture_ftle_gradient);
+        this.data_texture_ftle_jacoby_direction_x_side.copyFrom(bo.gl_side, this.data_texture_ftle_jacoby_direction_x);
+        this.data_texture_ftle_jacoby_direction_y_side.copyFrom(bo.gl_side, this.data_texture_ftle_jacoby_direction_y);
+        this.data_texture_ftle_jacoby_direction_z_side.copyFrom(bo.gl_side, this.data_texture_ftle_jacoby_direction_z);
+
+        /*
+        this.data_texture_ftle_jacoby_direction_x.update(bo.gl);
+        this.data_texture_ftle_jacoby_direction_y.update(bo.gl);
+        this.data_texture_ftle_jacoby_direction_z.update(bo.gl);
+        
+        this.data_texture_ftle_jacoby_direction_x_side.update(bo.gl_side);
+        this.data_texture_ftle_jacoby_direction_y_side.update(bo.gl_side);
+        this.data_texture_ftle_jacoby_direction_z_side.update(bo.gl_side);
+        */
         this.finished = true;
     }
 
+    /*
     compute(gl, gl_side, dim_x, dim_y, dim_z, advection_time, step_size) {
         this.dim_x = dim_x;
         this.dim_y = dim_y;
@@ -406,8 +551,9 @@ class FTLEManager {
         this.computeFTLENormals(gl);
 
         this.data_texture_ftle_side.copyFrom(gl_side, this.data_texture_ftle);
-        this.data_texture_ftle_differences_side.copyFrom(gl_side, this.data_texture_ftle_differences);
+        this.data_texture_ftle_gradient_side.copyFrom(gl_side, this.data_texture_ftle_gradient);
     }
+    */
 
     computeFlowMap(gl) {
         console.log("computeFlowMap");
@@ -467,6 +613,7 @@ class FTLEManager {
         console.log("highest_iteration_count: ", highest_iteration_count_slice, this.highest_iteration_count);
     }
 
+    /*
     computeFlowMapFiniteDifferences(gl) {
         console.log("computeFlowMapFiniteDifferences");
         console.log(gl);
@@ -477,6 +624,7 @@ class FTLEManager {
         this.computeFlowMapFiniteDifferencesDirection(gl, 1, this.data_texture_flowmap_diff_y, h2_y);
         this.computeFlowMapFiniteDifferencesDirection(gl, 2, this.data_texture_flowmap_diff_z, h2_z);
     }
+    */
 
     computeFlowMapFiniteDifferencesDirection(gl, direction, data_texture, h2) {
         data_texture.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
@@ -514,6 +662,7 @@ class FTLEManager {
         data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
     }
 
+    /*
     computeFTLE(gl) {
         console.log("computeFTLE");
         this.ftle_max_value = 0;
@@ -529,6 +678,7 @@ class FTLEManager {
 
         //console.log(this.data_texture_flowmap_diff_x.texture.texture_data)
     }
+    */
 
     computeFTLESlice(gl, slice_index, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
@@ -586,7 +736,7 @@ class FTLEManager {
 
         return ftle;
     }
-
+    /*
     computeFTLENormals(gl) {
         console.log("computeFTLENormals");
         console.log(gl);
@@ -594,39 +744,64 @@ class FTLEManager {
         var h2_y = 2 / (this.dim_y - 1);
         var h2_z = 2 / (this.dim_z - 1);
 
-        this.data_texture_ftle_differences.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
+        this.data_texture_ftle_gradient.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
         for (var i = 0; i < this.dim_z; i++) {
-            this.computeFTLENormalsSlice(gl, i, this.data_texture_ftle_differences, h2_x, h2_y, h2_z, true);
+            this.computeFTLEGradientSlice(gl, i, this.data_texture_ftle_gradient, h2_x, h2_y, h2_z, true);
         }
         for (var i = 0; i < this.dim_z; i++) {
-            this.computeFTLENormalsSlice(gl, i, this.data_texture_ftle_differences, h2_x, h2_y, h2_z, false);
+            this.computeFTLEGradientSlice(gl, i, this.data_texture_ftle_gradient, h2_x, h2_y, h2_z, false);
         }
-        this.data_texture_ftle_differences.update(gl);
+        this.data_texture_ftle_gradient.update(gl);
 
-        console.log(this.data_texture_ftle_differences.texture.texture_data)
+        console.log(this.data_texture_ftle_gradient.texture.texture_data)
     }
-
-    computeFTLENormalsSlice(gl, slice_index, data_texture, h2_x, h2_y, h2_z, is_forward) {
+    */
+    computeFTLEGradientSlice(gl, slice_index, data_texture, h2_x, h2_y, h2_z, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFTLENormalsSlice: ", slice_index, z);
+        console.log("computeFTLEGradientSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
-        gl.useProgram(this.program_compute_ftle_normals);
-        gl.uniform1i(this.location_compute_ftle_normals.location_dim_x, this.dim_x);
-        gl.uniform1i(this.location_compute_ftle_normals.location_dim_y, this.dim_y);
-        gl.uniform1i(this.location_compute_ftle_normals.location_dim_z, this.dim_z);
-        gl.uniform1i(this.location_compute_ftle_normals.location_slice_index, slice_index);
-        gl.uniform1i(this.location_compute_ftle_normals.location_is_forward, is_forward);
-        gl.uniform1f(this.location_compute_ftle_normals.location_h2_x, h2_x);
-        gl.uniform1f(this.location_compute_ftle_normals.location_h2_y, h2_y);
-        gl.uniform1f(this.location_compute_ftle_normals.location_h2_z, h2_z);
+        gl.useProgram(this.program_compute_2z_gradient_slice);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_dim_x, this.dim_x);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_dim_y, this.dim_y);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_slice_index, slice_index);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_is_forward, is_forward);
+        gl.uniform1f(this.location_compute_compute_2z_gradient_slice.location_h2_x, h2_x);
+        gl.uniform1f(this.location_compute_compute_2z_gradient_slice.location_h2_y, h2_y);
+        gl.uniform1f(this.location_compute_compute_2z_gradient_slice.location_h2_z, h2_z);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle.texture.texture);
-        gl.uniform1i(this.location_compute_ftle_normals.location_texture_ftle, 0);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_texture_ftle, 0);
 
-        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_ftle_normals);
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_2z_gradient_slice);
+        var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
+        data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
+    }
+
+    computeFTLEJacobySlice(gl, slice_index, direction, data_texture, h2, is_forward) {
+        var sign_f = is_forward ? 1.0 : -1.0;
+        var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
+        var z = slice_index / (this.dim_z - 1);
+        console.log("computeFlowMapFiniteDifferencesSlice: ", slice_index, z);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
+        gl.viewport(0, 0, this.dim_x, this.dim_y);
+        gl.useProgram(this.program_compute_flowmap_finite_differences);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_x, this.dim_x);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_y, this.dim_y);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_slice_index, slice_index);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_direction, direction);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_is_forward, is_forward);
+        gl.uniform1f(this.location_compute_flowmap_finite_differences.location_h2, h2);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_3D, this.data_texture_flowmap.texture.texture);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_texture_flow_map, 0);
+
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_finite_differences);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
         data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
     }
@@ -652,6 +827,18 @@ class FTLEManager {
     }
 
     loadShaderUniformsComputeFTLENormals(gl, program) {
+        var program_shader_uniforms = new ShaderUniforms(gl, program);
+        program_shader_uniforms.print();
+        return program_shader_uniforms;
+    }
+
+    loadShaderUniformsCompute2zGradientSlice(gl, program){
+        var program_shader_uniforms = new ShaderUniforms(gl, program);
+        program_shader_uniforms.print();
+        return program_shader_uniforms;
+    }
+
+    loadShaderUniformsCompute2zJacobyColumnSlice(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();
         return program_shader_uniforms;

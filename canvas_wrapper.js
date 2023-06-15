@@ -27,7 +27,10 @@ class UniformLocationsRayTracing {
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
         this.location_texture_ftle = gl.getUniformLocation(program, "texture_ftle");
-        this.location_texture_ftle_differences = gl.getUniformLocation(program, "texture_ftle_differences");
+        this.location_texture_ftle_gradient = gl.getUniformLocation(program, "texture_ftle_gradient");
+        this.location_texture_ftle_jacoby_direction_x = gl.getUniformLocation(program, "texture_ftle_jacoby_direction_x");
+        this.location_texture_ftle_jacoby_direction_y = gl.getUniformLocation(program, "texture_ftle_jacoby_direction_y");
+        this.location_texture_ftle_jacoby_direction_z = gl.getUniformLocation(program, "texture_ftle_jacoby_direction_z");
         this.location_texture_dynamic_float = gl.getUniformLocation(program, "texture_dynamic_float");
         this.location_texture_dynamic_int = gl.getUniformLocation(program, "texture_dynamic_int");      
 
@@ -71,6 +74,7 @@ class UniformLocationsRayTracing {
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_show_volume_rendering_forward = gl.getUniformLocation(program, "show_volume_rendering_forward");
         this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
+        this.location_volume_rendering_use_original_ftle_field = gl.getUniformLocation(program, "volume_rendering_use_original_ftle_field");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
         this.location_volume_rendering_opacity_factor = gl.getUniformLocation(program, "volume_rendering_opacity_factor");
@@ -211,6 +215,9 @@ class CanvasWrapper {
         this.correct_volume_opacity = false;
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
+        this.volume_rendering_use_original_ftle_field = true;
+        this.overrite_min_scalar_ftle = 0;
+        this.overrite_max_scalar_ftle = 1;
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.volume_rendering_opacity_factor = 1.0;
@@ -934,13 +941,15 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_opacity_factor, this.volume_rendering_opacity_factor);
         
-
-
+        var min_scalar_ftle = this.volume_rendering_use_original_ftle_field ? this.p_ftle_manager.ftle_min_value : this.overrite_min_scalar_ftle;
+        var max_scalar_ftle = this.volume_rendering_use_original_ftle_field ? this.p_ftle_manager.ftle_max_value : this.overrite_max_scalar_ftle;
+        
+        gl.uniform1i(this.location_raytracing.location_volume_rendering_use_original_ftle_field, this.volume_rendering_use_original_ftle_field);
         gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);
-        gl.uniform1f(this.location_raytracing.location_min_scalar_ftle, this.p_ftle_manager.ftle_min_value);
-        gl.uniform1f(this.location_raytracing.location_max_scalar_ftle, this.p_ftle_manager.ftle_max_value);
+        gl.uniform1f(this.location_raytracing.location_min_scalar_ftle, min_scalar_ftle);
+        gl.uniform1f(this.location_raytracing.location_max_scalar_ftle, max_scalar_ftle);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_streamline_scalar, this.transfer_function_index_streamline_scalar);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_forward, this.transfer_function_index_ftle_forward);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);
@@ -965,8 +974,11 @@ class CanvasWrapper {
         //    this.location_raytracing.location_texture_ftle_differences);
 
         this.p_ftle_manager.bind(this.name, gl,
-            this.location_raytracing.location_texture_ftle, gl.TEXTURE4, 4,
-            this.location_raytracing.location_texture_ftle_differences, gl.TEXTURE5, 5);
+            this.location_raytracing.location_texture_ftle, 4,
+            this.location_raytracing.location_texture_ftle_gradient, 5,
+            this.location_raytracing.location_texture_ftle_jacoby_direction_x, 8,
+            this.location_raytracing.location_texture_ftle_jacoby_direction_y, 9,
+            this.location_raytracing.location_texture_ftle_jacoby_direction_z, 10);
 
         this.streamline_context_dynamic.bind_lod(this.name, active_lod, gl,
             this.shader_uniforms_raytracing,
@@ -978,7 +990,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_texture_ftle, 4);
 
         gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_gradient.texture.texture);
         gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);*/
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
@@ -1134,7 +1146,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_ftle_slice.location_texture_flow_map, 0);
 
         gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_differences.texture.texture);
+        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_gradient.texture.texture);
         gl.uniform1i(this.location_ftle_slice.location_texture_ftle_differences, 1);
         */
         this.global_data.bind(this.name, gl,

@@ -17,9 +17,13 @@ uniform isampler3D texture_int;
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
 uniform sampler3D texture_ftle;
-uniform sampler3D texture_ftle_differences;
+uniform sampler3D texture_ftle_gradient;
 uniform sampler3D texture_dynamic_float;
 uniform isampler3D texture_dynamic_int;
+uniform sampler3D texture_ftle_jacoby_direction_x;
+uniform sampler3D texture_ftle_jacoby_direction_y;
+uniform sampler3D texture_ftle_jacoby_direction_z;
+
 
 uniform float offset_x;
 uniform float offset_y;
@@ -45,6 +49,7 @@ uniform float volume_rendering_termination_opacity;
 uniform float volume_rendering_opacity_factor;
 uniform float min_scalar_ftle;
 uniform float max_scalar_ftle;
+uniform bool volume_rendering_use_original_ftle_field;
 
 uniform int transfer_function_index_streamline_scalar;
 uniform int transfer_function_index_ftle_forward;
