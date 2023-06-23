@@ -12,6 +12,17 @@ uniform int num_visual_seeds;
 uniform int visualize_seeds_mode;
 
 uniform float color_r;
+//TEXTURE0 = static streamline floats
+//TEXTURE1 = static streamline ints
+//TEXTURE2 = global data floats
+//TEXTURE3 = global data ints
+//TEXTURE4 = ftle 
+//TEXTURE5 = ftle gradient
+//TEXTURE6 = dynamic streamline floats
+//TEXTURE7 = dynamic streamline ints
+//TEXTURE8 = ftle jacobi direction x
+//TEXTURE9 = ftle jacobi direction y
+//TEXTURE10 = ftle jacobi direction z
 uniform sampler3D texture_float;
 uniform isampler3D texture_int;
 uniform sampler3D texture_float_global;
@@ -43,6 +54,7 @@ uniform int projection_index;
 
 uniform bool is_main_renderer;
 uniform bool show_origin_axes;
+uniform bool show_non_origin_axes;
 uniform bool correct_volume_opacity;
 uniform float volume_rendering_distance_between_points;
 uniform float volume_rendering_termination_opacity;

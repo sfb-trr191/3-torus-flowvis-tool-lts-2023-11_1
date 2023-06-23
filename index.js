@@ -1421,6 +1421,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.show_dynamic_streamline = tree_view.IsVisibleInHierarchy(18);
         canvas_wrapper_side.show_movable_axes = tree_view.IsVisibleInHierarchy(14);//document.getElementById("checkbox_show_movable_axes_side").checked;
         canvas_wrapper_side.show_origin_axes = tree_view.IsVisibleInHierarchy(13);//document.getElementById("checkbox_show_origin_axes_side").checked;
+        canvas_wrapper_side.show_non_origin_axes = tree_view.IsVisibleInHierarchy(19);//document.getElementById("checkbox_show_origin_axes_side").checked;
         canvas_wrapper_side.correct_volume_opacity = document.getElementById("checkbox_correct_volume_opacity").checked;
         canvas_wrapper_side.volume_rendering_mode = tree_view.IsVisibleInHierarchy(10) ? parseInt(document.getElementById("select_show_volume_side").value) : VOLUME_RENDERING_MODE_NONE;
         canvas_wrapper_side.volume_rendering_distance_between_points = parseFloat(document.getElementById("input_volume_rendering_distance_between_points").value);

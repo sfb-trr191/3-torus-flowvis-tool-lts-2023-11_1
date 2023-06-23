@@ -983,10 +983,22 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
     //index 1 is the other camera orientation
     //indices 2 to 9 are the axes
 	//index 10 is the fat origin axes
+    /*
 	int additional_index = show_origin_axes ? 1 : 0;
     int offset = is_main_renderer ? 0 : 11;
 	for(int i=offset+2; i<offset+10+additional_index; i++)
 		IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, i);
+*/
+    
+    if(show_non_origin_axes){
+        int offset = is_main_renderer ? 0 : 11;
+		for(int i=offset+2; i<offset+10; i++)
+		    IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, i);
+    }
+    if(show_origin_axes){//only for aux view
+		IntersectAxesCornerAABB(check_bounds, ray, ray_local_cutoff, hit, hitCube, 21);
+    }
+    
 
 }
 

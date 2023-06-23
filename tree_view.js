@@ -364,6 +364,7 @@ class TreeView{
         var node_aux_indicators = this.generateNode(this, "Indicators", "group_properties_root_aux_view_visual_objects_indicators", EYE, 11, EYE_DEFAULT_VISIBLE);
         var node_aux_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes", EYE, 12, EYE_DEFAULT_VISIBLE);
         var node_aux_origin_axes = this.generateNode(this, "Origin Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes_origin_axes", EYE, 13, EYE_DEFAULT_VISIBLE);
+        var node_aux_non_origin_axes = this.generateNode(this, "Cube Axes", "group_properties_root_aux_view_visual_objects_indicators_bounding_axes_non_origin_axes", EYE, 19, EYE_DEFAULT_VISIBLE);
         var node_aux_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_aux_view_visual_objects_indicators_top_right_axes", EYE, 14, EYE_DEFAULT_INVISIBLE);
         var node_aux_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_aux_view_visual_objects_indicators_clicked_position", EYE, 15, EYE_DEFAULT_VISIBLE);
         var node_aux_seeds = this.generateNode(this, "Seeds", "group_properties_root_aux_view_visual_objects_indicators_seeds", EYE, 16, EYE_DEFAULT_INVISIBLE);        
@@ -400,7 +401,8 @@ class TreeView{
         node_aux_visual_objects.addChild(node_aux_indicators);
         node_aux_streamlines.addChild(node_aux_streamlines_dynamic);
         node_aux_indicators.addChild(node_aux_bounding_axes);
-        node_aux_bounding_axes.addChild(node_aux_origin_axes);        
+        node_aux_bounding_axes.addChild(node_aux_origin_axes);       
+        node_aux_bounding_axes.addChild(node_aux_non_origin_axes);         
         node_aux_indicators.addChild(node_aux_top_right_axes);
         node_aux_indicators.addChild(node_aux_clicked_position);
         node_aux_indicators.addChild(node_aux_seeds);
