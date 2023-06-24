@@ -52,7 +52,9 @@ class VisibilityManager {
         if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_DISTANCE_ITERATION)
             return true;         
         if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_ITERATION_COUNT)
-            return true;        
+            return true;       
+        if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_COST)
+            return true;    
         return false;
     }
 
