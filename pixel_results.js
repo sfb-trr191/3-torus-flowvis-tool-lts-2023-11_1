@@ -55,12 +55,16 @@ class PixelResults {
             stop_string += this.cost.toFixed(3)
         }
         if (this.hit_type == TYPE_NONE){
-            var position_string = ""
+            position_string = ""
         }
+
+        var vertical_separator = this.hit_type == TYPE_STREAMLINE_SEGMENT ? SEPARATOR+"|"+SEPARATOR : ""
+        
         document.getElementById("paragraph_mouse_data_string").innerHTML = //WARNING: uses innerHTML, do not allow user input
             start_string
-            + position_string
             + stop_string
+            + vertical_separator
+            + position_string
     }
 }
 
