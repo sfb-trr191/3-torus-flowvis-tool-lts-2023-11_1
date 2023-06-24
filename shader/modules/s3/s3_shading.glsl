@@ -40,11 +40,6 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
                 surface_color = Get4DNormalColor(hit.normal); 
                 return surface_color;
             }
-            if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_POSITION){
-                vec4 mapped_position = map4(hit.position, vec4(-1,-1,-1,-1), vec4(1,1,1,1), vec4(0,0,0,0), vec4(1,1,1,1));	
-                surface_color = Get4DNormalColor(mapped_position); 
-                return surface_color;
-            }
             if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_SUBTYPE){
                 if(hit.sub_type == SUBTYPE_3SPHERE){
                     surface_color = vec3(1, 0, 0);

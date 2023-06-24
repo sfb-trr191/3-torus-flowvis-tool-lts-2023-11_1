@@ -113,6 +113,14 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
             bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
             return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
         }
+        if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_POSITION){
+#ifdef COORDINATES_4D
+            vec4 mapped_position = map4(hit.position, vec4(-1,-1,-1,-1), vec4(1,1,1,1), vec4(0,0,0,0), vec4(1,1,1,1));	
+#else
+            vec3 mapped_position = map(hit.position, vec3(-1,-1,-1), vec3(1,1,1), vec3(0,0,0), vec3(1,1,1));	
+#endif
+            return Get3DNormalColor(mapped_position); 
+        }
 #ifdef SHOW_VOLUME_RENDERING
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_FTLE)
         {

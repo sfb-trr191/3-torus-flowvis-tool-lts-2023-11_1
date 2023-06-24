@@ -50,6 +50,8 @@ class ShaderManager {
         code = code.replace("shader_formula_scalar", shader_formula_scalar);
 
         var defines = "";
+        if(shader_flags.space == SPACE_3_SPHERE_4_PLUS_4D)
+            defines += "\n#define COORDINATES_4D";
         if(shader_flags.show_volume_rendering)
             defines += "\n#define SHOW_VOLUME_RENDERING";        
         if(shader_flags.show_volume_rendering_forward)
