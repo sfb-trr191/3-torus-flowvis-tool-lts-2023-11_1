@@ -6,6 +6,7 @@ class PixelResults {
 
     constructor() {
         this.hit_type = 0;
+        this.hit_distance = -1;
         this.streamline_id = -1;
         this.cost = 0;
         this.position = glMatrix.vec4.fromValues(0, 0, 0, 0);
@@ -16,6 +17,7 @@ class PixelResults {
 
     setData(pixels) {
         this.hit_type = pixels[0];
+        this.hit_distance = pixels[3];
         this.streamline_id = pixels[4];
         this.cost = pixels[5];
         this.position = glMatrix.vec4.fromValues(pixels[8], pixels[9], pixels[10], pixels[11]);
@@ -32,6 +34,7 @@ class PixelResults {
             start_string += "Streamline: " + this.streamline_id + SEPARATOR
         }
         var position_string = "position: " + format4NumbersAsVectorString(this.center[0], this.center[1], this.center[2], this.center[3]);
+        position_string += SEPARATOR + "dist: " + (this.hit_distance).toFixed(3);
         if (this.hit_type == TYPE_STREAMLINE_SEGMENT){
             var termination_string = ""
             if(termination_condition == STREAMLINE_TERMINATION_CONDITION_ADVECTION_TIME){
