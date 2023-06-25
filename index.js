@@ -882,9 +882,21 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
                     var id = parseInt(document.getElementById("input_clicked_streamline_id_aux").value)
                     select_streamline(id);
                 }
-                else{
-                    console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
-                    //sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;
+                if(mouse_manager.control_mode == CONTROL_MODE_DYNAMIC_STREAMLINE){
+                    if(streamline_context_static.streamline_generator.space == SPACE_3_TORUS){
+                        if(canvas_wrapper_side.does_allow_dynamic_changes()){
+                            console.warn("AUX DID UPDATE, SCHEDULE TASK: TASK_CALCULATE_DYNAMIC_STREAMLINE")
+                            sheduled_task = TASK_CALCULATE_DYNAMIC_STREAMLINE;          
+                        }    
+                        else{
+                            //console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
+                            console.warn("DYNAMIC STREAMLINE CALCULATION ONLY FOR DEFAULT MODE")
+                        }    
+                    }   
+                    else{
+                        //console.warn("AUX DID UPDATE - DO NOTHING FOR NOW")
+                        console.warn("DYNAMIC STREAMLINE CALCULATION ONLY FOR 3-TORUS")
+                    }
                 }
             }
             if(dynamic_streamline.changed){

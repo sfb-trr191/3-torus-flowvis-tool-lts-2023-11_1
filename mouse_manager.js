@@ -14,6 +14,7 @@ class MouseManager {
         this.block_all_input = false;
         this.control_mode = CONTROL_MODE_CAMERA;
         this.dynamic_streamline = dynamic_streamline;
+        this.dynamic_movement_camera_is_main = true;//changed on button down
     }
 
     Link(ui_left_tool_bar, canvas_wrapper_main, canvas_wrapper_side){
@@ -47,10 +48,12 @@ class MouseManager {
 
     addOnMouseDown() {
         this.canvas.addEventListener("mousedown", (event) => {
+            this.dynamic_movement_camera_is_main = true;
             this.onMouseDown(event, this.canvas, this.camera, this.canvas_wrapper_main, this.side_camera);
             this.ui_left_tool_bar.SelectLeft();
         });
         this.side_canvas.addEventListener("mousedown", (event) => {
+            this.dynamic_movement_camera_is_main = false;
             this.onMouseDown(event, this.side_canvas, this.side_camera, this.canvas_wrapper_side, this.camera);
             this.ui_left_tool_bar.SelectRight();
         });
@@ -186,7 +189,11 @@ class MouseManager {
                     break;
                 case CONTROL_MODE_DYNAMIC_STREAMLINE:
                     //curretnly using main camera
-                    this.dynamic_streamline.UpdateMouseMove(this.camera, pos_percentage_main.x, pos_percentage_main.y, pos_canonical_main.x, pos_canonical_main.y, false);
+                    if(this.dynamic_movement_camera_is_main){
+                        this.dynamic_streamline.UpdateMouseMove(this.camera, pos_percentage_main.x, pos_percentage_main.y, pos_canonical_main.x, pos_canonical_main.y, false);
+                    }else{
+                        this.dynamic_streamline.UpdateMouseMove(this.side_camera, pos_percentage_aux.x, pos_percentage_aux.y, pos_canonical_aux.x, pos_canonical_aux.y, false);
+                    }
                     this.dynamic_streamline.repositionDefault();
                     this.dynamic_streamline.toUI();
                     //this.camera.SetLastMousePosition(pos_main);

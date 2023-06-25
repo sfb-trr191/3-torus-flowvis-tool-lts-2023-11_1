@@ -549,6 +549,9 @@ class CanvasWrapper {
         this.camera.changed = false;  
     }
 
+    does_allow_dynamic_changes(){
+        return this.draw_mode == DRAW_MODE_DEFAULT
+    }
     
     get_did_update_clicked_position_and_reset(){
         var state = this.did_update_clicked_position;
