@@ -23,6 +23,9 @@ class PixelResults {
         this.position = glMatrix.vec4.fromValues(pixels[8], pixels[9], pixels[10], pixels[11]);
         this.center = glMatrix.vec4.fromValues(pixels[12], pixels[13], pixels[14], pixels[15]);
         this.light_direction = glMatrix.vec4.fromValues(pixels[16], pixels[17], pixels[18], pixels[19]);
+        //debugging:
+        this.test_value = glMatrix.vec4.fromValues(pixels[20], pixels[21], pixels[22], pixels[23]);
+        console.warn("TEST", this.test_value);
     }
 
     //WARNING: uses innerHTML, do not allow user input

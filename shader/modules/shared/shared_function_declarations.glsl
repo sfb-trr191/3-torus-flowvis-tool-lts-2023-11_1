@@ -97,6 +97,11 @@ void RayRK4Step(inout Ray ray);
 void LightIntegrationPre(inout Ray ray);
 void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 
+//                       linalg
+int mat3eigenvalues(mat3 m, inout vec3 lambda);
+bool mat3realEigenvector(mat3 m, float lambda, inout vec3 ev);
+bool mat3RidgeEigen(mat3 m, inout float lambda, inout vec3 ev);
+
 //**********************************************************
 
 void Intersect3Sphere(bool dynamic, int part_index, Ray ray, float ray_local_cutoff, Sphere4D sphere4D, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);

@@ -34,6 +34,7 @@ const shader_modules_shared_uniforms = require("./shader/modules/shared/shared_u
 const shader_modules_shared_const = require("./shader/modules/shared/shared_const.glsl");
 const shader_modules_shared_function_declarations = require("./shader/modules/shared/shared_function_declarations.glsl");
 const shader_modules_shared_shading = require("./shader/modules/shared/shared_shading.glsl");
+const shader_modules_linalg = require("./shader/modules/shared/linalg.glsl");
 //modules: default
 const shader_modules_default_structs = require("./shader/modules/default/default_structs.glsl");
 const shader_modules_default_function_declarations = require("./shader/modules/default/default_function_declarations.glsl");
