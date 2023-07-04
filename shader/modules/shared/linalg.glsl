@@ -107,6 +107,7 @@ int mat3eigenvalues(mat3 m, inout vec3 lambda)
     return (vec3cubicroots(pqr, lambda, forceReal));    
 }
 
+//this version uses column-major matrix m (the original code uses row-major matrix m)
 bool mat3realEigenvector(mat3 m, float lambda, inout vec3 ev)
 // calculates eigenvector corresponding to real lambda and returns true if ok
 {
@@ -119,9 +120,14 @@ bool mat3realEigenvector(mat3 m, float lambda, inout vec3 ev)
     reduced[1][1] -= lambda;
     reduced[2][2] -= lambda;
 
-    m_cross[0] = cross(reduced[1], reduced[2]);//vec3cross(reduced[1], reduced[2], m_cross[0]);
-    m_cross[1] = cross(reduced[2], reduced[0]);//vec3cross(reduced[2], reduced[0], m_cross[1]);
-    m_cross[2] = cross(reduced[0], reduced[1]);//vec3cross(reduced[0], reduced[1], m_cross[2]);
+    //the following 3 lines are added to extract vectors from column-major format so that the rest of the code can stay the same
+    vec3 reduced_0 = vec3(reduced[0][0], reduced[1][0], reduced[2][0]);
+    vec3 reduced_1 = vec3(reduced[0][1], reduced[1][1], reduced[2][1]);
+    vec3 reduced_2 = vec3(reduced[0][2], reduced[1][2], reduced[2][2]);
+
+    m_cross[0] = cross(reduced_1, reduced_2);//vec3cross(reduced[1], reduced[2], m_cross[0]);
+    m_cross[1] = cross(reduced_2, reduced_0);//vec3cross(reduced[2], reduced[0], m_cross[1]);
+    m_cross[2] = cross(reduced_0, reduced_1);//vec3cross(reduced[0], reduced[1], m_cross[2]);
 
     sqr[0] = dot(m_cross[0], m_cross[0]);//vec3sqr(m_cross[0]); with vec3sqr(a) = vec3dot(a, a);
     sqr[1] = dot(m_cross[1], m_cross[1]);//vec3sqr(m_cross[1]); with vec3sqr(a) = vec3dot(a, a);
@@ -166,7 +172,7 @@ bool mat3RidgeEigen(mat3 m, inout float lambda, inout vec3 ev)
     }
 
     lambda = lambdas[index];
-    if(lambda >= 0.0){
+    if(lambda >= ridge_lambda_threshold){
         return false;
     }
 

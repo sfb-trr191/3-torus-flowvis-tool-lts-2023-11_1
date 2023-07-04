@@ -1365,6 +1365,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.volume_rendering_use_original_ftle_field = document.getElementById("checkbox_volume_rendering_use_original_ftle_field").checked;
         canvas_wrapper_main.overrite_min_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle").value);
         canvas_wrapper_main.overrite_max_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle").value);
+        canvas_wrapper_main.ridge_lambda_threshold = parseFloat(document.getElementById("input_ridge_lambda_threshold").value);
        
         canvas_wrapper_main.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_main").checked;
         canvas_wrapper_main.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_main").checked;
@@ -1443,6 +1444,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.volume_rendering_use_original_ftle_field = document.getElementById("checkbox_volume_rendering_use_original_ftle_field").checked;
         canvas_wrapper_side.overrite_min_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle").value);
         canvas_wrapper_side.overrite_max_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle").value);
+        canvas_wrapper_side.ridge_lambda_threshold = parseFloat(document.getElementById("input_ridge_lambda_threshold").value);
        
         canvas_wrapper_side.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_aux").checked;
         canvas_wrapper_side.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_aux").checked;

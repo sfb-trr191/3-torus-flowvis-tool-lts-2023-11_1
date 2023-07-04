@@ -85,6 +85,7 @@ class UniformLocationsRayTracing {
         this.location_dim_z = gl.getUniformLocation(program, "dim_z");
         this.location_min_scalar_ftle = gl.getUniformLocation(program, "min_scalar_ftle");
         this.location_max_scalar_ftle = gl.getUniformLocation(program, "max_scalar_ftle");  
+        this.location_ridge_lambda_threshold = gl.getUniformLocation(program, "ridge_lambda_threshold");
         this.location_transfer_function_index_streamline_scalar = gl.getUniformLocation(program, "transfer_function_index_streamline_scalar");
         this.location_transfer_function_index_ftle_forward = gl.getUniformLocation(program, "transfer_function_index_ftle_forward");
         this.location_transfer_function_index_ftle_backward = gl.getUniformLocation(program, "transfer_function_index_ftle_backward");
@@ -223,6 +224,7 @@ class CanvasWrapper {
         this.volume_rendering_distance_between_points = 0.01;
         this.volume_rendering_termination_opacity = 0.99;
         this.volume_rendering_opacity_factor = 1.0;
+        this.ridge_lambda_threshold = 0.0;
         this.transfer_function_index_streamline_scalar = 0;
         this.transfer_function_index_ftle_forward = 3;
         this.transfer_function_index_ftle_backward = 4;
@@ -949,13 +951,14 @@ class CanvasWrapper {
         
         var min_scalar_ftle = this.volume_rendering_use_original_ftle_field ? this.p_ftle_manager.ftle_min_value : this.overrite_min_scalar_ftle;
         var max_scalar_ftle = this.volume_rendering_use_original_ftle_field ? this.p_ftle_manager.ftle_max_value : this.overrite_max_scalar_ftle;
-        
+
         gl.uniform1i(this.location_raytracing.location_volume_rendering_use_original_ftle_field, this.volume_rendering_use_original_ftle_field);
         gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);
         gl.uniform1f(this.location_raytracing.location_min_scalar_ftle, min_scalar_ftle);
         gl.uniform1f(this.location_raytracing.location_max_scalar_ftle, max_scalar_ftle);
+        gl.uniform1f(this.location_raytracing.location_ridge_lambda_threshold, this.ridge_lambda_threshold);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_streamline_scalar, this.transfer_function_index_streamline_scalar);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_forward, this.transfer_function_index_ftle_forward);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);

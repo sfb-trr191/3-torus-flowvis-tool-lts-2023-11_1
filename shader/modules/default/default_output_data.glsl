@@ -21,7 +21,8 @@ vec4 GetOutput(HitInformation hit)
         case 5:
             float test_value = 8.0;
             //vec3 lambda = vec3(0,0,0);
-            mat3 matrix = mat3(vec3(1,-2,4), vec3(-2,1,3), vec3(4,3,1));
+            //mat3 matrix = mat3(vec3(1,-2,4), vec3(-2,1,3), vec3(4,3,1));
+            mat3 matrix = mat3(vec3(1,6,4), vec3(2,5,8), vec3(3,9,7));
             //mat3eigenvalues(matrix, lambda);
             float lambda = 0.0;
             vec3 ev = vec3(0,0,0);

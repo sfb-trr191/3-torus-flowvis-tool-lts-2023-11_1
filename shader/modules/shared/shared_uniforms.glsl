@@ -62,6 +62,7 @@ uniform float volume_rendering_opacity_factor;
 uniform float min_scalar_ftle;
 uniform float max_scalar_ftle;
 uniform bool volume_rendering_use_original_ftle_field;
+uniform float ridge_lambda_threshold;
 
 uniform int transfer_function_index_streamline_scalar;
 uniform int transfer_function_index_ftle_forward;

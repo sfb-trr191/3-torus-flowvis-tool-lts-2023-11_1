@@ -141,15 +141,22 @@ vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_of
     vec3 sample_gradient_normalized = normalize(sample_gradient);
 
     mat3 sample_hessian = BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
-    vec3 new_vec = sample_hessian * sample_gradient;
-    vec3 new_vec_normalized = normalize(new_vec);
-
-    float dot_new_grad = dot(new_vec_normalized, sample_gradient_normalized);
+    
+    //old
+    //vec3 new_vec = sample_hessian * sample_gradient;
+    //vec3 new_vec_normalized = normalize(new_vec);
+    //float scalar = dot(new_vec_normalized, sample_gradient_normalized);
+    //new
+    float lambda = 0.0;
+    vec3 ev = vec3(0,0,0);
+    bool ok = mat3RidgeEigen(sample_hessian, lambda, ev);
+    float dot_grad_ev = dot(sample_gradient_normalized, ev);
+    float scalar = ok ? 1.0 - abs(dot_grad_ev) : 0.0;
 
     //apply transfer function
     //float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
     //float t = abs(normalize(sample_jacoby_direction_x).x);
-    float t = (abs(dot_new_grad) - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+    float t = (abs(scalar) - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
     int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
     vec4 rgba = GetScalarColor(bin, transfer_function_index);
