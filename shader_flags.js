@@ -7,7 +7,7 @@ class ShaderFlags {
         tube_radius_factor, tube_radius_factor_projection, tube_radius_factor_projection_highlight, 
         show_bounding_box, show_bounding_box_projection,
         streamline_method, streamline_method_projection, 
-        volume_rendering_mode, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode,
+        volume_rendering_directions, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode,
         integrate_light){
 
         this.changed = true;
@@ -51,17 +51,17 @@ class ShaderFlags {
         this.show_volume_rendering = false;
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
-        switch (volume_rendering_mode) {
-            case VOLUME_RENDERING_MODE_BOTH:
+        switch (volume_rendering_directions) {
+            case VOLUME_RENDERING_DIRECTIONS_BOTH:
                 this.show_volume_rendering = true;
                 this.show_volume_rendering_forward = true;
                 this.show_volume_rendering_backward = true;
                 break;
-            case VOLUME_RENDERING_MODE_FORWARD:
+            case VOLUME_RENDERING_DIRECTIONS_FORWARD:
                 this.show_volume_rendering = true;
                 this.show_volume_rendering_forward = true;
                 break;
-            case VOLUME_RENDERING_MODE_BACKWARD:
+            case VOLUME_RENDERING_DIRECTIONS_BACKWARD:
                 this.show_volume_rendering = true;
                 this.show_volume_rendering_backward = true;
                 break;

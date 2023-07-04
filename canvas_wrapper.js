@@ -75,10 +75,11 @@ class UniformLocationsRayTracing {
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_show_volume_rendering_forward = gl.getUniformLocation(program, "show_volume_rendering_forward");
         this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
-        this.location_volume_rendering_use_original_ftle_field = gl.getUniformLocation(program, "volume_rendering_use_original_ftle_field");
+        this.location_volume_rendering_mode = gl.getUniformLocation(program, "volume_rendering_mode");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
         this.location_volume_rendering_opacity_factor = gl.getUniformLocation(program, "volume_rendering_opacity_factor");
+        this.location_volume_rendering_clamp_scalars = gl.getUniformLocation(program, "volume_rendering_clamp_scalars");
         
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
@@ -214,11 +215,12 @@ class CanvasWrapper {
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
-        this.volume_rendering_mode = 0;
+        this.volume_rendering_directions = VOLUME_RENDERING_DIRECTIONS_NONE;
         this.correct_volume_opacity = false;
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
-        this.volume_rendering_use_original_ftle_field = true;
+        this.volume_rendering_mode = VOLUME_RENDERING_MODE_ORIGINAL_FTLE;
+        this.volume_rendering_clamp_scalars = true;
         this.overrite_min_scalar_ftle = 0;
         this.overrite_max_scalar_ftle = 1;
         this.volume_rendering_distance_between_points = 0.01;
@@ -761,7 +763,7 @@ class CanvasWrapper {
             this.show_bounding_box_projection,
             this.streamline_method,
             this.streamline_method_projection, 
-            this.volume_rendering_mode,
+            this.volume_rendering_directions,
             this.show_movable_axes,
             this.cut_at_cube_faces,
             this.handle_inside,
@@ -825,17 +827,17 @@ class CanvasWrapper {
         var show_volume_rendering = false;
         var show_volume_rendering_forward = false;
         var show_volume_rendering_backward = false;
-        switch (this.volume_rendering_mode) {
-            case VOLUME_RENDERING_MODE_BOTH:
+        switch (this.volume_rendering_directions) {
+            case VOLUME_RENDERING_DIRECTIONS_BOTH:
                 show_volume_rendering = true;
                 show_volume_rendering_forward = true;
                 show_volume_rendering_backward = true;
                 break;
-            case VOLUME_RENDERING_MODE_FORWARD:
+            case VOLUME_RENDERING_DIRECTIONS_FORWARD:
                 show_volume_rendering = true;
                 show_volume_rendering_forward = true;
                 break;
-            case VOLUME_RENDERING_MODE_BACKWARD:
+            case VOLUME_RENDERING_DIRECTIONS_BACKWARD:
                 show_volume_rendering = true;
                 show_volume_rendering_backward = true;
                 break;
@@ -949,10 +951,11 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_opacity_factor, this.volume_rendering_opacity_factor);
         
-        var min_scalar_ftle = this.volume_rendering_use_original_ftle_field ? this.p_ftle_manager.ftle_min_value : this.overrite_min_scalar_ftle;
-        var max_scalar_ftle = this.volume_rendering_use_original_ftle_field ? this.p_ftle_manager.ftle_max_value : this.overrite_max_scalar_ftle;
+        var min_scalar_ftle = this.volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE ? this.p_ftle_manager.ftle_min_value : this.overrite_min_scalar_ftle;
+        var max_scalar_ftle = this.volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE ? this.p_ftle_manager.ftle_max_value : this.overrite_max_scalar_ftle;
 
-        gl.uniform1i(this.location_raytracing.location_volume_rendering_use_original_ftle_field, this.volume_rendering_use_original_ftle_field);
+        gl.uniform1i(this.location_raytracing.location_volume_rendering_mode, this.volume_rendering_mode);
+        gl.uniform1i(this.location_raytracing.location_volume_rendering_clamp_scalars, this.volume_rendering_clamp_scalars);
         gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);

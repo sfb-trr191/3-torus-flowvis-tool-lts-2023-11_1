@@ -79,12 +79,14 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
 
 void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit){
     vec4 rgba_forward;
-    if(volume_rendering_use_original_ftle_field){
-        rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);    
+    if(volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE){
+        rgba_forward = GetVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);
     }
-    else{
-        rgba_forward = GetDirectRidgeVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);      
-    }      
+    else if (volume_rendering_mode == VOLUME_RENDERING_MODE_RIDGES){
+        rgba_forward = GetDirectRidgeVolumeColorAndOpacity(ray, sample_position, z_offset, transfer_function_index);
+    }else{
+        rgba_forward = GetVolumeColorAndOpacitySmallestEigenvalue(ray, sample_position, z_offset, transfer_function_index);
+    }    
 
     vec3 combined_color = rgba_forward.rgb;
     float combined_alpha = rgba_forward.a * volume_rendering_opacity_factor;//volume_rendering_opacity_factor (experimental)
@@ -109,10 +111,15 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
 {
     float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
     vec3 sample_normal = normalize(InterpolateVec3(texture_ftle_gradient, sample_position, z_offset));
+    if(!volume_rendering_clamp_scalars){
+        if(sample_scalar > max_scalar_ftle || sample_scalar < min_scalar_ftle){
+            return vec4(0, 0, 0, 0);
+        }
+    }
 
     //apply transfer function
     float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
-    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);    
     bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
     vec4 rgba = GetScalarColor(bin, transfer_function_index);
     vec3 color = rgba.rgb;
@@ -122,6 +129,56 @@ vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int t
     vec3 lightColor = vec3(0, 0, 0);
     vec3 viewDir = -ray.direction;
     vec3 normal = sample_normal;	
+    for(int i=0; i<numDirLights; i++)
+    {
+        GL_DirLight light = GetDirLight(i);
+        lightColor += CalcDirLight(light, normal, viewDir);
+    }
+    lightColor *= color;
+    return vec4(lightColor, alpha);
+}
+
+vec4 GetVolumeColorAndOpacitySmallestEigenvalue(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index)
+{
+    float sample_scalar = InterpolateFloat(texture_ftle, sample_position, z_offset);
+    vec3 sample_jacoby_direction_x = InterpolateVec3(texture_ftle_jacoby_direction_x, sample_position, z_offset);
+    vec3 sample_jacoby_direction_y = InterpolateVec3(texture_ftle_jacoby_direction_y, sample_position, z_offset);
+    vec3 sample_jacoby_direction_z = InterpolateVec3(texture_ftle_jacoby_direction_z, sample_position, z_offset);
+    vec3 sample_gradient = InterpolateVec3(texture_ftle_gradient, sample_position, z_offset);
+    vec3 sample_gradient_normalized = normalize(sample_gradient);
+
+    mat3 sample_hessian = BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
+    
+    //old
+    //vec3 new_vec = sample_hessian * sample_gradient;
+    //vec3 new_vec_normalized = normalize(new_vec);
+    //float scalar = dot(new_vec_normalized, sample_gradient_normalized);
+    //new
+    float lambda = 0.0;
+    vec3 ev = vec3(0,0,0);
+    bool ok = mat3RidgeEigen(sample_hessian, lambda, ev);
+    float dot_grad_ev = dot(sample_gradient_normalized, ev);
+    float scalar = lambda;
+    if(!volume_rendering_clamp_scalars){
+        if(scalar > max_scalar_ftle || scalar < min_scalar_ftle){
+            return vec4(0, 0, 0, 0);
+        }
+    }
+
+    //apply transfer function
+    //float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+    //float t = abs(normalize(sample_jacoby_direction_x).x);
+    float t = (scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
+    int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+    bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+    vec4 rgba = GetScalarColor(bin, transfer_function_index);
+    vec3 color = rgba.rgb;
+    float alpha = rgba.a;
+
+    //apply phong shading
+    vec3 lightColor = vec3(0, 0, 0);
+    vec3 viewDir = -ray.direction;
+    vec3 normal = sample_gradient_normalized;	
     for(int i=0; i<numDirLights; i++)
     {
         GL_DirLight light = GetDirLight(i);
@@ -152,6 +209,11 @@ vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_of
     bool ok = mat3RidgeEigen(sample_hessian, lambda, ev);
     float dot_grad_ev = dot(sample_gradient_normalized, ev);
     float scalar = ok ? 1.0 - abs(dot_grad_ev) : 0.0;
+    if(!volume_rendering_clamp_scalars){
+        if(scalar > max_scalar_ftle || scalar < min_scalar_ftle){
+            return vec4(0, 0, 0, 0);
+        }
+    }
 
     //apply transfer function
     //float t = (sample_scalar - min_scalar_ftle) / (max_scalar_ftle - min_scalar_ftle);
