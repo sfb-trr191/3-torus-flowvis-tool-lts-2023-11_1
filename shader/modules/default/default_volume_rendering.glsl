@@ -207,8 +207,9 @@ vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_of
     float lambda = 0.0;
     vec3 ev = vec3(0,0,0);
     bool ok = mat3RidgeEigen(sample_hessian, lambda, ev);
-    float dot_grad_ev = dot(sample_gradient_normalized, ev);
-    float scalar = ok ? 1.0 - abs(dot_grad_ev) : 0.0;
+    float dot_grad_ev = dot(sample_gradient, ev);
+    //float scalar = ok ? 1.0 - abs(dot_grad_ev) : 0.0;
+    float scalar = ok ? abs(dot_grad_ev) : 10000.0;
     if(!volume_rendering_clamp_scalars){
         if(scalar > max_scalar_ftle || scalar < min_scalar_ftle){
             return vec4(0, 0, 0, 0);
