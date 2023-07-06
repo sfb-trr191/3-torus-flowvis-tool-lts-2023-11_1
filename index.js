@@ -1016,6 +1016,13 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             ui_seeds.addDynamicSeed();
             sheduled_task = TASK_CALCULATE_STREAMLINES;
         });
+        document.getElementById("button_export_ftle").addEventListener("click", (event) => {
+            if(block_all_input){
+                return;
+            }
+            console.log("onClickExportVTK");
+            ftle_manager.exportVTK();
+        });
     }
 
     function addOnClickUpdateRenderSettings() {

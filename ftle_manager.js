@@ -16,6 +16,8 @@ const {
     CholeskyDecomposition,
     EigenvalueDecomposition
 } = require('ml-matrix');
+const JSZip = require("jszip");
+const FileSaver = require("file-saver");
 //const V_SHADER_RAYTRACING = require("./shader/v_shader_raytracing.js");
 //const F_SHADER_PLACEHOLDER = require("./shader/f_shader_placeholder.glsl");
 
@@ -842,6 +844,46 @@ class FTLEManager {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
         program_shader_uniforms.print();
         return program_shader_uniforms;
+    }
+
+    exportVTK(){
+        //from the documentation: Data with implicit topology (structured data such as vtkImageData and vtkStructuredGrid) 
+        //are ordered with x increasing fastest, then y, then z.
+        var dim_x = this.data_texture_ftle.texture.texture_settings.width;
+        var dim_y = this.data_texture_ftle.texture.texture_settings.height;
+        var dim_z = this.data_texture_ftle.texture.texture_settings.depth / 2;//forward and backward are combined
+        console.warn("dim_x", dim_x);
+        console.warn("dim_y", dim_y);
+        console.warn("dim_z", dim_z);
+
+        var zip = new JSZip();
+
+        var forward = true;
+        zip.file("forward.txt", this.GenerateVTKString(forward, dim_x, dim_y, dim_z));
+        var forward = false;
+        zip.file("backward.txt", this.GenerateVTKString(forward, dim_x, dim_y, dim_z));
+    }
+
+    GenerateVTKString(forward, dim_x, dim_y, dim_z){
+        var s = "";
+        s += this.GenerateDataString(forward, dim_x, dim_y, dim_z);
+        return s;
+    }
+
+    GenerateDataString(forward, dim_x, dim_y, dim_z){
+        var offset = forward ? 0 : dim_z;
+        var s = "";
+        for(var z = 0; z<dim_z; z++){
+            for(var y = 0; y<dim_y; y++){
+                for(var x = 0; x<dim_x; x++){
+                    var z_texture = z + offset;      
+                    var global_index_texture = x + y * dim_x + z_texture * dim_x * dim_y;
+                    var scalar = this.data_texture_ftle.texture.texture_data[global_index_texture];
+                    s += string(scalar);
+                }
+            }
+        }
+        return s;
     }
 }
 
