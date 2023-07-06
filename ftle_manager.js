@@ -1,6 +1,7 @@
 const ComputeWrapper = require("./compute_wraper");
 const ShaderUniforms = require("./shader_uniforms");
 const DummyQuad = require("./dummy_quad");
+const VTK_File = require("./vtk_file");
 const { DataTextures, DataTexture3D_RGBA, DataTexture3D_R } = require("./data_textures");
 const module_webgl = require("./webgl");
 const loadShaderProgramFromCode = module_webgl.loadShaderProgramFromCode;
@@ -847,6 +848,7 @@ class FTLEManager {
     }
 
     exportVTK(){
+        var that = this;
         //from the documentation: Data with implicit topology (structured data such as vtkImageData and vtkStructuredGrid) 
         //are ordered with x increasing fastest, then y, then z.
         var dim_x = this.data_texture_ftle.texture.texture_settings.width;
@@ -858,12 +860,27 @@ class FTLEManager {
 
         var zip = new JSZip();
 
-        var forward = true;
-        zip.file("forward.txt", this.GenerateVTKString(forward, dim_x, dim_y, dim_z));
-        var forward = false;
-        zip.file("backward.txt", this.GenerateVTKString(forward, dim_x, dim_y, dim_z));
-    }
+        var texture_data = this.data_texture_ftle.texture.texture_data;
 
+        var forward = true;
+        var vtk_file_forward = new VTK_File();
+        vtk_file_forward.SetData(texture_data, forward, dim_x, dim_y, dim_z);        
+        zip.file("forward.vti", vtk_file_forward.GetFileContent());
+        
+        var forward = false;        
+        var vtk_file_backward = new VTK_File();
+        vtk_file_backward.SetData(texture_data, forward, dim_x, dim_y, dim_z);
+        zip.file("backward.vti", vtk_file_backward.GetFileContent());
+
+        var file_name_zip = "ftle_export";
+
+        zip.generateAsync({ type: "blob" })
+            .then(function (content) {
+                FileSaver.saveAs(content, file_name_zip);
+                that.finished_vtk_export = true;
+            });
+    }
+    /*
     GenerateVTKString(forward, dim_x, dim_y, dim_z){
         var s = "";
         s += this.GenerateDataString(forward, dim_x, dim_y, dim_z);
@@ -885,6 +902,7 @@ class FTLEManager {
         }
         return s;
     }
+    */
 }
 
 module.exports = FTLEManager;
