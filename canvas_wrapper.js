@@ -80,6 +80,7 @@ class UniformLocationsRayTracing {
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
         this.location_volume_rendering_opacity_factor = gl.getUniformLocation(program, "volume_rendering_opacity_factor");
         this.location_volume_rendering_clamp_scalars = gl.getUniformLocation(program, "volume_rendering_clamp_scalars");
+        this.location_ridges_force_symmetric_hessian = gl.getUniformLocation(program, "ridges_force_symmetric_hessian");
         
         this.location_dim_x = gl.getUniformLocation(program, "dim_x");
         this.location_dim_y = gl.getUniformLocation(program, "dim_y");
@@ -221,6 +222,7 @@ class CanvasWrapper {
         this.show_volume_rendering_backward = false;
         this.volume_rendering_mode = VOLUME_RENDERING_MODE_ORIGINAL_FTLE;
         this.volume_rendering_clamp_scalars = true;
+        this.ridges_force_symmetric_hessian = true;
         this.overrite_min_scalar_ftle = 0;
         this.overrite_max_scalar_ftle = 1;
         this.volume_rendering_distance_between_points = 0.01;
@@ -956,6 +958,7 @@ class CanvasWrapper {
 
         gl.uniform1i(this.location_raytracing.location_volume_rendering_mode, this.volume_rendering_mode);
         gl.uniform1i(this.location_raytracing.location_volume_rendering_clamp_scalars, this.volume_rendering_clamp_scalars);
+        gl.uniform1i(this.location_raytracing.location_ridges_force_symmetric_hessian, this.ridges_force_symmetric_hessian);        
         gl.uniform1i(this.location_raytracing.location_dim_x, this.p_ftle_manager.dim_x);
         gl.uniform1i(this.location_raytracing.location_dim_y, this.p_ftle_manager.dim_y);
         gl.uniform1i(this.location_raytracing.location_dim_z, this.p_ftle_manager.dim_z);

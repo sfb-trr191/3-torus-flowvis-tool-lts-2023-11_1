@@ -64,6 +64,7 @@ vec4 GetVolumeColorAndOpacitySmallestEigenvalue(Ray ray, vec3 sample_position, i
 vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index);
 mat3 BuildJacoby(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z);
 mat3 BuildHessian(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z);
+mat3 BuildHessianForceSym(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z);
 
 //**********************************************************
 

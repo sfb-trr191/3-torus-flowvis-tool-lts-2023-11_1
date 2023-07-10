@@ -147,7 +147,8 @@ vec4 GetVolumeColorAndOpacitySmallestEigenvalue(Ray ray, vec3 sample_position, i
     vec3 sample_gradient = InterpolateVec3(texture_ftle_gradient, sample_position, z_offset);
     vec3 sample_gradient_normalized = normalize(sample_gradient);
 
-    mat3 sample_hessian = BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
+    mat3 sample_hessian = ridges_force_symmetric_hessian ? BuildHessianForceSym(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z) : BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
+    
     
     //old
     //vec3 new_vec = sample_hessian * sample_gradient;
@@ -197,7 +198,7 @@ vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_of
     vec3 sample_gradient = InterpolateVec3(texture_ftle_gradient, sample_position, z_offset);
     vec3 sample_gradient_normalized = normalize(sample_gradient);
 
-    mat3 sample_hessian = BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
+    mat3 sample_hessian = ridges_force_symmetric_hessian ? BuildHessianForceSym(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z) : BuildHessian(sample_jacoby_direction_x, sample_jacoby_direction_y, sample_jacoby_direction_z);
     
     //old
     //vec3 new_vec = sample_hessian * sample_gradient;
@@ -255,6 +256,16 @@ mat3 BuildHessian(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y
     matrix[0] = vec3(sample_jacoby_direction_x.x, sample_jacoby_direction_y.x, sample_jacoby_direction_z.x);
     matrix[1] = vec3(sample_jacoby_direction_x.y, sample_jacoby_direction_y.y, sample_jacoby_direction_z.y);
     matrix[2] = vec3(sample_jacoby_direction_x.z, sample_jacoby_direction_y.z, sample_jacoby_direction_z.z);
+    return matrix;
+}
+
+mat3 BuildHessianForceSym(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z)
+{
+    //the hessian is the transpose of the jacobian of the gradient
+    mat3 matrix;//column major order, matrix[0] references the first column
+    matrix[0] = 0.5 * (sample_jacoby_direction_x + vec3(sample_jacoby_direction_x.x, sample_jacoby_direction_y.x, sample_jacoby_direction_z.x));
+    matrix[1] = 0.5 * (sample_jacoby_direction_y + vec3(sample_jacoby_direction_x.y, sample_jacoby_direction_y.y, sample_jacoby_direction_z.y));
+    matrix[2] = 0.5 * (sample_jacoby_direction_z + vec3(sample_jacoby_direction_x.z, sample_jacoby_direction_y.z, sample_jacoby_direction_z.z));
     return matrix;
 }
 

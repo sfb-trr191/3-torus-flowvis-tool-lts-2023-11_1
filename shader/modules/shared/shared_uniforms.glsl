@@ -64,6 +64,7 @@ uniform float max_scalar_ftle;
 uniform int volume_rendering_mode;
 uniform float ridge_lambda_threshold;
 uniform bool volume_rendering_clamp_scalars;
+uniform bool ridges_force_symmetric_hessian;
 
 uniform int transfer_function_index_streamline_scalar;
 uniform int transfer_function_index_ftle_forward;
