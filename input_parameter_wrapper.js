@@ -220,7 +220,13 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto"); 
         new InputWrapper(this, "input_volume_rendering_opacity_factor", "vof"); 
         new InputWrapper(this, "checkbox_transfer_function_log_scale", "tls");
-        new InputWrapper(this, "input_transfer_function_log_scale_d", "tld");        
+        new InputWrapper(this, "input_transfer_function_log_scale_d", "tld");   
+        new InputWrapper(this, "select_volume_rendering_mode", "vrm");      
+        new InputWrapper(this, "input_volume_rendering_overrite_min_scalar_ftle", "vos");      
+        new InputWrapper(this, "input_volume_rendering_overrite_max_scalar_ftle", "vos2");       
+        new InputWrapper(this, "checkbox_volume_rendering_clamp_scalars", "vcs");    
+        new InputWrapper(this, "input_ridge_lambda_threshold", "vlt");       
+        new InputWrapper(this, "checkbox_ridges_force_symmetric_hessian", "vsh");    
         //settings - quality        
         new InputWrapper(this, "input_still_resolution_factor", "rfs");   
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   

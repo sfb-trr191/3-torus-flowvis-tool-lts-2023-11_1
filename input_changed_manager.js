@@ -159,6 +159,12 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_backward")); 
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_correct_volume_opacity"));
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_volume_skip_first_fundamental_domain_main"));
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_volume_rendering_clamp_scalars"));
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_ridges_force_symmetric_hessian"));
+        this.group_render_settings.AddInput(document.getElementById("select_volume_rendering_mode"));    
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle"));    
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle"));   
+        this.group_render_settings.AddInput(document.getElementById("input_ridge_lambda_threshold")); 
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_max_distance"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_min_distance_main"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
