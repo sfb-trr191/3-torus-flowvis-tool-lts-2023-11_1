@@ -19,7 +19,8 @@ class UniformLocationsRayTracing {
         this.location_light_integration_step_size = gl.getUniformLocation(program, "light_integration_step_size");
         this.location_light_integration_max_step_count = gl.getUniformLocation(program, "light_integration_max_step_count");
 
-        
+        this.location_max_number_of_bisection_intervals = gl.getUniformLocation(program, "max_number_of_bisection_intervals");
+        this.location_max_number_of_volume_iterations = gl.getUniformLocation(program, "max_number_of_volume_iterations");
 
         this.location_color_r = gl.getUniformLocation(program, "color_r");
         this.location_texture_float = gl.getUniformLocation(program, "texture_float");
@@ -220,6 +221,9 @@ class CanvasWrapper {
         this.correct_volume_opacity = false;
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
+        this.show_ridge_surface = true;
+        this.max_number_of_bisection_intervals = 100;
+        this.max_number_of_volume_iterations = 10000;
         this.volume_rendering_mode = VOLUME_RENDERING_MODE_ORIGINAL_FTLE;
         this.volume_rendering_clamp_scalars = true;
         this.ridges_force_symmetric_hessian = true;
@@ -770,7 +774,8 @@ class CanvasWrapper {
             this.cut_at_cube_faces,
             this.handle_inside,
             this.seed_visualization_mode,
-            this.integrate_light);
+            this.integrate_light,
+            this.show_ridge_surface);
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
@@ -968,6 +973,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_streamline_scalar, this.transfer_function_index_streamline_scalar);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_forward, this.transfer_function_index_ftle_forward);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);
+
+        gl.uniform1i(this.location_raytracing.location_max_number_of_bisection_intervals, this.max_number_of_bisection_intervals);
+        gl.uniform1i(this.location_raytracing.location_max_number_of_volume_iterations, this.max_number_of_volume_iterations);
         
         gl.uniform1i(this.location_raytracing.location_debug_render_spherinder, this.debug_render_spherinder);
         gl.uniform1i(this.location_raytracing.location_debug_render_3Sphere, this.debug_render_3Sphere);

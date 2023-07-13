@@ -1,5 +1,13 @@
 global.SHADER_MODULE_DEFAULT_STRUCTS = `
 
+struct RidgeInformation
+{
+    bool ok;
+    vec3 ev;
+    float dot_grad_ev;  //first criterion:      gradient dot eigenvector ~= 0
+    float lambda;       //second criterion:     lambda < 0
+};
+
 struct HitInformation
 {
 	vec3 position;

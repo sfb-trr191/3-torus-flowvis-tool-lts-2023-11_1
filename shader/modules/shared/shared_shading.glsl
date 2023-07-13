@@ -40,6 +40,14 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 	{
 		objectColor = hit.objectColor;
 	}
+    if(hit.hitType == TYPE_FTLE_SURFACE_FORWARD)
+	{
+		return vec3(1,0,0);
+	}
+    if(hit.hitType == TYPE_FTLE_SURFACE_BACKWARD)
+	{
+		return vec3(0,0,1);
+	}
 	if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
 	{
         if(shading_mode_streamlines == SHADING_MODE_STREAMLINES_ID)

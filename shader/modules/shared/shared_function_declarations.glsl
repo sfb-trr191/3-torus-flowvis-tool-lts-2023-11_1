@@ -58,6 +58,7 @@ void IntersectAxes(bool check_bounds, Ray ray, float ray_local_cutoff, inout Hit
 //**********************************************************
 
 void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube);
+void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube);
 void ApplyVolumeSample(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index, inout HitInformation hit);
 vec4 GetVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index);
 vec4 GetVolumeColorAndOpacitySmallestEigenvalue(Ray ray, vec3 sample_position, int z_offset, int transfer_function_index);
@@ -103,6 +104,7 @@ void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 int mat3eigenvalues(mat3 m, inout vec3 lambda);
 bool mat3realEigenvector(mat3 m, float lambda, inout vec3 ev);
 bool mat3RidgeEigen(mat3 m, inout float lambda, inout vec3 ev);
+bool mat3RidgeEigenNoThreshold(mat3 m, inout float lambda, inout vec3 ev);
 
 //**********************************************************
 

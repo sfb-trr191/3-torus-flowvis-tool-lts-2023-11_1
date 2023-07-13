@@ -8,7 +8,7 @@ class ShaderFlags {
         show_bounding_box, show_bounding_box_projection,
         streamline_method, streamline_method_projection, 
         volume_rendering_directions, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode,
-        integrate_light){
+        integrate_light, show_ridge_surface){
 
         this.changed = true;
         this.space = space;
@@ -47,6 +47,8 @@ class ShaderFlags {
             default:
                 break;
         }
+
+        this.show_ridge_surface = show_ridge_surface;
 
         this.show_volume_rendering = false;
         this.show_volume_rendering_forward = false;

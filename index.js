@@ -25,6 +25,7 @@ const f_shader_raytracing_preprocessor = require("./shader/f_shader_raytracing_p
 //modules
 const shader_modules_out_of_bounds = require("./shader/modules/default/default_out_of_bounds.glsl");
 const shader_modules_volume_rendering = require("./shader/modules/default/default_volume_rendering.glsl");
+const shader_modules_default_bisection = require("./shader/modules/default/default_bisection.glsl");
 const shader_modules_handle_inside = require("./shader/modules/default/default_handle_inside.glsl");
 const shader_modules_handle_out_of_bounds = require("./shader/modules/default/default_handle_out_of_bounds.glsl");
 //modules: shared
@@ -1376,7 +1377,9 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.overrite_min_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle").value);
         canvas_wrapper_main.overrite_max_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle").value);
         canvas_wrapper_main.ridge_lambda_threshold = parseFloat(document.getElementById("input_ridge_lambda_threshold").value);
-       
+        canvas_wrapper_main.max_number_of_bisection_intervals = parseInt(document.getElementById("input_ridge_surface_max_number_of_bisection_intervals").value);
+        
+
         canvas_wrapper_main.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_main").checked;
         canvas_wrapper_main.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_main").checked;
 
@@ -1457,6 +1460,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.overrite_min_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle").value);
         canvas_wrapper_side.overrite_max_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle").value);
         canvas_wrapper_side.ridge_lambda_threshold = parseFloat(document.getElementById("input_ridge_lambda_threshold").value);
+        canvas_wrapper_side.max_number_of_bisection_intervals = parseInt(document.getElementById("input_ridge_surface_max_number_of_bisection_intervals").value);
        
         canvas_wrapper_side.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_aux").checked;
         canvas_wrapper_side.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_aux").checked;

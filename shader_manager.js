@@ -51,7 +51,9 @@ class ShaderManager {
 
         var defines = "";
         if(shader_flags.space == SPACE_3_SPHERE_4_PLUS_4D)
-            defines += "\n#define COORDINATES_4D";
+            defines += "\n#define COORDINATES_4D";            
+        if(shader_flags.show_ridge_surface)
+            defines += "\n#define SHOW_RIDGE_SURFACE";  
         if(shader_flags.show_volume_rendering)
             defines += "\n#define SHOW_VOLUME_RENDERING";        
         if(shader_flags.show_volume_rendering_forward)
@@ -137,7 +139,8 @@ class ShaderManager {
             code = code.replace("$SHADER_MODULE_OUTPUT_DATA$", SHADER_MODULE_S3_OUTPUT_DATA);   
             
             //not used in s3
-            code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", "");        
+            code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", "");
+            code = code.replace("$SHADER_MODULE_BISECTION$", "");         
             code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", "");
             code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", "");
             code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", "");
@@ -151,7 +154,8 @@ class ShaderManager {
             code = code.replace("$SHADER_MODULE_OUTPUT_DATA$", SHADER_MODULE_DEFAULT_OUTPUT_DATA);     
 
             //not used in s3
-            code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_DEFAULT_VOLUME_RENDERING);        
+            code = code.replace("$SHADER_MODULE_VOLUME_RENDERING$", SHADER_MODULE_DEFAULT_VOLUME_RENDERING);   
+            code = code.replace("$SHADER_MODULE_BISECTION$", SHADER_MODULE_DEFAULT_BISECTION);       
             code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_OUT_OF_BOUNDS);
             code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_DEFAULT_HANDLE_INSIDE);
             code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS);
@@ -209,6 +213,9 @@ class ShaderManager {
         shader_rule_z_neg_x, shader_rule_z_neg_y, shader_rule_z_neg_z,
         shader_flags){
         var key = shader_flags.space + ";" + shader_formula_scalar_float;
+        
+        if(shader_flags.show_ridge_surface)
+            key += ";SHOW_RIDGE_SURFACE"
         if(shader_flags.show_volume_rendering)
             key += ";SHOW_VOLUME_RENDERING"
         if(shader_flags.show_volume_rendering_forward)

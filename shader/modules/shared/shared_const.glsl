@@ -6,6 +6,8 @@ const int TYPE_STREAMLINE_SEGMENT = 1;
 const int TYPE_CLICKED_SPHERE = 2;
 const int TYPE_GL_CYLINDER = 3;
 const int TYPE_SEED = 4;
+const int TYPE_FTLE_SURFACE_FORWARD = 5;
+const int TYPE_FTLE_SURFACE_BACKWARD = 6;
 
 const int SUBTYPE_NONE = 0;
 const int SUBTYPE_3SPHERE = 1;

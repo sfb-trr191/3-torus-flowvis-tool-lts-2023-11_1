@@ -56,6 +56,13 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
             //t = variableRay.segment_length;
             t = variableRay.local_cutoff;
         }
+        
+#ifdef SHOW_RIDGE_SURFACE
+        {
+            float distance_end = t;
+            BisectRidges(variableRay, distance_end, hit, hitCube);            
+        }
+#endif
 
 #ifdef SHOW_VOLUME_RENDERING
         bool volume_flag = hit.vol_accumulated_opacity < volume_rendering_termination_opacity

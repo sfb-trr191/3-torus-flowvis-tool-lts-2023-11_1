@@ -179,5 +179,24 @@ bool mat3RidgeEigen(mat3 m, inout float lambda, inout vec3 ev)
     return mat3realEigenvector(m, lambda, ev);
 }
 
+//finds eigenvalue with smallest value and calculates associated eigenvector
+//returns:
+//ev contains the eigenvector, 
+//the return value is true (or false if there was a problem)
+bool mat3RidgeEigenNoThreshold(mat3 m, inout float lambda, inout vec3 ev)
+{
+    vec3 lambdas = vec3(0,0,0);
+    mat3eigenvalues(m, lambdas);
+    int index = 0;
+    if(lambdas[0] <= lambdas[1]){
+        index = lambdas[0] < lambdas[2] ? 0 : 2;
+    }else{//1 is smaller than 0
+        index = lambdas[1] < lambdas[2] ? 1 : 2;
+    }
+
+    lambda = lambdas[index];
+    return mat3realEigenvector(m, lambda, ev);
+}
+
 
 `;
