@@ -239,7 +239,7 @@ vec4 GetDirectRidgeVolumeColorAndOpacity(Ray ray, vec3 sample_position, int z_of
     lightColor *= color;
     return vec4(lightColor, alpha);
 }
-
+/*
 mat3 BuildJacoby(vec3 sample_jacoby_direction_x, vec3 sample_jacoby_direction_y, vec3 sample_jacoby_direction_z)
 {
     mat3 matrix;//column major order, matrix[0] references the first column
@@ -362,5 +362,6 @@ float InterpolateFloat(sampler3D texture, vec3 texture_coordinate, int z_offset)
 
     return v;
 }
+*/
 
 `;

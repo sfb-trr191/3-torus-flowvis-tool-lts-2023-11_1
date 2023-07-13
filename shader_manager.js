@@ -159,7 +159,8 @@ class ShaderManager {
         
 
 
-        //shared
+        //shared        
+        code = code.replace("$SHADER_MODULE_SHARED_UTILITY$", SHADER_MODULE_SHARED_UTILITY);
         code = code.replace("$SHADER_MODULE_SHARED_DATA_ACCESS$", SHADER_MODULE_SHARED_DATA_ACCESS);
         code = code.replace("$SHADER_MODULE_SHARED_STRUCTS$", SHADER_MODULE_SHARED_STRUCTS);
         code = code.replace("$SHADER_MODULE_SHARED_UNIFORMS$", SHADER_MODULE_SHARED_UNIFORMS);

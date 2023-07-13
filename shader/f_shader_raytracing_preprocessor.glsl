@@ -36,6 +36,7 @@ $SHADER_MODULE_HANDLE_INSIDE$
 $SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$
 
 //shared
+$SHADER_MODULE_SHARED_UTILITY$
 $SHADER_MODULE_SHARED_DATA_ACCESS$
 $SHADER_MODULE_LIGHT_INTEGRATION_DEFINITIONS$
 $SHADER_MODULE_SHARED_SHADING$
@@ -249,18 +250,6 @@ void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformati
             hit.cost = hit_outside.cost;
         }
     }
-}
-
-vec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {
-  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
-}
-
-vec4 map4(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {
-  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
-}
-
-float GetTubeRadius(int part_index){
-    return part_index == 0 ? tubeRadius : tubeRadiusOutside;
 }
 
 `;

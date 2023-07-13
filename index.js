@@ -28,6 +28,7 @@ const shader_modules_volume_rendering = require("./shader/modules/default/defaul
 const shader_modules_handle_inside = require("./shader/modules/default/default_handle_inside.glsl");
 const shader_modules_handle_out_of_bounds = require("./shader/modules/default/default_handle_out_of_bounds.glsl");
 //modules: shared
+const shader_modules_shared_utility = require("./shader/modules/shared/shared_utility.glsl");
 const shader_modules_data_access = require("./shader/modules/shared/shared_data_access.glsl");
 const shader_modules_shared_structs = require("./shader/modules/shared/shared_structs.glsl");
 const shader_modules_shared_uniforms = require("./shader/modules/shared/shared_uniforms.glsl");
