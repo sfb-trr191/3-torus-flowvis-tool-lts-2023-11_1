@@ -66,6 +66,7 @@ uniform float ridge_lambda_threshold;
 uniform bool volume_rendering_clamp_scalars;
 uniform bool ridges_force_symmetric_hessian;
 
+uniform int max_bisection_iterations_per_interval;
 uniform int max_number_of_bisection_intervals;
 uniform int max_number_of_volume_iterations;
 

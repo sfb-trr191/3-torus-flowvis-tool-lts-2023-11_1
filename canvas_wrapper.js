@@ -18,7 +18,8 @@ class UniformLocationsRayTracing {
         this.light_integrator_type = LIGHT_INTEGRATOR_LINE;
         this.location_light_integration_step_size = gl.getUniformLocation(program, "light_integration_step_size");
         this.location_light_integration_max_step_count = gl.getUniformLocation(program, "light_integration_max_step_count");
-
+        
+        this.location_max_bisection_iterations_per_interval = gl.getUniformLocation(program, "max_bisection_iterations_per_interval");
         this.location_max_number_of_bisection_intervals = gl.getUniformLocation(program, "max_number_of_bisection_intervals");
         this.location_max_number_of_volume_iterations = gl.getUniformLocation(program, "max_number_of_volume_iterations");
 
@@ -222,6 +223,7 @@ class CanvasWrapper {
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
         this.show_ridge_surface = true;
+        this.max_bisection_iterations_per_interval = 1;
         this.max_number_of_bisection_intervals = 100;
         this.max_number_of_volume_iterations = 10000;
         this.volume_rendering_mode = VOLUME_RENDERING_MODE_ORIGINAL_FTLE;
@@ -974,6 +976,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_forward, this.transfer_function_index_ftle_forward);
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);
 
+        gl.uniform1i(this.location_raytracing.location_max_bisection_iterations_per_interval, this.max_bisection_iterations_per_interval);
         gl.uniform1i(this.location_raytracing.location_max_number_of_bisection_intervals, this.max_number_of_bisection_intervals);
         gl.uniform1i(this.location_raytracing.location_max_number_of_volume_iterations, this.max_number_of_volume_iterations);
         

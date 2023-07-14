@@ -22,6 +22,7 @@ void GetRidgeInformation(bool forward, vec3 sample_position, inout RidgeInformat
     info.ev = ev;
     info.dot_grad_ev = dot_grad_ev;
     info.lambda = lambda;
+    info.sample_position = sample_position;
     //return info;
 }
 
@@ -41,35 +42,68 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
     }
     
 	RidgeInformation info_start;
-    GetRidgeInformation(forward, sample_position_start, info_start);
 	RidgeInformation info_stop;
+    RidgeInformation info_center;
+    GetRidgeInformation(forward, sample_position_start, info_start);
     GetRidgeInformation(forward, sample_position_stop, info_stop);
 
     bool has_change = IntervalHasSignChange(info_start, info_stop);
-    //has_change = info_start.ok;
-    while(has_change){
-        //TODO termination conditions
+    if(has_change){
+        //multiple bisection iterations        
+        for(int i=0; i<max_bisection_iterations_per_interval; i++){
+            //early termination conditions
 
-        //find the root
-        float center_distance = 0.5 * (start_distance + stop_distance);
-        float total_distance = ray.rayDistance + center_distance;
-        vec3 sample_position_center = ray.origin + ray.direction * center_distance;
-        RidgeInformation info_center;
-        GetRidgeInformation(forward, sample_position_center, info_center);
+            //divide interval at center
+            //float center_distance = 0.5 * (start_distance + stop_distance);
+            //float total_distance = ray.rayDistance + center_distance;
+            //vec3 sample_position_center = ray.origin + ray.direction * center_distance;       
+            vec3 sample_position_center = mix(info_start.sample_position, info_stop.sample_position, 0.5);;           
+            GetRidgeInformation(forward, sample_position_center, info_center);
 
+            //identify smaller interval
+            bool has_change_start = IntervalHasSignChange(info_start, info_center);
+            bool has_change_stop = IntervalHasSignChange(info_center, info_stop);
+            if(has_change_start){
+                info_stop = info_center;
+            }
+            else if(has_change_stop){
+                info_start = info_center;
+            }
+            else{
+                break;
+            }
+        }
+
+        //get best sample
+        bool flag_start_is_best = abs(info_start.dot_grad_ev) <= abs(info_stop.dot_grad_ev) && abs(info_start.dot_grad_ev) <= abs(info_center.dot_grad_ev);
+        bool flag_stop_is_best = abs(info_stop.dot_grad_ev) <= abs(info_start.dot_grad_ev) && abs(info_stop.dot_grad_ev) <= abs(info_center.dot_grad_ev);
+
+        RidgeInformation best_info;
+        if(flag_start_is_best)
+            best_info = info_start;
+        else if(flag_stop_is_best)
+            best_info = info_stop;
+        else
+            best_info = info_center;
+
+        //filter
+
+        float distance_from_ray_position = distance(ray.origin, best_info.sample_position);
+        float total_distance = ray.rayDistance + distance_from_ray_position;
+
+        //hit
         if((hit.hitType==TYPE_NONE) || (total_distance < hit.distance)){
             hit.hitType = forward ? TYPE_FTLE_SURFACE_FORWARD : TYPE_FTLE_SURFACE_BACKWARD; 
             hit.copy = false;
             hit.multiPolyID = -1;
             hit.distanceToCenter = 0.0;
             hit.positionCenter = vec3(-1, -1, -1);
-            hit.position = sample_position_center;
-            hit.normal = info_center.ev;
+            hit.position = best_info.sample_position;
+            hit.normal = best_info.ev;
             hit.distance = total_distance;
-            hit.distance_iteration = center_distance;//TODO probably wrong
+            hit.distance_iteration = distance_from_ray_position;//TODO probably wrong
             hit.ignore_override = false;
         }
-        return;
 
     }
 

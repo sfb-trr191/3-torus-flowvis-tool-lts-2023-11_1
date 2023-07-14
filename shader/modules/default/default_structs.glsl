@@ -6,6 +6,7 @@ struct RidgeInformation
     vec3 ev;
     float dot_grad_ev;  //first criterion:      gradient dot eigenvector ~= 0
     float lambda;       //second criterion:     lambda < 0
+    vec3 sample_position;
 };
 
 struct HitInformation
