@@ -57,7 +57,7 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
         RidgeInformation info_center;
         GetRidgeInformation(forward, sample_position_center, info_center);
 
-        //if((hit.hitType==TYPE_NONE) || (total_distance < hit.distance)){
+        if((hit.hitType==TYPE_NONE) || (total_distance < hit.distance)){
             hit.hitType = forward ? TYPE_FTLE_SURFACE_FORWARD : TYPE_FTLE_SURFACE_BACKWARD; 
             hit.copy = false;
             hit.multiPolyID = -1;
@@ -68,7 +68,7 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
             hit.distance = total_distance;
             hit.distance_iteration = center_distance;//TODO probably wrong
             hit.ignore_override = false;
-        //}
+        }
         return;
 
     }
