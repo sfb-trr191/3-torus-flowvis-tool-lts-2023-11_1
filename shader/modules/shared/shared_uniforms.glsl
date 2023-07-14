@@ -69,6 +69,7 @@ uniform bool ridges_force_symmetric_hessian;
 uniform int max_bisection_iterations_per_interval;
 uniform int max_number_of_bisection_intervals;
 uniform int max_number_of_volume_iterations;
+uniform bool ftle_surface_remove_valleys;
 
 uniform int transfer_function_index_streamline_scalar;
 uniform int transfer_function_index_ftle_forward;

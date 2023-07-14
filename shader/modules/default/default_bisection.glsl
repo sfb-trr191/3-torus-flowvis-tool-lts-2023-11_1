@@ -87,11 +87,12 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
             best_info = info_center;
 
         //filter
-
-        float distance_from_ray_position = distance(ray.origin, best_info.sample_position);
-        float total_distance = ray.rayDistance + distance_from_ray_position;
+        if(ftle_surface_remove_valleys && best_info.lambda >= 0.0)
+            return;
 
         //hit
+        float distance_from_ray_position = distance(ray.origin, best_info.sample_position);
+        float total_distance = ray.rayDistance + distance_from_ray_position;
         if((hit.hitType==TYPE_NONE) || (total_distance < hit.distance)){
             hit.hitType = forward ? TYPE_FTLE_SURFACE_FORWARD : TYPE_FTLE_SURFACE_BACKWARD; 
             hit.copy = false;
