@@ -8,7 +8,7 @@ class ShaderFlags {
         show_bounding_box, show_bounding_box_projection,
         streamline_method, streamline_method_projection, 
         volume_rendering_directions, show_movable_axes, cut_at_cube_faces, handle_inside, seed_visualization_mode,
-        integrate_light, show_ridge_surface){
+        integrate_light, ridge_surface_directions){
 
         this.changed = true;
         this.space = space;
@@ -48,22 +48,41 @@ class ShaderFlags {
                 break;
         }
 
-        this.show_ridge_surface = show_ridge_surface;
+        this.show_ridge_surface = false;
+        this.show_ridge_surface_forward = false;
+        this.show_ridge_surface_backward = false;
+        switch (ridge_surface_directions) {
+            case FTLE_DIRECTIONS_BOTH:
+                this.show_ridge_surface = true;
+                this.show_ridge_surface_forward = true;
+                this.show_ridge_surface_backward = true;
+                break;
+            case FTLE_DIRECTIONS_FORWARD:
+                this.show_ridge_surface = true;
+                this.show_ridge_surface_forward = true;
+                break;
+            case FTLE_DIRECTIONS_BACKWARD:
+                this.show_ridge_surface = true;
+                this.show_ridge_surface_backward = true;
+                break;
+            default:
+                break;
+        }
 
         this.show_volume_rendering = false;
         this.show_volume_rendering_forward = false;
         this.show_volume_rendering_backward = false;
         switch (volume_rendering_directions) {
-            case VOLUME_RENDERING_DIRECTIONS_BOTH:
+            case FTLE_DIRECTIONS_BOTH:
                 this.show_volume_rendering = true;
                 this.show_volume_rendering_forward = true;
                 this.show_volume_rendering_backward = true;
                 break;
-            case VOLUME_RENDERING_DIRECTIONS_FORWARD:
+            case FTLE_DIRECTIONS_FORWARD:
                 this.show_volume_rendering = true;
                 this.show_volume_rendering_forward = true;
                 break;
-            case VOLUME_RENDERING_DIRECTIONS_BACKWARD:
+            case FTLE_DIRECTIONS_BACKWARD:
                 this.show_volume_rendering = true;
                 this.show_volume_rendering_backward = true;
                 break;

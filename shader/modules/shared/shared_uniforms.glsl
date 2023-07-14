@@ -99,6 +99,8 @@ uniform GL_CameraData cameraAreaProjection3;
 uniform bool show_volume_rendering;
 uniform bool show_volume_rendering_forward;
 uniform bool show_volume_rendering_backward;
+uniform bool show_ridge_surface_forward;
+uniform bool show_ridge_surface_backward;
 uniform bool show_movable_axes;
 uniform bool show_streamlines;//not yet entirely redundant
 uniform bool show_streamlines_outside;//not yet entirely redundant

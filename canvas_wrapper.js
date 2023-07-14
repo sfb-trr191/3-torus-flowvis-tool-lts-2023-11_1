@@ -77,6 +77,8 @@ class UniformLocationsRayTracing {
         this.location_show_volume_rendering = gl.getUniformLocation(program, "show_volume_rendering");
         this.location_show_volume_rendering_forward = gl.getUniformLocation(program, "show_volume_rendering_forward");
         this.location_show_volume_rendering_backward = gl.getUniformLocation(program, "show_volume_rendering_backward");
+        this.location_show_ridge_surface_forward = gl.getUniformLocation(program, "show_ridge_surface_forward");
+        this.location_show_ridge_surface_backward = gl.getUniformLocation(program, "show_ridge_surface_backward");
         this.location_volume_rendering_mode = gl.getUniformLocation(program, "volume_rendering_mode");
         this.location_volume_rendering_distance_between_points = gl.getUniformLocation(program, "volume_rendering_distance_between_points");
         this.location_volume_rendering_termination_opacity = gl.getUniformLocation(program, "volume_rendering_termination_opacity");
@@ -218,11 +220,13 @@ class CanvasWrapper {
         this.ftle_min_scalar = 0;
         this.ftle_max_scalar = 1;
         this.ftle_slice_interpolate = true;
-        this.volume_rendering_directions = VOLUME_RENDERING_DIRECTIONS_NONE;
+        this.volume_rendering_directions = FTLE_DIRECTIONS_NONE;
+        this.ridge_surface_directions = FTLE_DIRECTIONS_NONE;
         this.correct_volume_opacity = false;
-        this.show_volume_rendering_forward = false;
-        this.show_volume_rendering_backward = false;
-        this.show_ridge_surface = true;
+        //this.show_volume_rendering_forward = false;
+        //this.show_volume_rendering_backward = false;
+        //this.show_ridge_surface_forward = false;
+        //this.show_ridge_surface_backward = false;
         this.max_bisection_iterations_per_interval = 1;
         this.max_number_of_bisection_intervals = 100;
         this.max_number_of_volume_iterations = 10000;
@@ -777,7 +781,7 @@ class CanvasWrapper {
             this.handle_inside,
             this.seed_visualization_mode,
             this.integrate_light,
-            this.show_ridge_surface);
+            this.ridge_surface_directions);
     }
 
     draw_mode_raytracing(gl, left_render_wrapper) {
@@ -837,16 +841,16 @@ class CanvasWrapper {
         var show_volume_rendering_forward = false;
         var show_volume_rendering_backward = false;
         switch (this.volume_rendering_directions) {
-            case VOLUME_RENDERING_DIRECTIONS_BOTH:
+            case FTLE_DIRECTIONS_BOTH:
                 show_volume_rendering = true;
                 show_volume_rendering_forward = true;
                 show_volume_rendering_backward = true;
                 break;
-            case VOLUME_RENDERING_DIRECTIONS_FORWARD:
+            case FTLE_DIRECTIONS_FORWARD:
                 show_volume_rendering = true;
                 show_volume_rendering_forward = true;
                 break;
-            case VOLUME_RENDERING_DIRECTIONS_BACKWARD:
+            case FTLE_DIRECTIONS_BACKWARD:
                 show_volume_rendering = true;
                 show_volume_rendering_backward = true;
                 break;

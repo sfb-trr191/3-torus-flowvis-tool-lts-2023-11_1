@@ -66,8 +66,8 @@ exports.state_description_dict = {
         new Entry("input_cube_axes_origin_length_side", "field", "F32"),
         new Entry("input_cube_axes_origin_radius_side", "field", "F32"), 
         //settings - volume rendering
-        new Entry("select_show_volume_main", "field", "UI8"),
-        new Entry("select_show_volume_side", "field", "UI8"),
+        new Entry("select_ftle_direction_main", "field", "UI8"),
+        new Entry("select_ftle_direction_side", "field", "UI8"),
         new Entry("input_volume_rendering_max_distance", "field", "F32"),
         new Entry("input_volume_rendering_distance_between_points", "field", "F32"),
         new Entry("input_volume_rendering_termination_opacity", "field", "F32"),

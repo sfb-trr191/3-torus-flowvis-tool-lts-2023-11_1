@@ -111,7 +111,6 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
 
 void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube)
 {
-    //return;
     int sample_index_iteration = 0;
     float delta = volume_rendering_distance_between_points;
     while(sample_index_iteration < max_number_of_bisection_intervals){
@@ -126,10 +125,18 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
         if(hit.hitType==TYPE_FTLE_SURFACE_FORWARD || hit.hitType==TYPE_FTLE_SURFACE_BACKWARD)
             break;
 
-        bool forward = true;
-        BisectInterval(ray, forward, start_distance, stop_distance, hit);
-        forward = false;
-        BisectInterval(ray, forward, start_distance, stop_distance, hit);
+#ifdef SHOW_RIDGE_SURFACE_FORWARD
+        {
+            bool forward = true;
+            BisectInterval(ray, forward, start_distance, stop_distance, hit);
+        }
+#endif
+#ifdef SHOW_RIDGE_SURFACE_BACKWARD
+        {
+            bool forward = false;
+            BisectInterval(ray, forward, start_distance, stop_distance, hit);
+        }
+#endif        
 
         //prepare next sample
         sample_index_iteration++;

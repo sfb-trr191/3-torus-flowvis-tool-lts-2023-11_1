@@ -152,8 +152,8 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_radius_side"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_origin_length_side"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_origin_radius_side"));   
-        this.group_render_settings.AddInput(document.getElementById("select_show_volume_main"));     
-        this.group_render_settings.AddInput(document.getElementById("select_show_volume_side"));     
+        this.group_render_settings.AddInput(document.getElementById("select_ftle_direction_main"));     
+        this.group_render_settings.AddInput(document.getElementById("select_ftle_direction_side"));     
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_scalar"));  
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_forward"));  
         this.group_render_settings.AddInput(document.getElementById("select_transfer_function_index_ftle_backward")); 

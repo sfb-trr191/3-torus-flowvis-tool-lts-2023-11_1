@@ -1239,13 +1239,15 @@
                             </fieldset> 
                             <fieldset class="subgroup_properties">
                                 <legend>FTLE Ridge Surface</legend>
-                                <div class="input_row" id="input_row_ridge_surface_max_number_of_bisection_intervals">
-                                    <label>max number of intervals</label>
-                                    <input id="input_ridge_surface_max_number_of_bisection_intervals" type="text" value="100" title="">
-                                </div>
-                                <div class="input_row" id="input_row_ridge_surface_max_bisection_iterations_per_interval">
-                                    <label>iterations per interval</label>
-                                    <input id="input_ridge_surface_max_bisection_iterations_per_interval" type="text" value="10" title="">
+                                <div class="vertical_container">  
+                                    <div class="input_row" id="input_row_ridge_surface_max_number_of_bisection_intervals">
+                                        <label>max number of intervals</label>
+                                        <input id="input_ridge_surface_max_number_of_bisection_intervals" type="text" value="100" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_ridge_surface_max_bisection_iterations_per_interval">
+                                        <label>iterations per interval</label>
+                                        <input id="input_ridge_surface_max_bisection_iterations_per_interval" type="text" value="10" title="">
+                                    </div>
                                 </div>
                             </fieldset>                             
                             <fieldset class="subgroup_properties">
@@ -1638,22 +1640,45 @@
                                
                     </fieldset>
                     
-
-                    <fieldset class="group_properties" id="group_properties_root_main_view_visual_objects_ftle_volume">
+                    <fieldset class="group_properties" id="group_properties_root_main_view_visual_objects_ftle">
                         <legend> 
-                            <span class="span_style_properties_legend_name">FTLE Volume</span>
-                            <span class="span_style_properties_legend_path">[Root/Main View/Visual Objects/FTLE Volume]</span>
+                            <span class="span_style_properties_legend_name">FTLE</span>
+                            <span class="span_style_properties_legend_path">[Root/Main View/Visual Objects/FTLE]</span>
                         </legend>  
                         <div class="group_properties_content">
                             <div class="input_row">
                                 <label>show</label>
-                                <select id="select_show_volume_main"
+                                <select id="select_ftle_direction_main"
                                     title="Which FTLE volume rendering is shown.">
                                     <option value="1">both</option>
                                     <option value="2">forward</option>
                                     <option value="3">backward</option>
                                 </select>
                             </div>
+                        </div>    
+                        <div class="group_properties_children">
+
+                        </div>    
+                    </fieldset>
+                    
+                    <fieldset class="group_properties" id="group_properties_root_main_view_visual_objects_ftle_volume">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">Volume</span>
+                            <span class="span_style_properties_legend_path">[Root/Main View/Visual Objects/FTLE/Volume]</span>
+                        </legend>  
+                        <div class="group_properties_content">
+                            
+                        </div>    
+                        <div class="group_properties_children">
+                        </div>    
+                    </fieldset>
+
+                    <fieldset class="group_properties" id="group_properties_root_main_view_visual_objects_ftle_surface">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">Ridge Surface</span>
+                            <span class="span_style_properties_legend_path">[Root/Main View/Visual Objects/FTLE/Ridge Surface]</span>
+                        </legend>  
+                        <div class="group_properties_content">
                         </div>    
                         <div class="group_properties_children">
 
@@ -2109,21 +2134,46 @@
                     </fieldset>
 
 
-                    <fieldset class="group_properties" id="group_properties_root_aux_view_visual_objects_ftle_volume">
+                    <fieldset class="group_properties" id="group_properties_root_aux_view_visual_objects_ftle">
                         <legend> 
-                            <span class="span_style_properties_legend_name">FTLE Volume</span>
-                            <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/FTLE Volume]</span>
+                            <span class="span_style_properties_legend_name">FTLE</span>
+                            <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/FTLE]</span>
                         </legend>  
                         <div class="group_properties_content">
                             <div class="input_row">
                                 <label>show</label>                                
-                                <select id="select_show_volume_side"
+                                <select id="select_ftle_direction_side"
                                     title="Decides which FTLE volume rendering is shown.">
                                     <option value="1">both</option>
                                     <option value="2">forward</option>
                                     <option value="3">backward</option>
                                 </select>                                
                             </div>
+                        </div>    
+                        <div class="group_properties_children">
+
+                        </div>    
+                    </fieldset>
+
+                    <fieldset class="group_properties" id="group_properties_root_aux_view_visual_objects_ftle_volume">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">Volume</span>
+                            <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/FTLE/Volume]</span>
+                        </legend>  
+                        <div class="group_properties_content">
+                            
+                        </div>    
+                        <div class="group_properties_children">
+
+                        </div>    
+                    </fieldset>
+
+                    <fieldset class="group_properties" id="group_properties_root_aux_view_visual_objects_ftle_surface">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">Ridge Surface</span>
+                            <span class="span_style_properties_legend_path">[Root/Aux View/Visual Objects/FTLE/Ridge Surface]</span>
+                        </legend>  
+                        <div class="group_properties_content">
                         </div>    
                         <div class="group_properties_children">
 

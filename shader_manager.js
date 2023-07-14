@@ -54,6 +54,10 @@ class ShaderManager {
             defines += "\n#define COORDINATES_4D";            
         if(shader_flags.show_ridge_surface)
             defines += "\n#define SHOW_RIDGE_SURFACE";  
+        if(shader_flags.show_ridge_surface_forward)
+            defines += "\n#define SHOW_RIDGE_SURFACE_FORWARD";        
+        if(shader_flags.show_ridge_surface_backward)
+            defines += "\n#define SHOW_RIDGE_SURFACE_BACKWARD";       
         if(shader_flags.show_volume_rendering)
             defines += "\n#define SHOW_VOLUME_RENDERING";        
         if(shader_flags.show_volume_rendering_forward)
@@ -216,6 +220,10 @@ class ShaderManager {
         
         if(shader_flags.show_ridge_surface)
             key += ";SHOW_RIDGE_SURFACE"
+        if(shader_flags.show_ridge_surface_forward)
+            key += ";SHOW_RIDGE_SURFACE_FORWARD"
+        if(shader_flags.show_ridge_surface_backward)
+            key += ";SHOW_RIDGE_SURFACE_BACKWARD"
         if(shader_flags.show_volume_rendering)
             key += ";SHOW_VOLUME_RENDERING"
         if(shader_flags.show_volume_rendering_forward)
