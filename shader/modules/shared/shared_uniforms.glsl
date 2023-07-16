@@ -85,6 +85,9 @@ uniform int selected_streamline_id;
 uniform float gray_scale_factor;
 uniform vec3 selected_streamline_color;
 uniform vec3 dynamic_streamline_color;
+uniform vec3 forward_ftle_surface_color;
+uniform vec3 backward_ftle_surface_color;
+
 uniform vec4 dynamic_seed_position;
 uniform float max_streamline_cost;
 

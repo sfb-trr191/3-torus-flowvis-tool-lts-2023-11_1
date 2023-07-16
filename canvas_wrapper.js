@@ -48,7 +48,9 @@ class UniformLocationsRayTracing {
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_cost = gl.getUniformLocation(program, "max_streamline_cost");  
         this.location_selected_streamline_color = gl.getUniformLocation(program, "selected_streamline_color");  
-        this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");            
+        this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");         
+        this.location_forward_ftle_surface_color = gl.getUniformLocation(program, "forward_ftle_surface_color");  
+        this.location_backward_ftle_surface_color = gl.getUniformLocation(program, "backward_ftle_surface_color"); 
         this.location_dynamic_seed_position = gl.getUniformLocation(program, "dynamic_seed_position");            
         this.location_selected_streamline_id = gl.getUniformLocation(program, "selected_streamline_id");    
         this.location_gray_scale_factor = gl.getUniformLocation(program, "gray_scale_factor");  
@@ -262,6 +264,8 @@ class CanvasWrapper {
 
         this.selected_streamline_color = glMatrix.vec3.fromValues(1,0,0);
         this.dynamic_streamline_color = glMatrix.vec3.fromValues(1,1,0);
+        this.forward_ftle_surface_color = glMatrix.vec3.fromValues(1,0,0);//overwritten by ui anyways
+        this.backward_ftle_surface_color = glMatrix.vec3.fromValues(0,0,1);//overwritten by ui anyways
         this.selected_streamline_id = -1;
         this.gray_scale_factor = 0.5;
 
@@ -927,6 +931,9 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);        
         gl.uniform3f(this.location_raytracing.location_selected_streamline_color, this.selected_streamline_color[0], this.selected_streamline_color[1], this.selected_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_dynamic_streamline_color, this.dynamic_streamline_color[0], this.dynamic_streamline_color[1], this.dynamic_streamline_color[2]);
+        gl.uniform3f(this.location_raytracing.location_forward_ftle_surface_color, this.forward_ftle_surface_color[0], this.forward_ftle_surface_color[1], this.forward_ftle_surface_color[2]);
+        gl.uniform3f(this.location_raytracing.location_backward_ftle_surface_color, this.backward_ftle_surface_color[0], this.backward_ftle_surface_color[1], this.backward_ftle_surface_color[2]);
+               
         gl.uniform4f(this.location_raytracing.location_dynamic_seed_position, 
             this.streamline_context_dynamic.streamline_generator.p_dynamic_streamline.position[0], 
             this.streamline_context_dynamic.streamline_generator.p_dynamic_streamline.position[1], 

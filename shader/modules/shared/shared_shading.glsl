@@ -42,11 +42,11 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 	}
     if(hit.hitType == TYPE_FTLE_SURFACE_FORWARD)
 	{
-		return vec3(1,0,0);
+		return forward_ftle_surface_color;
 	}
     if(hit.hitType == TYPE_FTLE_SURFACE_BACKWARD)
 	{
-		return vec3(0,0,1);
+		return backward_ftle_surface_color;
 	}
 	if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
 	{
