@@ -100,7 +100,7 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
             hit.distanceToCenter = 0.0;
             hit.positionCenter = vec3(-1, -1, -1);
             hit.position = best_info.sample_position;
-            hit.normal = best_info.ev;
+            hit.normal = dot(ray.direction, best_info.ev) < 0.0 ? best_info.ev : -best_info.ev;
             hit.distance = total_distance;
             hit.distance_iteration = distance_from_ray_position;//TODO probably wrong
             hit.ignore_override = false;
