@@ -43,7 +43,7 @@ class VTK_File {
 
         const e_DataArray = this.xmlDoc.createElement("DataArray");
         e_DataArray.setAttribute("type", "Float32");
-        e_DataArray.setAttribute("Name", "ImageScalars");
+        e_DataArray.setAttribute("Name", "scalars");
         e_DataArray.setAttribute("format", "ascii");
         e_DataArray.textContent = this.GenerateDataString();
 
