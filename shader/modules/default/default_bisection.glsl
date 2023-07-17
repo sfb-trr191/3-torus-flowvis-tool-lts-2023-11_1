@@ -15,6 +15,17 @@ void GetRidgeInformation(bool forward, vec3 sample_position, inout RidgeInformat
     float lambda = 0.0;
     vec3 ev = vec3(0,0,0);
     bool ok = mat3RidgeEigenNoThreshold(sample_hessian, lambda, ev);
+
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_X_AXIS && dot(ev, vec3(1,0,0)) > 0.0){
+        ev = -ev;
+    }
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_Y_AXIS && dot(ev, vec3(0,1,0)) > 0.0){
+        ev = -ev;
+    }
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_Z_AXIS && dot(ev, vec3(0,0,1)) > 0.0){
+        ev = -ev;
+    }
+
     float dot_grad_ev = dot(sample_gradient, ev);
 
     //RidgeInformation info;
@@ -27,7 +38,11 @@ void GetRidgeInformation(bool forward, vec3 sample_position, inout RidgeInformat
 }
 
 bool IntervalHasSignChange(RidgeInformation info_start, RidgeInformation info_stop){
-    return (info_start.dot_grad_ev > 0.0) ? (info_stop.dot_grad_ev < 0.0) : (info_stop.dot_grad_ev > 0.0);
+    float info_stop_dot_grad_ev = info_stop.dot_grad_ev;
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_LOCAL && dot(info_start.ev, info_stop.ev) < 0.0){
+        info_stop_dot_grad_ev = -info_stop.dot_grad_ev;
+    }
+    return (info_start.dot_grad_ev > 0.0) ? (info_stop_dot_grad_ev < 0.0) : (info_stop_dot_grad_ev > 0.0);
 }
 
 void BisectInterval(Ray ray, bool forward, float start_distance, float stop_distance, inout HitInformation hit){

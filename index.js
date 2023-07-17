@@ -1384,6 +1384,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.max_number_of_bisection_intervals = parseInt(document.getElementById("input_ridge_surface_max_number_of_bisection_intervals").value);
         canvas_wrapper_main.max_bisection_iterations_per_interval = parseInt(document.getElementById("input_ridge_surface_max_bisection_iterations_per_interval").value);
         canvas_wrapper_main.ftle_surface_remove_valleys = document.getElementById("checkbox_ftle_surface_remove_valleys").checked;
+        canvas_wrapper_main.eigen_orientation_method = parseInt(document.getElementById("select_eigen_orientation_method").value);
+        
 
         canvas_wrapper_main.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_main").checked;
         canvas_wrapper_main.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_main").checked;
@@ -1471,6 +1473,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.max_number_of_bisection_intervals = parseInt(document.getElementById("input_ridge_surface_max_number_of_bisection_intervals").value);
         canvas_wrapper_side.max_bisection_iterations_per_interval = parseInt(document.getElementById("input_ridge_surface_max_bisection_iterations_per_interval").value);
         canvas_wrapper_side.ftle_surface_remove_valleys = document.getElementById("checkbox_ftle_surface_remove_valleys").checked;
+        canvas_wrapper_side.eigen_orientation_method = parseInt(document.getElementById("select_eigen_orientation_method").value);
 
         canvas_wrapper_side.debug_render_spherinder = document.getElementById("checkbox_debug_render_streamline_spherinder_aux").checked;
         canvas_wrapper_side.debug_render_3Sphere = document.getElementById("checkbox_debug_render_streamline_3Sphere_aux").checked;

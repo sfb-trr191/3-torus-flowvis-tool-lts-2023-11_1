@@ -1249,10 +1249,19 @@
                                         <input id="input_ridge_surface_max_bisection_iterations_per_interval" type="text" value="10" title="">
                                     </div>
                                     <div class="input_row">
-                                        <label>remove valleys</label>
+                                        <label>lambda criterion</label>
                                         <input id="checkbox_ftle_surface_remove_valleys" type="checkbox" value="true" checked="true" title="">
                                     </div>   
-                                    
+                                    <div class="input_row">
+                                        <label>eigen orientation</label>
+                                        <select id="select_eigen_orientation_method" title="">
+                                            <option value="0">none</option>
+                                            <option value="1">x axis</option>
+                                            <option value="2">y axis</option>
+                                            <option value="3">z axis</option>
+                                            <option value="4">local</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </fieldset>                             
                             <fieldset class="subgroup_properties">
