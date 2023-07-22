@@ -100,6 +100,21 @@ class UniformLocationsCompute2zJacobyColumnSlice {
     }
 }
 
+class UniformLocationsCompute2zSymmetricColumnSlice {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsCompute2zSymmetricColumnSlice: ", name)
+        this.location_texture_column0 = gl.getUniformLocation(program, "texture_column0");       
+        this.location_texture_column1 = gl.getUniformLocation(program, "texture_column1");    
+        this.location_texture_column2 = gl.getUniformLocation(program, "texture_column2");     
+        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
+        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
+        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
+        this.location_slice_index = gl.getUniformLocation(program, "slice_index");
+        this.location_column_index = gl.getUniformLocation(program, "column_index");//direction
+        this.location_is_forward = gl.getUniformLocation(program, "is_forward");
+    }
+}
+
 class FTLEManager {
 
     constructor(gl, gl_side, p_streamline_context, p_shader_manager) {
@@ -109,25 +124,30 @@ class FTLEManager {
         this.dim_x = 100;
         this.dim_y = 100;
         this.dim_z = 100;
+        this.force_symmetric = true;
         this.UpdateExtendedDims(gl);
         this.step_size = 0.0125;
         this.advection_time = 0.5;
+        this.ftle_max_value = 0;
+        this.ftle_min_value = 0;
 
-        //this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
+        //temporary textures
         this.data_texture_flowmap = new DataTexture3D_RGBA(gl);
-
-        //this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
         this.data_texture_flowmap_diff_x = new DataTexture3D_RGBA(gl);
         this.data_texture_flowmap_diff_y = new DataTexture3D_RGBA(gl);
         this.data_texture_flowmap_diff_z = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_jacoby_direction_x_tmp = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_jacoby_direction_y_tmp = new DataTexture3D_RGBA(gl);
+        this.data_texture_ftle_jacoby_direction_z_tmp = new DataTexture3D_RGBA(gl);
+
+        //main textures
         this.data_texture_ftle = new DataTexture3D_R(gl);
         this.data_texture_ftle_gradient = new DataTexture3D_RGBA(gl);
         this.data_texture_ftle_jacoby_direction_x = new DataTexture3D_RGBA(gl);
         this.data_texture_ftle_jacoby_direction_y = new DataTexture3D_RGBA(gl);
         this.data_texture_ftle_jacoby_direction_z = new DataTexture3D_RGBA(gl);
-        this.ftle_max_value = 0;
-        this.ftle_min_value = 0;
 
+        //side textures
         this.data_texture_ftle_side = new DataTexture3D_R(gl_side);
         this.data_texture_ftle_gradient_side = new DataTexture3D_RGBA(gl_side);
         this.data_texture_ftle_jacoby_direction_x_side = new DataTexture3D_RGBA(gl_side);
@@ -165,6 +185,12 @@ class FTLEManager {
         this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
+
+        this.program_compute_2z_symmetric_column_slice = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_2z_symmetric_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_SYMMETRIC_COLUMN_SLICE);
+        this.location_compute_2z_symmetric_column_slice = new UniformLocationsCompute2zSymmetricColumnSlice(gl, this.program_compute_2z_symmetric_column_slice);
+        this.shader_uniforms_compute_2z_symmetric_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_symmetric_column_slice);
+        this.attribute_location_dummy_program_compute_2z_symmetric_column_slice = gl.getAttribLocation(this.program_compute_2z_symmetric_column_slice, "a_position");
 
         this.dummy_quad = new DummyQuad(gl);
     }
@@ -277,6 +303,7 @@ class FTLEManager {
         this.UpdateExtendedDims(bo.gl);
         this.advection_time = bo.input_parameters.advection_time;
         this.step_size = bo.input_parameters.step_size;
+        this.force_symmetric = bo.input_parameters.force_symmetric;
         this.highest_iteration_count = 0;
         this.enterState(FTLE_STATE_FLOW_MAP_SETUP);
     }
@@ -308,6 +335,9 @@ class FTLEManager {
                 break; 
             case FTLE_STATE_FTLE_JACOBY:
                 this.execute_ftle_jacoby(bo);
+                break; 
+            case FTLE_STATE_SYMMETRIC:
+                this.execute_ftle_symmetric(bo);
                 break; 
             case FTLE_STATE_FINISH:
                 this.execute_finish(bo);
@@ -461,7 +491,7 @@ class FTLEManager {
                 bo.tmp.h2_z = 2 / (this.dim_z - 1);
                 bo.tmp.h2 = bo.tmp.h2_x;
                 bo.tmp.direction = 0;
-                bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_x;
+                bo.tmp.data_texture = this.force_symmetric ? this.data_texture_ftle_jacoby_direction_x_tmp : this.data_texture_ftle_jacoby_direction_x;
                 bo.tmp.finished_forward = false;
                 bo.tmp.i = 0;
 
@@ -498,6 +528,56 @@ class FTLEManager {
                 bo.tmp.i = 0;
                 if(bo.tmp.direction == 1){
                     bo.tmp.h2 = bo.tmp.h2_y;
+                    bo.tmp.data_texture = this.force_symmetric ? this.data_texture_ftle_jacoby_direction_y_tmp : this.data_texture_ftle_jacoby_direction_y;
+                }
+                if(bo.tmp.direction == 2){
+                    bo.tmp.h2 = bo.tmp.h2_z;
+                    bo.tmp.data_texture = this.force_symmetric ? this.data_texture_ftle_jacoby_direction_z_tmp : this.data_texture_ftle_jacoby_direction_z; 
+                }
+                if(bo.tmp.direction == 3){
+                    //prepare next state
+                    if(this.force_symmetric){
+                        bo.tmp.direction = 0;
+                        bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_x;
+                        bo.tmp.finished_forward = false;
+                        bo.tmp.i = 0;
+                        this.enterState(FTLE_STATE_SYMMETRIC);
+                    }else{
+                        this.enterState(FTLE_STATE_FINISH);
+                    }
+                }
+            }else{
+                this.computeFTLEJacobySlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, false)
+                bo.tmp.i += 1;
+                var progress = ((bo.tmp.direction * 2 * this.dim_z) + this.dim_z + bo.tmp.i) / (6 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_5");
+            }
+        }
+    }
+
+    execute_ftle_symmetric(bo){//bo = bo_calculate_ftle
+        if(!bo.tmp.finished_forward){
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.finished_forward = true;
+                bo.tmp.i = 0;
+            }else{
+                if(bo.tmp.i == 0){
+                    bo.tmp.data_texture.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+                }
+                this.computeFTLESymmetricSlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, true)
+                bo.tmp.i += 1;
+                var progress = ((bo.tmp.direction * 2 * this.dim_z) + bo.tmp.i) / (6 * this.dim_z)
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_6");
+            }
+        }
+        else{
+            if(bo.tmp.i == this.dim_z){
+                bo.tmp.data_texture.update(bo.gl);
+                bo.tmp.finished_forward = false;
+                bo.tmp.direction += 1;
+                bo.tmp.i = 0;
+                if(bo.tmp.direction == 1){
+                    bo.tmp.h2 = bo.tmp.h2_y;
                     bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_y;
                 }
                 if(bo.tmp.direction == 2){
@@ -505,15 +585,17 @@ class FTLEManager {
                     bo.tmp.data_texture = this.data_texture_ftle_jacoby_direction_z;
                 }
                 if(bo.tmp.direction == 3){
+                    //prepare next state
+                    bo.tmp.direction = 0;
                     bo.tmp.finished_forward = false;
                     bo.tmp.i = 0;
                     this.enterState(FTLE_STATE_FINISH);
                 }
             }else{
-                this.computeFTLEJacobySlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, false)
+                this.computeFTLESymmetricSlice(bo.gl, bo.tmp.i, bo.tmp.direction, bo.tmp.data_texture, bo.tmp.h2, false)
                 bo.tmp.i += 1;
                 var progress = ((bo.tmp.direction * 2 * this.dim_z) + this.dim_z + bo.tmp.i) / (6 * this.dim_z)
-                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_5");
+                bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_6");
             }
         }
     }
@@ -785,29 +867,86 @@ class FTLEManager {
     }
 
     computeFTLEJacobySlice(gl, slice_index, direction, data_texture, h2, is_forward) {
-        var sign_f = is_forward ? 1.0 : -1.0;
+        if(false){
+            var sign_f = is_forward ? 1.0 : -1.0;
+            var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
+            var z = slice_index / (this.dim_z - 1);
+            console.log("computeFlowMapFiniteDifferencesSlice: ", slice_index, z);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
+            gl.viewport(0, 0, this.dim_x, this.dim_y);
+            gl.useProgram(this.program_compute_flowmap_finite_differences);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_x, this.dim_x);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_y, this.dim_y);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_z, this.dim_z);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_slice_index, slice_index);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_direction, direction);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_is_forward, is_forward);
+            gl.uniform1f(this.location_compute_flowmap_finite_differences.location_h2, h2);
+    
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_3D, this.data_texture_flowmap.texture.texture);
+            gl.uniform1i(this.location_compute_flowmap_finite_differences.location_texture_flow_map, 0);
+    
+            this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_finite_differences);
+            var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
+            data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
+        }else{
+            var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
+            var z = slice_index / (this.dim_z - 1);
+            console.log("computeFTLEJacobySlice: ", slice_index, z);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
+            gl.viewport(0, 0, this.dim_x, this.dim_y);
+            gl.useProgram(this.program_compute_2z_jacoby_column_slice);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_dim_x, this.dim_x);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_dim_y, this.dim_y);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_dim_z, this.dim_z);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_slice_index, slice_index);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_direction, direction);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_is_forward, is_forward);
+            gl.uniform1f(this.location_compute_2z_jacoby_column_slice.location_h2, h2);
+    
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle_gradient.texture.texture);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_texture_vector_fields, 0);
+    
+            this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_2z_jacoby_column_slice);
+            var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
+            data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
+        }
+
+    }
+
+    computeFTLESymmetricSlice(gl, slice_index, direction, data_texture, h2, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFlowMapFiniteDifferencesSlice: ", slice_index, z);
+        console.log("computeFTLESymmetricSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
-        gl.useProgram(this.program_compute_flowmap_finite_differences);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_x, this.dim_x);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_y, this.dim_y);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_dim_z, this.dim_z);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_slice_index, slice_index);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_direction, direction);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_is_forward, is_forward);
-        gl.uniform1f(this.location_compute_flowmap_finite_differences.location_h2, h2);
+        gl.useProgram(this.program_compute_2z_symmetric_column_slice);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_dim_x, this.dim_x);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_dim_y, this.dim_y);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_slice_index, slice_index);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_column_index, direction);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_is_forward, is_forward);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_3D, this.data_texture_flowmap.texture.texture);
-        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_texture_flow_map, 0);
+        gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle_jacoby_direction_x_tmp.texture.texture);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_texture_column0, 0);
 
-        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_finite_differences);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle_jacoby_direction_y_tmp.texture.texture);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_texture_column1, 1);
+
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle_jacoby_direction_z_tmp.texture.texture);
+        gl.uniform1i(this.location_compute_2z_symmetric_column_slice.location_texture_column2, 2);
+
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_2z_symmetric_column_slice);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
         data_texture.updateSlice(gl, slice_index_combined_texture, slice_data);
     }
+
 
     readPixelsRGBA(gl, dim_x, dim_y) {
         var pixels = new Float32Array(dim_x * dim_y * 4);

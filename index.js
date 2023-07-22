@@ -8,6 +8,7 @@ const f_shader_compute_flowmap_finite_differences = require("./shader/stand_alon
 const f_shader_compute_ftle_normals = require("./shader/stand_alone/f_shader_compute_ftle_normals.glsl");
 const f_shader_compute_2z_gradient_slice = require("./shader/stand_alone/f_shader_compute_2z_gradient_slice.glsl");
 const f_shader_compute_2z_jacoby_column_slice = require("./shader/stand_alone/f_shader_compute_2z_jacoby_column_slice.glsl");
+const f_shader_compute_2z_symmetric_column_slice = require("./shader/stand_alone/f_shader_compute_2z_symmetric_column_slice.glsl");
 const f_shader_copy = require("./shader/stand_alone/f_shader_copy.glsl");
 const f_shader_flow_map_slice = require("./shader/stand_alone/f_shader_flow_map_slice.glsl");
 const f_shader_placeholder = require("./shader/stand_alone/f_shader_placeholder.glsl");

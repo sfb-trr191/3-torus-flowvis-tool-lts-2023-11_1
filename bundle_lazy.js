@@ -175,6 +175,7 @@ global.FTLE_STATE_FLOW_MAP_FINITE_DIFFEREMCES_COMPUTE = 4;
 global.FTLE_STATE_FTLE = 5;
 global.FTLE_STATE_FTLE_GRADIENT = 6;
 global.FTLE_STATE_FTLE_JACOBY = 7;
+global.FTLE_STATE_SYMMETRIC = 8;
 global.FTLE_STATE_FINISH = 100;
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){

@@ -19,6 +19,7 @@ class BackgroundObjectCalculateFTLE{
         this.input_parameters.dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
         this.input_parameters.advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
         this.input_parameters.step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
+        this.input_parameters.force_symmetric = document.getElementById("input_ftle_calculation_force_symmetric").checked;
     }
 
     start(){
@@ -33,6 +34,7 @@ class BackgroundObjectCalculateFTLE{
         document.getElementById("progress_bar_calculate_ftle_3").style.width = width + '%';     
         document.getElementById("progress_bar_calculate_ftle_4").style.width = width + '%';     
         document.getElementById("progress_bar_calculate_ftle_5").style.width = width + '%';   
+        document.getElementById("progress_bar_calculate_ftle_6").style.width = width + '%';   
          
     }
 
