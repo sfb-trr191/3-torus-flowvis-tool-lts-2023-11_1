@@ -48,8 +48,11 @@ uniform float tubeRadiusOutside;
 uniform float fog_density;
 uniform int fog_type;
 uniform int shading_mode_streamlines;
+uniform int shading_mode_ftle_surface;
 uniform float min_scalar;
 uniform float max_scalar;
+uniform float min_scalar_ftle_surface;
+uniform float max_scalar_ftle_surface;
 uniform int projection_index;
 
 uniform bool is_main_renderer;
@@ -69,7 +72,7 @@ uniform bool ridges_force_symmetric_hessian;
 uniform int max_bisection_iterations_per_interval;
 uniform int max_number_of_bisection_intervals;
 uniform int max_number_of_volume_iterations;
-uniform bool ftle_surface_remove_valleys;
+uniform bool ftle_surface_use_lambda_criterion;
 uniform int eigen_orientation_method;
 
 uniform int transfer_function_index_streamline_scalar;

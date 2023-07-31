@@ -34,6 +34,7 @@ void GetRidgeInformation(bool forward, vec3 sample_position, inout RidgeInformat
     info.dot_grad_ev = dot_grad_ev;
     info.lambda = lambda;
     info.sample_position = sample_position;
+    info.ftle_value = sample_scalar;
     //return info;
 }
 
@@ -102,7 +103,7 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
             best_info = info_center;
 
         //filter
-        if(ftle_surface_remove_valleys && best_info.lambda >= 0.0)
+        if(ftle_surface_use_lambda_criterion && best_info.lambda >= 0.0)
             return;
 
         //hit
@@ -113,12 +114,15 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
             hit.copy = false;
             hit.multiPolyID = -1;
             hit.distanceToCenter = 0.0;
-            hit.positionCenter = vec3(-1, -1, -1);
+            hit.positionCenter = best_info.sample_position;//used by output
             hit.position = best_info.sample_position;
             hit.normal = dot(ray.direction, best_info.ev) < 0.0 ? best_info.ev : -best_info.ev;
             hit.distance = total_distance;
             hit.distance_iteration = distance_from_ray_position;//TODO probably wrong
             hit.ignore_override = false;
+
+            hit.ftle_value = best_info.ftle_value;
+            hit.ftle_ridge_strength = abs(best_info.lambda);
         }
 
     }

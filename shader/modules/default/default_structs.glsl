@@ -7,6 +7,7 @@ struct RidgeInformation
     float dot_grad_ev;  //first criterion:      gradient dot eigenvector ~= 0
     float lambda;       //second criterion:     lambda < 0
     vec3 sample_position;
+    float ftle_value;
 };
 
 struct HitInformation
@@ -43,6 +44,10 @@ struct HitInformation
     int sub_type;
     int iteration_count;
     bool dynamic;
+
+    //ftle surface hit data
+    float ftle_value;
+    float ftle_ridge_strength;
 };
 
 struct Ray

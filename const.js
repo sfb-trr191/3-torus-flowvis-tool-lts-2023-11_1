@@ -2,6 +2,11 @@ global.URL_RELEASE = "https://sfb-trr191.github.io/3-torus-flowvis-tool/index.ht
 
 global.TYPE_NONE = 0;
 global.TYPE_STREAMLINE_SEGMENT = 1;
+global.TYPE_CLICKED_SPHERE = 2;
+global.TYPE_GL_CYLINDER = 3;
+global.TYPE_SEED = 4;
+global.TYPE_FTLE_SURFACE_FORWARD = 5;
+global.TYPE_FTLE_SURFACE_BACKWARD = 6;
 
 global.CONTROL_MODE_CAMERA = 1;
 global.CONTROL_MODE_DYNAMIC_STREAMLINE = 2;

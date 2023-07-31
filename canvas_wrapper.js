@@ -22,7 +22,7 @@ class UniformLocationsRayTracing {
         
 
         this.location_eigen_orientation_method = gl.getUniformLocation(program, "eigen_orientation_method");
-        this.location_ftle_surface_remove_valleys = gl.getUniformLocation(program, "ftle_surface_remove_valleys");
+        this.location_ftle_surface_use_lambda_criterion = gl.getUniformLocation(program, "ftle_surface_use_lambda_criterion");
         this.location_max_bisection_iterations_per_interval = gl.getUniformLocation(program, "max_bisection_iterations_per_interval");
         this.location_max_number_of_bisection_intervals = gl.getUniformLocation(program, "max_number_of_bisection_intervals");
         this.location_max_number_of_volume_iterations = gl.getUniformLocation(program, "max_number_of_volume_iterations");
@@ -67,8 +67,11 @@ class UniformLocationsRayTracing {
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");
         this.location_projection_index = gl.getUniformLocation(program, "projection_index");
         this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");
+        this.location_shading_mode_ftle_surface = gl.getUniformLocation(program, "shading_mode_ftle_surface");        
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
+        this.location_min_scalar_ftle_surface = gl.getUniformLocation(program, "min_scalar_ftle_surface");
+        this.location_max_scalar_ftle_surface = gl.getUniformLocation(program, "max_scalar_ftle_surface");        
         this.location_cut_at_cube_faces = gl.getUniformLocation(program, "cut_at_cube_faces");
         this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");
         this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");
@@ -203,6 +206,7 @@ class CanvasWrapper {
         this.fog_density = 0;
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
+        this.shading_mode_ftle_surface = 0;
         this.projection_index = -1;
         this.streamline_method = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;
         this.streamline_method_projection = STREAMLINE_DRAW_METHOD_FUNDAMENTAL;        
@@ -212,6 +216,8 @@ class CanvasWrapper {
         this.max_iteration_count = 1;
         this.min_scalar = 0;
         this.max_scalar = 0;
+        this.min_scalar_ftle_surface = 0;
+        this.max_scalar_ftle_surface = 0;
         this.show_bounding_box = false;
         this.show_bounding_box_projection = false;
         this.show_movable_axes = false;
@@ -233,7 +239,7 @@ class CanvasWrapper {
         //this.show_volume_rendering_backward = false;
         //this.show_ridge_surface_forward = false;
         //this.show_ridge_surface_backward = false;
-        this.ftle_surface_remove_valleys = true;
+        this.ftle_surface_use_lambda_criterion = true;
         this.eigen_orientation_method = 0;
         this.max_bisection_iterations_per_interval = 1;
         this.max_number_of_bisection_intervals = 100;
@@ -953,8 +959,12 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
         gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
+        gl.uniform1i(this.location_raytracing.location_shading_mode_ftle_surface, this.shading_mode_ftle_surface);        
         gl.uniform1f(this.location_raytracing.location_min_scalar, this.min_scalar);
         gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar);
+        gl.uniform1f(this.location_raytracing.location_min_scalar_ftle_surface, this.min_scalar_ftle_surface);
+        gl.uniform1f(this.location_raytracing.location_max_scalar_ftle_surface, this.max_scalar_ftle_surface);
+        
 
         gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces);
         gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside);
@@ -994,7 +1004,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_transfer_function_index_ftle_backward, this.transfer_function_index_ftle_backward);
         
         gl.uniform1i(this.location_raytracing.location_eigen_orientation_method, this.eigen_orientation_method);
-        gl.uniform1i(this.location_raytracing.location_ftle_surface_remove_valleys, this.ftle_surface_remove_valleys);
+        gl.uniform1i(this.location_raytracing.location_ftle_surface_use_lambda_criterion, this.ftle_surface_use_lambda_criterion);
         gl.uniform1i(this.location_raytracing.location_max_bisection_iterations_per_interval, this.max_bisection_iterations_per_interval);
         gl.uniform1i(this.location_raytracing.location_max_number_of_bisection_intervals, this.max_number_of_bisection_intervals);
         gl.uniform1i(this.location_raytracing.location_max_number_of_volume_iterations, this.max_number_of_volume_iterations);

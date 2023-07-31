@@ -196,6 +196,7 @@ class InputParameterWrapper {
         //settings - streamline shading      
         new InputWrapper(this, "select_seed_mode_side", "ser");
         new InputWrapper(this, "select_shading_mode_streamlines", "sms");
+        new InputWrapper(this, "select_shading_mode_ftle_surface", "smfs");
         new InputWrapper(this, "input_formula_scalar", "fs");
         new InputWrapper(this, "input_min_scalar", "smin");
         new InputWrapper(this, "input_max_scalar", "smax");        

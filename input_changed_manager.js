@@ -180,6 +180,14 @@ class InputChangedManager{
 
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_transfer_function_log_scale"));  
         this.group_render_settings.AddInput(document.getElementById("input_transfer_function_log_scale_d"));    
+        
+        this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_max_number_of_bisection_intervals"));
+        this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_max_bisection_iterations_per_interval"));
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_ftle_surface_use_lambda_criterion"));
+        this.group_render_settings.AddInput(document.getElementById("select_eigen_orientation_method"));
+        this.group_render_settings.AddInput(document.getElementById("select_shading_mode_ftle_surface"));
+        this.group_render_settings.AddInput(document.getElementById("input_min_scalar_ftle_surface"));
+        this.group_render_settings.AddInput(document.getElementById("input_max_scalar_ftle_surface"));
     }
 
     LinkUISeeds(ui_seeds){

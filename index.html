@@ -1236,7 +1236,7 @@
                                     </div>
                                     <div class="input_row" id="input_row_scalar_range">
                                         <label>scalar range</label>
-                                        <div id="div_buttons_rng" class="horizontal_div_2">
+                                        <div class="horizontal_div_2">
                                             <input id="input_min_scalar" type="text" value="-1.0"
                                                 title="The minimum value of the scalar field.">
                                             <input id="input_max_scalar" type="text" value="1.0"
@@ -1258,7 +1258,7 @@
                                     </div>
                                     <div class="input_row">
                                         <label>lambda criterion</label>
-                                        <input id="checkbox_ftle_surface_remove_valleys" type="checkbox" value="true" checked="true" title="">
+                                        <input id="checkbox_ftle_surface_use_lambda_criterion" type="checkbox" value="true" checked="true" title="">
                                     </div>   
                                     <div class="input_row">
                                         <label>eigen orientation</label>
@@ -1269,6 +1269,28 @@
                                             <option value="3">z axis</option>
                                             <option value="4">local</option>
                                         </select>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>color</label>
+                                        <select id="select_shading_mode_ftle_surface" title="This parameter decides the color of the surface.
+        -type: forward and backward are colored red and blue respectively.
+        -ftle value: the surface has the color of the ftle field at that position.
+        -strength: the strength of the ridge calculated as: abs(eigenvalue).">
+                                            <!-- -FTLE: the streamlines are colored based on position and the scalar field specified below"> -->
+                                            <option value="0">type</option>
+                                            <option value="1">ftle value</option>
+                                            <option value="2">strength</option>
+                                            <!-- <option value="2">FTLE</option> -->
+                                        </select>
+                                    </div>
+                                    <div class="input_row" id="input_row_scalar_range_ftle_surface">
+                                        <label>scalar range</label>
+                                        <div class="horizontal_div_2">
+                                            <input id="input_min_scalar_ftle_surface" type="text" value="0.0"
+                                                title="The minimum value used for coloring.">
+                                            <input id="input_max_scalar_ftle_surface" type="text" value="10.0"
+                                                title="The maximum value used for coloring.">
+                                        </div>
                                     </div>
                                 </div>
                             </fieldset>                             

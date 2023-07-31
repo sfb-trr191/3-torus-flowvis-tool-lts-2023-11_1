@@ -42,11 +42,49 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 	}
     if(hit.hitType == TYPE_FTLE_SURFACE_FORWARD)
 	{
-		return forward_ftle_surface_color;
+        if(shading_mode_ftle_surface == SHADING_MODE_FTLE_SURFACE_TYPE)
+        {
+		    return forward_ftle_surface_color;
+        }
+        if(shading_mode_ftle_surface == SHADING_MODE_FTLE_SURFACE_FTLE_VALUE)
+        {
+            float scalar = hit.ftle_value;
+            float t = (scalar - min_scalar_ftle_surface) / (max_scalar_ftle_surface - min_scalar_ftle_surface);
+            int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+            bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+            return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
+        }
+        if(shading_mode_ftle_surface == SHADING_MODE_FTLE_SURFACE_STRENGTH)
+        {
+            float scalar = hit.ftle_ridge_strength;
+            float t = (scalar - min_scalar_ftle_surface) / (max_scalar_ftle_surface - min_scalar_ftle_surface);
+            int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+            bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+            return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
+        }
 	}
     if(hit.hitType == TYPE_FTLE_SURFACE_BACKWARD)
 	{
-		return backward_ftle_surface_color;
+        if(shading_mode_ftle_surface == SHADING_MODE_FTLE_SURFACE_TYPE)
+        {
+		    return backward_ftle_surface_color;
+        }
+        if(shading_mode_ftle_surface == SHADING_MODE_FTLE_SURFACE_FTLE_VALUE)
+        {
+            float scalar = hit.ftle_value;
+            float t = (scalar - min_scalar_ftle_surface) / (max_scalar_ftle_surface - min_scalar_ftle_surface);
+            int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+            bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+            return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
+        }
+        if(shading_mode_ftle_surface == SHADING_MODE_FTLE_SURFACE_STRENGTH)
+        {
+            float scalar = hit.ftle_ridge_strength;
+            float t = (scalar - min_scalar_ftle_surface) / (max_scalar_ftle_surface - min_scalar_ftle_surface);
+            int bin = int(float(TRANSFER_FUNCTION_LAST_BIN) * t);
+            bin = clamp(bin, 0, TRANSFER_FUNCTION_LAST_BIN);
+            return GetScalarColor(bin, transfer_function_index_streamline_scalar).rgb;
+        }
 	}
 	if(hit.hitType == TYPE_STREAMLINE_SEGMENT)
 	{
