@@ -187,7 +187,9 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("select_eigen_orientation_method"));
         this.group_render_settings.AddInput(document.getElementById("select_shading_mode_ftle_surface"));
         this.group_render_settings.AddInput(document.getElementById("input_min_scalar_ftle_surface"));
-        this.group_render_settings.AddInput(document.getElementById("input_max_scalar_ftle_surface"));
+        this.group_render_settings.AddInput(document.getElementById("input_max_scalar_ftle_surface"));        
+        this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_filter_strength"));
+        this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_filter_ftle"));
     }
 
     LinkUISeeds(ui_seeds){

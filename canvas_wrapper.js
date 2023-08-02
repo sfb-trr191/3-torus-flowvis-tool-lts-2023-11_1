@@ -71,7 +71,9 @@ class UniformLocationsRayTracing {
         this.location_min_scalar = gl.getUniformLocation(program, "min_scalar");
         this.location_max_scalar = gl.getUniformLocation(program, "max_scalar");
         this.location_min_scalar_ftle_surface = gl.getUniformLocation(program, "min_scalar_ftle_surface");
-        this.location_max_scalar_ftle_surface = gl.getUniformLocation(program, "max_scalar_ftle_surface");        
+        this.location_max_scalar_ftle_surface = gl.getUniformLocation(program, "max_scalar_ftle_surface");     
+        this.location_ridge_surface_filter_strength = gl.getUniformLocation(program, "ridge_surface_filter_strength");
+        this.location_ridge_surface_filter_ftle = gl.getUniformLocation(program, "ridge_surface_filter_ftle");   
         this.location_cut_at_cube_faces = gl.getUniformLocation(program, "cut_at_cube_faces");
         this.location_handle_inside = gl.getUniformLocation(program, "handle_inside");
         this.location_is_main_renderer = gl.getUniformLocation(program, "is_main_renderer");
@@ -218,6 +220,8 @@ class CanvasWrapper {
         this.max_scalar = 0;
         this.min_scalar_ftle_surface = 0;
         this.max_scalar_ftle_surface = 0;
+        this.ridge_surface_filter_strength = 0;
+        this.ridge_surface_filter_ftle = 0;
         this.show_bounding_box = false;
         this.show_bounding_box_projection = false;
         this.show_movable_axes = false;
@@ -964,7 +968,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_max_scalar, this.max_scalar);
         gl.uniform1f(this.location_raytracing.location_min_scalar_ftle_surface, this.min_scalar_ftle_surface);
         gl.uniform1f(this.location_raytracing.location_max_scalar_ftle_surface, this.max_scalar_ftle_surface);
-        
+        gl.uniform1f(this.location_raytracing.location_ridge_surface_filter_strength, this.ridge_surface_filter_strength);
+        gl.uniform1f(this.location_raytracing.location_ridge_surface_filter_ftle, this.ridge_surface_filter_ftle);    
 
         gl.uniform1i(this.location_raytracing.location_cut_at_cube_faces, this.cut_at_cube_faces);
         gl.uniform1i(this.location_raytracing.location_handle_inside, this.handle_inside);

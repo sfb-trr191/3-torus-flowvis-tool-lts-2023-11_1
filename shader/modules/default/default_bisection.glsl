@@ -102,9 +102,18 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
         else
             best_info = info_center;
 
+
         //filter
         if(ftle_surface_use_lambda_criterion && best_info.lambda >= 0.0)
             return;
+
+        float ftle_ridge_strength = abs(best_info.lambda);
+        if(ftle_ridge_strength < ridge_surface_filter_strength)
+            return;
+
+        float ftle_value = best_info.ftle_value;
+        if(ftle_value < ridge_surface_filter_ftle)
+            return;  
 
         //hit
         float distance_from_ray_position = distance(ray.origin, best_info.sample_position);
@@ -121,8 +130,8 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
             hit.distance_iteration = distance_from_ray_position;//TODO probably wrong
             hit.ignore_override = false;
 
-            hit.ftle_value = best_info.ftle_value;
-            hit.ftle_ridge_strength = abs(best_info.lambda);
+            hit.ftle_value = ftle_value;
+            hit.ftle_ridge_strength = ftle_ridge_strength;
         }
 
     }

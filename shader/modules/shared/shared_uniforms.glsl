@@ -53,6 +53,8 @@ uniform float min_scalar;
 uniform float max_scalar;
 uniform float min_scalar_ftle_surface;
 uniform float max_scalar_ftle_surface;
+uniform float ridge_surface_filter_strength;
+uniform float ridge_surface_filter_ftle;
 uniform int projection_index;
 
 uniform bool is_main_renderer;
