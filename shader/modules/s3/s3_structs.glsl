@@ -35,6 +35,10 @@ struct HitInformation
     int sub_type;
     int iteration_count;
     bool dynamic;
+
+    //ftle surface hit data - unused in s3
+    float ftle_value;
+    float ftle_ridge_strength;
 };
 
 struct Ray
