@@ -191,6 +191,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 	return objectColor;
 }
 
+//viewDir is the negative ray direction
 vec3 CalcDirLight(GL_DirLight light, vec3 normal, vec3 viewDir)
 {	
 	float shininess = tubeShininess;
