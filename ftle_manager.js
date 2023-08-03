@@ -37,8 +37,10 @@ class UniformLocationsComputeFlowMapSlice {
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_sign_f = gl.getUniformLocation(program, "sign_f");        
         this.location_step_size = gl.getUniformLocation(program, "step_size");
+        this.location_termination_condition = gl.getUniformLocation(program, "termination_condition");
         this.location_advection_time = gl.getUniformLocation(program, "advection_time");
-
+        this.location_termination_arc_length = gl.getUniformLocation(program, "termination_arc_length");
+        
     }
 }
 
@@ -128,6 +130,8 @@ class FTLEManager {
         this.UpdateExtendedDims(gl);
         this.step_size = 0.0125;
         this.advection_time = 0.5;
+        this.termination_arc_length = 0.5;
+        this.termination_condition = FTLE_TERMINATION_CONDITION_ADVECTION_TIME;
         this.ftle_max_value = 0;
         this.ftle_min_value = 0;
 
@@ -301,7 +305,9 @@ class FTLEManager {
         this.dim_y = bo.input_parameters.dim_y;
         this.dim_z = bo.input_parameters.dim_z;
         this.UpdateExtendedDims(bo.gl);
+        this.termination_condition = bo.input_parameters.termination_condition;
         this.advection_time = bo.input_parameters.advection_time;
+        this.termination_arc_length = bo.input_parameters.termination_arc_length;
         this.step_size = bo.input_parameters.step_size;
         this.force_symmetric = bo.input_parameters.force_symmetric;
         this.highest_iteration_count = 0;
@@ -683,7 +689,9 @@ class FTLEManager {
         gl.uniform1f(this.location_compute_flowmap_slice.location_step_size, this.step_size);
         gl.uniform1i(this.location_compute_flowmap_slice.location_slice_index, slice_index);
         gl.uniform1f(this.location_compute_flowmap_slice.location_sign_f, sign_f);        
+        gl.uniform1i(this.location_compute_flowmap_slice.location_termination_condition, this.termination_condition);
         gl.uniform1f(this.location_compute_flowmap_slice.location_advection_time, this.advection_time);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_termination_arc_length, this.termination_arc_length);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
@@ -814,7 +822,12 @@ class FTLEManager {
         var real = e.realEigenvalues;
         var lambda_max = Math.max(real[0], real[1], real[2]);
         //calculate FTLE
-        var ftle = 1 / this.advection_time * Math.log(Math.sqrt(lambda_max));
+        var ftle = 0;
+        if(this.termination_condition == FTLE_TERMINATION_CONDITION_ADVECTION_TIME){
+            ftle = 1 / this.advection_time * Math.log(Math.sqrt(lambda_max));
+        }else if (this.termination_condition == FTLE_TERMINATION_CONDITION_ARC_LENGTH){
+            ftle = 1 / this.termination_arc_length * Math.log(Math.sqrt(lambda_max));
+        }
         //ftle= is_forward ? x : y;
         this.ftle_max_value = Math.max(ftle, this.ftle_max_value);
         this.ftle_min_value = Math.min(ftle, this.ftle_min_value);

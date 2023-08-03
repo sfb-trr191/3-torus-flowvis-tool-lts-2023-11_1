@@ -1052,9 +1052,23 @@
                                 <legend>Parameters</legend>
                                 <div class="vertical_container">
                                     <div class="input_row">
+                                        <label>termination method</label>
+                                        <select id="select_ftle_termination_method" title="FTLE termination method:
+            - advection time: stops when the advection time is reached.
+            - arc length: stops when the arc length is reached.">
+                                            <option selected value="1">advection time</option>
+                                            <option value="2">arc length</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row">
                                         <label>advection time</label>
                                         <input id="input_ftle_advection_time" type="text" value="0.5"
                                             title="Numerical integration of each streamline of the flow map continues until the advection time is reached.">
+                                    </div>
+                                    <div class="input_row">
+                                        <label>arc length</label>
+                                        <input id="input_ftle_termination_arc_length" type="text" value="0.5"
+                                            title="Numerical integration of each streamline of the flow map continues until the arc length is reached.">
                                     </div>
                                     <div class="input_row">
                                         <label>step size</label>

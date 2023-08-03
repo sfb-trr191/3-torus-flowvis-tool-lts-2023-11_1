@@ -17,7 +17,9 @@ class BackgroundObjectCalculateFTLE{
         this.input_parameters.dim_x = parseInt(document.getElementById("input_ftle_dim_x").value);
         this.input_parameters.dim_y = parseInt(document.getElementById("input_ftle_dim_y").value);
         this.input_parameters.dim_z = parseInt(document.getElementById("input_ftle_dim_z").value);
+        this.input_parameters.termination_condition = parseInt(document.getElementById("select_ftle_termination_method").value);
         this.input_parameters.advection_time = parseFloat(document.getElementById("input_ftle_advection_time").value);
+        this.input_parameters.termination_arc_length = parseFloat(document.getElementById("input_ftle_termination_arc_length").value);
         this.input_parameters.step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
         this.input_parameters.force_symmetric = document.getElementById("input_ftle_calculation_force_symmetric").checked;
     }

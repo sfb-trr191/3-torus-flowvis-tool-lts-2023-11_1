@@ -19,8 +19,13 @@ uniform int slice_index;
 uniform float sign_f;//1.0 for forward direction, -1.0 for backward direction
 uniform float step_size;
 uniform float advection_time;//T
+uniform float termination_arc_length;
 out vec4 outputColor;
-const int max_iterations = 10000;
+const int max_iterations = 100000;
+
+uniform int termination_condition;
+const int FTLE_TERMINATION_CONDITION_ADVECTION_TIME = 1;
+const int FTLE_TERMINATION_CONDITION_ARC_LENGTH = 2;
 
 vec3 f(vec3 vector);
 
@@ -42,12 +47,12 @@ void main()
 
     vec3 previous_f = f(previous_position);
     float previous_speed = length(previous_f);
-    float previous_cost = 0.0;//cost = time
+    float previous_cost = 0.0;//cost = time or length depending on termination_condition
 
     vec3 current_position;
     vec3 current_f;
     float current_speed = 0.0;
-    float current_cost = 0.0;//cost = time
+    float current_cost = 0.0;//cost = time or length depending on termination_condition
 
     float segment_length = 0.0;
     float average_speed = 0.0;
@@ -66,11 +71,22 @@ void main()
         segment_length = length(difference);
         arc_length += segment_length;
         average_speed = (previous_speed + current_speed) * 0.5;
-        current_cost = previous_cost + (segment_length / average_speed);
 
-        //stop if speed is below threshold or advection time is reached
-        if(current_cost > advection_time)
-            break;
+
+        //cost = time or length depending on termination_condition
+        if(termination_condition == FTLE_TERMINATION_CONDITION_ADVECTION_TIME){
+            current_cost = previous_cost + (segment_length / average_speed);
+            //stop if speed is below threshold or advection time is reached
+            if(current_cost > advection_time)
+                break;
+        }else{
+            //FTLE_TERMINATION_CONDITION_ARC_LENGTH
+            current_cost = arc_length;
+            //stop if speed is below threshold or advection time is reached
+            if(current_cost > termination_arc_length)
+                break;
+        }
+
 
         //prepare next iteration
         previous_position = current_position;
