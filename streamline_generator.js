@@ -1141,7 +1141,7 @@ class StreamlineGenerator {
             //previousPosition = currentPosition;
             if (terminate){
                 tmp.finished = true;
-                this.InterpolateLastSegment(currentIndex, previousIndex, raw_data);
+                //this.InterpolateLastSegment(currentIndex, previousIndex, raw_data);
                 this.UpdateTotalStreamlineProgress(tmp.i, time_current, arc_length_current, bo_calculate_streamlines);
                 break;
             }
