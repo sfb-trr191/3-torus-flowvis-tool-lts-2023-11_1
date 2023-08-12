@@ -4,7 +4,7 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
 {
     int sample_index_iteration = 0;
     float delta = volume_rendering_distance_between_points;
-    while(sample_index_iteration < 10000){
+    while(sample_index_iteration < max_number_of_volume_iterations){
         //check termination condition
         float sample_distance_iteration = float(sample_index_iteration) * delta;
         float current_distance = ray.rayDistance + sample_distance_iteration;
