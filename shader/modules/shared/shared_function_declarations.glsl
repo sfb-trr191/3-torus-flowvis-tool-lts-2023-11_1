@@ -40,6 +40,8 @@ vec4 map4(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax);
 
 void IntersectUnitCube(Ray ray, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
 void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout float nearest_t, inout vec3 out_normal);
+void IntersectUnitCubeAllSides(Ray ray, inout bool doesIntersect, inout int numberOfIntersections, inout float nearest_t, inout float farthest_t);
+void IntersectUnitCubeFace2(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout int numberOfIntersections, inout float nearest_t, inout float farthest_t);
 void HandleOutOfBound_LineSegment(bool dynamic, int part_index, Ray ray, int lineSegmentID, inout HitInformation hitCube);
 void HandleOutOfBound_Cylinder(bool dynamic, int part_index, mat4 matrix, float h, inout HitInformation hitCube, bool copy, int multiPolyID, float cost_a, float cost_b);
 void HandleOutOfBound_Sphere(bool dynamic, int part_index, Sphere sphere, inout HitInformation hitCube, bool copy, int multiPolyID);

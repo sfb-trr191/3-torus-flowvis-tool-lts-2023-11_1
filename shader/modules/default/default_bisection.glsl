@@ -142,12 +142,13 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
 {
     int sample_index_iteration = 0;
     float delta = volume_rendering_distance_between_points;
+    float max_range = min(max_volume_distance, distance_exit);
     while(sample_index_iteration < max_number_of_bisection_intervals){
         //check termination condition
         float start_distance = float(sample_index_iteration) * delta;
         float stop_distance = float(sample_index_iteration+1) * delta;
         
-        bool max_range_reached = stop_distance > max_volume_distance;
+        bool max_range_reached = stop_distance > max_range;
         if(max_range_reached)
             break;
 

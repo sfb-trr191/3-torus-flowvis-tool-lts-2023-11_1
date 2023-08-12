@@ -56,11 +56,45 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
             //t = variableRay.segment_length;
             t = variableRay.local_cutoff;
         }
-        
+
+#ifndef INTEGRATE_LIGHT    
+//#ifdef SAMPLING_OPTIMIZATION_FOR_LINEAR_RAYS
+        //speed up ridge surface and volume rendering for linear rays
+        bool doesIntersectCube;
+        int numberOfIntersectionsCube;
+        float nearest_tCube;
+        float farthest_tCube;
+        IntersectUnitCubeAllSides(variableRay, doesIntersectCube, numberOfIntersectionsCube, nearest_tCube, farthest_tCube);
+        bool rayStartsOutOfBounds = CheckOutOfBounds(variableRay.origin);
+        //flag_ray_stays_inside = ! CheckOutOfBounds(variableRay.nextPosition);
+#endif  
+
 #ifdef SHOW_RIDGE_SURFACE
         {
             float distance_end = t;
-            BisectRidges(variableRay, distance_end, hit, hitCube);            
+            #ifdef INTEGRATE_LIGHT 
+                BisectRidges(variableRay, distance_end, hit, hitCube); 
+            #else 
+                if(numberOfIntersectionsCube == 0){
+                    //for rays that dont intersect we dont need to do rendering of volume or ridges
+                    distance_end = 0.0;
+                    BisectRidges(variableRay, distance_end, hit, hitCube);
+                }
+                else if(rayStartsOutOfBounds){
+                    //for rays that start out of bound, but DO intersect the cube, skip forward to the intersection
+                    Ray skipRay;
+                    skipRay.origin = variableRay.origin + variableRay.direction * nearest_tCube;
+                    skipRay.direction = variableRay.direction;
+                    skipRay.dir_inv = variableRay.dir_inv;
+                    skipRay.rayDistance = variableRay.rayDistance + nearest_tCube;
+                    skipRay.local_cutoff = variableRay.local_cutoff - nearest_tCube;
+                    BisectRidges(skipRay, distance_end - nearest_tCube, hit, hitCube);
+                }
+                else{
+                    //this leaves rays starting inside the cube, use normal behavior
+                    BisectRidges(variableRay, distance_end, hit, hitCube);
+                }
+            #endif           
         }
 #endif
 
@@ -70,7 +104,29 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         if(volume_flag)
         {
             float distance_end = t;
-            IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+            #ifdef INTEGRATE_LIGHT 
+                IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+            #else 
+                if(numberOfIntersectionsCube == 0){
+                    //for rays that dont intersect we dont need to do rendering of volume or ridges
+                    distance_end = 0.0;
+                    IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+                }
+                else if(rayStartsOutOfBounds){
+                    //for rays that start out of bound, but DO intersect the cube, skip forward to the intersection
+                    Ray skipRay;
+                    skipRay.origin = variableRay.origin + variableRay.direction * nearest_tCube;
+                    skipRay.direction = variableRay.direction;
+                    skipRay.dir_inv = variableRay.dir_inv;
+                    skipRay.rayDistance = variableRay.rayDistance + nearest_tCube;
+                    skipRay.local_cutoff = variableRay.local_cutoff - nearest_tCube;
+                    IntersectVolumeInstance(skipRay, distance_end, hit, hitCube);//not using "distance_end - nearest_tCube" because the volume rendering uses different logic
+                }
+                else{
+                    //this leaves rays starting inside the cube, use normal behavior
+                    IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+                }
+            #endif           
         }
 #endif
 
@@ -898,6 +954,92 @@ void IntersectUnitCubeFace(Ray ray, vec3 planeNormal, float planeDistance, inout
 		out_normal = planeNormal;
 	}
 	doesIntersect = true;
+}
+
+void IntersectUnitCubeAllSides(Ray ray, inout bool doesIntersect, inout int numberOfIntersections, inout float nearest_t, inout float farthest_t)
+{	
+	GL_CameraData cam = GetActiveCamera();
+	vec3 E = cam.E.xyz;
+	float error = 0.0;//0.0001;
+	//return;
+	vec3 normal;
+	float planeDistance;
+	doesIntersect = false;
+	nearest_t = 100000.0;
+    farthest_t = -100000.0;
+    numberOfIntersections = 0;
+
+	//X
+	{
+		normal = vec3(1, 0, 0);
+		planeDistance = 1.0 + error;
+		IntersectUnitCubeFace2(ray, normal, planeDistance, doesIntersect, numberOfIntersections, nearest_t, farthest_t);
+	}
+	{
+		normal = vec3(-1, 0, 0);
+		planeDistance = 0.0 - error;
+		IntersectUnitCubeFace2(ray, normal, planeDistance, doesIntersect, numberOfIntersections, nearest_t, farthest_t);
+	}
+
+	//Y
+	{
+		normal = vec3(0, 1, 0);
+		planeDistance = 1.0 + error;
+		IntersectUnitCubeFace2(ray, normal, planeDistance, doesIntersect, numberOfIntersections, nearest_t, farthest_t);
+	}
+	{
+		normal = vec3(0, -1, 0);
+		planeDistance = 0.0 - error;
+		IntersectUnitCubeFace2(ray, normal, planeDistance, doesIntersect, numberOfIntersections, nearest_t, farthest_t);
+	}
+	
+	//Z
+	{
+		normal = vec3(0, 0, 1);
+		planeDistance = 1.0 + error;
+		IntersectUnitCubeFace2(ray, normal, planeDistance, doesIntersect, numberOfIntersections, nearest_t, farthest_t);
+	}
+	{
+		normal = vec3(0, 0, -1);
+		planeDistance = 0.0 - error;
+		IntersectUnitCubeFace2(ray, normal, planeDistance, doesIntersect, numberOfIntersections, nearest_t, farthest_t);
+	}
+}
+
+void IntersectUnitCubeFace2(Ray ray, vec3 planeNormal, float planeDistance, inout bool doesIntersect, inout int numberOfIntersections, inout float nearest_t, inout float farthest_t)
+{
+	float d_n = dot(ray.direction, planeNormal);
+	if(d_n == 0.0)
+		return;
+	float t = (planeDistance - dot(ray.origin, planeNormal)) / d_n;
+	if(t < 0.0)
+		return;
+	
+	//return;
+	float distance_os = t;
+	float distance = ray.rayDistance + distance_os;
+	vec3 position_ws = ray.origin + distance_os * ray.direction;
+	
+	
+	for(int i=0; i<3; i++)
+	{
+		if(planeNormal[i] == 0.0)
+		{
+			if(position_ws[i] < 0.0 || position_ws[i] > 1.0)
+				return;
+		}
+	}
+	
+	if((!doesIntersect) || (t < nearest_t))
+	{
+		nearest_t = t;
+	}
+    if((!doesIntersect) || (t > farthest_t))
+	{
+		farthest_t = t;
+	}
+	doesIntersect = true;
+    numberOfIntersections += 1;
 }
 
 

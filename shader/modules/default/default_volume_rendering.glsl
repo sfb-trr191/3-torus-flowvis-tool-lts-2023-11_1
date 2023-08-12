@@ -28,13 +28,13 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
         bool has_hit_cube = hitCube.hitType > TYPE_NONE;
         bool has_hit_any = has_hit || has_hit_cube;
         bool no_hit_any = !has_hit_any;
-        bool sample_in_front_of_hit = sample_distance_iteration < hit.distance_iteration;
-        bool sample_in_front_of_hit_cube = sample_distance_iteration < hitCube.distance_iteration;
+        bool sample_in_front_of_hit = current_distance < hit.distance;
+        bool sample_in_front_of_hit_cube = current_distance < hitCube.distance;
         float min_hit_distance = has_hit && has_hit_cube
-            ? min(hit.distance_iteration, hitCube.distance_iteration)
-            : has_hit ? hit.distance_iteration : hitCube.distance_iteration;
-        bool sample_in_front_of_hit_any = sample_distance_iteration < min_hit_distance;
-        bool sample_in_front_of_exit = sample_distance_iteration < distance_exit;
+            ? min(hit.distance, hitCube.distance)
+            : has_hit ? hit.distance : hitCube.distance;
+        bool sample_in_front_of_hit_any = current_distance < min_hit_distance;
+        bool sample_in_front_of_exit = current_distance < distance_exit;
         bool ok = (no_hit_any && sample_in_front_of_exit)
             || (has_hit_any && sample_in_front_of_hit_any);
         if(!ok)
