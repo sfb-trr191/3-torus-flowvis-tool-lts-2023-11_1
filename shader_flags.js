@@ -126,6 +126,8 @@ class ShaderFlags {
         if(space == SPACE_3_SPHERE_4_PLUS_4D){            
             this.show_movable_axes = false;
         }
+
+        this.use_linear_light_skip_optimization = (!integrate_light) && (max_iteration_count == 1);
     }
 
 

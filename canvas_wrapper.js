@@ -218,6 +218,7 @@ class CanvasWrapper {
         this.max_iteration_count = 1;
         this.min_scalar = 0;
         this.max_scalar = 0;
+        this.force_overrite_ftle_limits = false;//usually the min max values of the ftle field are used, this allows to use overrides
         this.min_scalar_ftle_surface = 0;
         this.max_scalar_ftle_surface = 0;
         this.ridge_surface_filter_strength = 0;
@@ -992,8 +993,8 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_opacity_factor, this.volume_rendering_opacity_factor);
         
-        var min_scalar_ftle = this.volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE ? this.p_ftle_manager.ftle_min_value : this.overrite_min_scalar_ftle;
-        var max_scalar_ftle = this.volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE ? this.p_ftle_manager.ftle_max_value : this.overrite_max_scalar_ftle;
+        var min_scalar_ftle = this.volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE && (!this.force_overrite_ftle_limits) ? this.p_ftle_manager.ftle_min_value : this.overrite_min_scalar_ftle;
+        var max_scalar_ftle = this.volume_rendering_mode == VOLUME_RENDERING_MODE_ORIGINAL_FTLE && (!this.force_overrite_ftle_limits) ? this.p_ftle_manager.ftle_max_value : this.overrite_max_scalar_ftle;
 
         gl.uniform1i(this.location_raytracing.location_volume_rendering_mode, this.volume_rendering_mode);
         gl.uniform1i(this.location_raytracing.location_volume_rendering_clamp_scalars, this.volume_rendering_clamp_scalars);

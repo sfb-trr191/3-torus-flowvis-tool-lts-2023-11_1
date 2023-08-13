@@ -84,6 +84,9 @@ class ShaderManager {
             defines += "\n#define SHOW_SEEDS_INSTANCE";
         if(shader_flags.integrate_light)
             defines += "\n#define INTEGRATE_LIGHT";
+        if(shader_flags.use_linear_light_skip_optimization)
+            defines += "\n#define USE_LINEAR_LIGHT_SKIP_OPTIMIZATION";
+
         
         code = code.replace("$defines$", defines);
         
@@ -248,6 +251,8 @@ class ShaderManager {
             key += ";SHOW_SEEDS_ONCE"     
         if(shader_flags.show_seeds_instance)
             key += ";SHOW_SEEDS_INSTANCE"     
+        if(shader_flags.use_linear_light_skip_optimization)
+            key += ";USE_LINEAR_LIGHT_SKIP_OPTIMIZATION";
         if(shader_flags.integrate_light){
             key += ";INTEGRATE_LIGHT" 
             key += ";"+light_transport_p0 
@@ -279,7 +284,7 @@ class ShaderManager {
             key += ";"+shader_rule_z_neg_y 
             key += ";"+shader_rule_z_neg_z 
         }
-        console.log("code:", key);       
+        console.log("shader key:", key);       
         return key;
     }
 

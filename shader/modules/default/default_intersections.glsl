@@ -57,8 +57,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
             t = variableRay.local_cutoff;
         }
 
-#ifndef INTEGRATE_LIGHT    
-//#ifdef SAMPLING_OPTIMIZATION_FOR_LINEAR_RAYS
+#ifdef USE_LINEAR_LIGHT_SKIP_OPTIMIZATION    
         //speed up ridge surface and volume rendering for linear rays
         bool doesIntersectCube;
         int numberOfIntersectionsCube;
@@ -72,9 +71,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 #ifdef SHOW_RIDGE_SURFACE
         {
             float distance_end = t;
-            #ifdef INTEGRATE_LIGHT 
-                BisectRidges(variableRay, distance_end, hit, hitCube); 
-            #else 
+            #ifdef USE_LINEAR_LIGHT_SKIP_OPTIMIZATION 
                 if(numberOfIntersectionsCube == 0){
                     //for rays that dont intersect we dont need to do rendering of volume or ridges
                     distance_end = 0.0;
@@ -94,6 +91,8 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                     //this leaves rays starting inside the cube, use normal behavior
                     BisectRidges(variableRay, distance_end, hit, hitCube);
                 }
+            #else 
+                BisectRidges(variableRay, distance_end, hit, hitCube);                 
             #endif           
         }
 #endif
@@ -104,9 +103,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         if(volume_flag)
         {
             float distance_end = t;
-            #ifdef INTEGRATE_LIGHT 
-                IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
-            #else 
+            #ifdef USE_LINEAR_LIGHT_SKIP_OPTIMIZATION 
                 if(numberOfIntersectionsCube == 0){
                     //for rays that dont intersect we dont need to do rendering of volume or ridges
                     distance_end = 0.0;
@@ -126,6 +123,8 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                     //this leaves rays starting inside the cube, use normal behavior
                     IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
                 }
+            #else 
+                IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
             #endif           
         }
 #endif

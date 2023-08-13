@@ -1260,6 +1260,20 @@
                                 </div>
                             </fieldset> 
                             <fieldset class="subgroup_properties">
+                                <legend>FTLE</legend>
+                                <div class="vertical_container">  
+                                    <div class="input_row">
+                                        <label>force symmetric hessian</label>
+                                        <input id="checkbox_ridges_force_symmetric_hessian" type="checkbox" value="true" checked="true" title="">
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_distance_between_points">
+                                        <label>sample distance</label>
+                                        <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
+                                            title="Distance between each sample.">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset class="subgroup_properties">
                                 <legend>FTLE Ridge Surface</legend>
                                 <div class="vertical_container">  
                                     <div class="input_row" id="input_row_ridge_surface_max_number_of_bisection_intervals">
@@ -1318,7 +1332,11 @@
                             </fieldset>                             
                             <fieldset class="subgroup_properties">
                                 <legend>Volume Rendering</legend>
-                                <div class="vertical_container">                                    
+                                <div class="vertical_container">    
+                                    <div class="input_row" id="input_row_volume_rendering_max_number_of_volume_iterations">
+                                        <label>max number of samples</label>
+                                        <input id="input_volume_rendering_max_number_of_volume_iterations" type="text" value="4000" title="">
+                                    </div>                                
                                     <div class="input_row" id="input_row_volume_rendering_max_distance">
                                         <label>max distance</label>
                                         <input id="input_volume_rendering_max_distance" type="text" value="0" title="Maximum distance of volume rendering.
@@ -1336,11 +1354,6 @@
                                         <label>skip FD</label>
                                         <input id="checkbox_volume_skip_first_fundamental_domain_main" type="checkbox" value="false" title="">
                                     </div>   
-                                    <div class="input_row" id="input_row_volume_rendering_distance_between_points">
-                                        <label>sample distance</label>
-                                        <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
-                                            title="Distance between each sample.">
-                                    </div>
                                     <div class="input_row" id="input_row_volume_rendering_termination_opacity">
                                         <label>termination opacity</label>
                                         <input id="input_volume_rendering_termination_opacity" type="text" value="0.99"
@@ -1363,6 +1376,10 @@
                                             <option value="2">smallest eigenvalue</option>
                                         </select>
                                     </div>   
+                                    <div class="input_row">
+                                        <label>overrite limits</label>
+                                        <input id="checkbox_volume_rendering_force_overrite_ftle_limits" type="checkbox" value="false" title="">
+                                    </div>   
                                     <div class="input_row" id="input_row_volume_rendering_opacity_factor">
                                         <label>min scalar</label>
                                         <input id="input_volume_rendering_overrite_min_scalar_ftle" type="text" value="0.0"
@@ -1381,10 +1398,6 @@
                                         <label>lambda threshold</label>
                                         <input id="input_ridge_lambda_threshold" type="text" value="0.0"
                                             title="Experimental.">
-                                    </div>
-                                    <div class="input_row">
-                                        <label>force symmetric hessian</label>
-                                        <input id="checkbox_ridges_force_symmetric_hessian" type="checkbox" value="true" checked="true" title="">
                                     </div>  
                                 </div>
                             </fieldset>
