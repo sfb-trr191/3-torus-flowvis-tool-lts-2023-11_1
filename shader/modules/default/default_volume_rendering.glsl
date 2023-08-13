@@ -24,6 +24,7 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
             continue;
         }
 
+#ifdef USE_LINEAR_LIGHT_SKIP_OPTIMIZATION
         bool has_hit = hit.hitType > TYPE_NONE;
         bool has_hit_cube = hitCube.hitType > TYPE_NONE;
         bool has_hit_any = has_hit || has_hit_cube;
@@ -39,6 +40,24 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
             || (has_hit_any && sample_in_front_of_hit_any);
         if(!ok)
             break;
+#else
+        bool has_hit = hit.hitType > TYPE_NONE;
+        bool has_hit_cube = hitCube.hitType > TYPE_NONE;
+        bool has_hit_any = has_hit || has_hit_cube;
+        bool no_hit_any = !has_hit_any;
+        bool sample_in_front_of_hit = sample_distance_iteration < hit.distance_iteration;
+        bool sample_in_front_of_hit_cube = sample_distance_iteration < hitCube.distance_iteration;
+        float min_hit_distance = has_hit && has_hit_cube
+            ? min(hit.distance_iteration, hitCube.distance_iteration)
+            : has_hit ? hit.distance_iteration : hitCube.distance_iteration;
+        bool sample_in_front_of_hit_any = sample_distance_iteration < min_hit_distance;
+        bool sample_in_front_of_exit = sample_distance_iteration < distance_exit;
+        bool ok = (no_hit_any && sample_in_front_of_exit)
+            || (has_hit_any && sample_in_front_of_hit_any);
+        if(!ok)
+            break;
+#endif
+
 
         //calculate sample position
         vec3 sample_position = ray.origin + ray.direction * sample_distance_iteration;
