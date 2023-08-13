@@ -17,6 +17,24 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
 	//IntersectAxesCorner(ray, hit, hitCube, 0);
 
+    #ifdef SHOW_STREAMLINES_OUTSIDE
+    {
+        bool check_bounds = false;
+        bool dynamic = false;
+	    IntersectInstance_Tree(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
+        if(render_dynamic_streamline){
+            dynamic = true;
+            IntersectInstance_Tree(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
+        }
+    }
+#endif
+
+#ifdef SHOW_SEEDS_ONCE
+    {
+		IntersectSeeds(ray, maxRayDistance, hit_outside);
+    }
+#endif
+
 	while(true)
 	{
         variableRay.iteration_count = count;
@@ -107,7 +125,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                 if(numberOfIntersectionsCube == 0){
                     //for rays that dont intersect we dont need to do rendering of volume or ridges
                     distance_end = 0.0;
-                    IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+                    IntersectVolumeInstance(variableRay, distance_end, hit, hitCube, hit_outside);
                 }
                 else if(rayStartsOutOfBounds){
                     //for rays that start out of bound, but DO intersect the cube, skip forward to the intersection
@@ -117,14 +135,14 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                     skipRay.dir_inv = variableRay.dir_inv;
                     skipRay.rayDistance = variableRay.rayDistance + nearest_tCube;
                     skipRay.local_cutoff = variableRay.local_cutoff - nearest_tCube;
-                    IntersectVolumeInstance(skipRay, distance_end, hit, hitCube);//not using "distance_end - nearest_tCube" because the volume rendering uses different logic
+                    IntersectVolumeInstance(skipRay, distance_end, hit, hitCube, hit_outside);//not using "distance_end - nearest_tCube" because the volume rendering uses different logic
                 }
                 else{
                     //this leaves rays starting inside the cube, use normal behavior
-                    IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+                    IntersectVolumeInstance(variableRay, distance_end, hit, hitCube, hit_outside);
                 }
             #else 
-                IntersectVolumeInstance(variableRay, distance_end, hit, hitCube);
+                IntersectVolumeInstance(variableRay, distance_end, hit, hitCube, hit_outside);
             #endif           
         }
 #endif
@@ -242,23 +260,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		//break;
 	}	
 
-#ifdef SHOW_STREAMLINES_OUTSIDE
-    {
-        bool check_bounds = false;
-        bool dynamic = false;
-	    IntersectInstance_Tree(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
-        if(render_dynamic_streamline){
-            dynamic = true;
-            IntersectInstance_Tree(dynamic, PART_INDEX_OUTSIDE, check_bounds, ray, maxRayDistance, hit_outside, hitCube);
-        }
-    }
-#endif
 
-#ifdef SHOW_SEEDS_ONCE
-    {
-		IntersectSeeds(ray, maxRayDistance, hit_outside);
-    }
-#endif
 }
 
 

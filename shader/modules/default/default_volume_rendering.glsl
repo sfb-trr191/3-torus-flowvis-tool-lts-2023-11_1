@@ -1,6 +1,6 @@
 global.SHADER_MODULE_DEFAULT_VOLUME_RENDERING = `
 
-void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube)
+void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube, inout HitInformation hit_outside)
 {
     int sample_index_iteration = 0;
     float delta = volume_rendering_distance_between_points;
@@ -27,13 +27,23 @@ void IntersectVolumeInstance(Ray ray, float distance_exit, inout HitInformation 
 #ifdef USE_LINEAR_LIGHT_SKIP_OPTIMIZATION
         bool has_hit = hit.hitType > TYPE_NONE;
         bool has_hit_cube = hitCube.hitType > TYPE_NONE;
-        bool has_hit_any = has_hit || has_hit_cube;
+        bool has_hit_outside = hit_outside.hitType > TYPE_NONE;
+        bool has_hit_any = has_hit || has_hit_cube || has_hit_outside;
         bool no_hit_any = !has_hit_any;
         bool sample_in_front_of_hit = current_distance < hit.distance;
         bool sample_in_front_of_hit_cube = current_distance < hitCube.distance;
+        bool sample_in_front_of_hit_outside = current_distance < hit_outside.distance;
+
         float min_hit_distance = has_hit && has_hit_cube
             ? min(hit.distance, hitCube.distance)
             : has_hit ? hit.distance : hitCube.distance;
+        if(has_hit_outside){
+            if(has_hit || has_hit_cube)
+                min_hit_distance = min(min_hit_distance, hit_outside.distance);
+            else
+                min_hit_distance = hit_outside.distance;
+        }
+
         bool sample_in_front_of_hit_any = current_distance < min_hit_distance;
         bool sample_in_front_of_exit = current_distance < distance_exit;
         bool ok = (no_hit_any && sample_in_front_of_exit)
