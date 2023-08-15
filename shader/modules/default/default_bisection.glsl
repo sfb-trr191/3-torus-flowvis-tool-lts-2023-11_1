@@ -148,6 +148,20 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
         float start_distance = float(sample_index_iteration) * delta;
         float stop_distance = float(sample_index_iteration+1) * delta;
         
+        //global check
+        float total_start_distance = ray.rayDistance + start_distance;
+        float total_stop_distance = ray.rayDistance + stop_distance;
+        
+        bool min_range_reached = total_start_distance >= min_volume_distance;
+        if(!min_range_reached){            
+            sample_index_iteration++;
+            continue;
+        }
+
+        if(total_start_distance >= max_volume_distance)
+            break;
+        //end of global check
+
         bool max_range_reached = stop_distance > max_range;
         if(max_range_reached)
             break;
