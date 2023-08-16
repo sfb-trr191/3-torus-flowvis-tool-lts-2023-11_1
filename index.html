@@ -1271,6 +1271,22 @@
                                         <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
                                             title="Distance between each sample.">
                                     </div>
+                                    <div class="input_row" id="input_row_volume_rendering_max_distance">
+                                        <label>max distance (main)</label>
+                                        <input id="input_volume_rendering_max_distance" type="text" value="3" title="Maximum distance of FTLE rendering.
+    - FTLE rendering will not continue beyond the maximum distance specified by 'max distance' in
+        Camera [Root/View/Main View/Camera] 
+    - A value of 0 means that no additional limit is used and 'max distance' is used instead.
+    - Reduce to improve performance.">
+                                    </div>
+                                    <div class="input_row" id="input_row_volume_rendering_min_distance_main">
+                                        <label>min distance (main)</label>
+                                        <input id="input_volume_rendering_min_distance_main" type="text" value="0" title="Minimum distance of FTLE rendering.">
+                                    </div>
+                                    <div class="input_row">
+                                        <label>skip FD</label>
+                                        <input id="checkbox_volume_skip_first_fundamental_domain_main" type="checkbox" value="false" title="">
+                                    </div>
                                 </div>
                             </fieldset>
                             <fieldset class="subgroup_properties">
@@ -1292,10 +1308,10 @@
                                         <label>eigen orientation</label>
                                         <select id="select_eigen_orientation_method" title="">
                                             <option value="0">none</option>
-                                            <option value="1">x axis</option>
-                                            <option value="2">y axis</option>
-                                            <option value="3">z axis</option>
-                                            <option value="4">local</option>
+                                            <option selected value="1">local</option>
+                                            <option value="2">x axis</option>
+                                            <option value="3">y axis</option>
+                                            <option value="4">z axis</option>
                                         </select>
                                     </div>
                                     <div class="input_row">
@@ -1336,23 +1352,7 @@
                                     <div class="input_row" id="input_row_volume_rendering_max_number_of_volume_iterations">
                                         <label>max number of samples</label>
                                         <input id="input_volume_rendering_max_number_of_volume_iterations" type="text" value="4000" title="">
-                                    </div>                                
-                                    <div class="input_row" id="input_row_volume_rendering_max_distance">
-                                        <label>max distance (main)</label>
-                                        <input id="input_volume_rendering_max_distance" type="text" value="3" title="Maximum distance of volume rendering.
-    - Volume rendering will not continue beyond the maximum distance specified by 'max distance' in
-        Camera [Root/View/Main View/Camera] 
-    - A value of 0 means that no additional limit is used and 'max distance' is used instead.
-    - Reduce to improve performance.">
-                                    </div>
-                                    <div class="input_row" id="input_row_volume_rendering_min_distance_main">
-                                        <label>min distance (main)</label>
-                                        <input id="input_volume_rendering_min_distance_main" type="text" value="0" title="Minimum distance of volume rendering.">
-                                    </div>
-                                    <div class="input_row">
-                                        <label>skip FD</label>
-                                        <input id="checkbox_volume_skip_first_fundamental_domain_main" type="checkbox" value="false" title="">
-                                    </div>   
+                                    </div> 
                                     <div class="input_row" id="input_row_volume_rendering_termination_opacity">
                                         <label>termination opacity</label>
                                         <input id="input_volume_rendering_termination_opacity" type="text" value="0.99"

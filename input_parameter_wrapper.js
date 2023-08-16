@@ -228,6 +228,18 @@ class InputParameterWrapper {
         new InputWrapper(this, "checkbox_volume_rendering_clamp_scalars", "vcs");    
         new InputWrapper(this, "input_ridge_lambda_threshold", "vlt");       
         new InputWrapper(this, "checkbox_ridges_force_symmetric_hessian", "vsh");    
+
+        new InputWrapper(this, "input_ridge_surface_max_number_of_bisection_intervals", "rsbi");    
+        new InputWrapper(this, "input_ridge_surface_max_bisection_iterations_per_interval", "rsii");   
+        new InputWrapper(this, "checkbox_ftle_surface_use_lambda_criterion", "rscl");   
+        new InputWrapper(this, "select_eigen_orientation_method", "rsom");   
+        new InputWrapper(this, "input_min_scalar_ftle_surface", "rsm1");   
+        new InputWrapper(this, "input_max_scalar_ftle_surface", "rsm2");   
+        new InputWrapper(this, "input_ridge_surface_filter_strength", "rsfs");   
+        new InputWrapper(this, "input_ridge_surface_filter_ftle", "rsff");   
+        new InputWrapper(this, "input_volume_rendering_max_number_of_volume_iterations", "vmvi");   
+        new InputWrapper(this, "checkbox_volume_rendering_force_overrite_ftle_limits", "fofl");
+        
         //settings - quality        
         new InputWrapper(this, "input_still_resolution_factor", "rfs");   
         new InputWrapper(this, "input_panning_resolution_factor", "rfp");   

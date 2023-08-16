@@ -162,6 +162,7 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_volume_rendering_clamp_scalars"));
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_ridges_force_symmetric_hessian"));
         this.group_render_settings.AddInput(document.getElementById("select_volume_rendering_mode"));    
+        this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_max_number_of_volume_iterations"));
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle"));   
         this.group_render_settings.AddInput(document.getElementById("input_ridge_lambda_threshold")); 
@@ -184,6 +185,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_max_number_of_bisection_intervals"));
         this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_max_bisection_iterations_per_interval"));
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_ftle_surface_use_lambda_criterion"));
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_volume_rendering_force_overrite_ftle_limits"));
         this.group_render_settings.AddInput(document.getElementById("select_eigen_orientation_method"));
         this.group_render_settings.AddInput(document.getElementById("select_shading_mode_ftle_surface"));
         this.group_render_settings.AddInput(document.getElementById("input_min_scalar_ftle_surface"));
