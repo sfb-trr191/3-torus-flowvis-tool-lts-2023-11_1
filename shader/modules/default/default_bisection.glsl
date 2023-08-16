@@ -143,10 +143,20 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
     int sample_index_iteration = 0;
     float delta = volume_rendering_distance_between_points;
     float max_range = min(max_volume_distance, distance_exit);
+    
+    //
+    float start_offset = 0.0;
+    if(min_volume_distance > ray.rayDistance){
+        start_offset = min_volume_distance - ray.rayDistance;
+        if(start_offset > max_range){
+            return;
+        }
+    }
+
     while(sample_index_iteration < max_number_of_bisection_intervals){
         //check termination condition
-        float start_distance = float(sample_index_iteration) * delta;
-        float stop_distance = float(sample_index_iteration+1) * delta;
+        float start_distance = start_offset + float(sample_index_iteration) * delta;
+        float stop_distance = start_offset + float(sample_index_iteration+1) * delta;
         
         //global check
         float total_start_distance = ray.rayDistance + start_distance;
@@ -165,6 +175,13 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
         bool max_range_reached = stop_distance > max_range;
         if(max_range_reached)
             break;
+
+        bool skip_first_fundamental_domain = ray.iteration_count == 0 && volume_skip_first_fundamental_domain;
+        if(skip_first_fundamental_domain){
+            //prepare next sample
+            sample_index_iteration++;
+            continue;
+        }
 
         if(hit.hitType==TYPE_FTLE_SURFACE_FORWARD || hit.hitType==TYPE_FTLE_SURFACE_BACKWARD)
             break;
