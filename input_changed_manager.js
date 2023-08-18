@@ -168,6 +168,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_ridge_lambda_threshold")); 
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_max_distance"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_min_distance_main"));    
+        this.group_render_settings.AddInput(document.getElementById("input_streamlines_min_distance_main"));            
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_distance_between_points"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_termination_opacity"));       
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_opacity_factor"));     

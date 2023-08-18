@@ -41,6 +41,7 @@ uniform float offset_y;
 uniform float maxRayDistance;
 uniform float max_volume_distance;
 uniform float min_volume_distance;
+uniform float min_streamline_distance;
 uniform bool volume_skip_first_fundamental_domain;
 uniform int maxIterationCount;
 uniform float tubeRadius;

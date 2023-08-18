@@ -1271,22 +1271,6 @@
                                         <input id="input_volume_rendering_distance_between_points" type="text" value="0.001"
                                             title="Distance between each sample.">
                                     </div>
-                                    <div class="input_row" id="input_row_volume_rendering_max_distance">
-                                        <label>max distance (main)</label>
-                                        <input id="input_volume_rendering_max_distance" type="text" value="3" title="Maximum distance of FTLE rendering.
-    - FTLE rendering will not continue beyond the maximum distance specified by 'max distance' in
-        Camera [Root/View/Main View/Camera] 
-    - A value of 0 means that no additional limit is used and 'max distance' is used instead.
-    - Reduce to improve performance.">
-                                    </div>
-                                    <div class="input_row" id="input_row_volume_rendering_min_distance_main">
-                                        <label>min distance (main)</label>
-                                        <input id="input_volume_rendering_min_distance_main" type="text" value="0" title="Minimum distance of FTLE rendering.">
-                                    </div>
-                                    <div class="input_row">
-                                        <label>skip FD</label>
-                                        <input id="checkbox_volume_skip_first_fundamental_domain_main" type="checkbox" value="false" title="">
-                                    </div>
                                 </div>
                             </fieldset>
                             <fieldset class="subgroup_properties">
@@ -1563,6 +1547,26 @@
                                         value="100" readonly
                                         title="The actual maximum distance for intersection tests. Can be smaller than the upper limit depending on fog.">
                                 </div>
+                            </div>
+                            <div class="input_row" id="input_row_volume_rendering_max_distance">
+                                <label>max distance (FTLE)</label>
+                                <input id="input_volume_rendering_max_distance" type="text" value="3" title="Maximum distance of FTLE rendering.
+- FTLE rendering will not continue beyond the maximum distance specified by 'max distance' in
+Camera [Root/View/Main View/Camera] 
+- A value of 0 means that no additional limit is used and 'max distance' is used instead.
+- Reduce to improve performance.">
+                            </div>
+                            <div class="input_row" id="input_row_volume_rendering_min_distance_main">
+                                <label>min distance (FTLE)</label>
+                                <input id="input_volume_rendering_min_distance_main" type="text" value="0" title="Minimum distance of FTLE rendering.">
+                            </div>
+                            <div class="input_row" id="input_row_streamlines_min_distance_main">
+                                <label>min distance (streamlines)</label>
+                                <input id="input_streamlines_min_distance_main" type="text" value="0" title="Minimum distance of streamline rendering.">
+                            </div>   
+                            <div class="input_row">
+                                <label>skip FD (FTLE)</label>
+                                <input id="checkbox_volume_skip_first_fundamental_domain_main" type="checkbox" value="false" title="">
                             </div>
                             <div class="input_row">
                                 <label>field of view</label>
@@ -2073,7 +2077,7 @@
                                         <label>show</label>
                                         <input id="checkbox_show_4_projections_main" type="checkbox" value="true" checked="true" title="">
                                     </div>   
-                                    <div class="input_row" id="input_row_volume_rendering_max_distance">
+                                    <div class="input_row">
                                         <label>width</label>
                                         <input id="input_width_percentage_4_projections" type="text" value="0.2" title="">
                                     </div>

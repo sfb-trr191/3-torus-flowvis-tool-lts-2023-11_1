@@ -59,6 +59,7 @@ class UniformLocationsRayTracing {
         this.location_gray_scale_factor = gl.getUniformLocation(program, "gray_scale_factor");  
         this.location_max_volume_distance = gl.getUniformLocation(program, "max_volume_distance");
         this.location_min_volume_distance = gl.getUniformLocation(program, "min_volume_distance");
+        this.location_min_streamline_distance = gl.getUniformLocation(program, "min_streamline_distance");
         this.location_volume_skip_first_fundamental_domain = gl.getUniformLocation(program, "volume_skip_first_fundamental_domain");        
         this.location_max_iteration_count = gl.getUniformLocation(program, "maxIterationCount");
         this.location_tube_radius = gl.getUniformLocation(program, "tubeRadius");
@@ -957,6 +958,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_max_cost, this.max_cost);
         gl.uniform1f(this.location_raytracing.location_max_volume_distance, this.max_volume_distance == 0 ? this.limited_max_distance : this.max_volume_distance);
         gl.uniform1f(this.location_raytracing.location_min_volume_distance, this.min_volume_distance);
+        gl.uniform1f(this.location_raytracing.location_min_streamline_distance, this.min_streamline_distance);        
         gl.uniform1f(this.location_raytracing.location_volume_skip_first_fundamental_domain, this.volume_skip_first_fundamental_domain);        
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
         gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);

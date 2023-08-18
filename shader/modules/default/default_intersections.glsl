@@ -708,6 +708,9 @@ void IntersectCylinder(bool dynamic, int part_index, bool check_bounds, Ray ray,
 		}
 	}
 	
+    float total_distance = ray.rayDistance + distance_os;
+    if(total_distance <= min_streamline_distance)
+        return;
 
 	if(distance_os > ray_local_cutoff)
 		return;
@@ -744,7 +747,7 @@ void IntersectCylinder(bool dynamic, int part_index, bool check_bounds, Ray ray,
         hit.dynamic = dynamic;
         hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
-		hit.distance = ray.rayDistance + distance_os;	
+		hit.distance = total_distance;	
 		hit.position = position_ws;	
 		hit.positionCenter = tube_center;
         hit.light_direction = ray.direction;
@@ -831,6 +834,9 @@ void IntersectSphere(bool dynamic, int part_index, bool check_bounds, Ray ray, f
 		}
 	}
 	
+    float total_distance = ray.rayDistance + distance_os;
+    if(total_distance <= min_streamline_distance)
+        return;
 		
 	if(distance_os > ray_local_cutoff)
 		return;
@@ -860,7 +866,7 @@ void IntersectSphere(bool dynamic, int part_index, bool check_bounds, Ray ray, f
         hit.dynamic = dynamic;
         hit.iteration_count = ray.iteration_count;
 		hit.distance_iteration = distance_os;	
-		hit.distance = ray.rayDistance + distance_os;
+		hit.distance = total_distance;
 		hit.position = position_ws;
 		hit.positionCenter = sphere.center;
         hit.light_direction = ray.direction;

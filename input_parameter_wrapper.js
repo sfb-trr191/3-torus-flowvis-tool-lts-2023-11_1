@@ -217,6 +217,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "checkbox_volume_skip_first_fundamental_domain_main", "sfd"); 
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_min_distance_main", "vmd2"); 
+        new InputWrapper(this, "input_streamlines_min_distance_main", "smd2");         
         new InputWrapper(this, "input_volume_rendering_distance_between_points", "vpd"); 
         new InputWrapper(this, "input_volume_rendering_termination_opacity", "vto"); 
         new InputWrapper(this, "input_volume_rendering_opacity_factor", "vof"); 
