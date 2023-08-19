@@ -97,6 +97,7 @@ class ShaderFlags {
             this.tube_radius_factor_active_outside = tube_radius_factor_projection_highlight;
             //deactivate volume rendering in projection mode
             this.show_volume_rendering = false;
+            this.show_ridge_surface = false;
             this.show_bounding_box = false;
         }
         else{
