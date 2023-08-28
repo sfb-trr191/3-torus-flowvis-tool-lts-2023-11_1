@@ -166,7 +166,9 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
     
 
     bool reuse_last_iteration = false;//first iteration can not be reused
-    while(sample_index_iteration < max_number_of_bisection_intervals){
+    int iterations_for_max_range = int(ceil(max_range / delta));
+    int max_iteration = min(iterations_for_max_range, max_number_of_bisection_intervals);
+    while(sample_index_iteration < max_iteration){
         //check termination condition
         
         //if possible, copy start values from last iterations stop values
@@ -203,8 +205,10 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
         //end of global check
 
         bool max_range_reached = stop_distance > max_range;
-        if(max_range_reached)
-            break;
+        if(max_range_reached){
+            //do not break, instead set position to end
+            stop_distance = max_range;
+        }
 
         bool skip_first_fundamental_domain = ray.iteration_count == 0 && volume_skip_first_fundamental_domain;
         if(skip_first_fundamental_domain){
