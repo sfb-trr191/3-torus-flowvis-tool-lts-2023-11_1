@@ -46,7 +46,7 @@ bool IntervalHasSignChange(RidgeInformation info_start, RidgeInformation info_st
     return (info_start.dot_grad_ev > 0.0) ? (info_stop_dot_grad_ev < 0.0) : (info_stop_dot_grad_ev > 0.0);
 }
 
-void BisectInterval(Ray ray, bool forward, float start_distance, float stop_distance, inout HitInformation hit){
+void BisectInterval(Ray ray, bool forward, float start_distance, float stop_distance, RidgeInformation info_start, RidgeInformation info_stop, inout HitInformation hit){
         
     vec3 sample_position_start = ray.origin + ray.direction * start_distance;
     vec3 sample_position_stop = ray.origin + ray.direction * stop_distance;
@@ -57,11 +57,11 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
         return;
     }
     
-	RidgeInformation info_start;
-	RidgeInformation info_stop;
+	//RidgeInformation info_start;
+	//RidgeInformation info_stop;
     RidgeInformation info_center;
-    GetRidgeInformation(forward, sample_position_start, info_start);
-    GetRidgeInformation(forward, sample_position_stop, info_stop);
+    //GetRidgeInformation(forward, sample_position_start, info_start);
+    //GetRidgeInformation(forward, sample_position_stop, info_stop);
 
     bool has_change = IntervalHasSignChange(info_start, info_stop);
     if(has_change){
@@ -140,6 +140,17 @@ void BisectInterval(Ray ray, bool forward, float start_distance, float stop_dist
 
 void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout HitInformation hitCube)
 {
+    bool forward;
+    float start_distance;
+    float stop_distance;
+    vec3 sample_position_start;
+    vec3 sample_position_stop;
+    RidgeInformation info_start_forward;
+	RidgeInformation info_stop_forward;
+    RidgeInformation info_start_backward;
+	RidgeInformation info_stop_backward;
+
+
     int sample_index_iteration = 0;
     float delta = volume_rendering_distance_between_points;
     float max_range = min(max_volume_distance, distance_exit);
@@ -152,11 +163,30 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
             return;
         }
     }
+    
 
+    bool reuse_last_iteration = false;//first iteration can not be reused
     while(sample_index_iteration < max_number_of_bisection_intervals){
         //check termination condition
-        float start_distance = start_offset + float(sample_index_iteration) * delta;
-        float stop_distance = start_offset + float(sample_index_iteration+1) * delta;
+        
+        //if possible, copy start values from last iterations stop values
+        if(reuse_last_iteration){
+            start_distance = stop_distance;
+            sample_position_start = sample_position_stop;
+            info_start_forward = info_stop_forward;
+            info_start_backward = info_stop_backward;
+        }
+        else{
+            start_distance = start_offset + float(sample_index_iteration) * delta;
+            sample_position_start = ray.origin + ray.direction * start_distance;   
+            forward = true;
+            GetRidgeInformation(forward, sample_position_start, info_start_forward);
+            forward = false;
+            GetRidgeInformation(forward, sample_position_start, info_start_backward);
+        }
+        reuse_last_iteration = false;//some iterations might be stopped early, therefore reuse is not always possible. this value is set to true at the end of the iteration only if the iteration was completely executed.
+
+        stop_distance = start_offset + float(sample_index_iteration+1) * delta;
         
         //global check
         float total_start_distance = ray.rayDistance + start_distance;
@@ -186,21 +216,28 @@ void BisectRidges(Ray ray, float distance_exit, inout HitInformation hit, inout 
         if(hit.hitType==TYPE_FTLE_SURFACE_FORWARD || hit.hitType==TYPE_FTLE_SURFACE_BACKWARD)
             break;
 
+
+         
+        sample_position_stop = ray.origin + ray.direction * stop_distance;
+
 #ifdef SHOW_RIDGE_SURFACE_FORWARD
         {
             bool forward = true;
-            BisectInterval(ray, forward, start_distance, stop_distance, hit);
+            GetRidgeInformation(forward, sample_position_stop, info_stop_forward);
+            BisectInterval(ray, forward, start_distance, stop_distance, info_start_forward, info_stop_forward, hit);
         }
 #endif
 #ifdef SHOW_RIDGE_SURFACE_BACKWARD
         {
             bool forward = false;
-            BisectInterval(ray, forward, start_distance, stop_distance, hit);
+            GetRidgeInformation(forward, sample_position_stop, info_stop_backward);
+            BisectInterval(ray, forward, start_distance, stop_distance, info_start_backward, info_stop_backward, hit);
         }
 #endif        
 
         //prepare next sample
         sample_index_iteration++;
+        reuse_last_iteration = true;//if the iteration is completely executed, we can reuse start values next iteration
         //END OF LOOP
         //return;
 
