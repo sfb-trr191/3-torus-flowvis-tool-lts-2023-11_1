@@ -1374,6 +1374,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.is_main_renderer = true;
         canvas_wrapper_main.show_bounding_box = tree_view.IsVisibleInHierarchy(4);
         canvas_wrapper_main.show_movable_axes = tree_view.IsVisibleInHierarchy(5);
+        canvas_wrapper_main.show_non_origin_axes = canvas_wrapper_main.show_bounding_box;
         canvas_wrapper_main.show_dynamic_streamline = tree_view.IsVisibleInHierarchy(17);
         canvas_wrapper_main.show_origin_axes = false;
         canvas_wrapper_main.correct_volume_opacity = document.getElementById("checkbox_correct_volume_opacity").checked;
