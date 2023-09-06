@@ -22,4 +22,7 @@ exports.VERSION_REDIRECTION_DICT = {
     "2022-08.3" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-10_2/index.html", //versions before 3-sphere
     "2022-10.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-10_2/index.html", //versions before 3-sphere
     "2022-10.2" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2022-10_2/index.html", //versions before 3-sphere
+    "2023-08.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-08_3/index.html", //versions before changes to ridge rendering
+    "2023-08.2" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-08_3/index.html", //versions before changes to ridge rendering
+    "2023-08.3" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-08_3/index.html", //versions before changes to ridge rendering
 }
