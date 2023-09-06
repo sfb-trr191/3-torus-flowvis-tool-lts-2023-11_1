@@ -71,7 +71,10 @@ class ExportObject{
 module.exports = ExportObject;
 
 function GenerateExportString_Latex(url, file_name){
-    var latex = "\\href{"+url+"}{\\includegraphics[width=\\textwidth]{"+file_name+"}}";
+    const searchRegExp = /\%/g;
+    const replaceWith = '\\%';
+    var url_escaped = url.replace(searchRegExp, replaceWith);//replaces every "%" with "\%" to escape it
+    var latex = "\\href{"+url_escaped+"}{\\includegraphics[width=\\textwidth]{"+file_name+"}}";
     return latex;    
 }
 
