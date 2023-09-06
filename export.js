@@ -32,7 +32,7 @@ class ExportObject{
             var url_lazy_main = input_parameter_wrapper.toURL(layout_key_main, true);
             var url_lazy_aux = input_parameter_wrapper.toURL(layout_key_aux, true);
             zip.file("latex/latex_main.txt", GenerateExportString_Latex(url_main, image_dir_name+file_name_main));
-            zip.file("latex/latex_aux.txt", GenerateExportString_Latex(url_aux, image_dir_name+file_name_main));
+            zip.file("latex/latex_aux.txt", GenerateExportString_Latex(url_aux, image_dir_name+file_name_aux));
             zip.file("url/url_direct_state.txt", url_state);
             zip.file("url/url_direct_main.txt", url_main);
             zip.file("url/url_direct_aux.txt", url_aux);
