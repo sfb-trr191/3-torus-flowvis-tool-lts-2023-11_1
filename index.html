@@ -686,185 +686,204 @@
                                 </div>
                                 <input id="input_field_equation_d3" type="text" value="-p3" title="">
                             </div>
-                            <fieldset class="subgroup_properties">
-                                <legend>Light Integration</legend>
-                                <div class="vertical_container" id="fieldset_light_integrator_type">
-                                    <div class="input_row" id="input_row_space">
-                                        <label>Type</label>
-                                        <select id="select_light_integrator_type" title="Select how light is transported.">
-                                            <option value="0">Line</option>
-                                            <option value="1">RK4</option>
-                                        </select>
-                                    </div>
-                                    <div class="input_row" id="input_row_light_integration_step_size">
-                                        <label>step size</label>
-                                        <input id="input_light_integration_step_size" type="text" value="0.01" 
-                                        title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_integration_max_step_count">
-                                        <label>max step count</label>
-                                        <input id="input_light_integration_max_step_count" type="text" value="1000" 
-                                        title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_p0">
-                                        <div class="math-left-align">
-                                            $$ \dot{p}_0 $$
-                                        </div>
-                                        <input id="input_field_light_transport_p0" type="text" value="d0" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_p1">
-                                        <div class="math-left-align">
-                                            $$ \dot{p}_1 $$
-                                        </div>
-                                        <input id="input_field_light_transport_p1" type="text" value="d1" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_p2">
-                                        <div class="math-left-align">
-                                            $$ \dot{p}_2 $$
-                                        </div>
-                                        <input id="input_field_light_transport_p2" type="text" value="d2" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_p3">
-                                        <div class="math-left-align">
-                                            $$ \dot{p}_3 $$
-                                        </div>
-                                        <input id="input_field_light_transport_p3" type="text" value="d3" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_d0">
-                                        <div class="math-left-align">
-                                            $$ \dot{d}_0 $$
-                                        </div>
-                                        <input id="input_field_light_transport_d0" type="text" value="-p0" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_d1">
-                                        <div class="math-left-align">
-                                            $$ \dot{d}_1 $$
-                                        </div>
-                                        <input id="input_field_light_transport_d1" type="text" value="-p1" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_d2">
-                                        <div class="math-left-align">
-                                            $$ \dot{d}_2 $$
-                                        </div>
-                                        <input id="input_field_light_transport_d2" type="text" value="-p2" title="">
-                                    </div>
-                                    <div class="input_row" id="input_row_light_transport_d3">
-                                        <div class="math-left-align">
-                                            $$ \dot{d}_3 $$
-                                        </div>
-                                        <input id="input_field_light_transport_d3" type="text" value="-p3" title="">
-                                    </div>
-                                </div>
-                            </fieldset>
-                            <fieldset class="subgroup_properties">
-                                <legend>Light Boundary Rules</legend>
-                                <div>
-                                    <fieldset class="subgroup_properties_2">
-                                        <legend>x > 0</legend>
-                                        <div class="vertical_container">
-                                            <div class="input_row">
-                                                <label>x</label>
-                                                <input id="input_field_shader_rule_x_pos_x" type="text" value="x-1.0" title="Determines how the x value changes if x > 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>y</label>
-                                                <input id="input_field_shader_rule_x_pos_y" type="text" value="y" title="Determines how the y value changes if x > 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>z</label>
-                                                <input id="input_field_shader_rule_x_pos_z" type="text" value="z" title="Determines how the z value changes if x > 0">
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <fieldset class="subgroup_properties_2">
-                                        <legend>x &lt 0</legend>
-                                        <div class="vertical_container">
-                                            <div class="input_row">
-                                                <label>x</label>
-                                                <input id="input_field_shader_rule_x_neg_x" type="text" value="x+1.0" title="Determines how the x value changes if x &lt 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>y</label>
-                                                <input id="input_field_shader_rule_x_neg_y" type="text" value="y" title="Determines how the y value changes if x &lt 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>z</label>
-                                                <input id="input_field_shader_rule_x_neg_z" type="text" value="z" title="Determines how the z value changes if x &lt 0">
-                                            </div>
-                                        </div>
-                                    </fieldset>
+                        </div>    
+                        <div class="group_properties_children">
 
-                                    <fieldset class="subgroup_properties_2">
-                                        <legend>y > 0</legend>
-                                        <div class="vertical_container">
-                                            <div class="input_row">
-                                                <label>x</label>
-                                                <input id="input_field_shader_rule_y_pos_x" type="text" value="x" title="Determines how the x value changes if y > 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>y</label>
-                                                <input id="input_field_shader_rule_y_pos_y" type="text" value="y-1.0" title="Determines how the y value changes if y > 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>z</label>
-                                                <input id="input_field_shader_rule_y_pos_z" type="text" value="z" title="Determines how the z value changes if y > 0">
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <fieldset class="subgroup_properties_2">
-                                        <legend>y &lt 0</legend>
-                                        <div class="vertical_container">
-                                            <div class="input_row">
-                                                <label>x</label>
-                                                <input id="input_field_shader_rule_y_neg_x" type="text" value="x" title="Determines how the x value changes if y &lt 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>y</label>
-                                                <input id="input_field_shader_rule_y_neg_y" type="text" value="y+1.0" title="Determines how the y value changes if y &lt 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>z</label>
-                                                <input id="input_field_shader_rule_y_neg_z" type="text" value="z" title="Determines how the z value changes if y &lt 0">
-                                            </div>
-                                        </div>
-                                    </fieldset>
+                        </div>                            
+                    </fieldset>
 
-                                    <fieldset class="subgroup_properties_2">
-                                        <legend>z > 0</legend>
-                                        <div class="vertical_container">
-                                            <div class="input_row">
-                                                <label>x</label>
-                                                <input id="input_field_shader_rule_z_pos_x" type="text" value="x" title="Determines how the x value changes if z > 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>y</label>
-                                                <input id="input_field_shader_rule_z_pos_y" type="text" value="y" title="Determines how the y value changes if z > 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>z</label>
-                                                <input id="input_field_shader_rule_z_pos_z" type="text" value="z-1.0" title="Determines how the z value changes if z > 0">
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <fieldset class="subgroup_properties_2">
-                                        <legend>z &lt 0</legend>
-                                        <div class="vertical_container">
-                                            <div class="input_row">
-                                                <label>x</label>
-                                                <input id="input_field_shader_rule_z_neg_x" type="text" value="x" title="Determines how the x value changes if z &lt 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>y</label>
-                                                <input id="input_field_shader_rule_z_neg_y" type="text" value="y" title="Determines how the y value changes if z &lt 0">
-                                            </div>
-                                            <div class="input_row">
-                                                <label>z</label>
-                                                <input id="input_field_shader_rule_z_neg_z" type="text" value="z+1.0" title="Determines how the z value changes if z &lt 0">
-                                            </div>
-                                        </div>
-                                    </fieldset>
+                    <fieldset class="group_properties" id="group_properties_root_data_equations_light_integration">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">Ray Integration</span>
+                            <span class="span_style_properties_legend_path">[Root/Data/Equations/Ray Integration]</span>
+                        </legend>  
+                        <div class="group_properties_content">
+                            <div class="vertical_container">
+                                <div class="input_row" id="input_row_space">
+                                    <label>Type</label>
+                                    <select id="select_light_integrator_type" title="Select how light is transported.">
+                                        <option value="0">Line</option>
+                                        <option value="1">RK4</option>
+                                    </select>
                                 </div>
-                            </fieldset>
+                                <div class="input_row" id="input_row_light_integration_step_size">
+                                    <label>step size</label>
+                                    <input id="input_light_integration_step_size" type="text" value="0.01" 
+                                    title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_integration_max_step_count">
+                                    <label>max step count</label>
+                                    <input id="input_light_integration_max_step_count" type="text" value="1000" 
+                                    title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_p0">
+                                    <div class="math-left-align">
+                                        $$ \dot{p}_0 $$
+                                    </div>
+                                    <input id="input_field_light_transport_p0" type="text" value="d0" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_p1">
+                                    <div class="math-left-align">
+                                        $$ \dot{p}_1 $$
+                                    </div>
+                                    <input id="input_field_light_transport_p1" type="text" value="d1" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_p2">
+                                    <div class="math-left-align">
+                                        $$ \dot{p}_2 $$
+                                    </div>
+                                    <input id="input_field_light_transport_p2" type="text" value="d2" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_p3">
+                                    <div class="math-left-align">
+                                        $$ \dot{p}_3 $$
+                                    </div>
+                                    <input id="input_field_light_transport_p3" type="text" value="d3" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_d0">
+                                    <div class="math-left-align">
+                                        $$ \dot{d}_0 $$
+                                    </div>
+                                    <input id="input_field_light_transport_d0" type="text" value="-p0" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_d1">
+                                    <div class="math-left-align">
+                                        $$ \dot{d}_1 $$
+                                    </div>
+                                    <input id="input_field_light_transport_d1" type="text" value="-p1" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_d2">
+                                    <div class="math-left-align">
+                                        $$ \dot{d}_2 $$
+                                    </div>
+                                    <input id="input_field_light_transport_d2" type="text" value="-p2" title="">
+                                </div>
+                                <div class="input_row" id="input_row_light_transport_d3">
+                                    <div class="math-left-align">
+                                        $$ \dot{d}_3 $$
+                                    </div>
+                                    <input id="input_field_light_transport_d3" type="text" value="-p3" title="">
+                                </div>
+                            </div>
+                        </div>    
+                        <div class="group_properties_children">
+
+                        </div>                            
+                    </fieldset>
+
+
+                    <fieldset class="group_properties" id="group_properties_root_data_equations_rules">
+                        <legend> 
+                            <span class="span_style_properties_legend_name">Boundary Rules</span>
+                            <span class="span_style_properties_legend_path">[Root/Data/Equations/Boundary Rules]</span>
+                        </legend>  
+                        <div class="group_properties_content">
+                            <div class="vertical_container">
+                                <fieldset class="subgroup_properties_2">
+                                    <legend>x > 0</legend>
+                                    <div class="vertical_container">
+                                        <div class="input_row">
+                                            <label>x</label>
+                                            <input id="input_field_shader_rule_x_pos_x" type="text" value="x-1.0" title="Determines how the x value changes if x > 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>y</label>
+                                            <input id="input_field_shader_rule_x_pos_y" type="text" value="y" title="Determines how the y value changes if x > 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>z</label>
+                                            <input id="input_field_shader_rule_x_pos_z" type="text" value="z" title="Determines how the z value changes if x > 0">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="subgroup_properties_2">
+                                    <legend>x &lt 0</legend>
+                                    <div class="vertical_container">
+                                        <div class="input_row">
+                                            <label>x</label>
+                                            <input id="input_field_shader_rule_x_neg_x" type="text" value="x+1.0" title="Determines how the x value changes if x &lt 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>y</label>
+                                            <input id="input_field_shader_rule_x_neg_y" type="text" value="y" title="Determines how the y value changes if x &lt 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>z</label>
+                                            <input id="input_field_shader_rule_x_neg_z" type="text" value="z" title="Determines how the z value changes if x &lt 0">
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="subgroup_properties_2">
+                                    <legend>y > 0</legend>
+                                    <div class="vertical_container">
+                                        <div class="input_row">
+                                            <label>x</label>
+                                            <input id="input_field_shader_rule_y_pos_x" type="text" value="x" title="Determines how the x value changes if y > 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>y</label>
+                                            <input id="input_field_shader_rule_y_pos_y" type="text" value="y-1.0" title="Determines how the y value changes if y > 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>z</label>
+                                            <input id="input_field_shader_rule_y_pos_z" type="text" value="z" title="Determines how the z value changes if y > 0">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="subgroup_properties_2">
+                                    <legend>y &lt 0</legend>
+                                    <div class="vertical_container">
+                                        <div class="input_row">
+                                            <label>x</label>
+                                            <input id="input_field_shader_rule_y_neg_x" type="text" value="x" title="Determines how the x value changes if y &lt 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>y</label>
+                                            <input id="input_field_shader_rule_y_neg_y" type="text" value="y+1.0" title="Determines how the y value changes if y &lt 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>z</label>
+                                            <input id="input_field_shader_rule_y_neg_z" type="text" value="z" title="Determines how the z value changes if y &lt 0">
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="subgroup_properties_2">
+                                    <legend>z > 0</legend>
+                                    <div class="vertical_container">
+                                        <div class="input_row">
+                                            <label>x</label>
+                                            <input id="input_field_shader_rule_z_pos_x" type="text" value="x" title="Determines how the x value changes if z > 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>y</label>
+                                            <input id="input_field_shader_rule_z_pos_y" type="text" value="y" title="Determines how the y value changes if z > 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>z</label>
+                                            <input id="input_field_shader_rule_z_pos_z" type="text" value="z-1.0" title="Determines how the z value changes if z > 0">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="subgroup_properties_2">
+                                    <legend>z &lt 0</legend>
+                                    <div class="vertical_container">
+                                        <div class="input_row">
+                                            <label>x</label>
+                                            <input id="input_field_shader_rule_z_neg_x" type="text" value="x" title="Determines how the x value changes if z &lt 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>y</label>
+                                            <input id="input_field_shader_rule_z_neg_y" type="text" value="y" title="Determines how the y value changes if z &lt 0">
+                                        </div>
+                                        <div class="input_row">
+                                            <label>z</label>
+                                            <input id="input_field_shader_rule_z_neg_z" type="text" value="z+1.0" title="Determines how the z value changes if z &lt 0">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
                         </div>    
                         <div class="group_properties_children">
 
