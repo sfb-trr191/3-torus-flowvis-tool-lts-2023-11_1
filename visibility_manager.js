@@ -2,6 +2,7 @@
 class VisibilityManager {
     constructor() {
         this.AddListener("select_shading_mode_streamlines");
+        this.AddListener("select_light_integrator_type");
     }
 
     Link(streamline_context_static){
@@ -20,6 +21,17 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_side_mode", this.ShouldShow_input_row_side_mode());
         this.UpdateInputRow("input_row_side_mode_s3", this.ShouldShow_input_row_side_mode_s3());
         this.UpdateInputRow("input_row_scalar_range", this.ShouldShow_input_row_scalar_range());
+        
+        this.UpdateInputRow("input_row_light_integration_step_size", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_integration_max_step_count", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_p0", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_p1", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_p2", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_p3", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_d0", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_d1", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_d2", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_transport_d3", this.ShouldShow_light_integration());
         
     }
 
@@ -55,6 +67,12 @@ class VisibilityManager {
             return true;       
         if(document.getElementById("select_shading_mode_streamlines").value == SHADING_MODE_STREAMLINES_COST)
             return true;    
+        return false;
+    }
+
+    ShouldShow_light_integration(){
+        if(document.getElementById("select_light_integrator_type").value == LIGHT_INTEGRATOR_RK4)
+            return true;
         return false;
     }
 
