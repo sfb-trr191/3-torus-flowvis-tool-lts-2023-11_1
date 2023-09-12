@@ -451,15 +451,16 @@ class CanvasWrapper {
     }
 
     CalculateLimitedMaxRayDistance(max_ray_distance) {
+        var deadzone = Math.min(this.min_volume_distance, this.min_streamline_distance);
         var d = this.fog_density;
         this.max_ray_distance = max_ray_distance;
         this.limited_max_distance = max_ray_distance;
         if (this.fog_type == FOG_EXPONENTIAL) {
-            this.limited_max_distance = Math.min(this.max_ray_distance, 6.90776 / d);//js allows division by zero;
+            this.limited_max_distance = Math.min(this.max_ray_distance, 6.90776 / d) + deadzone;//js allows division by zero;
         }
         else if (this.fog_type == FOG_EXPONENTIAL_SQUARED) {
             //see https://www.wolframalpha.com/input/?i=e%5E%28-%28d*z%29%5E2%29+%3E+0.001
-            this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d * d)));//js allows division by zero;
+            this.limited_max_distance = Math.min(this.max_ray_distance, 2.62826 * Math.sqrt(1 / (d * d))) + deadzone;//js allows division by zero;
         }
     }
 

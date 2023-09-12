@@ -2,19 +2,23 @@ global.SHADER_MODULE_SHARED_SHADING = `
 
 float CalculateFogFactor(float dist)
 {
+    float deadzone = min(min_volume_distance, min_streamline_distance);
+    float dist_after_cut = dist - deadzone;
+    float fog_length = maxRayDistance - deadzone;
+
     float fogFactor = 1.0;
     if (fog_type == FOG_LINEAR){
 	    //float fogFactor = (fogEnd - hit.distance)/(fogEnd-fogStart);
-	    fogFactor = (maxRayDistance - dist)/(maxRayDistance);
+	    fogFactor = (fog_length - dist_after_cut)/(fog_length);
 	    fogFactor = clamp(fogFactor, 0.0, 1.0);   
     }
     else if (fog_type == FOG_EXPONENTIAL){
-        float dz = fog_density * dist;
+        float dz = fog_density * dist_after_cut;
 	    fogFactor = exp(-dz);
 	    fogFactor = clamp(fogFactor, 0.0, 1.0);   
     }
     else if (fog_type == FOG_EXPONENTIAL_SQUARED){
-        float dz = fog_density * dist;
+        float dz = fog_density * dist_after_cut;
 	    fogFactor = exp(-dz*dz);
 	    fogFactor = clamp(fogFactor, 0.0, 1.0);      
     }
