@@ -519,6 +519,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         console.log("#SC: state_streamline_calculation_finished");
         var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
         context.NotifyFinished();
+        context.LogMetaData();
 
         data_changed = true;
         input_changed_manager.UpdateDefaultValuesCalculate();

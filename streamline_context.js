@@ -146,10 +146,11 @@ class StreamlineContext {
             this.lod_list[i].UpdateDataUnit();
             this.lod_list[i].UpdateDataTextures(gl, gl_side);
         }
-
+        /*
         for (var i = 0; i < this.lod_list.length; i++) {
-            this.lod_list[i].LogState();
+            this.lod_list[i].LogMetaData();
         }
+        */
     }
 
     NotifyFinished(){
@@ -214,9 +215,11 @@ class StreamlineContext {
             this.lod_list[i].UpdateDataTextures(gl, gl_side);
         }
 
+        /*
         for (var i = 0; i < this.lod_list.length; i++) {
-            this.lod_list[i].LogState();
+            this.lod_list[i].LogMetaData();
         }
+        */
     }
 
     bind_lod(canvas_wrapper_name, lod_index, gl, shader_uniforms, location_texture_float, location_texture_int) {
@@ -224,7 +227,10 @@ class StreamlineContext {
         this.lod_list[lod_index].bind(this.name, canvas_wrapper_name, gl, shader_uniforms, location_texture_float, location_texture_int);
     }
 
-
+    LogMetaData()
+    {
+        this.lod_list[0].LogMetaData();
+    }
 
 }
 

@@ -101,10 +101,10 @@ class LODDataPart{
         this.data_container_tree_nodes.data = this.tree_nodes;
     }
 
-    LogState() {
-        console.log("LogState LOD: " + this.name);
-        console.log("LogState segments: " + this.vectorLineSegment.length);
-        console.log("LogState nodes: " + this.tree_nodes.length);
+    LogMetaData() {
+        console.log("LogMetaData LOD: " + this.name);
+        console.log("LogMetaData segments: " + this.vectorLineSegment.length);
+        console.log("LogMetaData nodes: " + this.tree_nodes.length);
     }
 
 }
@@ -564,9 +564,10 @@ class LODData {
         console.log("GenerateLineSegmentCopies completed");
     }
 
-    LogState() {
+    LogMetaData() {
+        console.log("LogMetaData context: " + this.name);
         for(var i=0; i<this.list_part.length; i++){
-            this.list_part[i].LogState();
+            this.list_part[i].LogMetaData();
         }
     }
 }

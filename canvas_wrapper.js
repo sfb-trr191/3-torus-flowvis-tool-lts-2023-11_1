@@ -283,7 +283,7 @@ class CanvasWrapper {
         this.forward_ftle_surface_color = glMatrix.vec3.fromValues(1,0,0);//overwritten by ui anyways
         this.backward_ftle_surface_color = glMatrix.vec3.fromValues(0,0,1);//overwritten by ui anyways
         this.selected_streamline_id = -1;
-        this.gray_scale_factor = 0.5;
+        this.gray_scale_factor = 0.0;
 
         this.last_shader_formula_scalar = "";
 
