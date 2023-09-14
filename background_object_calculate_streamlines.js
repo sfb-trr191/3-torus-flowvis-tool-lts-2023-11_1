@@ -47,10 +47,15 @@ class BackgroundObjectCalculateStreamlines{
 
     start(){
         this.t_start = performance.now();
-        console.log("#SC start: ", this.t_start);
-
-        
+        //console.log("#Performance Streamlines start: ", this.t_start);        
     } 
+
+    finish(){
+        this.t_stop = performance.now();
+        //console.log("#Performance Streamlines end: ", this.t_stop);    
+        var t = Math.ceil(this.t_stop-this.t_start) 
+        console.log("#Performance Streamlines finished in: ", t, "ms");          
+    }
     
     ResetProgress(){
         var width = 0;

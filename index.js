@@ -195,6 +195,9 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
     var old_space;//this variable contains the space of the previous streamline calculation. a change in space may trigger for example changes to the camera.
 
+    var t_start_export;
+    var t_stop_export;
+
     function onStart(evt) {
         console.log("onStart");
 
@@ -452,6 +455,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
     function state_streamline_calculation_setup(time_now){
         bo_calculate_streamlines = new BackgroundObjectCalculateStreamlines(gl, gl_side, sheduled_task);
+        bo_calculate_streamlines.start();
 
         canvas_wrapper_main.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
         canvas_wrapper_side.tube_radius_fundamental = bo_calculate_streamlines.input_parameters.tube_radius_fundamental;
@@ -531,6 +535,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         UpdateURL();
         sheduled_task = TASK_NONE;
         document.getElementById("wrapper_dialog_calculating").className = "hidden";
+        bo_calculate_streamlines.finish();
         requestAnimationFrame(on_update);
     }
 
@@ -659,6 +664,10 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             return;
         }
         if(finished){
+            t_stop_export = performance.now();
+            var t = Math.ceil(t_stop_export-t_start_export); 
+            console.log("#Performance export main finished in: ", t, "ms", Math.ceil(t/64));
+            t_start_export = performance.now();    
             requestAnimationFrame(on_update_export_aux);
             return;
         }
@@ -675,6 +684,10 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             return;
         }
         if(finished){
+            t_stop_export = performance.now();
+            var t = Math.ceil(t_stop_export-t_start_export); 
+            console.log("#Performance export aux finished in: ", t, "ms", Math.ceil(t/64));
+            
             export_object.startExport(input_parameter_wrapper, ui_tools);
             export_wizard.ActivateWaitingForDownloadImage();
             requestAnimationFrame(on_update_wait_for_export_finished);
@@ -778,6 +791,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             canvas_wrapper_side.startExport(gl_side, width_aux, height_aux);
             sheduled_task = TASK_NONE;
             export_object = new ExportObject(TASK_EXPORT_THUMBNAIL);
+            t_start_export = performance.now();    
             requestAnimationFrame(on_update_export_main);
             return;  
         }
@@ -792,6 +806,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             canvas_wrapper_side.startExport(gl_side, width_aux, height_aux);
             sheduled_task = TASK_NONE;
             export_object = new ExportObject(TASK_EXPORT_LATEX);
+            t_start_export = performance.now();    
             requestAnimationFrame(on_update_export_main);
             return;  
         }

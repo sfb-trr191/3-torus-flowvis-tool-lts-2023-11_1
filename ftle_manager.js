@@ -622,6 +622,8 @@ class FTLEManager {
         this.data_texture_ftle_jacoby_direction_y_side.update(bo.gl_side);
         this.data_texture_ftle_jacoby_direction_z_side.update(bo.gl_side);
         */
+        bo.finish();
+
         this.finished = true;
     }
 

@@ -664,8 +664,20 @@ class CanvasWrapper {
         if (this.camera.changed || data_changed || settings_changed)
             this.aliasing_index = 0;
 
-        if (this.aliasing_index == this.aliasing.num_rays_per_pixel)
+        if (this.aliasing_index == this.aliasing.num_rays_per_pixel){
+            if(!this.finished){
+                this.finished = true;
+                this.t_stop = performance.now();
+                var t = Math.ceil(this.t_stop-this.t_start) 
+                console.log("#Performance render in: ", t, "ms", Math.ceil(t/64));       
+            }
             return;
+        }
+
+        if (this.aliasing_index == 0){
+            this.finished = false;
+            this.t_start = performance.now();
+        }
 
         //if at least one frame is drawn, check if progressive drawing is allowed
         if (this.aliasing_index > 0){
