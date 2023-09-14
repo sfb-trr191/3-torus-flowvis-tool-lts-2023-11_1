@@ -810,6 +810,7 @@ class CanvasWrapper {
     draw_mode_raytracing(gl, left_render_wrapper) {
         var get_pixel_data_results = false;
         this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+        
         //if(true){
         //    var get_pixel_data_results = true;
         //    this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
@@ -920,7 +921,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_get_pixel_data_results, get_pixel_data_results);
         gl.uniform1f(this.location_raytracing.location_output_x_percentage, this.output_x_percentage);
         gl.uniform1f(this.location_raytracing.location_output_y_percentage, this.output_y_percentage);
-
+        
         
         this.camera.WriteToUniform(gl, this.program_raytracing, "active_camera");
         this.InitAreaProjectionCameras();
@@ -928,24 +929,20 @@ class CanvasWrapper {
         this.cameraAreaProjection1.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection1");
         this.cameraAreaProjection2.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection2");
         this.cameraAreaProjection3.WriteToUniform(gl, this.program_raytracing, "cameraAreaProjection3");
-        //gl.uniform1f(this.location_raytracing.location_color_r, 0.5 + 0.5 * Math.sin(2 * Math.PI * x));
-        console.log("drawTextureRaytracing draw size", this.camera.width, "x", this.camera.height);
         gl.uniform1i(this.location_raytracing.location_width, this.camera.width);
         gl.uniform1i(this.location_raytracing.location_height, this.camera.height);
         gl.uniform1i(this.location_raytracing.location_max_iteration_count, max_iteration_count);
 
-        gl.uniform1i(this.location_raytracing.location_num_visual_seeds, this.global_data.GetNumVisualSeeds());
-        
+        gl.uniform1i(this.location_raytracing.location_num_visual_seeds, this.global_data.GetNumVisualSeeds());        
 
         gl.uniform1f(this.location_raytracing.location_offset_x, this.aliasing.offset_x[this.aliasing_index]);
         gl.uniform1f(this.location_raytracing.location_offset_y, this.aliasing.offset_y[this.aliasing_index]);
-        console.log("this.limited_max_distance", this.name, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_max_ray_distance, this.limited_max_distance);
         gl.uniform1f(this.location_raytracing.location_light_integration_step_size, this.light_integration_step_size);  
         gl.uniform1i(this.location_raytracing.location_light_integration_max_step_count, this.light_integration_max_step_count);       
 
         gl.uniform1i(this.location_raytracing.location_selected_streamline_id, this.selected_streamline_id);
-        gl.uniform1i(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);        
+        gl.uniform1f(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);        
         gl.uniform3f(this.location_raytracing.location_selected_streamline_color, this.selected_streamline_color[0], this.selected_streamline_color[1], this.selected_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_dynamic_streamline_color, this.dynamic_streamline_color[0], this.dynamic_streamline_color[1], this.dynamic_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_forward_ftle_surface_color, this.forward_ftle_surface_color[0], this.forward_ftle_surface_color[1], this.forward_ftle_surface_color[2]);
@@ -1033,10 +1030,6 @@ class CanvasWrapper {
             this.location_raytracing.location_texture_float_global, gl.TEXTURE2, 2,
             this.location_raytracing.location_texture_int_global, gl.TEXTURE3, 3);
 
-        //this.p_ftle_manager.bind(this.name, gl,
-        //    this.location_raytracing.location_texture_ftle,
-        //    this.location_raytracing.location_texture_ftle_differences);
-
         this.p_ftle_manager.bind(this.name, gl,
             this.location_raytracing.location_texture_ftle, 4,
             this.location_raytracing.location_texture_ftle_gradient, 5,
@@ -1048,19 +1041,8 @@ class CanvasWrapper {
             this.shader_uniforms_raytracing,
             this.location_raytracing.location_texture_dynamic_float,
             this.location_raytracing.location_texture_dynamic_int);
-            /*
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle.texture.texture);
-        gl.uniform1i(this.location_raytracing.location_texture_ftle, 4);
-
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_3D, this.p_ftle_manager.data_texture_ftle_gradient.texture.texture);
-        gl.uniform1i(this.location_raytracing.location_texture_ftle_differences, 5);*/
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_raytracing);
-
-        //var pixel = gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        //warn("pixel: ", pixel)
 
         if(get_pixel_data_results){
             this.readPixelsRGBA(gl, this.compute_wrapper_pixel_results.render_texture.texture_settings.width, this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
@@ -1155,7 +1137,7 @@ class CanvasWrapper {
         var show_progressbar = this.isRenderingIncomplete();
         var progress = this.aliasing_index / (this.aliasing.num_rays_per_pixel - 1);
         //console.log("drawResampling draw size", this.canvas_width, "x", this.canvas_height);
-        console.log("drawResampling draw size", this.canvas.width, "x", this.canvas.height);
+        //console.log("drawResampling draw size", this.canvas.width, "x", this.canvas.height);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         //gl.viewport(0, 0, this.canvas_width, this.canvas_height);
@@ -1264,19 +1246,19 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
     loadShaderUniformsAverage(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
     loadShaderUniformsCopy(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
@@ -1293,7 +1275,7 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
@@ -1310,7 +1292,7 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_int_seeds", "INT", -1);
         program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 

@@ -971,31 +971,31 @@ class FTLEManager {
 
     loadShaderUniformsComputeFlowMapSlice(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
     loadShaderUniformsComputeFlowMapFiniteDifferences(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
     loadShaderUniformsComputeFTLENormals(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
     loadShaderUniformsCompute2zGradientSlice(gl, program){
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 
     loadShaderUniformsCompute2zJacobyColumnSlice(gl, program) {
         var program_shader_uniforms = new ShaderUniforms(gl, program);
-        program_shader_uniforms.print();
+        //program_shader_uniforms.print();
         return program_shader_uniforms;
     }
 

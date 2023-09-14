@@ -63,7 +63,7 @@ class GL_CameraData {
         gl.uniform1f(location_area_height_percentage, this.area_height_percentage);
         gl.uniform1f(location_area_width_percentage, this.area_width_percentage);
 
-        console.log("WriteToUniform this.E", this.E)
+        //console.log("WriteToUniform this.E", this.E)
     }
 }
 
@@ -101,10 +101,10 @@ class CameraState {
     }
 
     fromString(s) {
-        console.log("0x22 CAMERA_STATE ", s);
+        //console.log("0x22 CAMERA_STATE ", s);
         if (s === null)
             return;
-        console.log("CAMERA_STATE not null");
+        //console.log("CAMERA_STATE not null");
         if (!s.includes("~"))
             return;
 
@@ -146,7 +146,7 @@ class CameraState {
             + this.right[1] + "~"
             + this.right[2] + "~"
             + this.right[3]
-        console.log("0x22 toString", s);
+        //console.log("0x22 toString", s);
         return s;
     }
 
@@ -408,7 +408,7 @@ class Camera {
     WriteToInputFields() {
         if (!this.changed)
             return;
-        console.log("0x22 this.position", this.position)
+        //console.log("0x22 this.position", this.position)
         var decimals = 6;
         var up_negated = glMatrix.vec4.create();
         glMatrix.vec4.negate(up_negated, this.up);
