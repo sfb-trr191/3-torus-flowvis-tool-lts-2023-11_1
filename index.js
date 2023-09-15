@@ -563,6 +563,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         console.warn("#SC: state_ftle_setup");
         
         bo_calculate_ftle = new BackgroundObjectCalculateFTLE(gl, gl_side, sheduled_task);
+        bo_calculate_ftle.start();
         ftle_manager.initialize_statemachine(bo_calculate_ftle);
 
         requestAnimationFrame(state_ftle);
