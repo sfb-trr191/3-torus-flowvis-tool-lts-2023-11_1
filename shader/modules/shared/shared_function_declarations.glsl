@@ -30,7 +30,7 @@ float ExtractLinearPercentage(float a, float b, float value);
 
 //**********************************************************
 
-vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override);
+vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override, bool allow_fog);
 float CalculateFogFactor(float dist);
 vec3 GetObjectColor(Ray ray, inout HitInformation hit);
 

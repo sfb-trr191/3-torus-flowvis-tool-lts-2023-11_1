@@ -99,7 +99,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
     if(hit.hitType > TYPE_NONE)
     {
         //return vec3(1,0,0);
-        vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true);
+        vec3 resultColor = Shade(rayPixelOffset, hit, hitCube, true, false);
         return resultColor;	
     }
 #endif
@@ -123,7 +123,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
                 Ray ray = GenerateRay(x_offset, y_offset, area_index);
                 Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
                 CombineHitInformation(ray, hit, hit_outside, hitCube);
-                vec3 resultColor = Shade(ray, hit, hitCube, false);
+                vec3 resultColor = Shade(ray, hit, hitCube, false, true);
                 return resultColor;  
             }
         }
@@ -134,7 +134,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
         Ray ray = GenerateRay(x_offset, y_offset, -1);
         Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
         CombineHitInformation(ray, hit, hit_outside, hitCube);
-        vec3 resultColor = Shade(ray, hit, hitCube, false);
+        vec3 resultColor = Shade(ray, hit, hitCube, false, true);
         return resultColor;
     }
    
@@ -143,7 +143,7 @@ vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, i
     Ray ray = GenerateRay(x_offset, y_offset);	  
     Intersect(ray, hit, hit_outside, hitCube);//found in decision: intersection_control_definitions
     CombineHitInformation(ray, hit, hit_outside, hitCube);
-	vec3 resultColor = Shade(ray, hit, hitCube, false);
+	vec3 resultColor = Shade(ray, hit, hitCube, false, true);
   	return resultColor;
 }
 

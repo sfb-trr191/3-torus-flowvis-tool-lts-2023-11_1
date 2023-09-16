@@ -9,7 +9,7 @@ vec3 Get3DNormalColor(vec3 normal){
     return color;
 }
 
-vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override)
+vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override, bool allow_fog)
 {			
 	ignore_override = ignore_override || hit.ignore_override;
 	vec3 resultColor = vec3(0,0,0);
@@ -90,10 +90,14 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 		vec3 objectColor = GetObjectColor(ray, hit);	
 		lightColor *= objectColor;
 		
-        float fogFactor = CalculateFogFactor(hit.distance);
-		
-		//formula: finalColor = (1.0 - f)*fogColor + f * lightColor
-		surface_color = mix(fogColor, lightColor, fogFactor);
+        if(allow_fog){
+            float fogFactor = CalculateFogFactor(hit.distance);		
+		    //formula: finalColor = (1.0 - f)*fogColor + f * lightColor
+		    surface_color = mix(fogColor, lightColor, fogFactor);
+        }else{
+		    surface_color = lightColor;
+        }
+
 	}
 	else
 	{
