@@ -202,7 +202,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_max_scalar", "smax");        
         //settings - fog
         new InputWrapper(this, "select_fog_type", "sft");      
-        new InputWrapper(this, "input_fog_density", "fd");          
+        new InputWrapper(this, "input_fog_density", "fd");
+        new InputWrapper(this, "select_fog_type_aux", "sft2");      
+        new InputWrapper(this, "input_fog_density_aux", "fd2");          
         //settings - axes   
         new InputWrapper(this, "input_cube_axes_length_main", "all"); 
         new InputWrapper(this, "input_cube_axes_length_side", "alr"); 

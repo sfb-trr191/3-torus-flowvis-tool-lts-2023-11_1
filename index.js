@@ -1470,8 +1470,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_side.tube_radius_factor_projection_highlight = document.getElementById("input_tube_radius_factor_projection_highlight").value;
         
-        canvas_wrapper_side.fog_density = document.getElementById("input_fog_density").value;
-        canvas_wrapper_side.fog_type = document.getElementById("select_fog_type").value;
+        canvas_wrapper_side.fog_density = document.getElementById("input_fog_density_aux").value;
+        canvas_wrapper_side.fog_type = document.getElementById("select_fog_type_aux").value;
         canvas_wrapper_side.projection_index = document.getElementById("select_projection_index").value;
         canvas_wrapper_side.shading_mode_streamlines = document.getElementById("select_shading_mode_streamlines").value;
         canvas_wrapper_side.shading_mode_ftle_surface = document.getElementById("select_shading_mode_ftle_surface").value;        

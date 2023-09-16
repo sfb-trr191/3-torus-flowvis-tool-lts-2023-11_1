@@ -846,6 +846,7 @@ class CanvasWrapper {
     }
 
     drawTextureRaytracing(gl, render_wrapper, get_pixel_data_results) {
+        var fog_type = this.fog_type;
         var projection_index = -1;
         var max_iteration_count = this.max_iteration_count;
         var tube_radius_factor_active = this.tube_radius_factor;
@@ -894,7 +895,7 @@ class CanvasWrapper {
                 break;
         }
 
-        if(this.draw_mode == DRAW_MODE_PROJECTION){
+        if(this.draw_mode == DRAW_MODE_PROJECTION){            
             projection_index = this.projection_index;
             max_iteration_count = 1000;
             tube_radius_factor_active = this.tube_radius_factor_projection;
@@ -902,6 +903,8 @@ class CanvasWrapper {
             //deactivate volume rendering in projection mode
             show_volume_rendering = false;
             show_bounding_box = false;
+            //no fog in projection
+            fog_type = FOG_NONE;
         }
         else{
             show_bounding_box_projection = false;
@@ -973,7 +976,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
         gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
-        gl.uniform1i(this.location_raytracing.location_fog_type, this.fog_type);
+        gl.uniform1i(this.location_raytracing.location_fog_type, fog_type);
         gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);
         gl.uniform1i(this.location_raytracing.location_shading_mode_ftle_surface, this.shading_mode_ftle_surface);        

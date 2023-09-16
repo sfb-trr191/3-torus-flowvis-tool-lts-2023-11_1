@@ -1402,33 +1402,7 @@
                                             title="Experimental.">
                                     </div>  
                                 </div>
-                            </fieldset>
-
-                            <fieldset class="subgroup_properties">
-                                <legend>Fog</legend>
-                                <div class="vertical_container">
-                                    <div class="input_row">
-                                        <label>fog type</label>
-                                        <select id="select_fog_type" title="The fog type used.
-        - exponential: the recommended fog type when using fog: t = exp(-d), 
-            where d is the intersection distance multiplied by the fog density
-            and t is used for linear interpolate between white and the color obtained at the intersection.
-        - squared exponential: t = exp(-d*d)
-        - linear: t = (max_distance - intersection_distance)/(max_distance)
-        - none: no fog is used.">
-                                            <option value="2">exponential</option>
-                                            <option value="3">squared exponential</option>
-                                            <option value="1">linear</option>
-                                            <option value="0">none</option>
-                                        </select>
-                                    </div>
-                                    <div class="input_row">
-                                        <label>fog density</label>
-                                        <input id="input_fog_density" type="text" value="0.01" title="Parameter used by exponential and squared exponential fog.
-        - High density leads to reduced view distance.">
-                                    </div>
-                                </div>
-                            </fieldset>
+                            </fieldset>                          
     
                             <fieldset class="subgroup_properties">
                                 <legend>Quality</legend>
@@ -1683,6 +1657,32 @@ Camera [Root/View/Main View/Camera]
     - checked: the value of this field can be freely modified to achieve a desired aspect ratio.
     - unchecked: the value of this field is calculated automatically and can not be changed.">
                                         </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Fog</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>fog type</label>
+                                        <select id="select_fog_type" title="The fog type used.
+        - exponential: the recommended fog type when using fog: t = exp(-d), 
+            where d is the intersection distance multiplied by the fog density
+            and t is used for linear interpolate between white and the color obtained at the intersection.
+        - squared exponential: t = exp(-d*d)
+        - linear: t = (max_distance - intersection_distance)/(max_distance)
+        - none: no fog is used.">
+                                            <option value="2">exponential</option>
+                                            <option value="3">squared exponential</option>
+                                            <option value="1">linear</option>
+                                            <option value="0">none</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>fog density</label>
+                                        <input id="input_fog_density" type="text" value="0.01" title="Parameter used by exponential and squared exponential fog.
+        - High density leads to reduced view distance.">
                                     </div>
                                 </div>
                             </fieldset>
@@ -2130,6 +2130,32 @@ Camera [Root/View/Main View/Camera]
     - checked: the value of this field can be freely modified to achieve a desired aspect ratio.
     - unchecked: the value of this field is calculated automatically and can not be changed.">
                                         </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="subgroup_properties">
+                                <legend>Fog</legend>
+                                <div class="vertical_container">
+                                    <div class="input_row">
+                                        <label>fog type</label>
+                                        <select id="select_fog_type_aux" title="The fog type used.
+        - exponential: the recommended fog type when using fog: t = exp(-d), 
+            where d is the intersection distance multiplied by the fog density
+            and t is used for linear interpolate between white and the color obtained at the intersection.
+        - squared exponential: t = exp(-d*d)
+        - linear: t = (max_distance - intersection_distance)/(max_distance)
+        - none: no fog is used.">
+                                            <option value="2">exponential</option>
+                                            <option value="3">squared exponential</option>
+                                            <option value="1">linear</option>
+                                            <option selected value="0">none</option>
+                                        </select>
+                                    </div>
+                                    <div class="input_row">
+                                        <label>fog density</label>
+                                        <input id="input_fog_density_aux" type="text" value="0.01" title="Parameter used by exponential and squared exponential fog.
+        - High density leads to reduced view distance.">
                                     </div>
                                 </div>
                             </fieldset>
