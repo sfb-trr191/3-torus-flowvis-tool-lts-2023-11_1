@@ -9,6 +9,8 @@ class RenderWrapper {
         var format = gl.RGBA;
         var internalformat = gl.RGBA;
         this.render_texture = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
+        this.render_texture_alternative = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
+        this.render_texture_compare = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
         this.render_texture_average_in = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
         this.render_texture_average_out = new RenderTexture(gl, texture_width, texture_height, type, format, internalformat);
 
@@ -19,6 +21,18 @@ class RenderWrapper {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.frame_buffer);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D,
             this.render_texture.texture, this.render_texture.texture_settings.level);
+
+        //this produces a single frame with alternative parameters --> allows comparison and hole detection
+        this.frame_buffer_alternative = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.frame_buffer_alternative);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D,
+            this.render_texture_alternative.texture, this.render_texture_alternative.texture_settings.level);
+
+        //comparison of render_texture and render_texture_alternative, hole detection
+        this.frame_buffer_compare = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.frame_buffer_compare);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D,
+            this.render_texture_compare.texture, this.render_texture_compare.texture_settings.level);
 
         //this sums the previous frames (render_texture_average_in) and the new frame (render_texture)
         this.frame_buffer_average = gl.createFramebuffer();
@@ -36,6 +50,8 @@ class RenderWrapper {
     resize(gl, texture_width, texture_height) {
         console.log("resize RenderWrapper: ", this.name, texture_width, texture_height)
         this.render_texture.resize(gl, texture_width, texture_height);
+        this.render_texture_alternative.resize(gl, texture_width, texture_height);
+        this.render_texture_compare.resize(gl, texture_width, texture_height);
         this.render_texture_average_in.resize(gl, texture_width, texture_height);
         this.render_texture_average_out.resize(gl, texture_width, texture_height);
 

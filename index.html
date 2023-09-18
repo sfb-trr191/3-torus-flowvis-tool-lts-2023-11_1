@@ -1223,6 +1223,15 @@
                             <span class="span_style_properties_legend_path">[Root/View]</span>
                         </legend>  
                         <div class="group_properties_content">
+                            <div class="input_row">
+                                <label>show quality markers</label>
+                                <input id="checkbox_show_comparison_marker" type="checkbox" value="false" checked="false" title="">
+                            </div>
+                            <div class="input_row" id="input_row_quality_marker_index">
+                                <label>quality marker index</label>
+                                <input id="input_quality_marker_index" type="text" value="16"
+                                    title="The index after which the quality markers are shown. Increasing this value delays the marker but improves performance during exploration.">
+                            </div>
                             <fieldset class="subgroup_properties">
                                 <legend>Streamline Rendering</legend>
                                 <div class="vertical_container">     
@@ -1479,6 +1488,10 @@
                             <fieldset class="subgroup_properties">
                                 <legend>Colors</legend>
                                 <div class="vertical_container">
+                                    <div class="input_row" id="input_row_colors_quality_marker">
+                                        <label>quality marker</label>
+                                        <input id="input_colors_quality_marker" type="color" title="Color of the quality marker." value="#FF00FF"> 
+                                    </div>
                                     <div class="input_row" id="input_row_colors_selected">
                                         <label>selected streamline</label>
                                         <input id="input_colors_selected" type="color" title="Color of the streamline started at this seed." value="#EA4335"> 

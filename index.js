@@ -1,6 +1,7 @@
 //########## GLOBALS ##########
 const module_const = require("./const");
 const module_version = require("./version");
+const f_shader_compare = require("./shader/stand_alone/f_shader_compare.glsl");
 const f_shader_average = require("./shader/stand_alone/f_shader_average.glsl");
 const f_shader_compute_flow_map_slice_AB = require("./shader/stand_alone/f_shader_compute_flow_map_slice_AB.glsl");
 const f_shader_compute_flow_map_slice = require("./shader/stand_alone/f_shader_compute_flow_map_slice.glsl");
@@ -1361,6 +1362,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         var light_integration_max_step_count = parseInt(document.getElementById("input_light_integration_max_step_count").value);
         //MAIN
              
+        canvas_wrapper_main.quality_marker_color = getColorVectorFromElementID("input_colors_quality_marker");
         canvas_wrapper_main.selected_streamline_color = getColorVectorFromElementID("input_colors_selected");
         canvas_wrapper_main.dynamic_streamline_color = getColorVectorFromElementID("input_colors_dynamic");
         canvas_wrapper_main.forward_ftle_surface_color = getColorVectorFromElementID("input_colors_forward_ftle_surface");
@@ -1402,7 +1404,9 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.volume_rendering_opacity_factor = parseFloat(document.getElementById("input_volume_rendering_opacity_factor").value);
         canvas_wrapper_main.volume_rendering_mode = parseInt(document.getElementById("select_volume_rendering_mode").value);
         canvas_wrapper_main.volume_rendering_clamp_scalars = document.getElementById("checkbox_volume_rendering_clamp_scalars").checked;   
-        canvas_wrapper_main.ridges_force_symmetric_hessian = document.getElementById("checkbox_ridges_force_symmetric_hessian").checked;           
+        canvas_wrapper_main.ridges_force_symmetric_hessian = document.getElementById("checkbox_ridges_force_symmetric_hessian").checked;     
+        canvas_wrapper_main.show_comparison_marker = document.getElementById("checkbox_show_comparison_marker").checked;        
+        canvas_wrapper_main.quality_marker_index = parseInt(document.getElementById("input_quality_marker_index").value);
         canvas_wrapper_main.force_overrite_ftle_limits = document.getElementById("checkbox_volume_rendering_force_overrite_ftle_limits").checked;
         canvas_wrapper_main.overrite_min_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle").value);
         canvas_wrapper_main.overrite_max_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle").value);
@@ -1448,7 +1452,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         //canvas_wrapper_main.ReplaceRaytracingShader(gl, shader_formula_scalar_float);
 
         //SIDE        
-
+        
+        canvas_wrapper_side.quality_marker_color = getColorVectorFromElementID("input_colors_quality_marker");
         canvas_wrapper_side.selected_streamline_color = getColorVectorFromElementID("input_colors_selected");
         canvas_wrapper_side.dynamic_streamline_color = getColorVectorFromElementID("input_colors_dynamic");
         canvas_wrapper_side.forward_ftle_surface_color = getColorVectorFromElementID("input_colors_forward_ftle_surface");
@@ -1500,6 +1505,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.volume_rendering_mode = parseInt(document.getElementById("select_volume_rendering_mode").value);
         canvas_wrapper_side.volume_rendering_clamp_scalars = document.getElementById("checkbox_volume_rendering_clamp_scalars").checked;    
         canvas_wrapper_side.ridges_force_symmetric_hessian = document.getElementById("checkbox_ridges_force_symmetric_hessian").checked;      
+        canvas_wrapper_side.show_comparison_marker = document.getElementById("checkbox_show_comparison_marker").checked;           
+        canvas_wrapper_side.quality_marker_index = parseInt(document.getElementById("input_quality_marker_index").value);
         canvas_wrapper_side.force_overrite_ftle_limits = document.getElementById("checkbox_volume_rendering_force_overrite_ftle_limits").checked;  
         canvas_wrapper_side.overrite_min_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle").value);
         canvas_wrapper_side.overrite_max_scalar_ftle = parseFloat(document.getElementById("input_volume_rendering_overrite_max_scalar_ftle").value);

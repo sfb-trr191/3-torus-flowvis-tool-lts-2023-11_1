@@ -163,6 +163,8 @@ class InputChangedManager{
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_volume_skip_first_fundamental_domain_main"));
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_volume_rendering_clamp_scalars"));
         this.group_render_settings.AddCheckbox(document.getElementById("checkbox_ridges_force_symmetric_hessian"));
+        this.group_render_settings.AddCheckbox(document.getElementById("checkbox_show_comparison_marker"));  
+        this.group_render_settings.AddInput(document.getElementById("input_quality_marker_index"));                
         this.group_render_settings.AddInput(document.getElementById("select_volume_rendering_mode"));    
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_max_number_of_volume_iterations"));
         this.group_render_settings.AddInput(document.getElementById("input_volume_rendering_overrite_min_scalar_ftle"));    

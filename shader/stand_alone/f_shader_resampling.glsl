@@ -11,12 +11,16 @@ uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform sampler3D texture_float_global;
 uniform isampler3D texture_int_global;
+uniform sampler2D texture_compare;
 
 uniform float progress;
 uniform bool show_progressbar;
 uniform	int text_rect_width;
 uniform	int text_rect_height;
 uniform bool render_color_bar;
+uniform bool show_comparison_marker;
+uniform	int quality_marker_index;
+uniform vec3 quality_marker_color;
 
 out vec4 outputColor;
 
@@ -50,6 +54,11 @@ void main()
     vec2 v_texcoord = vec2(gl_FragCoord[0]/float(width), (gl_FragCoord[1]/float(height)));
     //outputColor = vec4(v_texcoord[0],v_texcoord[1],0,1);
     outputColor = texture(texture1, v_texcoord);//center
+    float compare_value = texture(texture_compare, v_texcoord).x;
+    float min_progress = min(1.0, float(quality_marker_index + 1) / float(64-1));
+    if(show_comparison_marker && progress >= min_progress && compare_value > 0.001){
+        outputColor = vec4(quality_marker_color,1);//center
+    }
 
     if(render_color_bar){
         int x = int(gl_FragCoord[0]);

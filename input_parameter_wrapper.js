@@ -231,7 +231,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "checkbox_volume_rendering_clamp_scalars", "vcs");    
         new InputWrapper(this, "input_ridge_lambda_threshold", "vlt");       
         new InputWrapper(this, "checkbox_ridges_force_symmetric_hessian", "vsh");    
-
+        new InputWrapper(this, "checkbox_show_comparison_marker", "sqm"); 
+        new InputWrapper(this, "input_quality_marker_index", "qmi"); 
+        
         new InputWrapper(this, "input_ridge_surface_max_number_of_bisection_intervals", "rsbi");    
         new InputWrapper(this, "input_ridge_surface_max_bisection_iterations_per_interval", "rsii");   
         new InputWrapper(this, "checkbox_ftle_surface_use_lambda_criterion", "rscl");   

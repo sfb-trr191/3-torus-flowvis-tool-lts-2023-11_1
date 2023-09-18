@@ -114,6 +114,16 @@ class UniformLocationsRayTracing {
     }
 }
 
+class UniformLocationsCompare {
+    constructor(gl, program, name) {
+        console.log("UniformLocationsCompare: ", name)
+        this.location_texture1 = gl.getUniformLocation(program, "texture1");
+        this.location_texture2 = gl.getUniformLocation(program, "texture2");
+        this.location_width = gl.getUniformLocation(program, "width");
+        this.location_height = gl.getUniformLocation(program, "height");
+    }
+}
+
 class UniformLocationsAverage {
     constructor(gl, program, name) {
         console.log("UniformLocationsAverage: ", name)
@@ -138,12 +148,16 @@ class UniformLocationsCopy {
 class UniformLocationsResampling {
     constructor(gl, program, name) {
         console.log("UniformLocationsResampling: ", name)
+        this.location_show_comparison_marker = gl.getUniformLocation(program, "show_comparison_marker");
+        this.location_quality_marker_index = gl.getUniformLocation(program, "quality_marker_index");
         this.location_show_progressbar = gl.getUniformLocation(program, "show_progressbar");
         this.location_progress = gl.getUniformLocation(program, "progress");
         this.location_texture1 = gl.getUniformLocation(program, "texture1");
         this.location_texture2 = gl.getUniformLocation(program, "texture2");
         this.location_texture_float_global = gl.getUniformLocation(program, "texture_float_global");
         this.location_texture_int_global = gl.getUniformLocation(program, "texture_int_global");
+        this.location_texture_compare = gl.getUniformLocation(program, "texture_compare");
+        this.location_quality_marker_color = gl.getUniformLocation(program, "quality_marker_color"); 
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_height = gl.getUniformLocation(program, "height");
         this.location_render_color_bar = gl.getUniformLocation(program, "render_color_bar");
@@ -198,6 +212,9 @@ class CanvasWrapper {
         this.p_ftle_manager = ftle_manager;
         this.tree_view = tree_view;
         this.aliasing_index = 0;
+        this.repeat_same_aliasing_index = false;//for comparison mode (e.g. hole detection)
+        this.show_comparison_marker = false;
+        this.quality_marker_index = 16;
         this.max_ray_distance = 0;
         this.tube_radius_fundamental = 0.005;
         this.max_radius_factor_highlight = 2.0;
@@ -278,6 +295,7 @@ class CanvasWrapper {
         this.update_clicked_position = false;
         this.update_clicked_position_control_mode = CONTROL_MODE_SELECT_STREAMLINE;
 
+        this.quality_marker_color = glMatrix.vec3.fromValues(1,0,1);
         this.selected_streamline_color = glMatrix.vec3.fromValues(1,0,0);
         this.dynamic_streamline_color = glMatrix.vec3.fromValues(1,1,0);
         this.forward_ftle_surface_color = glMatrix.vec3.fromValues(1,0,0);//overwritten by ui anyways
@@ -416,6 +434,12 @@ class CanvasWrapper {
     }
 
     InitializeShaders(gl){    
+        this.program_compare = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compare, V_SHADER_RAYTRACING, F_SHADER_COMPARE);
+        this.location_compare = new UniformLocationsCompare(gl, this.program_compare);
+        this.shader_uniforms_compare = this.loadShaderUniformsCompare(gl, this.program_compare);
+        this.attribute_location_dummy_program_compare = gl.getAttribLocation(this.program_compare, "a_position");
+
         this.program_average = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_average, V_SHADER_RAYTRACING, F_SHADER_AVERAGE);
         this.location_average = new UniformLocationsAverage(gl, this.program_average);
@@ -721,7 +745,18 @@ class CanvasWrapper {
                 break;
         }
 
-        this.aliasing_index += 1;
+        if(this.repeat_same_aliasing_index){
+            //it was already repeated --> continue normally
+            this.repeat_same_aliasing_index = false;
+            this.aliasing_index += 1;
+        }else if(this.aliasing_index == this.quality_marker_index){
+            //not yet repeated --> repeat this index once
+            this.repeat_same_aliasing_index = true;
+        }
+        else{
+            this.aliasing_index += 1;//normal case, increment after each iteration
+        }
+
     }
 
     //only for aux view
@@ -818,17 +853,19 @@ class CanvasWrapper {
             this.ridge_surface_directions);
     }
 
-    draw_mode_raytracing(gl, left_render_wrapper) {
+    draw_mode_raytracing(gl, left_render_wrapper) {        
         var get_pixel_data_results = false;
-        this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
-        
-        //if(true){
-        //    var get_pixel_data_results = true;
-        //    this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
-        //}
-        this.drawTextureAverage(gl, left_render_wrapper);
-        this.drawResampling(gl, left_render_wrapper);
-        this.drawTextureSumCopy(gl, left_render_wrapper);
+
+        if(this.repeat_same_aliasing_index){
+            console.log("#Performance REPEAT", this.aliasing_index)
+            this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+            this.drawTextureCompare(gl, left_render_wrapper);
+        }else{
+            this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
+            this.drawTextureAverage(gl, left_render_wrapper);
+            this.drawResampling(gl, left_render_wrapper);
+            this.drawTextureSumCopy(gl, left_render_wrapper);
+        }
     }
 
     draw_mode_ftle_slice(gl, left_render_wrapper) {
@@ -924,10 +961,18 @@ class CanvasWrapper {
                 this.compute_wrapper_pixel_results.render_texture.texture_settings.height);
         }
         else{
-            gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer);
+            var use_alternative_buffer = this.repeat_same_aliasing_index;
+            var buffer = use_alternative_buffer ? render_wrapper.frame_buffer_alternative : render_wrapper.frame_buffer;
+            gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);
             //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, this.camera.width, this.camera.height);
         }
+
+        //use different distance for alternative frame
+        var distance_between_points = this.volume_rendering_distance_between_points;
+        if(this.repeat_same_aliasing_index){
+            distance_between_points *= 0.1;
+        } 
 
         //console.log(this.camera.width, this.camera.height);
         //console.warn("xy", this.output_x_percentage, this.output_y_percentage);
@@ -956,7 +1001,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_light_integration_max_step_count, this.light_integration_max_step_count);       
 
         gl.uniform1i(this.location_raytracing.location_selected_streamline_id, this.selected_streamline_id);
-        gl.uniform1f(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);        
+        gl.uniform1f(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);
         gl.uniform3f(this.location_raytracing.location_selected_streamline_color, this.selected_streamline_color[0], this.selected_streamline_color[1], this.selected_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_dynamic_streamline_color, this.dynamic_streamline_color[0], this.dynamic_streamline_color[1], this.dynamic_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_forward_ftle_surface_color, this.forward_ftle_surface_color[0], this.forward_ftle_surface_color[1], this.forward_ftle_surface_color[2]);
@@ -1003,7 +1048,7 @@ class CanvasWrapper {
         gl.uniform1i(this.location_raytracing.location_correct_volume_opacity, this.correct_volume_opacity);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_forward, show_volume_rendering_forward);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_backward, show_volume_rendering_backward);
-        gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, this.volume_rendering_distance_between_points);
+        gl.uniform1f(this.location_raytracing.location_volume_rendering_distance_between_points, distance_between_points);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_termination_opacity, this.volume_rendering_termination_opacity);
         gl.uniform1f(this.location_raytracing.location_volume_rendering_opacity_factor, this.volume_rendering_opacity_factor);
         
@@ -1114,6 +1159,23 @@ class CanvasWrapper {
         this.linked_element_input_dynamic_position_w.value = this.pixel_results.position[3].toFixed(decimals);
     }
 
+    drawTextureCompare(gl, render_wrapper, width, height) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer_compare);
+        gl.viewport(0, 0, this.camera.width, this.camera.height);
+        gl.useProgram(this.program_compare);
+        gl.uniform1i(this.location_compare.location_width, this.camera.width);
+        gl.uniform1i(this.location_compare.location_height, this.camera.height);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture.texture);
+        gl.uniform1i(this.location_compare.location_texture1, 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_alternative.texture);
+        gl.uniform1i(this.location_compare.location_texture2, 1);
+
+        this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compare);
+    }
+
     drawTextureAverage(gl, render_wrapper, width, height) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, render_wrapper.frame_buffer_average);
         gl.viewport(0, 0, this.camera.width, this.camera.height);
@@ -1157,7 +1219,10 @@ class CanvasWrapper {
         //gl.viewport(0, 0, this.canvas_width, this.canvas_height);
         gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         gl.useProgram(this.program_resampling);
-        gl.uniform1f(this.location_resampling.location_show_progressbar, show_progressbar);
+        gl.uniform3f(this.location_resampling.location_quality_marker_color, this.quality_marker_color[0], this.quality_marker_color[1], this.quality_marker_color[2]);
+        gl.uniform1i(this.location_resampling.location_show_comparison_marker, this.show_comparison_marker);  
+        gl.uniform1i(this.location_resampling.location_quality_marker_index, this.quality_marker_index);          
+        gl.uniform1f(this.location_resampling.location_show_progressbar, show_progressbar);      
         gl.uniform1f(this.location_resampling.location_progress, progress);
         //gl.uniform1i(this.location_resampling.location_width, this.canvas_width);
         //gl.uniform1i(this.location_resampling.location_height, this.canvas_height);
@@ -1177,6 +1242,10 @@ class CanvasWrapper {
             this.shader_uniforms_resampling,
             this.location_resampling.location_texture_float_global, gl.TEXTURE2, 2,
             this.location_resampling.location_texture_int_global, gl.TEXTURE3, 3);
+
+        gl.activeTexture(gl.TEXTURE4);
+        gl.bindTexture(gl.TEXTURE_2D, render_wrapper.render_texture_compare.texture);
+        gl.uniform1i(this.location_resampling.location_texture_compare, 4);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_resampling);
     }
@@ -1261,6 +1330,11 @@ class CanvasWrapper {
         program_shader_uniforms.registerUniform("start_index_float_seeds", "INT", -1);
 
         //program_shader_uniforms.print();
+        return program_shader_uniforms;
+    }
+
+    loadShaderUniformsCompare(gl, program){
+        var program_shader_uniforms = new ShaderUniforms(gl, program);
         return program_shader_uniforms;
     }
 

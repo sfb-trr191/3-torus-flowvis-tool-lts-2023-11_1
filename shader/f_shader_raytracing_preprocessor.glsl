@@ -48,7 +48,7 @@ void main() {
 	HitInformation hit;
     HitInformation hit_outside;
 	vec3 color = CalculateOneRay(offset_x, offset_y, hit, hit_outside);
-	outputColor = vec4(color, 1);
+	outputColor = vec4(color, hit.distance);
     if(get_pixel_data_results){
         outputColor = GetOutput(hit);
     }
