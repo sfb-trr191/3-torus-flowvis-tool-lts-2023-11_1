@@ -749,7 +749,7 @@ class CanvasWrapper {
             //it was already repeated --> continue normally
             this.repeat_same_aliasing_index = false;
             this.aliasing_index += 1;
-        }else if(this.aliasing_index == this.quality_marker_index){
+        }else if(this.show_comparison_marker && this.aliasing_index == this.quality_marker_index){
             //not yet repeated --> repeat this index once
             this.repeat_same_aliasing_index = true;
         }
