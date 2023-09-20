@@ -515,7 +515,7 @@ class ObjectManager {
     }
 
     CalculateMatrix4D(cylinder){
-        console.log("CalculateMatrix4D");
+        //console.log("CalculateMatrix4D");
         var matrixInverted = glMatrix.mat4.create();
         //var raw_data = this.p_streamline_context.GetRawData(part_index);
         //var vectorLineSegment = this.GetVectorLineSegment(part_index);

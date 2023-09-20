@@ -124,7 +124,7 @@ class RawData {
             }
             else{
                 new_entry.cost = this.data[i].local_i / termination_max_value;
-                console.log("PositionData: ", this.data[i].local_i, termination_max_value, new_entry.cost);
+                //console.log("PositionData: ", this.data[i].local_i, termination_max_value, new_entry.cost);
             }
 
             this.position_data[i] = new_entry;

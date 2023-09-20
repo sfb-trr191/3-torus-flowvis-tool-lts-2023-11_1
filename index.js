@@ -496,7 +496,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     }
 
     function state_streamline_calculation_continue_streamline(time_now){
-        console.log("#SC: state_streamline_calculation_continue_streamline", bo_calculate_streamlines.next_streamline_index);
+        //console.log("#SC: state_streamline_calculation_continue_streamline", bo_calculate_streamlines.next_streamline_index);
         var context = sheduled_task == TASK_CALCULATE_STREAMLINES ? streamline_context_static : streamline_context_dynamic;
         if(bo_calculate_streamlines.current_streamline.finished){
             bo_calculate_streamlines.next_streamline_index++;            
@@ -665,15 +665,19 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             export_wizard.OnExportCancelled();
             return;
         }
-        if(finished){
-            t_stop_export = performance.now();
-            var t = Math.ceil(t_stop_export-t_start_export); 
-            console.log("#Performance export main finished in: ", t, "ms", Math.ceil(t/64));
-            t_start_export = performance.now();    
-            requestAnimationFrame(on_update_export_aux);
+        if(finished){    
+            requestAnimationFrame(on_completed_main);
             return;
         }
         requestAnimationFrame(on_update_export_main);
+    }
+
+    function on_completed_main(){
+        t_stop_export = performance.now();
+        var t = Math.ceil(t_stop_export-t_start_export); 
+        console.log("#Performance export main finished in: ", t, "ms", Math.ceil(t/64));
+        t_start_export = performance.now();
+        requestAnimationFrame(on_update_export_aux);
     }
 
     function on_update_export_aux(time_now){       
@@ -686,21 +690,32 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             return;
         }
         if(finished){
-            t_stop_export = performance.now();
-            var t = Math.ceil(t_stop_export-t_start_export); 
-            console.log("#Performance export aux finished in: ", t, "ms", Math.ceil(t/64));
-            
-            export_object.startExport(input_parameter_wrapper, ui_tools);
-            export_wizard.ActivateWaitingForDownloadImage();
-            requestAnimationFrame(on_update_wait_for_export_finished);
+            requestAnimationFrame(on_completed_aux);            
             return;
         }
         requestAnimationFrame(on_update_export_aux);
     }
 
+    function on_completed_aux(){
+        t_stop_export = performance.now();
+        var t = Math.ceil(t_stop_export-t_start_export); 
+        console.log("#Performance export aux finished in: ", t, "ms", Math.ceil(t/64));
+        
+        //start download
+        t_start_export = performance.now();
+        export_object.startExport(input_parameter_wrapper, ui_tools);
+        export_wizard.ActivateWaitingForDownloadImage();
+        requestAnimationFrame(on_update_wait_for_export_finished);
+    }
+
     function on_update_wait_for_export_finished(time_now){ 
         console.log("on_update_wait_for_export_finished"); 
         if(export_object.finished){
+            t_stop_export = performance.now();
+            var t = Math.ceil(t_stop_export-t_start_export); 
+            console.log("#Performance download export finished in: ", t, "ms");
+
+
             export_wizard.OnExportFinished();
             requestAnimationFrame(on_update);
             return;
@@ -725,7 +740,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             fence_sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
             gl.flush();
         }
-        console.log(canvas_wrapper.aliasing_index, render, status);
+        //console.log(canvas_wrapper.aliasing_index, render, status);
         return false;
     }
 

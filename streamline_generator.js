@@ -936,12 +936,14 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].arc_length = arc_length_current;
             raw_data.data[currentIndex].local_i = local_i;            
             
+            /*
             console.log("-------------------");
             console.log("position", raw_data.data[currentIndex].position, glMatrix.vec3.length(raw_data.data[currentIndex].position));
             console.log("direction", raw_data.data[currentIndex].direction, glMatrix.vec3.length(raw_data.data[currentIndex].direction));
             console.log("time_current", time_current);
             console.log("arc_length_current", arc_length_current);
             console.log("difference", difference);
+            */
 
             //previousPosition = currentPosition;
             if (terminate){
@@ -970,7 +972,7 @@ class StreamlineGenerator {
         var tmp = bo_calculate_streamlines.current_streamline;
         var raw_data = bo_calculate_streamlines.raw_data;
         var signum = tmp.signum;
-        console.log("#SC: ContinueStreamline2Sphere3Plus3D", tmp.i);
+        //console.log("#SC: ContinueStreamline3Sphere4Plus4D", tmp.i);
 
         var currentPosition = glMatrix.vec4.create();
         var k1 = glMatrix.vec4.create();
@@ -1131,12 +1133,14 @@ class StreamlineGenerator {
             raw_data.data[currentIndex].arc_length = arc_length_current;
             raw_data.data[currentIndex].local_i = local_i;            
             
+            /*
             console.log("-------------------");
             console.log("position", raw_data.data[currentIndex].position, glMatrix.vec4.length(raw_data.data[currentIndex].position));
             console.log("direction", raw_data.data[currentIndex].direction, glMatrix.vec4.length(raw_data.data[currentIndex].direction));
             console.log("time_current", time_current);
             console.log("arc_length_current", arc_length_current);
             console.log("difference", difference);
+            */
 
             //previousPosition = currentPosition;
             if (terminate){
@@ -1160,7 +1164,7 @@ class StreamlineGenerator {
 
     TerminationChecks(i, time_current, arc_length_current, bo_calculate_streamlines){
         if(this.termination_condition == STREAMLINE_TERMINATION_CONDITION_POINTS){  
-            console.log("#TerminationChecks", i, time_current, arc_length_current, bo_calculate_streamlines.input_parameters.num_points_per_streamline);          
+            //console.log("#TerminationChecks", i, time_current, arc_length_current, bo_calculate_streamlines.input_parameters.num_points_per_streamline);          
             if (i >= bo_calculate_streamlines.input_parameters.num_points_per_streamline - 1){
                 return true;
             }
@@ -1210,7 +1214,7 @@ class StreamlineGenerator {
         var b = (bo_calculate_streamlines.next_streamline_index+1)/(this.seeds.length);
         var t = this.GetCurrentStreamlineProgress(i, time_current, arc_length_current, bo_calculate_streamlines);
         bo_calculate_streamlines.streamline_part_progress = module_utility.lerp(a, b, t);
-        console.log("#Pro", i, a, b, t, "num", bo_calculate_streamlines.input_parameters.num_points_per_streamline);
+        //console.log("#Pro", i, a, b, t, "num", bo_calculate_streamlines.input_parameters.num_points_per_streamline);
     }
 
     GetCurrentStreamlineProgress(i, time_current, arc_length_current, bo_calculate_streamlines){
@@ -1505,7 +1509,7 @@ class StreamlineGenerator {
     }
 
     MoveOutOfBounds4(position) {
-        console.log("MoveOutOfBounds4: "+position[0] + ", " + position[1] + ", " + position[2] + ", " + position[3]);
+        //console.log("MoveOutOfBounds4: "+position[0] + ", " + position[1] + ", " + position[2] + ", " + position[3]);
         //user friendly variables
         var x = position[0];
         var y = position[1];

@@ -469,7 +469,7 @@ class LODData {
     }
 
     CalculateMatrix4D(part_index, segment_index, projection_index){
-        console.log("CalculateMatrix4D");
+        //console.log("CalculateMatrix4D");
         var raw_data = this.p_streamline_context.GetRawData(part_index);
         var vectorLineSegment = this.GetVectorLineSegment(part_index);
 
