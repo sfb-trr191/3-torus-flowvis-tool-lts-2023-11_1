@@ -54,7 +54,7 @@ class BackgroundObjectCalculateStreamlines{
         this.t_stop = performance.now();
         //console.log("#Performance Streamlines end: ", this.t_stop);    
         var t = Math.ceil(this.t_stop-this.t_start) 
-        console.log("#Performance Streamlines finished in: ", t, "ms");          
+        console.log("#Paper Performance Streamlines finished in: ", t, "ms");          
     }
     
     ResetProgress(){

@@ -692,7 +692,7 @@ class CanvasWrapper {
                 this.finished = true;
                 this.t_stop = performance.now();
                 var t = Math.ceil(this.t_stop-this.t_start) 
-                console.log("#Performance render in: ", t, "ms", Math.ceil(t/64));       
+                console.log("#Paper Performance render in: ", t, "ms", Math.ceil(t/64));       
             }
             return;
         }
@@ -857,7 +857,7 @@ class CanvasWrapper {
         var get_pixel_data_results = false;
 
         if(this.repeat_same_aliasing_index){
-            console.log("#Performance REPEAT", this.aliasing_index)
+            console.log("#Paper REPEAT", this.aliasing_index)
             this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
             this.drawTextureCompare(gl, left_render_wrapper);
         }else{

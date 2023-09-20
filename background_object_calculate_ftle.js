@@ -33,7 +33,7 @@ class BackgroundObjectCalculateFTLE{
         this.t_stop = performance.now();
         //console.log("#Performance FTLE end: ", this.t_stop);   
         var t = Math.ceil(this.t_stop-this.t_start) 
-        console.log("#Performance FTLE finished in: ", t, "ms");            
+        console.log("#Paper Performance FTLE finished in: ", t, "ms");            
     }
     
     ResetProgress(){

@@ -126,7 +126,7 @@ class MovableAxesState {
         cylinder2.position_a = vec4fromvec3(position_a, 1);
         cylinder2.position_b = vec4fromvec3(position_a_v_z, 1);
 
-        console.log("DEBUG_CENTER", position_a);
+        //console.log("DEBUG_CENTER", position_a);
     }
     /*
     UpdateWithRotation(Cylinder & cylinder0, Cylinder & cylinder1, Cylinder & cylinder2) {

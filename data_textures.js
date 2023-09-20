@@ -50,11 +50,13 @@ class DataTexture {
         var border = this.texture_settings.border;
         var format = this.texture_settings.format;
         var type = this.texture_settings.type;
+        /*
         console.log("updateDataTexture");
         console.log("texture_data.length: " + this.texture_data.length);
         console.log("width: " + width);
         console.log("height: " + height);
         console.log("depth: " + depth);
+        */
         gl.texImage3D(target, level, internalformat, width, height, depth, border, format, type, this.texture_data);
     }
 

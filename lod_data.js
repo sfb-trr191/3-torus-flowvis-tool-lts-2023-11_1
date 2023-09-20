@@ -102,9 +102,9 @@ class LODDataPart{
     }
 
     LogMetaData() {
-        console.log("LogMetaData LOD: " + this.name);
-        console.log("LogMetaData segments: " + this.vectorLineSegment.length);
-        console.log("LogMetaData nodes: " + this.tree_nodes.length);
+        console.log("#Paper LogMetaData LOD: " + this.name);
+        console.log("#Paper LogMetaData segments: " + this.vectorLineSegment.length);
+        console.log("#Paper LogMetaData nodes: " + this.tree_nodes.length);
     }
 
 }

@@ -45,7 +45,7 @@ class RawData {
         this.data.length = 0;
         this.start_indices.length = 0;
         console.log("data length: ", this.data.length);
-        console.log("data: ", this.data);
+        //console.log("data: ", this.data);
     }
 
     MakeDataHomogenous() {

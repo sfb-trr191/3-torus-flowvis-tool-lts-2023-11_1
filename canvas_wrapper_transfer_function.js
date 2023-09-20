@@ -126,7 +126,7 @@ class CanvasWrapperTransferFunction {
     }
 
     FillBuffers(gl) {
-        console.log("FillBuffers");
+        //console.log("FillBuffers");
         //var transfer_function_name = this.p_ui_transfer_functions.active_transfer_function_name;
         //var transfer_function = this.transfer_function_manager.transfer_function_dict[transfer_function_name];
         var transfer_function_index = this.p_ui_transfer_functions.active_transfer_function_index;
@@ -142,10 +142,10 @@ class CanvasWrapperTransferFunction {
             var dy = this.tyToDeviceY(TRANSFER_FUNCTION_AREA_CENTER, ty);
             this.vertices_opacities[3 * i] = dx;
             this.vertices_opacities[3 * i + 1] = dy;
-            console.log("txy", tx, ty);
-            console.log("dxy", dx, dy);
+            //console.log("txy", tx, ty);
+            //console.log("dxy", dx, dy);
         }
-        console.log(this.vertices_opacities);
+        //console.log(this.vertices_opacities);
         this.vertices_opacities_count = transfer_function.list_opacity_points.length;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_opacities);
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices_opacities, gl.STATIC_DRAW);
@@ -166,10 +166,10 @@ class CanvasWrapperTransferFunction {
             var dy = this.tyToDeviceY(TRANSFER_FUNCTION_AREA_BOTTOM, ty);
             this.vertices_colors[3 * i] = dx;
             this.vertices_colors[3 * i + 1] = dy;
-            console.log("txy", tx, ty);
-            console.log("dxy", dx, dy);
+            //console.log("txy", tx, ty);
+            //console.log("dxy", dx, dy);
         }
-        console.log(this.vertices_colors);
+        //console.log(this.vertices_colors);
         this.vertices_colors_count = transfer_function.list_color_points.length;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_colors);
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices_colors, gl.STATIC_DRAW);
@@ -186,7 +186,7 @@ class CanvasWrapperTransferFunction {
         this.vertex_selected = [
             vertex_list[3 * this.drag_point_index], vertex_list[3 * this.drag_point_index + 1], 0.0,
         ];
-        console.log("vertex_selected", this.vertex_selected);
+        //console.log("vertex_selected", this.vertex_selected);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer_selected);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertex_selected), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -196,7 +196,7 @@ class CanvasWrapperTransferFunction {
         if (!this.transfer_function_changed)
             return;
 
-        console.log("Draw transfer function");
+        //console.log("Draw transfer function");
         this.FillBuffers(gl);
         this.drawBackground(gl);
         this.drawPoints(gl);

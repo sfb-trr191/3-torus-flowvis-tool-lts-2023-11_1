@@ -561,7 +561,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     }
 
     function state_ftle_setup(time_now){
-        console.warn("#SC: state_ftle_setup");
+        //console.warn("#SC: state_ftle_setup");
         
         bo_calculate_ftle = new BackgroundObjectCalculateFTLE(gl, gl_side, sheduled_task);
         bo_calculate_ftle.start();
@@ -571,7 +571,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     }
 
     function state_ftle(time_now){
-        console.warn("#SC: state_ftle");
+        //console.warn("#SC: state_ftle");
         ftle_manager.execute_statemachine(bo_calculate_ftle);
         if(ftle_manager.finished){
             requestAnimationFrame(state_ftle_calculation_finished);
@@ -675,7 +675,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     function on_completed_main(){
         t_stop_export = performance.now();
         var t = Math.ceil(t_stop_export-t_start_export); 
-        console.log("#Performance export main finished in: ", t, "ms", Math.ceil(t/64));
+        console.log("#Paper Performance export main finished in: ", t, "ms", Math.ceil(t/64));
         t_start_export = performance.now();
         requestAnimationFrame(on_update_export_aux);
     }
@@ -699,7 +699,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     function on_completed_aux(){
         t_stop_export = performance.now();
         var t = Math.ceil(t_stop_export-t_start_export); 
-        console.log("#Performance export aux finished in: ", t, "ms", Math.ceil(t/64));
+        console.log("#Paper Performance export aux finished in: ", t, "ms", Math.ceil(t/64));
         
         //start download
         t_start_export = performance.now();
@@ -713,7 +713,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         if(export_object.finished){
             t_stop_export = performance.now();
             var t = Math.ceil(t_stop_export-t_start_export); 
-            console.log("#Performance download export finished in: ", t, "ms");
+            console.log("#Paper Performance download export finished in: ", t, "ms");
 
 
             export_wizard.OnExportFinished();
@@ -1359,7 +1359,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             cube_axes_length_side, cube_axes_length_origin_side,
             camera_axes_invert_color_side, cube_use_axes_colors_side);
 
-        console.log(object_manager.cylinders);
+        //console.log(object_manager.cylinders);
 
         main_camera.trackball_rotation_sensitivity = parseFloat(document.getElementById("input_trackball_rotation_sensitivity").value);
         main_camera.trackball_translation_sensitivity = parseFloat(document.getElementById("input_trackball_translation_sensitivity").value);

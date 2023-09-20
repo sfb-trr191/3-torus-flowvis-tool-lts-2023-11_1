@@ -315,7 +315,7 @@ class FTLEManager {
     }
 
     enterState(state){
-        console.warn("enter state:", state)
+        console.log("enter state:", state)
         this.state = state;        
     }
 
@@ -675,7 +675,7 @@ class FTLEManager {
         //var sign_f = 1.0;
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z_extended;
         //var z = slice_index / (this.dim_z - 1);
-        console.log("computeFlowMapSlice: ", slice_index);
+        //console.log("computeFlowMapSlice: ", slice_index);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_extended.frame_buffer);
         gl.viewport(0, 0, this.dim_x_extended, this.dim_y_extended);
         gl.useProgram(this.program_compute_flowmap_slice);
@@ -705,7 +705,7 @@ class FTLEManager {
             highest_iteration_count_slice = Math.max(slice_data[i], highest_iteration_count_slice);
         }
         this.highest_iteration_count = Math.max(highest_iteration_count_slice, this.highest_iteration_count);
-        console.log("highest_iteration_count: ", highest_iteration_count_slice, this.highest_iteration_count);
+        //console.log("highest_iteration_count: ", highest_iteration_count_slice, this.highest_iteration_count);
     }
 
     /*
@@ -736,7 +736,7 @@ class FTLEManager {
         var sign_f = is_forward ? 1.0 : -1.0;
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFlowMapFiniteDifferencesSlice: ", slice_index, z);
+        //console.log("computeFlowMapFiniteDifferencesSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
         gl.useProgram(this.program_compute_flowmap_finite_differences);
@@ -778,7 +778,7 @@ class FTLEManager {
     computeFTLESlice(gl, slice_index, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFTLESlice: ", slice_index, z, slice_index_combined_texture);
+        //console.log("computeFTLESlice: ", slice_index, z, slice_index_combined_texture);
 
         var slice_data = new Float32Array(this.dim_x * this.dim_y);
         for (var x = 0; x < this.dim_x; x++) {
@@ -859,7 +859,7 @@ class FTLEManager {
     computeFTLEGradientSlice(gl, slice_index, data_texture, h2_x, h2_y, h2_z, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFTLEGradientSlice: ", slice_index, z);
+        //console.log("computeFTLEGradientSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
         gl.useProgram(this.program_compute_2z_gradient_slice);
@@ -908,7 +908,7 @@ class FTLEManager {
         }else{
             var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
             var z = slice_index / (this.dim_z - 1);
-            console.log("computeFTLEJacobySlice: ", slice_index, z);
+            //console.log("computeFTLEJacobySlice: ", slice_index, z);
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
             gl.viewport(0, 0, this.dim_x, this.dim_y);
             gl.useProgram(this.program_compute_2z_jacoby_column_slice);
@@ -934,7 +934,7 @@ class FTLEManager {
     computeFTLESymmetricSlice(gl, slice_index, direction, data_texture, h2, is_forward) {
         var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
         var z = slice_index / (this.dim_z - 1);
-        console.log("computeFTLESymmetricSlice: ", slice_index, z);
+        //console.log("computeFTLESymmetricSlice: ", slice_index, z);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
         gl.viewport(0, 0, this.dim_x, this.dim_y);
         gl.useProgram(this.program_compute_2z_symmetric_column_slice);
