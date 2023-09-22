@@ -92,6 +92,59 @@ vec3 MoveOutOfBounds(vec3 position)
 	return vec3(x,y,z);
 }
 
+vec3 MoveOutOfBoundsDirection(vec3 position, vec3 direction)
+{    
+    //user friendly variables
+	float x = position.x;
+	float y = position.y;
+	float z = position.z;
+	float u = direction.x;
+	float v = direction.y;
+	float w = direction.z;
+
+	if(x > 1.0-epsilon_move_ray)
+	{
+		u = shader_rule_x_pos_u;
+		v = shader_rule_x_pos_v;
+		w = shader_rule_x_pos_w;
+	}
+	else if(x < 0.0+epsilon_move_ray)
+	{
+		u = shader_rule_x_neg_u;
+		v = shader_rule_x_neg_v;
+		w = shader_rule_x_neg_w;
+	}
+
+	if(y > 1.0-epsilon_move_ray)
+	{
+		u = shader_rule_y_pos_u;
+		v = shader_rule_y_pos_v;
+		w = shader_rule_y_pos_w;
+	}
+	else if(y < 0.0+epsilon_move_ray)
+	{
+		u = shader_rule_y_neg_u;
+		v = shader_rule_y_neg_v;
+		w = shader_rule_y_neg_w;
+	}
+
+	if(z > 1.0-epsilon_move_ray)
+	{
+		u = shader_rule_z_pos_u;
+		v = shader_rule_z_pos_v;
+		w = shader_rule_z_pos_w;
+	}
+	else if(z < 0.0+epsilon_move_ray)
+	{
+		u = shader_rule_z_neg_u;
+		v = shader_rule_z_neg_v;
+		w = shader_rule_z_neg_w;
+	}
+
+
+	return vec3(u,v,w);
+}
+
 vec3 MoveOutOfBoundsAndGetFlags(vec3 position, inout MoveOutOfBoundsFlags flags)
 {
 	//user friendly variables

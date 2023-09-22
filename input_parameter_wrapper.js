@@ -159,6 +159,28 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_field_shader_rule_z_neg_y", "rzny");
         new InputWrapper(this, "input_field_shader_rule_z_neg_z", "rznz");
 
+        //data - rules direction
+        new InputWrapper(this, "input_field_shader_rule_x_pos_u", "rxpu");
+        new InputWrapper(this, "input_field_shader_rule_x_pos_v", "rxpv");
+        new InputWrapper(this, "input_field_shader_rule_x_pos_w", "rxpw");
+        new InputWrapper(this, "input_field_shader_rule_x_neg_u", "rxnu");
+        new InputWrapper(this, "input_field_shader_rule_x_neg_v", "rxnv");
+        new InputWrapper(this, "input_field_shader_rule_x_neg_w", "rxnw");
+
+        new InputWrapper(this, "input_field_shader_rule_y_pos_u", "rypu");
+        new InputWrapper(this, "input_field_shader_rule_y_pos_v", "rypv");
+        new InputWrapper(this, "input_field_shader_rule_y_pos_w", "rypw");
+        new InputWrapper(this, "input_field_shader_rule_y_neg_u", "rynu");
+        new InputWrapper(this, "input_field_shader_rule_y_neg_v", "rynv");
+        new InputWrapper(this, "input_field_shader_rule_y_neg_w", "rynw");
+
+        new InputWrapper(this, "input_field_shader_rule_z_pos_u", "rzpu");
+        new InputWrapper(this, "input_field_shader_rule_z_pos_v", "rzpv");
+        new InputWrapper(this, "input_field_shader_rule_z_pos_w", "rzpw");
+        new InputWrapper(this, "input_field_shader_rule_z_neg_u", "rznu");
+        new InputWrapper(this, "input_field_shader_rule_z_neg_v", "rznv");
+        new InputWrapper(this, "input_field_shader_rule_z_neg_w", "rznw");
+
         //data - parameters        
         new InputWrapper(this, "select_data_paramaters_mode", PARAM_select_data_paramaters_mode);
         new InputWrapper(this, "select_streamline_calculation_method", PARAM_STREAMLINE_CALCULATION_METHOD);

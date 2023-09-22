@@ -18,6 +18,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 bool CheckOutOfBounds(vec3 position);
 vec3 MoveOutOfBounds(vec3 position);
+vec3 MoveOutOfBoundsDirection(vec3 position, vec3 direction);
 vec3 MoveOutOfBoundsProjection(vec3 position);
 vec3 MoveOutOfBoundsAndGetFlags(vec3 position, inout MoveOutOfBoundsFlags flags);
 vec3 ApplyMoveOutOfBoundsFlags(vec3 position, MoveOutOfBoundsFlags flags);

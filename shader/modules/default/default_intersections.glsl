@@ -240,6 +240,8 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                 
                 
 #else
+                variableRay.direction = normalize(MoveOutOfBoundsDirection(exit, variableRay.direction));
+                variableRay.dir_inv = 1.0/variableRay.direction;
                 variableRay.origin = MoveOutOfBounds(exit);
 #endif   
             }
