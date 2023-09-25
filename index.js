@@ -648,7 +648,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.SetRayTracingProgram(gl_side, shader_manager.container_side);
 
         var t_stop = performance.now();
-        console.log("Performance: Waiting for shaders in: ", Math.ceil(t_stop-t_start_waiting_for_shaders), "ms");
+        console.log("#Paper Waiting for shaders in: ", Math.ceil(t_stop-t_start_waiting_for_shaders), "ms");
 
         document.getElementById("wrapper_dialog_wait_for_shader").className = "hidden";
         document.getElementById("wrapper_transparent_overlay").className = "hidden";   
