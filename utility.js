@@ -20,6 +20,16 @@ exports.getMousePosition = function(canvas, event) {
     };
 }
 
+exports.getTouchPosition = function(canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let x = event.touches[0].clientX - rect.left;
+    let y = event.touches[0].clientY - rect.top;
+    return {
+        x: x,
+        y: y
+    };
+}
+
 exports.getMousePositionFromBottomLeft = function(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
@@ -40,6 +50,16 @@ exports.getMousePositionPercentage = function (canvas, event) {
     };
 }
 
+exports.getTouchPositionPercentage = function (canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let x = (event.touches[0].clientX - rect.left) / rect.width;
+    let y = (event.touches[0].clientY - rect.top) / rect.height;
+    return {
+        x: x,
+        y: y
+    };
+}
+
 /**
  * 
  * @param {*} canvas 
@@ -53,6 +73,19 @@ exports.getMousePositionCanonical = function (canvas, event) {
     let cy = rect.top + 0.5 * rect.height;
     let x = 2 * (event.clientX - cx) / s;
     let y = -2 * (event.clientY - cy) / s;
+    return {
+        x: x,
+        y: y
+    };
+}
+
+exports.getTouchPositionCanonical = function (canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let s = Math.min(rect.width, rect.height)
+    let cx = rect.left + 0.5 * rect.width;
+    let cy = rect.top + 0.5 * rect.height;
+    let x = 2 * (event.touches[0].clientX - cx) / s;
+    let y = -2 * (event.touches[0].clientY - cy) / s;
     return {
         x: x,
         y: y

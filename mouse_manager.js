@@ -2,6 +2,9 @@ const module_utility = require("./utility");
 const getMousePositionPercentage = module_utility.getMousePositionPercentage;
 const getMousePositionCanonical = module_utility.getMousePositionCanonical;
 const getMousePosition = module_utility.getMousePosition;
+const getTouchPositionPercentage = module_utility.getTouchPositionPercentage;
+const getTouchPositionCanonical = module_utility.getTouchPositionCanonical;
+const getTouchPosition = module_utility.getTouchPosition;
 
 class MouseManager {
 
@@ -47,6 +50,19 @@ class MouseManager {
     }
 
     addOnMouseDown() {
+        this.canvas.addEventListener("touchstart", (event) => {
+            this.dynamic_movement_camera_is_main = true;
+            this.onTouchDown(event, this.canvas, this.camera, this.canvas_wrapper_main, this.side_camera);
+            this.ui_left_tool_bar.SelectLeft();
+            console.warn("touchstart")
+        });
+        this.side_canvas.addEventListener("touchstart", (event) => {
+            this.dynamic_movement_camera_is_main = false;
+            this.onTouchDown(event, this.side_canvas, this.side_camera, this.canvas_wrapper_side, this.camera);
+            this.ui_left_tool_bar.SelectLeft();
+            console.warn("touchstart")
+        });
+
         this.canvas.addEventListener("mousedown", (event) => {
             this.dynamic_movement_camera_is_main = true;
             this.onMouseDown(event, this.canvas, this.camera, this.canvas_wrapper_main, this.side_camera);
@@ -132,7 +148,33 @@ class MouseManager {
         //canvas_wrapper.SetOutputPositionPercentage(pos_percentage.x, pos_percentage.y);
     }
 
+    onTouchDown(event, canvas, camera, canvas_wrapper, other_camera){
+        if(this.block_all_input){
+            return;
+        }
+        var shift_pressed = false;//event.getModifierState("Shift");
+        var ctrl_pressed = false;//event.getModifierState("Control");
+        //var pos = getMousePosition(this.canvas, event);
+        var pos = getTouchPosition(this.canvas, event);        
+        var pos_percentage = getTouchPositionPercentage(canvas, event)
+        var pos_canonical = getTouchPositionCanonical(canvas, event);
+        console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
+
+        this.onMouseDownControlModeCamera(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical);
+    }
+
     addOnMouseUp() {
+        document.addEventListener("touchend", (event) => {
+            console.warn("touchend")
+            if(this.block_all_input){
+                return;
+            }
+            this.camera.StopPanning();
+            this.side_camera.StopPanning();
+            this.dynamic_streamline.StopPanning();
+            this.camera.other_camera_is_panning = false;
+            this.side_camera.other_camera_is_panning = false;
+        });
         document.addEventListener("mouseup", (event) => {
             if(this.block_all_input){
                 return;
@@ -164,6 +206,37 @@ class MouseManager {
     }
 
     addOnMouseMove() {
+        /*
+        this.canvas.addEventListener("touchmove", (event) => {
+            //this.dynamic_movement_camera_is_main = true;
+            //this.onMouseDown(event, this.canvas, this.camera, this.canvas_wrapper_main, this.side_camera);
+            //this.ui_left_tool_bar.SelectLeft();
+            console.warn("touchmove")
+        });
+        */
+        document.addEventListener("touchmove", (event) => {
+            if(this.block_all_input){
+                return;
+            }
+            console.warn("touchmove")
+
+            var pos_main = getTouchPosition(this.canvas, event);
+            var pos_percentage_main = getTouchPositionPercentage(this.canvas, event);
+            var pos_canonical_main = getTouchPositionCanonical(this.canvas, event);
+
+
+            var pos_aux = getTouchPosition(this.side_canvas, event);
+            var pos_percentage_aux = getTouchPositionPercentage(this.side_canvas, event);
+            var pos_canonical_aux = getTouchPositionCanonical(this.side_canvas, event);
+
+            this.camera.UpdateMouseMove(pos_percentage_main.x, pos_percentage_main.y, pos_canonical_main.x, pos_canonical_main.y, false);
+            this.camera.SetLastMousePosition(pos_main);
+            this.canvas_wrapper_main.SetOutputPositionPercentage(pos_percentage_main.x, pos_percentage_main.y);
+            this.side_camera.UpdateMouseMove(pos_percentage_aux.x, pos_percentage_aux.y, pos_canonical_aux.x, pos_canonical_aux.y, false);
+            this.side_camera.SetLastMousePosition(pos_aux);
+            this.canvas_wrapper_side.SetOutputPositionPercentage(pos_percentage_aux.x, pos_percentage_aux.y);
+        });
+
         document.addEventListener("mousemove", (event) => {
             if(this.block_all_input){
                 return;
