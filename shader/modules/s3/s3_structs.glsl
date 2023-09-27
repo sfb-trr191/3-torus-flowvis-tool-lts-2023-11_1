@@ -64,4 +64,12 @@ struct IntersectionResult{
     float t;
 };
 
+struct ExplicitIntegrationData
+{
+	float t;
+    vec4 original_position;
+    vec4 original_direction;
+    bool markError;
+};
+
 `;

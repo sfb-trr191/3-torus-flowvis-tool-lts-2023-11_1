@@ -48,7 +48,7 @@ struct HitInformation
     //ftle surface hit data
     float ftle_value;
     float ftle_ridge_strength;
-    
+
     bool markError;
 };
 
@@ -66,6 +66,14 @@ struct Ray
     float segment_length;
     int iteration_count;
     int ray_projection_index;
+};
+
+struct ExplicitIntegrationData
+{
+	float t;
+    vec3 original_position;
+    vec3 original_direction;
+    bool markError;
 };
 
 `;

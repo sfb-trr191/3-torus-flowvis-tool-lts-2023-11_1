@@ -13,6 +13,22 @@ void RayEulerStep(inout Ray ray)
 	ray.direction = currentDirection;
 }
 */
+
+void RayExplicitStep(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData)
+{
+    /*
+	vec3 currentPosition = ray.origin;
+	vec3 currentDirection = ray.direction;
+
+    ray.nextPosition = RayLightFunctionPosExplicit(explicitIntegrationData);
+
+    ray.local_cutoff = distance(currentPosition, ray.nextPosition);    
+	ray.direction = ray.nextPosition - currentPosition;    
+    ray.direction = normalize(ray.direction);
+    ray.dir_inv = 1.0/ray.direction;
+    */
+}
+
 void RayRK4Step(inout Ray ray)
 {
     
