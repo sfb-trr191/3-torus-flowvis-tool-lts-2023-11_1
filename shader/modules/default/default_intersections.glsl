@@ -250,6 +250,11 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                     //set next position of variable ray, next iteration will resume normally
                     //variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
                     //variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
+
+                    if(true)//TODO: parameter render_face_border_intersections
+                    {
+                        RenderFaceIntersections(variableRay, hit, exit);
+                    }
                     
                     explicitIntegrationData.t = 0.0;
                     explicitIntegrationData.original_position = MoveOutOfBounds(variableRay.nextPosition);
@@ -286,6 +291,97 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 	}	
 
 
+}
+
+
+void RenderFaceIntersections(Ray ray, inout HitInformation hit, vec3 exit)
+{
+    float x = exit.x;
+    float y = exit.y;
+    float z = exit.z;
+
+    //find the highest outside coordinate
+    //outside coordinates are the difference between the exit value, and either the plane at 0 or 1
+    float outside_x = x > 0.5 ? x - 1.0 : - x;
+    float outside_y = y > 0.5 ? y - 1.0 : - y;
+    float outside_z = z > 0.5 ? z - 1.0 : - z;
+
+    float abs_outside_x = abs(outside_x);
+    float abs_outside_y = abs(outside_y);
+    float abs_outside_z = abs(outside_z);
+
+    vec3 normal;
+    vec3 color_x = vec3(1,0,0);
+    vec3 color_y = vec3(0,1,0);
+    vec3 color_z = vec3(0,0,1);
+
+    if(outside_x > outside_y){
+        if(outside_x > outside_z){
+            //x plane
+            normal = x>0.5 ? vec3(-1,0,0) : vec3(1,0,0);
+            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_y, abs_outside_z, color_x);
+        }
+        else{
+            //z plane
+            normal = z>0.5 ? vec3(0,0,-1) : vec3(0,0,1);
+            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_y, color_z);
+        }
+    }
+    else{
+        if(outside_y > outside_z){
+            //y plane
+            normal = y>0.5 ? vec3(0,-1,0) : vec3(0,1,0);
+            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_z, color_y);
+        }
+        else{
+            //z plane
+            normal = z>0.5 ? vec3(0,0,-1) : vec3(0,0,1);
+            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_y, color_z);
+        }
+    }
+
+}
+
+void RenderFaceIntersection(Ray ray, inout HitInformation hit, vec3 exit, vec3 normal, float abs_a, float abs_b, vec3 color)
+{
+    float width = 0.05;
+    if(abs_a > width && abs_b > width ){
+        return;
+    }
+
+    float exit_distance = distance(ray.origin, exit);
+    /*
+    hit.hitType = TYPE_STREAMLINE_SEGMENT;
+    hit.copy = false;
+    hit.multiPolyID = -1;
+    hit.distanceToCenter = 0.0;
+    hit.positionCenter = exit;
+    hit.position = exit;
+    hit.normal = normal;
+    hit.distance = ray.rayDistance + exit_distance;	
+    hit.distance_iteration = exit_distance;
+    hit.ignore_override = false;
+    */
+
+
+
+    hit.hitType = TYPE_GL_CYLINDER;
+    hit.sub_type = SUBTYPE_CYLINDER;
+    hit.dynamic = false;//for now, dynamic only contains streamlines, no objects
+    hit.iteration_count = ray.iteration_count;
+    hit.distance_iteration = exit_distance;	
+    hit.distance = ray.rayDistance + exit_distance;
+    hit.position = exit;
+    hit.positionCenter = exit;
+    hit.light_direction = ray.direction;
+    hit.normal = normal;
+    //hit.normal = normalize(sphere.center - hit.position);
+    hit.copy = false;//copy;
+    hit.multiPolyID = -1;//interactiveStreamline ? -1 : multiPolyID;
+    hit.velocity = -1.0;//velocity;
+    hit.cost = -1.0;//cost;
+    hit.ignore_override = true;
+    hit.objectColor = color;
 }
 
 

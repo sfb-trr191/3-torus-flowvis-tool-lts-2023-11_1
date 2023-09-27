@@ -29,6 +29,8 @@ bool IntersectGLAABB(Sphere sphere, Ray r, float ray_local_cutoff, inout float t
 void IntersectCylinder(bool dynamic, int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, int lineSegmentID, inout HitInformation hit, bool ignore_override);
 void IntersectSphere(bool dynamic, int part_index, bool check_bounds, Ray ray, float ray_local_cutoff, Sphere sphere, inout HitInformation hit, bool copy, int multiPolyID, int type, float velocity, float cost);
 float ExtractLinearPercentage(float a, float b, float value);
+void RenderFaceIntersections(Ray ray, inout HitInformation hit, vec3 exit);
+void RenderFaceIntersection(Ray ray, inout HitInformation hit, vec3 exit, vec3 normal, float abs_a, float abs_b, vec3 color);
 
 //**********************************************************
 
