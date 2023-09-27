@@ -170,19 +170,25 @@ GL_CameraData GetCameraForArea(int area_index)
 }
 
 #ifdef INTEGRATE_LIGHT
-void LightIntegrationPre(inout Ray ray){
-    RayRK4Step(ray);
+void LightIntegrationPre(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData){
+    if(light_integrator_type == LIGHT_INTEGRATOR_RK4)
+        RayRK4Step(ray);
+    else//LIGHT_INTEGRATOR_EXPLICIT
+        RayExplicitStep(ray, explicitIntegrationData);
+
 }
 
 void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside){
-    /*
-    if(flag_ray_stays_inside){
-
+    if(light_integrator_type == LIGHT_INTEGRATOR_RK4)
+    {
+        ray.origin = ray.nextPosition;
+        ray.direction = ray.nextDirection;
+        ray.dir_inv = 1.0/ray.direction;
     }
-    */
-    ray.origin = ray.nextPosition;
-    ray.direction = ray.nextDirection;
-    ray.dir_inv = 1.0/ray.direction;
+    else//LIGHT_INTEGRATOR_EXPLICIT
+    {
+        ray.origin = ray.nextPosition;
+    }
 }
 #endif 
 

@@ -96,4 +96,11 @@ struct MoveOutOfBoundsFlags
 	bool z_smaller;
 };
 
+struct ExplicitIntegrationData
+{
+	float t;
+    vec3 original_position;
+    vec3 original_direction;
+};
+
 `;

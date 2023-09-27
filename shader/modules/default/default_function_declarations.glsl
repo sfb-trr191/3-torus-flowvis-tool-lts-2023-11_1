@@ -8,6 +8,7 @@ void IntersectLineSegment(bool dynamic, int part_index, bool check_bounds, Ray r
 float GetScalar(vec3 position);
 vec3 RayLightFunctionPos(vec3 position, vec3 direction);
 vec3 RayLightFunctionDir(vec3 position, vec3 direction);
+vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrationData);
 
 //**********************************************************
 

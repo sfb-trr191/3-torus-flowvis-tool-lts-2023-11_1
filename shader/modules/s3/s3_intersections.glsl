@@ -14,6 +14,12 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
     variableRay.local_cutoff = maxRayDistance;
     variableRay.ray_projection_index = ray.ray_projection_index;
 
+    //initialize ExplicitIntegrationData, which is NOT USED for s3 currently, but needed to call functions
+    ExplicitIntegrationData explicitIntegrationData;
+    explicitIntegrationData.t = 0.0;
+    explicitIntegrationData.original_position = ray.origin;
+	explicitIntegrationData.original_direction = ray.direction;
+
     /*	
     if(IsVec4Similar(ray.origin, vec4(0.0, 0.0, 0.0, 1.0))){
         hit.hitType = TYPE_STREAMLINE_SEGMENT;
@@ -46,7 +52,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         variableRay.iteration_count = count;
         tmp_rayDistance = variableRay.rayDistance;
 #ifdef INTEGRATE_LIGHT
-        LightIntegrationPre(variableRay);  
+        LightIntegrationPre(variableRay, explicitIntegrationData);  
 #endif  
         bool dynamic = false;
 		IntersectInstance(dynamic, variableRay, hit);             

@@ -17,6 +17,7 @@ vec3 RepositionIntoFundamentalDomain(vec3 position);
 void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 void CombineHitInformation(Ray ray, inout HitInformation hit, inout HitInformation hit_outside, inout HitInformation hitCube);
 bool CheckOutOfBounds(vec3 position);
+vec3 MoveOutOfBoundsTorusRules(vec3 position);
 vec3 MoveOutOfBounds(vec3 position);
 vec3 MoveOutOfBoundsDirection(vec3 position, vec3 direction);
 vec3 MoveOutOfBoundsProjection(vec3 position);
@@ -100,7 +101,8 @@ ivec3 GetIndex3D(int global_index);
 
 void RayEulerStep(inout Ray ray);
 void RayRK4Step(inout Ray ray);
-void LightIntegrationPre(inout Ray ray);
+void RayExplicitStep(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData);
+void LightIntegrationPre(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData);
 void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
 
 //                       linalg

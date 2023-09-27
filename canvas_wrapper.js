@@ -15,7 +15,9 @@ class UniformLocationsRayTracing {
         console.log("UniformLocationsRayTracing: ", name)
         this.location_num_visual_seeds = gl.getUniformLocation(program, "num_visual_seeds");
 
-        this.light_integrator_type = LIGHT_INTEGRATOR_LINE;
+        this.light_integrator_type = LIGHT_INTEGRATOR_LINE;//TODO why is this here?
+        
+        this.location_light_integrator_type = gl.getUniformLocation(program, "light_integrator_type");
         this.location_light_integration_step_size = gl.getUniformLocation(program, "light_integration_step_size");
         this.location_light_integration_max_step_count = gl.getUniformLocation(program, "light_integration_max_step_count");
         
@@ -500,7 +502,7 @@ class CanvasWrapper {
             this.light_integration_step_size = light_integration_step_size;
         }
         */
-        this.integrate_light = (light_integrator_type == LIGHT_INTEGRATOR_RK4);
+        this.integrate_light = (light_integrator_type == LIGHT_INTEGRATOR_RK4) || (light_integrator_type == LIGHT_INTEGRATOR_EXPLICIT);
         
 
     }
@@ -1076,6 +1078,8 @@ class CanvasWrapper {
         
         gl.uniform1i(this.location_raytracing.location_debug_render_spherinder, this.debug_render_spherinder);
         gl.uniform1i(this.location_raytracing.location_debug_render_3Sphere, this.debug_render_3Sphere);
+
+        gl.uniform1i(this.location_raytracing.location_light_integrator_type, this.light_integrator_type);
         
         var panning = this.camera.IsPanningOrForced();
         var active_lod = panning ? this.lod_index_panning : this.lod_index_still;

@@ -92,6 +92,47 @@ vec3 MoveOutOfBounds(vec3 position)
 	return vec3(x,y,z);
 }
 
+vec3 MoveOutOfBoundsTorusRules(vec3 position)
+{
+	//user friendly variables
+	float x = position.x;
+	float y = position.y;
+	float z = position.z;
+	//additional "constant" variables for this calculation
+	float x0 = x;
+	float y0 = y;
+	float z0 = z;
+	
+	if(x > 1.0-epsilon_move_ray)
+	{
+		x = x - 1.0;
+	}
+	else if(x < 0.0+epsilon_move_ray)
+	{
+		x = x + 1.0;
+	}
+
+	if(y > 1.0-epsilon_move_ray)
+	{
+		y = y - 1.0;
+	}
+	else if(y < 0.0+epsilon_move_ray)
+	{
+		y = y + 1.0;
+	}
+
+	if(z > 1.0-epsilon_move_ray)
+	{
+		z = z - 1.0;
+	}
+	else if(z < 0.0+epsilon_move_ray)
+	{
+        z = z + 1.0;
+	}
+
+	return vec3(x,y,z);
+}
+
 vec3 MoveOutOfBoundsDirection(vec3 position, vec3 direction)
 {    
     //user friendly variables

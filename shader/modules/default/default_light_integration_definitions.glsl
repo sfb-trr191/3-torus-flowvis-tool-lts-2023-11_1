@@ -13,6 +13,20 @@ void RayEulerStep(inout Ray ray)
 	ray.direction = currentDirection;
 }
 */
+
+void RayExplicitStep(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData)
+{
+	vec3 currentPosition = ray.origin;
+	vec3 currentDirection = ray.direction;
+
+    ray.nextPosition = RayLightFunctionPosExplicit(explicitIntegrationData);
+
+    ray.local_cutoff = distance(currentPosition, ray.nextPosition);    
+	ray.direction = ray.nextPosition - currentPosition;    
+    ray.direction = normalize(ray.direction);
+    ray.dir_inv = 1.0/ray.direction;
+}
+
 void RayRK4Step(inout Ray ray)
 {
     
@@ -36,6 +50,48 @@ void RayRK4Step(inout Ray ray)
     ray.local_cutoff = distance(currentPosition, ray.nextPosition);
     ray.nextDirection = normalize(ray.nextDirection);
     
+}
+
+vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrationData)
+{	
+    //update internal
+    explicitIntegrationData.t = explicitIntegrationData.t + light_integration_step_size;
+
+    //rename for userfriendly acces to variable
+    float t = explicitIntegrationData.t;
+
+	float x1 = explicitIntegrationData.original_position.x;
+	float x2 = explicitIntegrationData.original_position.y;
+	float x3 = explicitIntegrationData.original_position.z;
+
+	float v1 = explicitIntegrationData.original_direction.x;
+	float v2 = explicitIntegrationData.original_direction.y;
+	float v3 = explicitIntegrationData.original_direction.z;
+
+
+    //equations
+    float P1;
+    float P2;
+    float P3;
+    if(false){
+        //line for debugging purpose
+	    P1 = x1 + v1 * t;
+	    P2 = x2 + v2 * t;
+	    P3 = x3 + v3 * t;
+    }else{
+        float w = v3;
+        float c = sqrt(v1*v1 + v2*v2);
+        float alpha = atan(v2, v1);
+
+        float xt = c / w * (sin(w*t+alpha)-sin(alpha));
+        float yt = - c / w * (cos(w*t+alpha)-cos(alpha));
+        float zt = t*(w+(c*c)/(2.0*w)) - (c*c)/(4.0*w*w) * (sin(2.0*w*t + 2.0*alpha) - sin(2.0*alpha)) + (c*c)/(2.0*w*w)*(sin(w*t+2.0*alpha)-sin(2.0*alpha)-sin(t*w));
+
+        P1 = x1 + xt;
+        P2 = x2 + yt;
+        P3 = x3 + zt + x1*yt;
+    }
+	return vec3(P1,P2,P3);	
 }
 
 vec3 RayLightFunctionPos(vec3 position, vec3 direction)

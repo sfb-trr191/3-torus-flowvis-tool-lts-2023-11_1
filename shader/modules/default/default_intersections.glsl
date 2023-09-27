@@ -10,6 +10,11 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
     variableRay.local_cutoff = maxRayDistance;
 
     Ray transitional_ray;
+
+    ExplicitIntegrationData explicitIntegrationData;
+    explicitIntegrationData.t = 0.0;
+    explicitIntegrationData.original_position = ray.origin;
+	explicitIntegrationData.original_direction = ray.direction;
 			
 	int count = 0;
 	int hitCount = 0;
@@ -41,7 +46,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         tmp_rayDistance = variableRay.rayDistance;
 
 #ifdef INTEGRATE_LIGHT
-        LightIntegrationPre(variableRay);  
+        LightIntegrationPre(variableRay, explicitIntegrationData);  
 #endif      
         bool dynamic = false;
 		IntersectInstance(dynamic, variableRay, hit, hitCube);
@@ -199,44 +204,62 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                 */
                 //V3
 
-                //set next position of variable ray, next iteration will resume normally
-                variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
-                variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
-                //however, for the transition we use a transitional ray
-                //the transitional ray keeps the same direction as the variable ray
-                //but will be moved (possibly multiple times if multiple borders are crossed)            
-                transitional_ray.direction = variableRay.direction;
-                transitional_ray.dir_inv = variableRay.dir_inv;
-                //each iteration the local cutoff is reduced by the exit distance i.e. the distance from current position to the cube intersection
-                float exit_distance = distance(variableRay.origin, exit);
-                transitional_ray.local_cutoff = variableRay.local_cutoff;
-                transitional_ray.rayDistance = tmp_rayDistance;
-                while(transitional_ray.local_cutoff >= exit_distance && exit_distance > 0.0){
-                    transitional_ray.local_cutoff -= exit_distance;
-                    transitional_ray.rayDistance += exit_distance;
-                    transitional_ray.origin = MoveOutOfBounds(exit);
-                    dynamic = false;
-                    IntersectInstance(dynamic, transitional_ray, hit, hitCube);
-                    if(render_dynamic_streamline){
-                        dynamic = true;
+                //OLD
+                if(false){
+                    //set next position of variable ray, next iteration will resume normally
+                    variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
+                    variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
+                    //however, for the transition we use a transitional ray
+                    //the transitional ray keeps the same direction as the variable ray
+                    //but will be moved (possibly multiple times if multiple borders are crossed)            
+                    transitional_ray.direction = variableRay.direction;
+                    transitional_ray.dir_inv = variableRay.dir_inv;
+                    //each iteration the local cutoff is reduced by the exit distance i.e. the distance from current position to the cube intersection
+                    float exit_distance = distance(variableRay.origin, exit);
+                    transitional_ray.local_cutoff = variableRay.local_cutoff;
+                    transitional_ray.rayDistance = tmp_rayDistance;
+                    while(transitional_ray.local_cutoff >= exit_distance && exit_distance > 0.0){
+                        transitional_ray.local_cutoff -= exit_distance;
+                        transitional_ray.rayDistance += exit_distance;
+                        transitional_ray.origin = MoveOutOfBounds(exit);
+                        dynamic = false;
                         IntersectInstance(dynamic, transitional_ray, hit, hitCube);
+                        if(render_dynamic_streamline){
+                            dynamic = true;
+                            IntersectInstance(dynamic, transitional_ray, hit, hitCube);
+                        }
+
+                        //calculate exit (the point where ray leaves the current instance)
+                        //formula: target = origin + t * direction
+                        //float tar_x = (variableRay.direction.x > 0) ? 1 : 0;	
+                        //float tar_y = (variableRay.direction.y > 0) ? 1 : 0;
+                        //float tar_z = (variableRay.direction.z > 0) ? 1 : 0;
+                        vec3 tar = step(vec3(0,0,0), transitional_ray.direction);
+                        //float t_x = (tar_x - variableRay.origin.x) * variableRay.dir_inv.x;	
+                        //float t_y = (tar_y - variableRay.origin.y) * variableRay.dir_inv.y;	
+                        //float t_z = (tar_z - variableRay.origin.z) * variableRay.dir_inv.z;	
+                        vec3 t_v = (tar - transitional_ray.origin) * transitional_ray.dir_inv;	
+                        float t_exit = min(t_v.x, min(t_v.y, t_v.z));		
+                        exit = transitional_ray.origin + t_exit * transitional_ray.direction;
+
+                        exit_distance = distance(transitional_ray.origin, exit);
                     }
+                }else{
+                    //NEW
+                    //IF EXPLICIT
+                    //set next position of variable ray, next iteration will resume normally
+                    //variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
+                    //variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
+                    
+                    explicitIntegrationData.t = 0.0;
+                    explicitIntegrationData.original_position = MoveOutOfBounds(variableRay.nextPosition);
 
-                    //calculate exit (the point where ray leaves the current instance)
-                    //formula: target = origin + t * direction
-                    //float tar_x = (variableRay.direction.x > 0) ? 1 : 0;	
-                    //float tar_y = (variableRay.direction.y > 0) ? 1 : 0;
-                    //float tar_z = (variableRay.direction.z > 0) ? 1 : 0;
-                    vec3 tar = step(vec3(0,0,0), transitional_ray.direction);
-                    //float t_x = (tar_x - variableRay.origin.x) * variableRay.dir_inv.x;	
-                    //float t_y = (tar_y - variableRay.origin.y) * variableRay.dir_inv.y;	
-                    //float t_z = (tar_z - variableRay.origin.z) * variableRay.dir_inv.z;	
-                    vec3 t_v = (tar - transitional_ray.origin) * transitional_ray.dir_inv;	
-                    float t_exit = min(t_v.x, min(t_v.y, t_v.z));		
-                    exit = transitional_ray.origin + t_exit * transitional_ray.direction;
-
-                    exit_distance = distance(transitional_ray.origin, exit);
+                    //explicitIntegrationData.original_position = MoveOutOfBoundsTorusRules(variableRay.nextPosition);//this is a temporary test
+	                //explicitIntegrationData.original_direction = variableRay.direction;
+                    explicitIntegrationData.original_direction = normalize(MoveOutOfBoundsDirection(variableRay.nextPosition, variableRay.direction));
                 }
+
+
                 
                 
 #else
