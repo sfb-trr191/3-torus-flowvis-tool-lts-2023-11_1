@@ -39,6 +39,7 @@ struct HitInformation
     //ftle surface hit data - unused in s3
     float ftle_value;
     float ftle_ridge_strength;
+    bool markError;
 };
 
 struct Ray

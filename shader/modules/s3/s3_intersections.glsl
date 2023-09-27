@@ -52,7 +52,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         variableRay.iteration_count = count;
         tmp_rayDistance = variableRay.rayDistance;
 #ifdef INTEGRATE_LIGHT
-        LightIntegrationPre(variableRay, explicitIntegrationData);  
+        LightIntegrationPre(variableRay, hit, explicitIntegrationData);  
 #endif  
         bool dynamic = false;
 		IntersectInstance(dynamic, variableRay, hit);             

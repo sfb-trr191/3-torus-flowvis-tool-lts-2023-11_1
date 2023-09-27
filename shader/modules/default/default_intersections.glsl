@@ -13,6 +13,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
     ExplicitIntegrationData explicitIntegrationData;
     explicitIntegrationData.t = 0.0;
+    explicitIntegrationData.markError = false;
     explicitIntegrationData.original_position = ray.origin;
 	explicitIntegrationData.original_direction = ray.direction;
 			
@@ -46,7 +47,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
         tmp_rayDistance = variableRay.rayDistance;
 
 #ifdef INTEGRATE_LIGHT
-        LightIntegrationPre(variableRay, explicitIntegrationData);  
+        LightIntegrationPre(variableRay, hit, explicitIntegrationData);  
 #endif      
         bool dynamic = false;
 		IntersectInstance(dynamic, variableRay, hit, hitCube);

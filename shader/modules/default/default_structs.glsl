@@ -48,6 +48,8 @@ struct HitInformation
     //ftle surface hit data
     float ftle_value;
     float ftle_ridge_strength;
+    
+    bool markError;
 };
 
 struct Ray

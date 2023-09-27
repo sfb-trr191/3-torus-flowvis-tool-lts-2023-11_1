@@ -56,6 +56,7 @@ void main() {
 
 vec3 CalculateOneRay(float x_offset, float y_offset, inout HitInformation hit, inout HitInformation hit_outside)
 {
+    hit.markError = false;
     hit.was_copied_from_outside = false;
 	hit.hitType = TYPE_NONE;
     hit.sub_type = SUBTYPE_NONE;    
@@ -170,11 +171,16 @@ GL_CameraData GetCameraForArea(int area_index)
 }
 
 #ifdef INTEGRATE_LIGHT
-void LightIntegrationPre(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData){
+void LightIntegrationPre(inout Ray ray, inout HitInformation hit, inout ExplicitIntegrationData explicitIntegrationData){
     if(light_integrator_type == LIGHT_INTEGRATOR_RK4)
         RayRK4Step(ray);
-    else//LIGHT_INTEGRATOR_EXPLICIT
-        RayExplicitStep(ray, explicitIntegrationData);
+    else{
+        //LIGHT_INTEGRATOR_EXPLICIT
+        RayExplicitStep(ray, explicitIntegrationData);        
+        if(explicitIntegrationData.markError){
+            hit.markError = true;
+        }
+    }
 
 }
 

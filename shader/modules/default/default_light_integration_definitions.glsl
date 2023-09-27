@@ -90,6 +90,10 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
         P1 = x1 + xt;
         P2 = x2 + yt;
         P3 = x3 + zt + x1*yt;
+
+        if(abs(w) < 0.002){
+            explicitIntegrationData.markError = true;
+        }
     }
 	return vec3(P1,P2,P3);	
 }

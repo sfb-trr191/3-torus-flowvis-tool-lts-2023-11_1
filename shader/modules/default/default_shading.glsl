@@ -10,7 +10,13 @@ vec3 Get3DNormalColor(vec3 normal){
 }
 
 vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool ignore_override, bool allow_fog)
-{			
+{		
+    if(hit.markError)
+    {
+	    vec3 errorColor = vec3(1,0,1);
+        return errorColor;
+    }
+
 	ignore_override = ignore_override || hit.ignore_override;
 	vec3 resultColor = vec3(0,0,0);
     vec3 surface_color = vec3(0,0,0);

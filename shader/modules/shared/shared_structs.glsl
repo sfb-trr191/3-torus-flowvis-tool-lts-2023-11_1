@@ -101,6 +101,7 @@ struct ExplicitIntegrationData
 	float t;
     vec3 original_position;
     vec3 original_direction;
+    bool markError;
 };
 
 `;
