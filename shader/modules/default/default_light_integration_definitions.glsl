@@ -25,6 +25,10 @@ void RayExplicitStep(inout Ray ray, inout ExplicitIntegrationData explicitIntegr
 	ray.direction = ray.nextPosition - currentPosition;    
     ray.direction = normalize(ray.direction);
     ray.dir_inv = 1.0/ray.direction;
+
+    //in case the ray leaves the fundamental domain we need to make sure that the next direction is "good"
+    bool flag_ray_goes_outside = CheckOutOfBounds(ray.nextPosition);
+
 }
 
 void RayRK4Step(inout Ray ray)

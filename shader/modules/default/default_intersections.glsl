@@ -320,12 +320,12 @@ void RenderFaceIntersections(Ray ray, inout HitInformation hit, vec3 exit)
         if(outside_x > outside_z){
             //x plane
             normal = x>0.5 ? vec3(-1,0,0) : vec3(1,0,0);
-            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_y, abs_outside_z, color_x);
+            //RenderFaceIntersection(ray, hit, exit, normal, abs_outside_y, abs_outside_z, color_x);
         }
         else{
             //z plane
             normal = z>0.5 ? vec3(0,0,-1) : vec3(0,0,1);
-            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_y, color_z);
+            //RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_y, color_z);
         }
     }
     else{
@@ -337,7 +337,7 @@ void RenderFaceIntersections(Ray ray, inout HitInformation hit, vec3 exit)
         else{
             //z plane
             normal = z>0.5 ? vec3(0,0,-1) : vec3(0,0,1);
-            RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_y, color_z);
+            //RenderFaceIntersection(ray, hit, exit, normal, abs_outside_x, abs_outside_y, color_z);
         }
     }
 
