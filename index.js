@@ -1382,6 +1382,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.dynamic_streamline_color = getColorVectorFromElementID("input_colors_dynamic");
         canvas_wrapper_main.forward_ftle_surface_color = getColorVectorFromElementID("input_colors_forward_ftle_surface");
         canvas_wrapper_main.backward_ftle_surface_color = getColorVectorFromElementID("input_colors_backward_ftle_surface");
+        canvas_wrapper_main.fog_color = getColorVectorFromElementID("input_colors_fog");
         
         canvas_wrapper_main.max_cost = parseFloat(document.getElementById("input_max_cost_percentage").value);        
         canvas_wrapper_main.camera.fov_theta = parseFloat(document.getElementById("input_fov_theta_main").value);
@@ -1473,6 +1474,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_side.dynamic_streamline_color = getColorVectorFromElementID("input_colors_dynamic");
         canvas_wrapper_side.forward_ftle_surface_color = getColorVectorFromElementID("input_colors_forward_ftle_surface");
         canvas_wrapper_side.backward_ftle_surface_color = getColorVectorFromElementID("input_colors_backward_ftle_surface");
+        canvas_wrapper_side.fog_color = getColorVectorFromElementID("input_colors_fog");
         var show_4_projections = document.getElementById("checkbox_show_4_projections_main").checked;
         canvas_wrapper_side.camera.SetArea(-1, show_4_projections, parseFloat(document.getElementById("input_width_percentage_4_projections").value));
         canvas_wrapper_side.cameraAreaProjection0.SetArea(0, document.getElementById("checkbox_show_4_projections_main").checked, parseFloat(document.getElementById("input_width_percentage_4_projections").value));

@@ -262,7 +262,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
                     //explicitIntegrationData.original_position = MoveOutOfBoundsTorusRules(variableRay.nextPosition);//this is a temporary test
 	                //explicitIntegrationData.original_direction = variableRay.direction;
-                    explicitIntegrationData.original_direction = normalize(MoveOutOfBoundsDirection(variableRay.nextPosition, variableRay.direction));
+                    explicitIntegrationData.original_direction = normalize(MoveOutOfBoundsDirection(variableRay.nextPosition, variableRay.nextDirection));
                 }
 
 

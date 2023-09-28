@@ -76,7 +76,7 @@ const int allowOutOfBoundSphere = 0;//DUMMY
 const int numDirLights = 3;//DUMMY
 const float fogStart = 1000.0;//DUMMY
 const float fogEnd = 1001.0;//DUMMY
-const vec3 fogColor = vec3(1,1,1);//DUMMY
+//const vec3 fogColor = vec3(1,1,1);//DUMMY
 const float tubeShininess = 32.0;//DUMMY
 const bool blinn_phong = true;//DUMMY
 

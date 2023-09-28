@@ -92,6 +92,7 @@ uniform int dim_z;//dim of volume texture
 
 uniform int selected_streamline_id;
 uniform float gray_scale_factor;
+uniform vec3 fog_color;
 uniform vec3 selected_streamline_color;
 uniform vec3 dynamic_streamline_color;
 uniform vec3 forward_ftle_surface_color;

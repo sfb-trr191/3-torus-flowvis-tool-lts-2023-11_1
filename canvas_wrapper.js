@@ -52,6 +52,7 @@ class UniformLocationsRayTracing {
         this.location_offset_y = gl.getUniformLocation(program, "offset_y");
         this.location_max_ray_distance = gl.getUniformLocation(program, "maxRayDistance");
         this.location_max_cost = gl.getUniformLocation(program, "max_streamline_cost");  
+        this.location_fog_color = gl.getUniformLocation(program, "fog_color");  
         this.location_selected_streamline_color = gl.getUniformLocation(program, "selected_streamline_color");  
         this.location_dynamic_streamline_color = gl.getUniformLocation(program, "dynamic_streamline_color");         
         this.location_forward_ftle_surface_color = gl.getUniformLocation(program, "forward_ftle_surface_color");  
@@ -298,6 +299,7 @@ class CanvasWrapper {
         this.update_clicked_position_control_mode = CONTROL_MODE_SELECT_STREAMLINE;
 
         this.quality_marker_color = glMatrix.vec3.fromValues(1,0,1);
+        this.fog_color = glMatrix.vec3.fromValues(1,1,1);
         this.selected_streamline_color = glMatrix.vec3.fromValues(1,0,0);
         this.dynamic_streamline_color = glMatrix.vec3.fromValues(1,1,0);
         this.forward_ftle_surface_color = glMatrix.vec3.fromValues(1,0,0);//overwritten by ui anyways
@@ -1004,6 +1006,7 @@ class CanvasWrapper {
 
         gl.uniform1i(this.location_raytracing.location_selected_streamline_id, this.selected_streamline_id);
         gl.uniform1f(this.location_raytracing.location_gray_scale_factor, this.gray_scale_factor);
+        gl.uniform3f(this.location_raytracing.location_fog_color, this.fog_color[0], this.fog_color[1], this.fog_color[2]);
         gl.uniform3f(this.location_raytracing.location_selected_streamline_color, this.selected_streamline_color[0], this.selected_streamline_color[1], this.selected_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_dynamic_streamline_color, this.dynamic_streamline_color[0], this.dynamic_streamline_color[1], this.dynamic_streamline_color[2]);
         gl.uniform3f(this.location_raytracing.location_forward_ftle_surface_color, this.forward_ftle_surface_color[0], this.forward_ftle_surface_color[1], this.forward_ftle_surface_color[2]);

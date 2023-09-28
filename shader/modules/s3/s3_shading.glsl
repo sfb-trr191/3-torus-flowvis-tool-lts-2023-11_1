@@ -67,8 +67,8 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
         
         if(allow_fog){
             float fogFactor = CalculateFogFactor(hit.distance);        
-            //formula: finalColor = (1.0 - f)*fogColor + f * lightColor
-            surface_color = mix(fogColor, lightColor, fogFactor);
+            //formula: finalColor = (1.0 - f)*fog_color + f * lightColor
+            surface_color = mix(fog_color, lightColor, fogFactor);
         }else{
             surface_color = lightColor;
         }

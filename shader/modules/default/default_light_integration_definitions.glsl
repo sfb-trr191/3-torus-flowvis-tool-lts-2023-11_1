@@ -24,10 +24,25 @@ void RayExplicitStep(inout Ray ray, inout ExplicitIntegrationData explicitIntegr
     ray.local_cutoff = distance(currentPosition, ray.nextPosition);    
 	ray.direction = ray.nextPosition - currentPosition;    
     ray.direction = normalize(ray.direction);
+    ray.nextDirection = ray.direction;//for the case when we leave the fd
     ray.dir_inv = 1.0/ray.direction;
 
+    /*
     //in case the ray leaves the fundamental domain we need to make sure that the next direction is "good"
     bool flag_ray_goes_outside = CheckOutOfBounds(ray.nextPosition);
+    //TODO: bisection to get point close to the intersection?
+    //below: using the next position to calculate direction, doesnt change much
+    if(flag_ray_goes_outside){
+        ExplicitIntegrationData tmp;
+        tmp.t = explicitIntegrationData.t;
+        tmp.markError = explicitIntegrationData.markError;
+        tmp.original_position = explicitIntegrationData.original_position;
+        tmp.original_direction = explicitIntegrationData.original_direction;
+        vec3 nextPosition = RayLightFunctionPosExplicit(tmp);
+        ray.nextDirection = nextPosition - ray.nextPosition;  
+        ray.nextDirection = normalize(ray.nextDirection);
+    }
+    */
 
 }
 
