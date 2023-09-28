@@ -92,6 +92,9 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
     float P1;
     float P2;
     float P3;
+    float xt;
+    float yt;
+    float zt;
     if(false){
         //line for debugging purpose
 	    P1 = x1 + v1 * t;
@@ -102,17 +105,29 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
         float c = sqrt(v1*v1 + v2*v2);
         float alpha = atan(v2, v1);
 
-        float xt = c / w * (sin(w*t+alpha)-sin(alpha));
-        float yt = - c / w * (cos(w*t+alpha)-cos(alpha));
-        float zt = t*(w+(c*c)/(2.0*w)) - (c*c)/(4.0*w*w) * (sin(2.0*w*t + 2.0*alpha) - sin(2.0*alpha)) + (c*c)/(2.0*w*w)*(sin(w*t+2.0*alpha)-sin(2.0*alpha)-sin(t*w));
+        xt = c / w * (sin(w*t+alpha)-sin(alpha));
+        yt = - c / w * (cos(w*t+alpha)-cos(alpha));
+        zt = t*(w+(c*c)/(2.0*w)) - (c*c)/(4.0*w*w) * (sin(2.0*w*t + 2.0*alpha) - sin(2.0*alpha)) + (c*c)/(2.0*w*w)*(sin(w*t+2.0*alpha)-sin(2.0*alpha)-sin(t*w));
 
         P1 = x1 + xt;
         P2 = x2 + yt;
         P3 = x3 + zt + x1*yt;
 
-        if(abs(w) < 0.002){
+        bool markError = true;//TODO: uniform or solve problem
+        if(markError && abs(w) < 0.02){
             explicitIntegrationData.markError = true;
+            /*
+            xt = c * cos(alpha*t);
+            yt = c * sin(alpha*t);
+            zt = (c*c)/2.0 * cos(alpha) * sin(alpha*t*t);
+
+            P1 = x1 + xt;
+            P2 = x2 + yt;
+            P3 = x3 + zt + x1*yt;
+            */
         }
+
+
     }
 	return vec3(P1,P2,P3);	
 }
