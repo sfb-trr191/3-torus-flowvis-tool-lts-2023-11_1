@@ -22,8 +22,8 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_side_mode_s3", this.ShouldShow_input_row_side_mode_s3());
         this.UpdateInputRow("input_row_scalar_range", this.ShouldShow_input_row_scalar_range());
         
-        this.UpdateInputRow("input_row_light_integration_step_size", this.ShouldShow_light_integration());
-        this.UpdateInputRow("input_row_light_integration_max_step_count", this.ShouldShow_light_integration());
+        this.UpdateInputRow("input_row_light_integration_step_size", this.ShouldShow_light_integration_steps());
+        this.UpdateInputRow("input_row_light_integration_max_step_count", this.ShouldShow_light_integration_steps());
         this.UpdateInputRow("input_row_light_transport_p0", this.ShouldShow_light_integration());
         this.UpdateInputRow("input_row_light_transport_p1", this.ShouldShow_light_integration());
         this.UpdateInputRow("input_row_light_transport_p2", this.ShouldShow_light_integration());
@@ -72,6 +72,14 @@ class VisibilityManager {
 
     ShouldShow_light_integration(){
         if(document.getElementById("select_light_integrator_type").value == LIGHT_INTEGRATOR_RK4)
+            return true;
+        return false;
+    }
+
+    ShouldShow_light_integration_steps(){
+        if(document.getElementById("select_light_integrator_type").value == LIGHT_INTEGRATOR_RK4)
+            return true;
+        if(document.getElementById("select_light_integrator_type").value == LIGHT_INTEGRATOR_EXPLICIT)
             return true;
         return false;
     }
