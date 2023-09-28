@@ -276,19 +276,16 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
             }
         }
 
+        count++;
 #ifdef INTEGRATE_LIGHT
         LightIntegrationPost(variableRay, flag_ray_stays_inside);  
         if(count >= light_integration_max_step_count){
             break;
         }
-#endif    
-        
-        count++;
+#else
 		if(count >= maxIterationCount)
 			break;
-            
-				
-		//break;
+#endif
 	}	
 
 

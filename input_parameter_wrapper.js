@@ -128,7 +128,8 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_field_equation_d3", "d3");
         //data - light integration
         new InputWrapper(this, "select_light_integrator_type", "lis");
-        new InputWrapper(this, "input_light_integration_max_step_count", "lim");
+        new InputWrapper(this, "input_light_integration_step_size", "liss");
+        new InputWrapper(this, "input_light_integration_max_step_count", "lim");        
         new InputWrapper(this, "input_field_light_transport_p0", "lp0");
         new InputWrapper(this, "input_field_light_transport_p1", "lp1");
         new InputWrapper(this, "input_field_light_transport_p2", "lp2");
