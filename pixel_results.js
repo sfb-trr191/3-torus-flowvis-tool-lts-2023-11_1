@@ -56,7 +56,7 @@ class PixelResults {
     }
 
     setHitStringStreamline(termination_condition, termination_max_value){
-        var start_string = "Streamline: " + this.streamline_id + this.SEPARATOR
+        var start_string = "streamline: " + this.streamline_id + this.SEPARATOR
         var stop_string = ""
         var position_string = this.getPositionString();
         var termination_string = ""
