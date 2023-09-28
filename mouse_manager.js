@@ -29,6 +29,7 @@ class MouseManager {
 
     initialize() {
         console.log("initialize mouse manager");
+        this.addPreventDefaults();
         this.addOnMouseDown();
         this.addOnMouseUp();
         this.addOnMouseMove();
@@ -50,18 +51,39 @@ class MouseManager {
         this.block_all_input = false;
     }
 
+    addPreventDefaults(){
+        document.body.addEventListener("touchstart", (event) => {
+            if(event.target == this.canvas || event.target == this.side_canvas){
+                //console.warn("touchstart:preventDefault");
+                event.preventDefault();
+            }
+        }, {passive:false});
+        document.body.addEventListener("touchend", (event) => {
+            if(event.target == this.canvas || event.target == this.side_canvas){
+                //console.warn("touchend:preventDefault");
+                event.preventDefault();
+            }
+        }, {passive:false});
+        document.body.addEventListener("touchmove", (event) => {
+            if(event.target == this.canvas || event.target == this.side_canvas){
+                //console.warn("touchmove:preventDefault");
+                event.preventDefault();
+            }
+        }, {passive:false});
+    }
+
     addOnMouseDown() {
         this.canvas.addEventListener("touchstart", (event) => {
             this.dynamic_movement_camera_is_main = true;
             this.onTouchDown(event, this.canvas, this.camera, this.canvas_wrapper_main, this.side_camera);
             this.ui_left_tool_bar.SelectLeft();
-            console.warn("touchstart")
+            //console.warn("touchstart")
         });
         this.side_canvas.addEventListener("touchstart", (event) => {
             this.dynamic_movement_camera_is_main = false;
             this.onTouchDown(event, this.side_canvas, this.side_camera, this.canvas_wrapper_side, this.camera);
             this.ui_left_tool_bar.SelectLeft();
-            console.warn("touchstart")
+            //console.warn("touchstart")
         });
 
         this.canvas.addEventListener("mousedown", (event) => {
@@ -110,7 +132,7 @@ class MouseManager {
         var pos = getMousePosition(this.canvas, event);
         var pos_percentage = getMousePositionPercentage(canvas, event)
         var pos_canonical = getMousePositionCanonical(canvas, event);
-        console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
+        //console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
         switch (event.which) {
             case 1:
                 //Left Mouse button
@@ -159,12 +181,12 @@ class MouseManager {
         var pos = getTouchPosition(this.canvas, event);        
         var pos_percentage = getTouchPositionPercentage(canvas, event)
         var pos_canonical = getTouchPositionCanonical(canvas, event);
-        console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
+        //console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
 
         
         var flag_double_touch = event.timeStamp - canvas_wrapper.last_touch_ms < this.double_touch_threshold;
         if(flag_double_touch){
-            console.warn("double touch detected");
+            //console.warn("double touch detected");
             ctrl_pressed = true;
         }
 
@@ -176,7 +198,7 @@ class MouseManager {
 
     addOnMouseUp() {
         document.addEventListener("touchend", (event) => {
-            console.warn("touchend")
+            //console.warn("touchend")
             if(this.block_all_input){
                 return;
             }
@@ -229,7 +251,7 @@ class MouseManager {
             if(this.block_all_input){
                 return;
             }
-            console.warn("touchmove")
+            //console.warn("touchmove")
 
             var pos_main = getTouchPosition(this.canvas, event);
             var pos_percentage_main = getTouchPositionPercentage(this.canvas, event);
