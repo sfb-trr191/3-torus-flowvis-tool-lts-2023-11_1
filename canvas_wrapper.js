@@ -308,6 +308,7 @@ class CanvasWrapper {
         this.gray_scale_factor = 0.0;
 
         this.last_shader_formula_scalar = "";
+        this.last_touch_ms = 0;
 
         this.render_wrapper_raytracing_still_left = new RenderWrapper(gl, name + "_raytracing_still_left", camera.width_still, camera.height_still);
         this.render_wrapper_raytracing_still_right = new RenderWrapper(gl, name + "_raytracing_still_right", camera.width_still, camera.height_still);

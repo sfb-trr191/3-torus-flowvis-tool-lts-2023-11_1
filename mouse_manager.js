@@ -18,6 +18,7 @@ class MouseManager {
         this.control_mode = CONTROL_MODE_CAMERA;
         this.dynamic_streamline = dynamic_streamline;
         this.dynamic_movement_camera_is_main = true;//changed on button down
+        this.double_touch_threshold = 700;//in milliseconds
     }
 
     Link(ui_left_tool_bar, canvas_wrapper_main, canvas_wrapper_side){
@@ -160,7 +161,17 @@ class MouseManager {
         var pos_canonical = getTouchPositionCanonical(canvas, event);
         console.log("pos_canonical", pos_canonical.x, pos_canonical.y);
 
+        
+        var flag_double_touch = event.timeStamp - canvas_wrapper.last_touch_ms < this.double_touch_threshold;
+        if(flag_double_touch){
+            console.warn("double touch detected");
+            ctrl_pressed = true;
+        }
+
         this.onMouseDownControlModeCamera(event, canvas, camera, canvas_wrapper, other_camera, shift_pressed, ctrl_pressed, pos_percentage, pos_canonical);
+
+        //set time of event to allow double click detection
+        canvas_wrapper.last_touch_ms = event.timeStamp;
     }
 
     addOnMouseUp() {
