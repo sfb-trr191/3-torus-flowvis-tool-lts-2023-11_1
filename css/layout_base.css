@@ -25,6 +25,14 @@ body {
 }
 */
 
+p{
+    padding: 0px 8px 0px 8px;
+}
+
+li{
+    padding: 0px 8px 0px 0px;
+}
+
 fieldset {
     margin: 0%;
     padding: 8px 0px 0px 0px;
@@ -353,7 +361,6 @@ legend {
 
 .span_style_properties_legend_name{
     color: rgb(0, 0, 0);    
-    font-weight: bold;
 }
 
 .span_style_properties_legend_path{
