@@ -331,6 +331,13 @@ class CanvasWrapper {
 
         this.LinkElementsFromName();
         this.force_draw_retrieve_once = false;
+
+        this.adaptive_resolution = true;
+        this.adaptive_resolution_current_t = 1.0;
+        //this.adaptive_resolution_next_t = 1.0;
+        this.adaptive_resolution_step_size = 0.1;
+        this.adaptive_resolution_last_time_stamp = 0;
+        this.adaptive_resolution_cooldown = 500;
     }
 
     setRetreiveOnce(){
@@ -582,6 +589,7 @@ class CanvasWrapper {
         var width_panning = Math.round(width * this.panning_resolution_factor);
         var height_panning = Math.round(height * this.panning_resolution_factor);
 
+
         var changed = (width_still != this.camera.width_still) || (height_still != this.camera.height_still);
         if (changed) {
             console.log("12345", width, "x", height);
@@ -594,7 +602,14 @@ class CanvasWrapper {
             this.aliasing_index = -1;//skip extra frames when changiong resolution
         }
 
+        if(this.adaptive_resolution){
+            //this.adaptive_resolution_current_t = this.adaptive_resolution_next_t;
+            width_panning = Math.round(module_utilit.lerp(width_panning, width_still, this.adaptive_resolution_current_t));
+            height_panning = Math.round(module_utilit.lerp(height_panning, height_still, this.adaptive_resolution_current_t));
+        }
+
         var changed = (width_panning != this.camera.width_panning) || (height_panning != this.camera.height_panning);
+
         if (changed) {
             console.log(width, "x", height);
             this.camera.width_panning = width_panning;
@@ -604,6 +619,7 @@ class CanvasWrapper {
             this.camera.SetCorrectResolution();
             this.camera.changed = true;
             this.aliasing_index = -1;//skip extra frames when changiong resolution
+            //console.warn(width_panning, "x", height_panning, "(", this.adaptive_resolution_next_t, ")");
         }
     }
 
@@ -676,10 +692,11 @@ class CanvasWrapper {
         this.drawTextureRaytracing(gl, left_render_wrapper, get_pixel_data_results);
     }
 
-    draw(gl, data_changed, settings_changed) {
+    //current_fps is used for resolution factor
+    draw(gl, data_changed, settings_changed, time_now, current_fps) {
         //automatically change resolution if not exporting
         if(!this.is_exporting){
-            this.AutoUpdateResolution(gl);                
+            this.AutoUpdateResolution(gl);                      
         }
         
         //skip extra frames when changiong resolution
@@ -701,6 +718,22 @@ class CanvasWrapper {
             }
             return;
         }
+
+        if(this.adaptive_resolution){
+            if(this.camera.IsPanningOrForced() && time_now > this.adaptive_resolution_last_time_stamp + this.adaptive_resolution_cooldown){
+                if(current_fps > 30 && this.adaptive_resolution_current_t < 1.0){
+                    this.adaptive_resolution_last_time_stamp = time_now;
+                    this.adaptive_resolution_current_t = Math.min(1.0, this.adaptive_resolution_current_t + this.adaptive_resolution_step_size);
+                    //console.warn("fps: ", current_fps, " ---> INCREASE to", this.adaptive_resolution_current_t);
+                }
+                else if(current_fps < 15 && this.adaptive_resolution_current_t > 0.0){
+                    this.adaptive_resolution_last_time_stamp = time_now;
+                    this.adaptive_resolution_current_t = Math.max(0.0, this.adaptive_resolution_current_t - this.adaptive_resolution_step_size);
+                    //console.warn("panning: ", current_fps, " ---> REDUCE to", this.adaptive_resolution_current_t);
+                }    
+            }
+        }
+
 
         if (this.aliasing_index == 0){
             this.finished = false;

@@ -48,7 +48,7 @@ class RenderWrapper {
     }
 
     resize(gl, texture_width, texture_height) {
-        console.log("resize RenderWrapper: ", this.name, texture_width, texture_height)
+        //console.warn("resize RenderWrapper: ", this.name, texture_width, texture_height)
         this.render_texture.resize(gl, texture_width, texture_height);
         this.render_texture_alternative.resize(gl, texture_width, texture_height);
         this.render_texture_compare.resize(gl, texture_width, texture_height);

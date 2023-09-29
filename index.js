@@ -740,7 +740,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             render = (status == gl.SIGNALED)
         }
         if(render){
-            canvas_wrapper.draw(gl, data_changed, settings_changed);
+            canvas_wrapper.draw(gl, data_changed, settings_changed, current_fps);
             fence_sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
             gl.flush();
         }
@@ -883,9 +883,9 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             render = (status == gl.SIGNALED)
         }
         if(render){
-            canvas_wrapper_main.draw(gl, data_changed, settings_changed);
+            canvas_wrapper_main.draw(gl, data_changed, settings_changed, time_now, current_fps);
             canvas_wrapper_main.draw_retrieve(gl);
-            canvas_wrapper_side.draw(gl_side, data_changed, settings_changed);
+            canvas_wrapper_side.draw(gl_side, data_changed, settings_changed, time_now, current_fps);
             canvas_wrapper_side.draw_retrieve(gl_side);
             canvas_wrapper_transfer_function.draw(gl_transfer_function);
             fence_sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
