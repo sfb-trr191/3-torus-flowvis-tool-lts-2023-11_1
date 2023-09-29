@@ -82,6 +82,7 @@ class StreamlineContext {
             : termination_condition == STREAMLINE_TERMINATION_CONDITION_ARC_LENGTH ? termination_arc_length
             : (num_points_per_streamline-1);
     
+        //MARKER_RENAME_SYMBOLS
         this.streamline_generator.streamline_error_counter = 0;
         this.streamline_generator.space = bo_calculate_streamlines.input_parameters.space;
         this.streamline_generator.direction = bo_calculate_streamlines.input_parameters.direction;

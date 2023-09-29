@@ -98,6 +98,7 @@ void main()
 
 vec4 f(vec4 vector)
 {
+    //MARKER_RENAME_SYMBOLS
 	float x = vector.x;
 	float y = vector.y;
 	float v_x = vector.z;

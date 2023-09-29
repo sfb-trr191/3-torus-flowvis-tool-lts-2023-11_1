@@ -88,6 +88,7 @@ vec3 Shade(Ray ray, inout HitInformation hit, inout HitInformation hitCube, bool
 
 
 float GetScalar(vec4 position){
+    //MARKER_RENAME_SYMBOLS
     float x = position.x;
 	float y = position.y;
 	float z = position.z;

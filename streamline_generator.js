@@ -1236,6 +1236,8 @@ class StreamlineGenerator {
         //console.log("vector0: ", vector[0]);
         //console.log("vector1: ", vector[1]);
         //console.log("vector2: ", vector[2]);
+
+        //MARKER_RENAME_SYMBOLS
         let scope = {
             x: vector[0],
             y: vector[1],
@@ -1261,6 +1263,8 @@ class StreamlineGenerator {
         //console.log("vector0: ", vector[0]);
         //console.log("vector1: ", vector[1]);
         //console.log("vector2: ", vector[2]);
+        
+        //MARKER_RENAME_SYMBOLS
         let scope = {
             x: vector[0],
             y: vector[1],
@@ -1282,6 +1286,8 @@ class StreamlineGenerator {
     }
 
     f_2Sphere3Plus3D_position(vector_position, vector_direction,signum) {
+        
+        //MARKER_RENAME_SYMBOLS
         let scope = {
             p0: vector_position[0],
             p1: vector_position[1],
@@ -1314,6 +1320,8 @@ class StreamlineGenerator {
     }
 
     f_2Sphere3Plus3D_direction(vector_position, vector_direction, signum) {
+
+        //MARKER_RENAME_SYMBOLS
         let scope = {
             p0: vector_position[0],
             p1: vector_position[1],
@@ -1352,6 +1360,8 @@ class StreamlineGenerator {
         var signum = current_streamline.signum;
         var delta = current_streamline.delta;//for magnetic streamlines
         var s = current_streamline.s;//for magnetic streamlines
+
+        //MARKER_RENAME_SYMBOLS
         let scope = {
             p0: vector_position[0],
             p1: vector_position[1],
@@ -1393,6 +1403,8 @@ class StreamlineGenerator {
         var signum = current_streamline.signum;
         var delta = current_streamline.delta;//for magnetic streamlines
         var s = current_streamline.s;//for magnetic streamlines
+
+        //MARKER_RENAME_SYMBOLS
         let scope = {
             p0: vector_position[0],
             p1: vector_position[1],

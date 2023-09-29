@@ -104,6 +104,7 @@ class ExampleManager {
     }
 
     SetMagneticField(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -114,6 +115,7 @@ class ExampleManager {
     }
 
     SetDoublePendulum(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_2_PLUS_2D;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -124,6 +126,7 @@ class ExampleManager {
     }
 
     SetExample1(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -135,6 +138,7 @@ class ExampleManager {
     }
 
     SetExample2(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -146,6 +150,7 @@ class ExampleManager {
     }
 
     SetExample3(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -157,6 +162,7 @@ class ExampleManager {
     }
 
     SetExample4(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -168,6 +174,7 @@ class ExampleManager {
     }
 
     SetExample5(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
@@ -179,6 +186,7 @@ class ExampleManager {
     }
   
     SetExample6(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
         this.SetLightTransport3Sphere();
         this.SetDuplicatorOff();
@@ -195,6 +203,7 @@ class ExampleManager {
     }
 
     SetExample7(){
+        //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
         this.SetLightTransport3Sphere();
         this.SetDuplicatorOff();
@@ -211,7 +220,8 @@ class ExampleManager {
         this.hide_manager.UpdateVisibility();
     }
 
-    SetLightTransport3Sphere(){                
+    SetLightTransport3Sphere(){    
+        //MARKER_RENAME_SYMBOLS            
         document.getElementById("select_light_integrator_type").value = LIGHT_INTEGRATOR_RK4;
         document.getElementById("input_field_light_transport_p0").value = "d0";
         document.getElementById("input_field_light_transport_p1").value = "d1";

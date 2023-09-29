@@ -1577,6 +1577,7 @@ vec3 GetObjectColor(Ray ray, inout HitInformation hit)
 }
 
 float GetScalar(vec3 position){
+    //MARKER_RENAME_SYMBOLS
     float x = position.x;
 	float y = position.y;
 	float z = position.z;

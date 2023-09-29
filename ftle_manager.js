@@ -229,6 +229,7 @@ class FTLEManager {
     }
 
     ReplaceComputeFlowMapSliceShader(gl) {
+        //MARKER_RENAME_SYMBOLS
         console.log("ReplaceComputeFlowMapSliceShader");
         console.log(gl);
         var space = this.p_streamline_generator.space;

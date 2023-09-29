@@ -100,6 +100,7 @@ void main()
 
 vec3 f(vec3 vector)
 {
+    //MARKER_RENAME_SYMBOLS
 	float x = vector.x;
 	float y = vector.y;
 	float z = vector.z;
