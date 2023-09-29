@@ -105,28 +105,43 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
         float c = sqrt(v1*v1 + v2*v2);
         float alpha = atan(v2, v1);
 
-        xt = c / w * (sin(w*t+alpha)-sin(alpha));
-        yt = - c / w * (cos(w*t+alpha)-cos(alpha));
-        zt = t*(w+(c*c)/(2.0*w)) - (c*c)/(4.0*w*w) * (sin(2.0*w*t + 2.0*alpha) - sin(2.0*alpha)) + (c*c)/(2.0*w*w)*(sin(w*t+2.0*alpha)-sin(2.0*alpha)-sin(t*w));
+        /*
+        bool markError = true;//TODO: uniform or solve problem
+        if(markError && abs(w) < 0.5){
+            //explicitIntegrationData.markError = true;            
+        }
+        */
+
+        bool use_taylor = true;
+        if(use_taylor){
+            //taylor expansion in w of xt
+            //https://www.wolframalpha.com/input?i=Series%5B%5B%2F%2Fmath%3Ac%2Fw%28sin%28wt%2Ba%29-sin%28a%29%29%2F%2F%5D%2C+%7B%5B%2F%2Fmath%3Aw%2F%2F%5D%2C+%5B%2F%2Fmath%3A0%2F%2F%5D%2C+%5B%2F%2Fmath%3A10%2F%2F%5D%7D%5D
+            xt = c*t *cos(alpha) - 0.5 *w *(c *t*t *sin(alpha)) - 1.0/6.0 *w*w *(c *t*t*t *cos(alpha)) + 1.0/24.0 *c *t*t*t*t *w*w*w *sin(alpha);
+
+            //taylor expansion in w of yt
+            //https://www.wolframalpha.com/input?i=Series%5B%5B%2F%2Fmath%3A+-+c+%2F+w+*+%28cos%28w*t%2Balpha%29-cos%28alpha%29%29%2F%2F%5D%2C+%7B%5B%2F%2Fmath%3Aw%2F%2F%5D%2C+%5B%2F%2Fmath%3A0%2F%2F%5D%2C+%5B%2F%2Fmath%3A10%2F%2F%5D%7D%5D
+            yt = c *t *sin(alpha) + 0.5 *c *t*t *w *cos(alpha) - 1.0/6.0 *w*w *(c *t*t*t *sin(alpha)) - 1.0/24.0 *w*w*w *(c *t*t*t*t *cos(alpha));
+    
+            //taylor expansion in w of zt
+            //https://www.wolframalpha.com/input?i=Series%5B%5B%2F%2Fmath%3At*%28w%2B%28c%5E2%29%2F%282.0*w%29%29+-+%28c%5E2%29%2F%284.0*w%5E2%29+*+%28sin%282.0*w*t+%2B+2.0*alpha%29+-+sin%282.0*alpha%29%29+%2B+%28c%5E2%29%2F%282.0*w%5E2%29*%28sin%28w*t%2B2.0*alpha%29-sin%282.0*alpha%29-sin%28t*w%29%29%2F%2F%5D%2C+%7B%5B%2F%2Fmath%3Aw%2F%2F%5D%2C+%5B%2F%2Fmath%3A0%2F%2F%5D%2C+%5B%2F%2Fmath%3A10%2F%2F%5D%7D%5D
+            zt = 0.25 *c*c *t*t* sin(2.0*alpha) + w* (0.25 *c*c* pow(t,3.0) *cos(2.0*alpha) + 0.0833333 *c*c* pow(t,3.0) + t)            
+            - 0.145833 *w*w *(c*c* pow(t,4.0)* sin(2.0*alpha)) + c*c* pow(t,5.0) *pow(w,3.0)* (-0.0625 *cos(2.0* alpha) - 0.00416667);
+            /*                  
+            + 0.0215278 *c*c* pow(t,6.0) *pow(w,4.0) *sin(2.0*alpha)
+            + c*c *pow(t,7.0)* pow(w,5.0)* (0.00625 *cos(2.0*alpha) + 0.0000992063)
+            - 0.0015749 *pow(w,6.0) *(c*c *pow(t,8.0) *sin(2.0*alpha)) + c*c *pow(t,9.0) *pow(w,7.0) *(-0.000351356 *cos(2.0*alpha) - 1.37787/pow(10.0,6.0)) 
+            + 0.000070409 *c*c *pow(t,10.0) *pow(w,8.0) *sin(2.0*alpha) + c*c *pow(t,11.0) *pow(w,9.0) *(0.0000128142*cos(2.0*alpha) + 1.25261/pow(10.0,8.0)) 
+            - 2.13674/pow(10.0,6.0) *pow(w,10.0) *(c*c *pow(t,12.0) *sin(2.0*alpha));
+            */
+        }else{
+            xt = c / w * (sin(w*t+alpha)-sin(alpha));
+            yt = - c / w * (cos(w*t+alpha)-cos(alpha));
+            zt = t*(w+(c*c)/(2.0*w)) - (c*c)/(4.0*w*w) * (sin(2.0*w*t + 2.0*alpha) - sin(2.0*alpha)) + (c*c)/(2.0*w*w)*(sin(w*t+2.0*alpha)-sin(2.0*alpha)-sin(t*w));
+        }
 
         P1 = x1 + xt;
         P2 = x2 + yt;
         P3 = x3 + zt + x1*yt;
-
-        bool markError = true;//TODO: uniform or solve problem
-        if(markError && abs(w) < 0.02){
-            explicitIntegrationData.markError = true;
-            /*
-            xt = c * cos(alpha*t);
-            yt = c * sin(alpha*t);
-            zt = (c*c)/2.0 * cos(alpha) * sin(alpha*t*t);
-
-            P1 = x1 + xt;
-            P2 = x2 + yt;
-            P3 = x3 + zt + x1*yt;
-            */
-        }
-
 
     }
 	return vec3(P1,P2,P3);	
