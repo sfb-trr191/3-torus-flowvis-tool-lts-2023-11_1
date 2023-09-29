@@ -239,7 +239,9 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_ftle_direction_main", "vl"); 
         new InputWrapper(this, "select_ftle_direction_side", "vr"); 
         new InputWrapper(this, "checkbox_correct_volume_opacity", "cvo"); 
-        new InputWrapper(this, "checkbox_volume_skip_first_fundamental_domain_main", "sfd"); 
+        new InputWrapper(this, "checkbox_volume_skip_first_fundamental_domain_main", "sfd");         
+        new InputWrapper(this, "input_fov_theta_main", "fov1");      
+        new InputWrapper(this, "input_fov_theta_aux", "fov2"); 
         new InputWrapper(this, "input_volume_rendering_max_distance", "vmd"); 
         new InputWrapper(this, "input_volume_rendering_min_distance_main", "vmd2"); 
         new InputWrapper(this, "input_streamlines_min_distance_main", "smd2");         
