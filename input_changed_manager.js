@@ -104,7 +104,28 @@ class InputChangedManager{
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_method"));
         this.group_calculate.AddInput(document.getElementById("select_streamline_calculation_direction"));        
         this.group_calculate.AddInput(document.getElementById("input_tube_radius_fundamental"));
-        this.group_calculate.AddInput(document.getElementById("input_max_radius_factor_highlight"));        
+        this.group_calculate.AddInput(document.getElementById("input_max_radius_factor_highlight"));  
+        
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_x_pos_x"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_x_pos_y"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_x_pos_z"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_x_neg_x"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_x_neg_y"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_x_neg_z"));
+
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_y_pos_x"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_y_pos_y"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_y_pos_z"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_y_neg_x"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_y_neg_y"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_y_neg_z"));
+
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_z_pos_x"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_z_pos_y"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_z_pos_z"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_z_neg_x"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_z_neg_y"));
+        this.group_calculate.AddInput(document.getElementById("input_field_shader_rule_z_neg_z"));
     }
     
     GenerateGroupCamera(){
@@ -197,6 +218,42 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_max_scalar_ftle_surface"));        
         this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_filter_strength"));
         this.group_render_settings.AddInput(document.getElementById("input_ridge_surface_filter_ftle"));
+
+        
+        this.group_render_settings.AddInput(document.getElementById("select_light_integrator_type"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_integration_step_size"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_integration_max_step_count"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_p0"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_p1"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_p2"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_p3"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d0"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d1"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d2"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d3"));
+
+
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_pos_u"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_pos_v"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_pos_w"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_neg_u"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_neg_v"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_neg_w"));
+
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_y_pos_u"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_y_pos_v"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_y_pos_w"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_y_neg_u"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_y_neg_v"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_y_neg_w"));
+
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_z_pos_u"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_z_pos_v"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_z_pos_w"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_z_neg_u"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_z_neg_v"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_z_neg_w"));
+        
     }
 
     LinkUISeeds(ui_seeds){

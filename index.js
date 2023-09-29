@@ -1377,8 +1377,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
         var max_ray_distance = parseFloat(document.getElementById("input_max_ray_distance").value);
         var light_integrator_type = document.getElementById("select_light_integrator_type").value;
-        var light_integration_step_size = parseFloat(document.getElementById("input_light_integration_step_size").value);
-        var light_integration_max_step_count = parseInt(document.getElementById("input_light_integration_max_step_count").value);
+        var light_integration_step_size = parseFloat(document.getElementById("input_field_light_integration_step_size").value);
+        var light_integration_max_step_count = parseInt(document.getElementById("input_field_light_integration_max_step_count").value);
         //MAIN
              
         canvas_wrapper_main.quality_marker_color = getColorVectorFromElementID("input_colors_quality_marker");
