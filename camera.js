@@ -77,26 +77,27 @@ class CameraState {
         this.position = glMatrix.vec4.create();
         //unsaved variables
         this.allow_panning = true;
+        this.default_projection_distance = 3.25;
     }
 
     setProjectionX() {
         this.forward = glMatrix.vec4.fromValues(-1, 0, 0, 0);
         this.up = glMatrix.vec4.fromValues(0, 0, -1, 0);
-        this.position = glMatrix.vec4.fromValues(1, 0.5, 0.5, 0);
+        this.position = glMatrix.vec4.fromValues(this.default_projection_distance, 0.5, 0.5, 0);
         this.allow_panning = false;
     }
 
     setProjectionY() {
         this.forward = glMatrix.vec4.fromValues(0, -1, 0, 0);
         this.up = glMatrix.vec4.fromValues(-1, 0, 0, 0);
-        this.position = glMatrix.vec4.fromValues(0.5, 1, 0.5, 0);
+        this.position = glMatrix.vec4.fromValues(0.5, this.default_projection_distance, 0.5, 0);
         this.allow_panning = false;
     }
 
     setProjectionZ() {
         this.forward = glMatrix.vec4.fromValues(0, 0, -1, 0);
         this.up = glMatrix.vec4.fromValues(0, -1, 0, 0);
-        this.position = glMatrix.vec4.fromValues(0.5, 0.5, 1, 0);
+        this.position = glMatrix.vec4.fromValues(0.5, 0.5, this.default_projection_distance, 0);
         this.allow_panning = false;
     }
 
