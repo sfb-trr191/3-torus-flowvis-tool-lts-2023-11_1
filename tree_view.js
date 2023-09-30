@@ -327,13 +327,14 @@ class TreeView{
         console.log("this.dict_eye_id_to_node", this.dict_eye_id_to_node);
     }
 
-    notifyHeaderClicked(){        
-        document.body.style.display = 'none';
+    notifyHeaderClicked(){    
+        document.getElementById("container_properties").style.display = 'none';
+        //document.body.style.display = 'none';
         this.properties_view_is_disabled = true;
     }
 
     reenablePropertiesView(){
-        document.body.style.display = '';
+        //document.body.style.display = '';
         this.properties_view_is_disabled = false;
     }
 
