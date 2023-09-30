@@ -49,6 +49,7 @@ uniform int maxIterationCount;
 uniform float tubeRadius;
 uniform float tubeRadiusOutside;
 uniform float fog_density;
+uniform float face_intersection_width;
 uniform int fog_type;
 uniform int shading_mode_streamlines;
 uniform int shading_mode_ftle_surface;

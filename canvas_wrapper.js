@@ -70,6 +70,7 @@ class UniformLocationsRayTracing {
         this.location_tube_radius_outside = gl.getUniformLocation(program, "tubeRadiusOutside");        
         this.location_fog_density = gl.getUniformLocation(program, "fog_density");
         this.location_fog_type = gl.getUniformLocation(program, "fog_type");
+        this.location_face_intersection_width = gl.getUniformLocation(program, "face_intersection_width");
         this.location_projection_index = gl.getUniformLocation(program, "projection_index");
         this.location_shading_mode_streamlines = gl.getUniformLocation(program, "shading_mode_streamlines");
         this.location_shading_mode_ftle_surface = gl.getUniformLocation(program, "shading_mode_ftle_surface");        
@@ -228,6 +229,7 @@ class CanvasWrapper {
         this.lod_index_panning = 0;
         this.lod_index_still = 0;
         this.fog_density = 0;
+        this.face_intersection_width = 0.05;
         this.fog_type = 0;
         this.shading_mode_streamlines = 0;
         this.shading_mode_ftle_surface = 0;
@@ -1168,6 +1170,7 @@ class CanvasWrapper {
         gl.uniform1f(this.location_raytracing.location_tube_radius, tube_radius_active);
         gl.uniform1f(this.location_raytracing.location_tube_radius_outside, tube_radius_active_outside);
         gl.uniform1f(this.location_raytracing.location_fog_density, this.fog_density);
+        gl.uniform1f(this.location_raytracing.location_face_intersection_width, this.face_intersection_width);
         gl.uniform1i(this.location_raytracing.location_fog_type, fog_type);
         gl.uniform1i(this.location_raytracing.location_projection_index, projection_index);
         gl.uniform1i(this.location_raytracing.location_shading_mode_streamlines, this.shading_mode_streamlines);

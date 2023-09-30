@@ -168,10 +168,11 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection"));
         this.group_render_settings.AddInput(document.getElementById("input_tube_radius_factor_projection_highlight"));        
         this.group_render_settings.AddInput(document.getElementById("select_lod_still"));
-        this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));   
+        this.group_render_settings.AddInput(document.getElementById("select_lod_panning"));    
+        this.group_render_settings.AddInput(document.getElementById("input_face_intersection_width"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_main"));   
-        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_side"));    
-        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_radius_main"));   
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_length_side"));     
+        this.group_render_settings.AddInput(document.getElementById("input_cube_axes_radius_main"));           
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_radius_side"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_origin_length_side"));   
         this.group_render_settings.AddInput(document.getElementById("input_cube_axes_origin_radius_side"));   

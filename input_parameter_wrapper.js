@@ -229,6 +229,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_fog_type_aux", "sft2");      
         new InputWrapper(this, "input_fog_density_aux", "fd2");          
         //settings - axes   
+        new InputWrapper(this, "input_face_intersection_width", "fiw"); 
         new InputWrapper(this, "input_cube_axes_length_main", "all"); 
         new InputWrapper(this, "input_cube_axes_length_side", "alr"); 
         new InputWrapper(this, "input_cube_axes_radius_main", "arl"); 

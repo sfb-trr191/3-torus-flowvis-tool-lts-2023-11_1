@@ -347,7 +347,7 @@ void RenderFaceIntersections(Ray ray, inout HitInformation hit, vec3 exit)
 
 void RenderFaceIntersection(Ray ray, inout HitInformation hit, vec3 exit, vec3 normal, float abs_a, float abs_b, vec3 color)
 {
-    float width = tubeRadius;
+    float width = face_intersection_width;
     if(abs_a > width && abs_b > width ){
         return;
     }

@@ -1359,7 +1359,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
         transfer_function_manager.UpdateFromUI();
         canvas_wrapper_transfer_function.transfer_function_changed = true;
-
+        
         var cube_axes_radius_main = parseFloat(document.getElementById("input_cube_axes_radius_main").value);
         var cube_axes_radius_origin_main = 0;
         var cube_axes_length_main = parseFloat(document.getElementById("input_cube_axes_length_main").value);
@@ -1412,6 +1412,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.min_streamline_distance = parseFloat(document.getElementById("input_streamlines_min_distance_main").value);        
         canvas_wrapper_main.volume_skip_first_fundamental_domain = document.getElementById("checkbox_volume_skip_first_fundamental_domain_main").checked;
         
+        canvas_wrapper_main.face_intersection_width = parseFloat(document.getElementById("input_face_intersection_width").value);
         canvas_wrapper_main.tube_radius_factor = document.getElementById("input_tube_radius_factor").value;
         canvas_wrapper_main.tube_radius_factor_projection = document.getElementById("input_tube_radius_factor_projection").value;
         canvas_wrapper_main.tube_radius_factor_projection_highlight = document.getElementById("input_tube_radius_factor_projection_highlight").value;
