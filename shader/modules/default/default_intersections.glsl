@@ -252,7 +252,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                     //variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
                     //variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
 
-                    if(true)//TODO: parameter render_face_border_intersections
+                    if(render_face_border_intersections)
                     {
                         RenderFaceIntersections(variableRay, hit, exit);
                     }
@@ -269,6 +269,11 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                 
                 
 #else
+                if(render_face_border_intersections)
+                {
+                    RenderFaceIntersections(variableRay, hit, exit);
+                }
+
                 variableRay.direction = normalize(MoveOutOfBoundsDirection(exit, variableRay.direction));
                 variableRay.dir_inv = 1.0/variableRay.direction;
                 variableRay.origin = MoveOutOfBounds(exit);

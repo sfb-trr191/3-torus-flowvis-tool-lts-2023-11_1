@@ -1411,6 +1411,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         canvas_wrapper_main.cut_at_cube_faces = false;
         canvas_wrapper_main.handle_inside = false;
         canvas_wrapper_main.is_main_renderer = true;
+        canvas_wrapper_main.render_face_border_intersections = tree_view.IsVisibleInHierarchy(24);
         canvas_wrapper_main.show_bounding_box = tree_view.IsVisibleInHierarchy(4);
         canvas_wrapper_main.show_movable_axes = tree_view.IsVisibleInHierarchy(5);
         canvas_wrapper_main.show_non_origin_axes = canvas_wrapper_main.show_bounding_box;

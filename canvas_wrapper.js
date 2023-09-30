@@ -43,6 +43,7 @@ class UniformLocationsRayTracing {
         this.location_texture_dynamic_int = gl.getUniformLocation(program, "texture_dynamic_int");      
 
         this.location_render_dynamic_streamline = gl.getUniformLocation(program, "render_dynamic_streamline");
+        this.location_render_face_border_intersections = gl.getUniformLocation(program, "render_face_border_intersections");
         this.location_width = gl.getUniformLocation(program, "width");
         this.location_get_pixel_data_results = gl.getUniformLocation(program, "get_pixel_data_results");
         this.location_output_x_percentage = gl.getUniformLocation(program, "output_x_percentage");
@@ -290,6 +291,7 @@ class CanvasWrapper {
         this.is_exporting = false;
         this.did_update_clicked_position = false;
         this.show_dynamic_streamline = false;//set by ui --> does not mean that render_dynamic_streamline is true
+        this.render_face_border_intersections = false;//only allowed in main view
 
         this.output_x_percentage = 0;
         this.output_y_percentage = 0;
@@ -926,6 +928,7 @@ class CanvasWrapper {
         var tube_radius_factor_active = this.tube_radius_factor;
         var tube_radius_factor_active_outside = this.tube_radius_factor;
 
+        var render_face_border_intersections = this.render_face_border_intersections;
         var show_bounding_box = this.show_bounding_box;
         var show_bounding_box_projection = this.show_bounding_box_projection;
 
@@ -977,6 +980,7 @@ class CanvasWrapper {
             //deactivate volume rendering in projection mode
             show_volume_rendering = false;
             show_bounding_box = false;
+            render_face_border_intersections = false;
             //no fog in projection
             fog_type = FOG_NONE;
         }
@@ -1083,6 +1087,7 @@ class CanvasWrapper {
         
         var render_dynamic_streamline = this.should_render_dynamic_streamline();
         gl.uniform1i(this.location_raytracing.location_render_dynamic_streamline, render_dynamic_streamline);
+        gl.uniform1i(this.location_raytracing.location_render_face_border_intersections, render_face_border_intersections);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering, show_volume_rendering);
         gl.uniform1i(this.location_raytracing.location_correct_volume_opacity, this.correct_volume_opacity);
         gl.uniform1i(this.location_raytracing.location_show_volume_rendering_forward, show_volume_rendering_forward);

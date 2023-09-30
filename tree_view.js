@@ -354,6 +354,8 @@ class TreeView{
         var node_main_ftle_volume = this.generateNode(this, "Volume", "group_properties_root_main_view_visual_objects_ftle_volume", EYE, 20, EYE_DEFAULT_INVISIBLE);
         var node_main_ftle_surface = this.generateNode(this, "Ridge Surface", "group_properties_root_main_view_visual_objects_ftle_surface", EYE, 21, EYE_DEFAULT_INVISIBLE);
         var node_main_indicators = this.generateNode(this, "Indicators", "group_properties_root_main_view_visual_objects_indicators", EYE, 3, EYE_DEFAULT_VISIBLE);
+    
+        var node_main_bounding_face_intersections = this.generateNode(this, "Bounding Face Intersections", "group_properties_root_main_view_visual_objects_indicators_bounding_face_intersections", EYE, 24, EYE_DEFAULT_INVISIBLE);
         var node_main_bounding_axes = this.generateNode(this, "Bounding Axes", "group_properties_root_main_view_visual_objects_indicators_bounding_axes", EYE, 4, EYE_DEFAULT_INVISIBLE);
         var node_main_top_right_axes = this.generateNode(this, "Top Right Axes", "group_properties_root_main_view_visual_objects_indicators_top_right_axes", EYE, 5, EYE_DEFAULT_VISIBLE);
         var node_main_clicked_position = this.generateNode(this, "Clicked Position", "group_properties_root_main_view_visual_objects_indicators_clicked_position", EYE, 6, EYE_DEFAULT_VISIBLE);
@@ -399,6 +401,7 @@ class TreeView{
         node_main_ftle.addChild(node_main_ftle_surface);
         node_main_visual_objects.addChild(node_main_indicators);
         node_main_streamlines.addChild(node_main_streamlines_dynamic);
+        node_main_indicators.addChild(node_main_bounding_face_intersections);
         node_main_indicators.addChild(node_main_bounding_axes);
         node_main_indicators.addChild(node_main_top_right_axes);
         node_main_indicators.addChild(node_main_clicked_position);
