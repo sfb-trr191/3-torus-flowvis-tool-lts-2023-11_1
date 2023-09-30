@@ -961,8 +961,24 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         writeCurrentResolutionToUI();
         input_changed_manager.CheckValuesChanged();
 
+        /*
+        var SEPARATOR = "&nbsp;&nbsp;&nbsp;&nbsp;"
+        var fps_string = current_fps.toFixed(0);
+        var quality_string = canvas_wrapper_main.adaptive_resolution_current_t.toFixed(1);
+        legend_main_view.innerHTML = "Main View [quality:" + quality_string + SEPARATOR + "fps:"+fps_string+"]"
+        var quality_string = canvas_wrapper_side.adaptive_resolution_current_t.toFixed(1);
+        legend_aux_view.innerHTML = "Aux View [quality:" + quality_string + SEPARATOR + "fps:"+fps_string+"]"
+        */
+
+        //var fps_string = current_fps.toFixed(0);
+        //console.warn(fps_string)
+
+        var fps_string = current_fps.toFixed(0);
+        document.getElementById("paragraph_fps").innerHTML = fps_string + " fps";
+
         time_last_tick = time_now;
         requestAnimationFrame(on_update);
+
 
     }
 

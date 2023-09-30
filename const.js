@@ -1,5 +1,9 @@
 global.URL_RELEASE = "https://sfb-trr191.github.io/3-torus-flowvis-tool/index.html";
 
+global.ADAPTIVE_CHANGE_NONE = 0
+global.ADAPTIVE_CHANGE_POSITIVE = 1
+global.ADAPTIVE_CHANGE_NEGATIVE = -1
+
 global.TYPE_NONE = 0;
 global.TYPE_STREAMLINE_SEGMENT = 1;
 global.TYPE_CLICKED_SPHERE = 2;

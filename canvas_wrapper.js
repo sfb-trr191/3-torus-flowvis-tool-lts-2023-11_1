@@ -337,9 +337,25 @@ class CanvasWrapper {
         this.adaptive_resolution = true;
         this.adaptive_resolution_current_t = 1.0;
         //this.adaptive_resolution_next_t = 1.0;
-        this.adaptive_resolution_step_size = 0.1;
+        this.adaptive_resolution_step_size = 0.5;
         this.adaptive_resolution_last_time_stamp = 0;
         this.adaptive_resolution_cooldown = 500;
+    
+        this.adaptive_frame_counter = 0;
+        this.adaptive_alternating_counter = 0;
+        this.adaptive_alternating_number_changes = 0;
+        this.adaptive_last_change = ADAPTIVE_CHANGE_NONE;
+        this.adaptive_resolution_decimals = 3;
+
+        if(name == "main"){
+            this.element_legend_associated_view = document.getElementById("legend_main_view");
+            this.view_name = "Main View";
+        }else if(name == "side"){
+            this.element_legend_associated_view = document.getElementById("legend_aux_view");
+            this.view_name = "Aux View";
+        }
+        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+        this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
     }
 
     setRetreiveOnce(){
@@ -721,19 +737,58 @@ class CanvasWrapper {
             return;
         }
 
+        if(settings_changed){
+            console.warn("settings_changed");
+            this.adaptive_frame_counter = 0;
+            this.adaptive_alternating_counter = 0;
+            this.adaptive_alternating_number_changes = 0;
+            this.adaptive_alternating_counter_since_last_change = 0;
+            this.adaptive_last_change = ADAPTIVE_CHANGE_NONE;
+        }
+
+        if(this.camera.IsPanningOrForced()){
+            this.adaptive_frame_counter += 1; 
+        }
+        
         if(this.adaptive_resolution){
-            if(this.camera.IsPanningOrForced() && time_now > this.adaptive_resolution_last_time_stamp + this.adaptive_resolution_cooldown){
-                if(current_fps > 30 && this.adaptive_resolution_current_t < 1.0){
-                    this.adaptive_resolution_last_time_stamp = time_now;
-                    this.adaptive_resolution_current_t = Math.min(1.0, this.adaptive_resolution_current_t + this.adaptive_resolution_step_size);
-                    //console.warn("fps: ", current_fps, " ---> INCREASE to", this.adaptive_resolution_current_t);
+            var flag = this.adaptive_frame_counter >= 3
+                && this.adaptive_alternating_counter <= 3 
+                && this.adaptive_alternating_number_changes <= 8;
+            if(flag){
+                if(time_now > this.adaptive_resolution_last_time_stamp + this.adaptive_resolution_cooldown){
+                    if(current_fps > 30 && this.adaptive_resolution_current_t < 1.0){
+                        if(this.adaptive_last_change == ADAPTIVE_CHANGE_NEGATIVE){
+                            this.adaptive_alternating_counter += 1;
+                        }
+                        this.adaptive_frame_counter = 0;
+                        this.adaptive_alternating_number_changes += 1;
+                        this.adaptive_last_change = ADAPTIVE_CHANGE_POSITIVE;
+                        var current_step_size = this.adaptive_resolution_step_size / Math.pow(2, this.adaptive_alternating_counter);
+                        this.adaptive_resolution_last_time_stamp = time_now;
+                        this.adaptive_resolution_current_t = Math.min(1.0, this.adaptive_resolution_current_t + current_step_size);
+    
+                        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+                        this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
+                        console.warn("fps: ", current_fps, " ---> INCREASE to", this.adaptive_resolution_current_t);
+                    }
+                    else if(current_fps < 15 && this.adaptive_resolution_current_t > 0.0){
+                        if(this.adaptive_last_change == ADAPTIVE_CHANGE_POSITIVE){
+                            this.adaptive_alternating_counter += 1;
+                        }
+                        this.adaptive_frame_counter = 0;
+                        this.adaptive_alternating_number_changes += 1;
+                        this.adaptive_last_change = ADAPTIVE_CHANGE_NEGATIVE;
+                        var current_step_size = this.adaptive_resolution_step_size / Math.pow(2, this.adaptive_alternating_counter);
+                        this.adaptive_resolution_last_time_stamp = time_now;
+                        this.adaptive_resolution_current_t = Math.max(0.0, this.adaptive_resolution_current_t - current_step_size);
+                        
+                        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+                        this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
+                        console.warn("fps: ", current_fps, " ---> REDUCE to", this.adaptive_resolution_current_t);
+                    }    
                 }
-                else if(current_fps < 15 && this.adaptive_resolution_current_t > 0.0){
-                    this.adaptive_resolution_last_time_stamp = time_now;
-                    this.adaptive_resolution_current_t = Math.max(0.0, this.adaptive_resolution_current_t - this.adaptive_resolution_step_size);
-                    //console.warn("panning: ", current_fps, " ---> REDUCE to", this.adaptive_resolution_current_t);
-                }    
             }
+
         }
 
 
