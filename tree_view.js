@@ -330,12 +330,15 @@ class TreeView{
     notifyHeaderClicked(){    
         document.getElementById("container_properties").style.display = 'none';
         //document.body.style.display = 'none';
-        this.properties_view_is_disabled = true;
+        this.properties_view_is_disabled_counter = 2;
     }
 
     reenablePropertiesView(){
         //document.body.style.display = '';
-        this.properties_view_is_disabled = false;
+        this.properties_view_is_disabled_counter = Math.max(-1, this.properties_view_is_disabled_counter-1);
+        if(this.properties_view_is_disabled_counter == 0){
+            document.getElementById("container_properties").style.display = '';
+        }
     }
 
     generateNodes() {
