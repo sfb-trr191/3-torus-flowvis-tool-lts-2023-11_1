@@ -322,6 +322,9 @@ legend {
 .math-left-align mjx-container{
     text-align: left !important;
     margin: 0 !important;
+    font-size: 120% !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 
