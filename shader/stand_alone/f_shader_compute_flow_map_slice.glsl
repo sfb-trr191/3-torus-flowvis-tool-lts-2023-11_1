@@ -100,10 +100,10 @@ void main()
 
 vec3 f(vec3 vector)
 {
-    //MARKER_RENAME_SYMBOLS
-	float x = vector.x;
-	float y = vector.y;
-	float z = vector.z;
+    //MARKER_RENAME_SYMBOLS DONE FTLE
+	float x1 = vector.x;
+	float x2 = vector.y;
+	float x3 = vector.z;
 	float u = shader_formula_u;
 	float v = shader_formula_v;
 	float w = shader_formula_w;

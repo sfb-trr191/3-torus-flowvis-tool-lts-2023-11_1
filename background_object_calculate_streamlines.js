@@ -15,7 +15,7 @@ class BackgroundObjectCalculateStreamlines{
     }
 
     grabInputParameters(){
-        //MARKER_RENAME_SYMBOLS
+        //MARKER_RENAME_SYMBOLS Nothing to do here
         this.input_parameters.shader_formula_u = document.getElementById("input_field_equation_u").value;
         this.input_parameters.shader_formula_v = document.getElementById("input_field_equation_v").value;
         this.input_parameters.shader_formula_w = document.getElementById("input_field_equation_w").value;

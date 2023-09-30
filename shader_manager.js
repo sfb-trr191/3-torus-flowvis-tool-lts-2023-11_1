@@ -259,7 +259,7 @@ class ShaderManager {
     }
 
     GetShaderComputeFlowMapSlice(space, shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b){
-        //MARKER_RENAME_SYMBOLS
+        //MARKER_RENAME_SYMBOLS Nothing to do here
         var code;
         switch (space) {
             case SPACE_3_TORUS:

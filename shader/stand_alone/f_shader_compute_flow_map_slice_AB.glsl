@@ -98,14 +98,14 @@ void main()
 
 vec4 f(vec4 vector)
 {
-    //MARKER_RENAME_SYMBOLS
-	float x = vector.x;
-	float y = vector.y;
-	float v_x = vector.z;
-	float v_y = vector.w;
+    //MARKER_RENAME_SYMBOLS DONE double pendulum
+	float x1 = vector.x;
+	float x2 = vector.y;
+	float v1 = vector.z;
+	float v2 = vector.w;
 	float a = shader_formula_a;
 	float b = shader_formula_b;
-	return vec4(v_x*sign_f, v_y*sign_f, a*sign_f, b*sign_f);	
+	return vec4(v1*sign_f, v2*sign_f, a*sign_f, b*sign_f);	
 }
 
 `;

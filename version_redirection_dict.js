@@ -25,4 +25,5 @@ exports.VERSION_REDIRECTION_DICT = {
     "2023-08.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-08_3/index.html", //versions before changes to ridge rendering
     "2023-08.2" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-08_3/index.html", //versions before changes to ridge rendering
     "2023-08.3" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-08_3/index.html", //versions before changes to ridge rendering
+    "2023-09.1" : "https://sfb-trr191.github.io/3-torus-flowvis-tool-lts-2023-09_1/index.html", //versions before renaming symbols
 }

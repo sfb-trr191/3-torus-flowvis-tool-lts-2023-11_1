@@ -1237,11 +1237,11 @@ class StreamlineGenerator {
         //console.log("vector1: ", vector[1]);
         //console.log("vector2: ", vector[2]);
 
-        //MARKER_RENAME_SYMBOLS
+        //MARKER_RENAME_SYMBOLS DONE 3-torus
         let scope = {
-            x: vector[0],
-            y: vector[1],
-            z: vector[2],
+            x1: vector[0],
+            x2: vector[1],
+            x3: vector[2],
         };
         //console.log("scope: ", scope);
         //console.log("this.shader_formula_u: ", this.shader_formula_u);
@@ -1264,15 +1264,16 @@ class StreamlineGenerator {
         //console.log("vector1: ", vector[1]);
         //console.log("vector2: ", vector[2]);
         
-        //MARKER_RENAME_SYMBOLS
+        //MARKER_RENAME_SYMBOLS DONE double pendulum
         let scope = {
-            x: vector[0],
-            y: vector[1],
-            v_x: vector[2],
-            v_y: vector[3],
+            x1: vector[0],
+            x2: vector[1],
+            v1: vector[2],
+            v2: vector[3],
         };
         //console.log("scope: ", scope);
-        //console.log("this.shader_formula_u: ", this.shader_formula_u);
+        console.log("this.shader_formula_u: ", this.shader_formula_a);
+        console.log("this.shader_formula_u: ", this.shader_formula_b);
         var u = vector[2];
         var v = vector[3];
         var a = math.evaluate(this.shader_formula_a, scope);
@@ -1361,21 +1362,21 @@ class StreamlineGenerator {
         var delta = current_streamline.delta;//for magnetic streamlines
         var s = current_streamline.s;//for magnetic streamlines
 
-        //MARKER_RENAME_SYMBOLS
+        //MARKER_RENAME_SYMBOLS DONE 3-sphere
         let scope = {
-            p0: vector_position[0],
-            p1: vector_position[1],
-            p2: vector_position[2],
-            p3: vector_position[3],
-            d0: vector_direction[0],
-            d1: vector_direction[1],
-            d2: vector_direction[2],
-            d3: vector_direction[3],
+            x1: vector_position[0],
+            x2: vector_position[1],
+            x3: vector_position[2],
+            x4: vector_position[3],
+            v1: vector_direction[0],
+            v2: vector_direction[1],
+            v3: vector_direction[2],
+            v4: vector_direction[3],
             delta : delta,
             s : s
         };
         //console.log("scope: ", scope);
-        //console.log("this.shader_formula_u: ", this.shader_formula_u);
+        //console.log("this.shader_formula_p0: ", this.shader_formula_p0);
         var u = math.evaluate(this.shader_formula_p0, scope);
         var v = math.evaluate(this.shader_formula_p1, scope);
         var w = math.evaluate(this.shader_formula_p2, scope);
@@ -1404,16 +1405,16 @@ class StreamlineGenerator {
         var delta = current_streamline.delta;//for magnetic streamlines
         var s = current_streamline.s;//for magnetic streamlines
 
-        //MARKER_RENAME_SYMBOLS
+        //MARKER_RENAME_SYMBOLS DONE 3-sphere
         let scope = {
-            p0: vector_position[0],
-            p1: vector_position[1],
-            p2: vector_position[2],
-            p3: vector_position[3],
-            d0: vector_direction[0],
-            d1: vector_direction[1],
-            d2: vector_direction[2],
-            d3: vector_direction[3],
+            x1: vector_position[0],
+            x2: vector_position[1],
+            x3: vector_position[2],
+            x4: vector_position[3],
+            v1: vector_direction[0],
+            v2: vector_direction[1],
+            v3: vector_direction[2],
+            v4: vector_direction[3],
             delta : delta,
             s : s
         };

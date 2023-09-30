@@ -598,38 +598,48 @@
                                 </select>
                             </div>
                             <div class="input_row" id="input_row_field_equation_u">
-                                <!-- MARKER_RENAME_SYMBOLS -->
-                                <label>u</label>
-                                <input id="input_field_equation_u" type="text" value="2 * sin(2 * PI * z)" title="First component in the vector field: f(x, y, z) = (u, v, w).
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-torus-->
+                                <div class="math-left-align">
+                                    $$ \dot{x}_1 $$
+                                </div>
+                                <input id="input_field_equation_u" type="text" value="2*sin(2*PI*x3)" title="First component in the vector field: f(x, y, z) = (u, v, w).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                             <div class="input_row" id="input_row_field_equation_v">
-                                <!-- MARKER_RENAME_SYMBOLS -->
-                                <label>v</label>
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-torus-->
+                                <div class="math-left-align">
+                                    $$ \dot{x}_2 $$
+                                </div>
                                 <input id="input_field_equation_v" type="text"
-                                    value="sin(2 * PI * y) + 2 * cos (2 * PI * z)" title="Second component in the vector field: f(x, y, z) = (u, v, w).
+                                    value="sin(2*PI*x2)+2*cos(2*PI*x3)" title="Second component in the vector field: f(x, y, z) = (u, v, w).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                             <div class="input_row" id="input_row_field_equation_w">
-                                <!-- MARKER_RENAME_SYMBOLS -->
-                                <label>w</label>
-                                <input id="input_field_equation_w" type="text" value="cos(2 * PI * x)" title="Third component in the vector field: f(x, y, z) = (u, v, w).
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-torus-->
+                                <div class="math-left-align">
+                                    $$ \dot{x}_3 $$
+                                </div>
+                                <input id="input_field_equation_w" type="text" value="cos(2*PI*x1)" title="Third component in the vector field: f(x, y, z) = (u, v, w).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                             <div class="input_row" id="input_row_field_equation_a">
-                                <!-- MARKER_RENAME_SYMBOLS -->
-                                <label>a</label>
-                                <input id="input_field_equation_a" type="text" value="x^2" title="a component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
+                                <!-- MARKER_RENAME_SYMBOLS DONE double pendulum-->
+                                <div class="math-left-align">
+                                    $$ \dot{v}_1 $$
+                                </div>
+                                <input id="input_field_equation_a" type="text" value="x1^2" title="a component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
                             <div class="input_row" id="input_row_field_equation_b">
-                                <!-- MARKER_RENAME_SYMBOLS -->
-                                <label>b</label>
-                                <input id="input_field_equation_b" type="text" value="y^2" title="b component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
+                                <!-- MARKER_RENAME_SYMBOLS DONE double pendulum-->
+                                <div class="math-left-align">
+                                    $$ \dot{v}_2 $$
+                                </div>
+                                <input id="input_field_equation_b" type="text" value="x2^2" title="b component in the vector field: f(x, y, v_x, v_y) = (v_x, v_y, a, b).
     - Make sure that the field is periodic in [0, 1].
     - Explicitely use operators, e.g. 2*x instead of 2x.">
                             </div>
@@ -639,60 +649,60 @@
                                 <input id="input_field_equation_parameter_s" type="text" value="1" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_p0">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{p}_0 $$
+                                    $$ \dot{x}_1 $$
                                 </div>
-                                <input id="input_field_equation_p0" type="text" value="d0" title="">
+                                <input id="input_field_equation_p0" type="text" value="v1" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_p1">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{p}_1 $$
+                                    $$ \dot{x}_2 $$
                                 </div>
-                                <input id="input_field_equation_p1" type="text" value="d1" title="">
+                                <input id="input_field_equation_p1" type="text" value="v2" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_p2">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{p}_2 $$
+                                    $$ \dot{x}_3 $$
                                 </div>
-                                <input id="input_field_equation_p2" type="text" value="d2" title="">
+                                <input id="input_field_equation_p2" type="text" value="v3" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_p3">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{p}_3 $$
+                                    $$ \dot{x}_4 $$
                                 </div>
-                                <input id="input_field_equation_p3" type="text" value="d3" title="">
+                                <input id="input_field_equation_p3" type="text" value="v4" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_d0">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{d}_0 $$
+                                    $$ \dot{v}_1 $$
                                 </div>
-                                <input id="input_field_equation_d0" type="text" value="-p0" title="">
+                                <input id="input_field_equation_d0" type="text" value="-x1" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_d1">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{d}_1 $$
+                                    $$ \dot{v}_2 $$
                                 </div>
-                                <input id="input_field_equation_d1" type="text" value="-p1" title="">
+                                <input id="input_field_equation_d1" type="text" value="-x2" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_d2">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{d}_2 $$
+                                    $$ \dot{v}_3 $$
                                 </div>
-                                <input id="input_field_equation_d2" type="text" value="-p2" title="">
+                                <input id="input_field_equation_d2" type="text" value="-x3" title="">
                             </div>
                             <div class="input_row" id="input_row_equation_d3">
-                                <!-- MARKER_RENAME_SYMBOLS -->
+                                <!-- MARKER_RENAME_SYMBOLS DONE 3-sphere-->
                                 <div class="math-left-align">
-                                    $$ \dot{d}_3 $$
+                                    $$ \dot{v}_4 $$
                                 </div>
-                                <input id="input_field_equation_d3" type="text" value="-p3" title="">
+                                <input id="input_field_equation_d3" type="text" value="-x4" title="">
                             </div>
                         </div>    
                         <div class="group_properties_children">
@@ -726,60 +736,60 @@
                                     title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_p0">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{p}_0 $$
+                                        $$ \dot{x}_1 $$
                                     </div>
-                                    <input id="input_field_light_transport_p0" type="text" value="d0" title="">
+                                    <input id="input_field_light_transport_p0" type="text" value="v1" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_p1">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{p}_1 $$
+                                        $$ \dot{x}_2 $$
                                     </div>
-                                    <input id="input_field_light_transport_p1" type="text" value="d1" title="">
+                                    <input id="input_field_light_transport_p1" type="text" value="v2" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_p2">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{p}_2 $$
+                                        $$ \dot{x}_3 $$
                                     </div>
-                                    <input id="input_field_light_transport_p2" type="text" value="d2" title="">
+                                    <input id="input_field_light_transport_p2" type="text" value="v3" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_p3">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{p}_3 $$
+                                        $$ \dot{x}_4 $$
                                     </div>
-                                    <input id="input_field_light_transport_p3" type="text" value="d3" title="">
+                                    <input id="input_field_light_transport_p3" type="text" value="v4" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_d0">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{d}_0 $$
+                                        $$ \dot{v}_1 $$
                                     </div>
-                                    <input id="input_field_light_transport_d0" type="text" value="-p0" title="">
+                                    <input id="input_field_light_transport_d0" type="text" value="-x1" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_d1">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{d}_1 $$
+                                        $$ \dot{v}_2 $$
                                     </div>
-                                    <input id="input_field_light_transport_d1" type="text" value="-p1" title="">
+                                    <input id="input_field_light_transport_d1" type="text" value="-x2" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_d2">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{d}_2 $$
+                                        $$ \dot{v}_3 $$
                                     </div>
-                                    <input id="input_field_light_transport_d2" type="text" value="-p2" title="">
+                                    <input id="input_field_light_transport_d2" type="text" value="-x3" title="">
                                 </div>
                                 <div class="input_row" id="input_row_light_transport_d3">
-                                    <!-- MARKER_RENAME_SYMBOLS -->
+                                    <!-- MARKER_RENAME_SYMBOLS DONE light-->
                                     <div class="math-left-align">
-                                        $$ \dot{d}_3 $$
+                                        $$ \dot{v}_4 $$
                                     </div>
-                                    <input id="input_field_light_transport_d3" type="text" value="-p3" title="">
+                                    <input id="input_field_light_transport_d3" type="text" value="-x4" title="">
                                 </div>
                             </div>
                         </div>    
@@ -1126,19 +1136,26 @@
                         <div class="group_properties_content">
                             <fieldset class="subgroup_properties">
                                 <legend>Resolution</legend>
+                                <!-- MARKER_RENAME_SYMBOLS DONE FTLE-->
                                 <div class="vertical_container">
                                     <div class="input_row">
-                                        <label>x</label>
+                                        <div class="math-left-align">
+                                            $$ {x}_1 $$
+                                        </div>
                                         <input id="input_ftle_dim_x" type="text" value="100"
                                             title="Resolution of the grid in x direction.">
                                     </div>
                                     <div class="input_row">
-                                        <label>y</label>
+                                        <div class="math-left-align">
+                                            $$ {x}_2 $$
+                                        </div>
                                         <input id="input_ftle_dim_y" type="text" value="100"
                                             title="Resolution of the grid in y direction.">
                                     </div>
                                     <div class="input_row">
-                                        <label>z</label>
+                                        <div class="math-left-align">
+                                            $$ {x}_3 $$
+                                        </div>
                                         <input id="input_ftle_dim_z" type="text" value="100"
                                             title="Resolution of the grid in z direction.">
                                     </div>
@@ -1343,9 +1360,9 @@
                                         </select>
                                     </div>
                                     <div class="input_row" id="input_row_formula_scalar">
-                                        <!-- MARKER_RENAME_SYMBOLS -->
+                                        <!-- MARKER_RENAME_SYMBOLS DONE scalar field-->
                                         <label>scalar field</label>
-                                        <input id="input_formula_scalar" type="text" value="cos(2.0*PI*y)"
+                                        <input id="input_formula_scalar" type="text" value="cos(2.0*PI*x2)"
                                             title="The scalar field used for coloring the streamlines.">
                                     </div>
                                     <div class="input_row" id="input_row_scalar_field_debug">
