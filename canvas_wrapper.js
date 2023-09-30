@@ -741,15 +741,65 @@ class CanvasWrapper {
             console.warn("settings_changed");
             this.adaptive_frame_counter = 0;
             this.adaptive_alternating_counter = 0;
-            this.adaptive_alternating_number_changes = 0;
+            this.adaptive_number_changes = 0;
             this.adaptive_alternating_counter_since_last_change = 0;
             this.adaptive_last_change = ADAPTIVE_CHANGE_NONE;
+
+            this.adaptive_min_t = 0;
+            this.adaptive_resolution_current_t = 1;
+            this.adaptive_max_t = 1;
         }
 
         if(this.camera.IsPanningOrForced()){
             this.adaptive_frame_counter += 1; 
         }
         
+        if(this.adaptive_resolution){
+            var flag = this.adaptive_frame_counter >= 3
+                //&& this.adaptive_alternating_counter <= 3 
+                && this.adaptive_number_changes <= 8;
+            if(flag){
+                if(time_now > this.adaptive_resolution_last_time_stamp + this.adaptive_resolution_cooldown){
+                    if(current_fps > 30 && this.adaptive_resolution_current_t < 1.0){
+                        /*
+                        if(this.adaptive_last_change == ADAPTIVE_CHANGE_NEGATIVE){
+                            this.adaptive_alternating_counter += 1;
+                        }
+                        this.adaptive_last_change = ADAPTIVE_CHANGE_POSITIVE;
+                        */
+                        this.adaptive_min_t = this.adaptive_resolution_current_t;
+                        this.adaptive_resolution_current_t = 0.5 * (this.adaptive_resolution_current_t + this.adaptive_max_t);
+
+                        this.adaptive_frame_counter = 0;
+                        this.adaptive_number_changes += 1;
+                        this.adaptive_resolution_last_time_stamp = time_now;
+    
+                        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+                        this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
+                        console.warn("fps: ", current_fps, " ---> INCREASE to", this.adaptive_resolution_current_t);
+                    }
+                    else if(current_fps < 15 && this.adaptive_resolution_current_t > 0.0){
+                         /*
+                        if(this.adaptive_last_change == ADAPTIVE_CHANGE_POSITIVE){
+                            this.adaptive_alternating_counter += 1;
+                        }
+                        this.adaptive_last_change = ADAPTIVE_CHANGE_NEGATIVE;
+                        */
+                        this.adaptive_max_t = this.adaptive_resolution_current_t;
+                        this.adaptive_resolution_current_t = 0.5 * (this.adaptive_resolution_current_t + this.adaptive_min_t);
+
+                        this.adaptive_frame_counter = 0;
+                        this.adaptive_number_changes += 1;
+                        this.adaptive_resolution_last_time_stamp = time_now;
+                        
+                        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+                        this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
+                        console.warn("fps: ", current_fps, " ---> REDUCE to", this.adaptive_resolution_current_t);
+                    }    
+                }
+            }
+        }
+        /*
         if(this.adaptive_resolution){
             var flag = this.adaptive_frame_counter >= 3
                 && this.adaptive_alternating_counter <= 3 
@@ -788,8 +838,8 @@ class CanvasWrapper {
                     }    
                 }
             }
-
         }
+        */
 
 
         if (this.aliasing_index == 0){
