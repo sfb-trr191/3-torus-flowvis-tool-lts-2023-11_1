@@ -221,8 +221,9 @@ class TreeViewNode {
         this.tree_view.notifyHeaderClicked();
         var ctrl_pressed = event.getModifierState("Control");
         var shift_pressed = event.getModifierState("Shift");
-        //shift --> no children
-        if(shift_pressed){
+        //shift --> children
+        var ignore_children = !shift_pressed;
+        if(ignore_children){
             var toggle_state = !this.selected;   
             if(!ctrl_pressed){
                 this.tree_view.deselect();
@@ -327,18 +328,24 @@ class TreeView{
         console.log("this.dict_eye_id_to_node", this.dict_eye_id_to_node);
     }
 
-    notifyHeaderClicked(){    
+    notifyHeaderClicked(){ 
+        /*
+        //this does not fix the problem   
         document.getElementById("container_properties").style.display = 'none';
         //document.body.style.display = 'none';
         this.properties_view_is_disabled_counter = 2;
+        */
     }
 
     reenablePropertiesView(){
+        /*
+        //this does not fix the problem   
         //document.body.style.display = '';
         this.properties_view_is_disabled_counter = Math.max(-1, this.properties_view_is_disabled_counter-1);
         if(this.properties_view_is_disabled_counter == 0){
             document.getElementById("container_properties").style.display = '';
         }
+        */
     }
 
     generateNodes() {
