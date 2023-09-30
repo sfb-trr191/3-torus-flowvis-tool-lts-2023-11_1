@@ -107,7 +107,7 @@ class StreamlineContext {
 
         this.streamline_generator.SetRulesTorus();
         this.streamline_generator.SetRules2Plus2D();    
-        if(this.streamline_generator.space == SPACE_3_TORUS){
+        if(this.streamline_generator.space == SPACE_3_TORUS || this.streamline_generator.space == SPACE_2_PLUS_2D){
             this.streamline_generator.SetRulesFromUI_xyz();
         }    
         this.streamline_generator.GenerateSeedsFromUI(this.name);

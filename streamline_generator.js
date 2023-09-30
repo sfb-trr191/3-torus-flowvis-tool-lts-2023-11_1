@@ -69,6 +69,7 @@ class StreamlineGenerator {
 
     SetRulesTorus() {
         //MARKER_RENAME_SYMBOLS todo RULE
+        /*
         console.log("SetRulesTorus");
         //rules
         this.shader_rule_x_pos_x = "x-1";	//if x>1 : x=___
@@ -95,11 +96,12 @@ class StreamlineGenerator {
         this.shader_rule_z_neg_x = "x";	    //if z>1 : x=___
         this.shader_rule_z_neg_y = "y";	    //if z>1 : y=___
         this.shader_rule_z_neg_z = "z+1";	//if z>1 : z=___
+        */
     }
 
     SetRules2Plus2D(){
         //MARKER_RENAME_SYMBOLS todo RULE
-        
+        /*
         //rules
         this.shader_rule_x_pos_x = "x-1";	        //if x>1 : x=___
         this.shader_rule_x_pos_y = "y";		        //if x>1 : y=___
@@ -141,6 +143,7 @@ class StreamlineGenerator {
         this.shader_rule_v_y_neg_y = "y";		    //if v_y<1 : y=___
         this.shader_rule_v_y_neg_v_x = "v_x";	    //if v_y<1 : v_x=___
         this.shader_rule_v_y_neg_v_y = "v_y+1";	    //if v_y<1 : v_y=___
+        */
     }
 
     SetRulesFromUI_xyz(){
@@ -1547,6 +1550,7 @@ class StreamlineGenerator {
         };
 
         if (x1 > 1) {
+            //console.log("shader_rule_x_pos_x: "+this.shader_rule_x_pos_x);
             scope.x1 = math.evaluate(this.shader_rule_x_pos_x, scope);
             scope.x2 = math.evaluate(this.shader_rule_x_pos_y, scope);
             //scope.v_x = math.evaluate(this.shader_rule_x_pos_v_x, scope);
