@@ -68,6 +68,7 @@ class StreamlineGenerator {
     }    
 
     SetRulesTorus() {
+        //MARKER_RENAME_SYMBOLS todo RULE
         console.log("SetRulesTorus");
         //rules
         this.shader_rule_x_pos_x = "x-1";	//if x>1 : x=___
@@ -97,6 +98,7 @@ class StreamlineGenerator {
     }
 
     SetRules2Plus2D(){
+        //MARKER_RENAME_SYMBOLS todo RULE
         
         //rules
         this.shader_rule_x_pos_x = "x-1";	        //if x>1 : x=___
@@ -142,6 +144,7 @@ class StreamlineGenerator {
     }
 
     SetRulesFromUI_xyz(){
+        //MARKER_RENAME_SYMBOLS todo RULE
         this.shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
         this.shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
         this.shader_rule_x_pos_z = GetFormula("input_field_shader_rule_x_pos_z");
@@ -1470,99 +1473,101 @@ class StreamlineGenerator {
     }
 
     MoveOutOfBounds3(position) {
+        //MARKER_RENAME_SYMBOLS DONE RULE
         //user friendly variables
-        var x = position[0];
-        var y = position[1];
-        var z = position[2];
+        var x1 = position[0];
+        var x2 = position[1];
+        var x3 = position[2];
         //additional "constant" variables for this calculation
-        var x0 = x;
-        var y0 = y;
-        var z0 = z;
+        //var x0 = x;
+        //var y0 = y;
+        //var z0 = z;
 
         let scope = {
-            x: x,
-            y: y,
-            z: z,
+            x1: x1,
+            x2: x2,
+            x3: x3,
         };
 
-        if (x > 1) {
-            scope.x = math.evaluate(this.shader_rule_x_pos_x, scope);
-            scope.y = math.evaluate(this.shader_rule_x_pos_y, scope);
-            scope.z = math.evaluate(this.shader_rule_x_pos_z, scope);
+        if (x1 > 1) {
+            scope.x1 = math.evaluate(this.shader_rule_x_pos_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_x_pos_y, scope);
+            scope.x3 = math.evaluate(this.shader_rule_x_pos_z, scope);
         }
-        else if (x < 0) {
-            scope.x = math.evaluate(this.shader_rule_x_neg_x, scope);
-            scope.y = math.evaluate(this.shader_rule_x_neg_y, scope);
-            scope.z = math.evaluate(this.shader_rule_x_neg_z, scope);
-        }
-
-        if (y > 1) {
-            scope.x = math.evaluate(this.shader_rule_y_pos_x, scope);
-            scope.y = math.evaluate(this.shader_rule_y_pos_y, scope);
-            scope.z = math.evaluate(this.shader_rule_y_pos_z, scope);
-        }
-        else if (y < 0) {
-            scope.x = math.evaluate(this.shader_rule_y_neg_x, scope);
-            scope.y = math.evaluate(this.shader_rule_y_neg_y, scope);
-            scope.z = math.evaluate(this.shader_rule_y_neg_z, scope);
+        else if (x1 < 0) {
+            scope.x1 = math.evaluate(this.shader_rule_x_neg_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_x_neg_y, scope);
+            scope.x3 = math.evaluate(this.shader_rule_x_neg_z, scope);
         }
 
-        if (z > 1) {
-            scope.x = math.evaluate(this.shader_rule_z_pos_x, scope);
-            scope.y = math.evaluate(this.shader_rule_z_pos_y, scope);
-            scope.z = math.evaluate(this.shader_rule_z_pos_z, scope);
+        if (x2 > 1) {
+            scope.x1 = math.evaluate(this.shader_rule_y_pos_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_y_pos_y, scope);
+            scope.x3 = math.evaluate(this.shader_rule_y_pos_z, scope);
         }
-        else if (z < 0) {
-            scope.x = math.evaluate(this.shader_rule_z_neg_x, scope);
-            scope.y = math.evaluate(this.shader_rule_z_neg_y, scope);
-            scope.z = math.evaluate(this.shader_rule_z_neg_z, scope);
+        else if (x2 < 0) {
+            scope.x1 = math.evaluate(this.shader_rule_y_neg_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_y_neg_y, scope);
+            scope.x3 = math.evaluate(this.shader_rule_y_neg_z, scope);
         }
 
-        return glMatrix.vec3.fromValues(scope.x, scope.y, scope.z);
+        if (x3 > 1) {
+            scope.x1 = math.evaluate(this.shader_rule_z_pos_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_z_pos_y, scope);
+            scope.x3 = math.evaluate(this.shader_rule_z_pos_z, scope);
+        }
+        else if (x3 < 0) {
+            scope.x1 = math.evaluate(this.shader_rule_z_neg_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_z_neg_y, scope);
+            scope.x3 = math.evaluate(this.shader_rule_z_neg_z, scope);
+        }
+
+        return glMatrix.vec3.fromValues(scope.x1, scope.x2, scope.x3);
     }
 
     MoveOutOfBounds4(position) {
+        //MARKER_RENAME_SYMBOLS DONE RULE
         //console.log("MoveOutOfBounds4: "+position[0] + ", " + position[1] + ", " + position[2] + ", " + position[3]);
         //user friendly variables
-        var x = position[0];
-        var y = position[1];
-        var v_x = position[2];
-        var v_y = position[3];
+        var x1 = position[0];
+        var x2 = position[1];
+        var v1 = position[2];
+        var v2 = position[3];
         //additional "constant" variables for this calculation
-        var x0 = x;
-        var y0 = y;
-        var v_x0 = v_x;
-        var v_y0 = v_y;
+        //var x0 = x;
+        //var y0 = y;
+        //var v_x0 = v_x;
+        //var v_y0 = v_y;
 
         let scope = {
-            x: x,
-            y: y,
-            v_x: v_x,
-            v_y: v_y,
+            x1: x1,
+            x2: x2,
+            v1: v1,
+            v2: v2,
         };
 
-        if (x > 1) {
-            scope.x = math.evaluate(this.shader_rule_x_pos_x, scope);
-            scope.y = math.evaluate(this.shader_rule_x_pos_y, scope);
+        if (x1 > 1) {
+            scope.x1 = math.evaluate(this.shader_rule_x_pos_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_x_pos_y, scope);
             //scope.v_x = math.evaluate(this.shader_rule_x_pos_v_x, scope);
             //scope.v_y = math.evaluate(this.shader_rule_x_pos_v_y, scope);
         }
-        else if (x < 0) {
-            scope.x = math.evaluate(this.shader_rule_x_neg_x, scope);
-            scope.y = math.evaluate(this.shader_rule_x_neg_y, scope);
+        else if (x1 < 0) {
+            scope.x1 = math.evaluate(this.shader_rule_x_neg_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_x_neg_y, scope);
             //scope.v_x = math.evaluate(this.shader_rule_x_neg_v_x, scope);
             //scope.v_y = math.evaluate(this.shader_rule_x_neg_v_y, scope);
         }
 
-        if (y > 1) {
-            scope.x = math.evaluate(this.shader_rule_y_pos_x, scope);
-            scope.y = math.evaluate(this.shader_rule_y_pos_y, scope);
+        if (x2 > 1) {
+            scope.x1 = math.evaluate(this.shader_rule_y_pos_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_y_pos_y, scope);
             //scope.v_x = math.evaluate(this.shader_rule_y_pos_v_x, scope);
             //scope.v_y = math.evaluate(this.shader_rule_y_pos_v_y, scope);
         }
-        else if (y < 0) {
-            scope.x = math.evaluate(this.shader_rule_y_neg_x, scope);
-            scope.y = math.evaluate(this.shader_rule_y_neg_y, scope);
+        else if (x2 < 0) {
+            scope.x1 = math.evaluate(this.shader_rule_y_neg_x, scope);
+            scope.x2 = math.evaluate(this.shader_rule_y_neg_y, scope);
             //scope.v_x = math.evaluate(this.shader_rule_y_neg_v_x, scope);
             //scope.v_y = math.evaluate(this.shader_rule_y_neg_v_y, scope);
         }
@@ -1593,7 +1598,7 @@ class StreamlineGenerator {
             scope.v_y = math.evaluate(this.shader_rule_v_y_neg_v_y, scope);
         }
         */
-        return glMatrix.vec4.fromValues(scope.x, scope.y, scope.v_x, scope.v_y);
+        return glMatrix.vec4.fromValues(scope.x1, scope.x2, scope.v1, scope.v2);
     }
 
     //vec3 currentPosition, previousPosition

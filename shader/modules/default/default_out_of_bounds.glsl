@@ -41,161 +41,162 @@ bool CheckOutOfBounds(vec3 position)
 
 vec3 MoveOutOfBounds(vec3 position)
 {
+    //MARKER_RENAME_SYMBOLS DONE RULE
 	//user friendly variables
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 	//additional "constant" variables for this calculation
-	float x0 = x;
-	float y0 = y;
-	float z0 = z;
+	//float x0 = x;
+	//float y0 = y;
+	//float z0 = z;
 	
-	if(x > 1.0-epsilon_move_ray)
+	if(x1 > 1.0-epsilon_move_ray)
 	{
-		x = shader_rule_x_pos_x;
-		y = shader_rule_x_pos_y;
-		z = shader_rule_x_pos_z;
+		x1 = shader_rule_x_pos_x;
+		x2 = shader_rule_x_pos_y;
+		x3 = shader_rule_x_pos_z;
 	}
-	else if(x < 0.0+epsilon_move_ray)
+	else if(x1 < 0.0+epsilon_move_ray)
 	{
-		x = shader_rule_x_neg_x;
-		y = shader_rule_x_neg_y;
-		z = shader_rule_x_neg_z;
-	}
-
-	if(y > 1.0-epsilon_move_ray)
-	{
-		x = shader_rule_y_pos_x;
-		y = shader_rule_y_pos_y;
-		z = shader_rule_y_pos_z;
-	}
-	else if(y < 0.0+epsilon_move_ray)
-	{
-		x = shader_rule_y_neg_x;
-		y = shader_rule_y_neg_y;
-		z = shader_rule_y_neg_z;
+		x1 = shader_rule_x_neg_x;
+		x2 = shader_rule_x_neg_y;
+		x3 = shader_rule_x_neg_z;
 	}
 
-	if(z > 1.0-epsilon_move_ray)
+	if(x2 > 1.0-epsilon_move_ray)
 	{
-		x = shader_rule_z_pos_x;
-		y = shader_rule_z_pos_y;
-		z = shader_rule_z_pos_z;
+		x1 = shader_rule_y_pos_x;
+		x2 = shader_rule_y_pos_y;
+		x3 = shader_rule_y_pos_z;
 	}
-	else if(z < 0.0+epsilon_move_ray)
+	else if(x2 < 0.0+epsilon_move_ray)
 	{
-		x = shader_rule_z_neg_x;
-		y = shader_rule_z_neg_y;
-		z = shader_rule_z_neg_z;
+		x1 = shader_rule_y_neg_x;
+		x2 = shader_rule_y_neg_y;
+		x3 = shader_rule_y_neg_z;
 	}
 
-	return vec3(x,y,z);
+	if(x3 > 1.0-epsilon_move_ray)
+	{
+		x1 = shader_rule_z_pos_x;
+		x2 = shader_rule_z_pos_y;
+		x3 = shader_rule_z_pos_z;
+	}
+	else if(x3 < 0.0+epsilon_move_ray)
+	{
+		x1 = shader_rule_z_neg_x;
+		x2 = shader_rule_z_neg_y;
+		x3 = shader_rule_z_neg_z;
+	}
+
+	return vec3(x1,x2,x3);
 }
 
 vec3 MoveOutOfBoundsTorusRules(vec3 position)
 {
 	//user friendly variables
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 	//additional "constant" variables for this calculation
-	float x0 = x;
-	float y0 = y;
-	float z0 = z;
+	//float x0 = x;
+	//float y0 = y;
+	//float z0 = z;
 	
-	if(x > 1.0-epsilon_move_ray)
+	if(x1 > 1.0-epsilon_move_ray)
 	{
-		x = x - 1.0;
+		x1 = x1 - 1.0;
 	}
-	else if(x < 0.0+epsilon_move_ray)
+	else if(x1 < 0.0+epsilon_move_ray)
 	{
-		x = x + 1.0;
-	}
-
-	if(y > 1.0-epsilon_move_ray)
-	{
-		y = y - 1.0;
-	}
-	else if(y < 0.0+epsilon_move_ray)
-	{
-		y = y + 1.0;
+		x1 = x1 + 1.0;
 	}
 
-	if(z > 1.0-epsilon_move_ray)
+	if(x2 > 1.0-epsilon_move_ray)
 	{
-		z = z - 1.0;
+		x2 = x2 - 1.0;
 	}
-	else if(z < 0.0+epsilon_move_ray)
+	else if(x2 < 0.0+epsilon_move_ray)
 	{
-        z = z + 1.0;
+		x2 = x2 + 1.0;
 	}
 
-	return vec3(x,y,z);
+	if(x3 > 1.0-epsilon_move_ray)
+	{
+		x3 = x3 - 1.0;
+	}
+	else if(x3 < 0.0+epsilon_move_ray)
+	{
+        x3 = x3 + 1.0;
+	}
+
+	return vec3(x1,x2,x3);
 }
 
 vec3 MoveOutOfBoundsDirection(vec3 position, vec3 direction)
 {    
     //user friendly variables
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
-	float u = direction.x;
-	float v = direction.y;
-	float w = direction.z;
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
+	float v1 = direction.x;
+	float v2 = direction.y;
+	float v3 = direction.z;
 
-	if(x > 1.0-epsilon_move_ray)
+	if(x1 > 1.0-epsilon_move_ray)
 	{
-		u = shader_rule_x_pos_u;
-		v = shader_rule_x_pos_v;
-		w = shader_rule_x_pos_w;
+		v1 = shader_rule_x_pos_u;
+		v2 = shader_rule_x_pos_v;
+		v3 = shader_rule_x_pos_w;
 	}
-	else if(x < 0.0+epsilon_move_ray)
+	else if(x1 < 0.0+epsilon_move_ray)
 	{
-		u = shader_rule_x_neg_u;
-		v = shader_rule_x_neg_v;
-		w = shader_rule_x_neg_w;
-	}
-
-	if(y > 1.0-epsilon_move_ray)
-	{
-		u = shader_rule_y_pos_u;
-		v = shader_rule_y_pos_v;
-		w = shader_rule_y_pos_w;
-	}
-	else if(y < 0.0+epsilon_move_ray)
-	{
-		u = shader_rule_y_neg_u;
-		v = shader_rule_y_neg_v;
-		w = shader_rule_y_neg_w;
+		v1 = shader_rule_x_neg_u;
+		v2 = shader_rule_x_neg_v;
+		v3 = shader_rule_x_neg_w;
 	}
 
-	if(z > 1.0-epsilon_move_ray)
+	if(x2 > 1.0-epsilon_move_ray)
 	{
-		u = shader_rule_z_pos_u;
-		v = shader_rule_z_pos_v;
-		w = shader_rule_z_pos_w;
+		v1 = shader_rule_y_pos_u;
+		v2 = shader_rule_y_pos_v;
+		v3 = shader_rule_y_pos_w;
 	}
-	else if(z < 0.0+epsilon_move_ray)
+	else if(x2 < 0.0+epsilon_move_ray)
 	{
-		u = shader_rule_z_neg_u;
-		v = shader_rule_z_neg_v;
-		w = shader_rule_z_neg_w;
+		v1 = shader_rule_y_neg_u;
+		v2 = shader_rule_y_neg_v;
+		v3 = shader_rule_y_neg_w;
+	}
+
+	if(x3 > 1.0-epsilon_move_ray)
+	{
+		v1 = shader_rule_z_pos_u;
+		v2 = shader_rule_z_pos_v;
+		v3 = shader_rule_z_pos_w;
+	}
+	else if(x3 < 0.0+epsilon_move_ray)
+	{
+		v1 = shader_rule_z_neg_u;
+		v2 = shader_rule_z_neg_v;
+		v3 = shader_rule_z_neg_w;
 	}
 
 
-	return vec3(u,v,w);
+	return vec3(v1,v2,v3);
 }
 
 vec3 MoveOutOfBoundsAndGetFlags(vec3 position, inout MoveOutOfBoundsFlags flags)
 {
 	//user friendly variables
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 	//additional "constant" variables for this calculation
-	float x0 = x;
-	float y0 = y;
-	float z0 = z;
+	//float x0 = x;
+	//float y0 = y;
+	//float z0 = z;
 
     flags.x_greater = false;
     flags.x_smaller = false;
@@ -204,163 +205,163 @@ vec3 MoveOutOfBoundsAndGetFlags(vec3 position, inout MoveOutOfBoundsFlags flags)
     flags.z_greater = false;
     flags.z_smaller = false;
 	
-	if(x > 1.0-epsilon_move_ray)
+	if(x1 > 1.0-epsilon_move_ray)
 	{
-		x = x-1.0;
-		y = y;
-		z = z;
+		x1 = x1-1.0;
+		x2 = x2;
+		x3 = x3;
         flags.x_greater = true;
 	}
-	else if(x < 0.0+epsilon_move_ray)
+	else if(x1 < 0.0+epsilon_move_ray)
 	{
-		x = x+1.0;
-		y = y;
-		z = z;
+		x1 = x1+1.0;
+		x2 = x2;
+		x3 = x3;
         flags.x_smaller = true;
 	}
 
-	if(y > 1.0-epsilon_move_ray)
+	if(x2 > 1.0-epsilon_move_ray)
 	{
-		x = x;
-		y = y-1.0;
-		z = z;
+		x1 = x1;
+		x2 = x2-1.0;
+		x3 = x3;
         flags.y_greater = true;
 	}
-	else if(y < 0.0+epsilon_move_ray)
+	else if(x2 < 0.0+epsilon_move_ray)
 	{
-		x = x;
-		y = y+1.0;
-		z = z;
+		x1 = x1;
+		x2 = x2+1.0;
+		x3 = x3;
         flags.y_smaller = true;
 	}
 
-	if(z > 1.0-epsilon_move_ray)
+	if(x3 > 1.0-epsilon_move_ray)
 	{
-		x = x;
-		y = y;
-		z = z-1.0;
+		x1 = x1;
+		x2 = x2;
+		x3 = x3-1.0;
         flags.z_greater = true;
 	}
-	else if(z < 0.0+epsilon_move_ray)
+	else if(x3 < 0.0+epsilon_move_ray)
 	{
-		x = x;
-		y = y;
-		z = z+1.0;
+		x1 = x1;
+		x2 = x2;
+		x3 = x3+1.0;
         flags.z_smaller = true;
 	}
 
-	return vec3(x,y,z);
+	return vec3(x1,x2,x3);
 }
 
 vec3 ApplyMoveOutOfBoundsFlags(vec3 position, MoveOutOfBoundsFlags flags)
 {
 	//user friendly variables
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 	//additional "constant" variables for this calculation
-	float x0 = x;
-	float y0 = y;
-	float z0 = z;
+	//float x0 = x;
+	//float y0 = y;
+	//float z0 = z;
 	
 	if(flags.x_greater)
 	{
-		x = x-1.0;
-		y = y;
-		z = z;
+		x1 = x1-1.0;
+		x2 = x2;
+		x3 = x3;
 	}
 	else if(flags.x_smaller)
 	{
-		x = x+1.0;
-		y = y;
-		z = z;
+		x1 = x1+1.0;
+		x2 = x2;
+		x3 = x3;
 	}
 
 	if(flags.y_greater)
 	{
-		x = x;
-		y = y-1.0;
-		z = z;
+		x1 = x1;
+		x2 = x2-1.0;
+		x3 = x3;
 	}
 	else if(flags.y_smaller)
 	{
-		x = x;
-		y = y+1.0;
-		z = z;
+		x1 = x1;
+		x2 = x2+1.0;
+		x3 = x3;
 	}
 
 	if(flags.z_greater)
 	{
-		x = x;
-		y = y;
-		z = z-1.0;
+		x1 = x1;
+		x2 = x2;
+		x3 = x3-1.0;
 	}
 	else if(flags.z_smaller)
 	{
-		x = x;
-		y = y;
-		z = z+1.0;
+		x1 = x1;
+		x2 = x2;
+		x3 = x3+1.0;
 	}
 
-	return vec3(x,y,z);
+	return vec3(x1,x2,x3);
 }
 
 vec3 MoveOutOfBoundsProjection(vec3 position)
 {
 	//user friendly variables
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 	//additional "constant" variables for this calculation
-	float x0 = x;
-	float y0 = y;
-	float z0 = z;
+	//float x0 = x;
+	//float y0 = y;
+	//float z0 = z;
 
     if(projection_index != 0){
-        if(x > 1.0-epsilon_move_ray)
+        if(x1 > 1.0-epsilon_move_ray)
         {
-            x = x-1.0;
-            y = y;
-            z = z;
+            x1 = x1-1.0;
+            x2 = x2;
+            x3 = x3;
         }
-        else if(x < 0.0+epsilon_move_ray)
+        else if(x1 < 0.0+epsilon_move_ray)
         {
-            x = x+1.0;
-            y = y;
-            z = z;
+            x1 = x1+1.0;
+            x2 = x2;
+            x3 = x3;
         }
     }	
 
     if(projection_index != 1){
-        if(y > 1.0-epsilon_move_ray)
+        if(x2 > 1.0-epsilon_move_ray)
         {
-            x = x;
-            y = y-1.0;
-            z = z;
+            x1 = x1;
+            x2 = x2-1.0;
+            x3 = x3;
         }
-        else if(y < 0.0+epsilon_move_ray)
+        else if(x2 < 0.0+epsilon_move_ray)
         {
-            x = x;
-            y = y+1.0;
-            z = z;
+            x1 = x1;
+            x2 = x2+1.0;
+            x3 = x3;
         }
     }
 
     if(projection_index != 2){
-        if(z > 1.0-epsilon_move_ray)
+        if(x3 > 1.0-epsilon_move_ray)
         {
-            x = x;
-            y = y;
-            z = z-1.0;
+            x1 = x1;
+            x2 = x2;
+            x3 = x3-1.0;
         }
-        else if(z < 0.0+epsilon_move_ray)
+        else if(x3 < 0.0+epsilon_move_ray)
         {
-            x = x;
-            y = y;
-            z = z+1.0;
+            x1 = x1;
+            x2 = x2;
+            x3 = x3+1.0;
         }
     }
-	return vec3(x,y,z);
+	return vec3(x1,x2,x3);
 }
 
 `;

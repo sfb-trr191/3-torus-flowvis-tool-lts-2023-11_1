@@ -149,13 +149,14 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
 
 vec3 RayLightFunctionPos(vec3 position, vec3 direction)
 {	
-	float p0 = position.x;
-	float p1 = position.y;
-	float p2 = position.z;
+    //MARKER_RENAME_SYMBOLS DONE RULE
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 
-	float d0 = direction.x;
-	float d1 = direction.y;
-	float d2 = direction.z;
+	float v1 = direction.x;
+	float v2 = direction.y;
+	float v3 = direction.z;
 
 	float P0 = light_transport_p0;
 	float P1 = light_transport_p1;
@@ -166,13 +167,14 @@ vec3 RayLightFunctionPos(vec3 position, vec3 direction)
 
 vec3 RayLightFunctionDir(vec3 position, vec3 direction)
 {
-	float p0 = position.x;
-	float p1 = position.y;
-	float p2 = position.z;
+    //MARKER_RENAME_SYMBOLS DONE RULE
+	float x1 = position.x;
+	float x2 = position.y;
+	float x3 = position.z;
 
-	float d0 = direction.x;
-	float d1 = direction.y;
-	float d2 = direction.z;
+	float v1 = direction.x;
+	float v2 = direction.y;
+	float v3 = direction.z;
 	
 	float D0 = light_transport_d0;
 	float D1 = light_transport_d1;

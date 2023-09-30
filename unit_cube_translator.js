@@ -41,55 +41,56 @@ class UnitCubeTranslator {
     }
 
     MoveOutOfBounds(position, apply_rule_x, apply_rule_y, apply_rule_z) {
+        //MARKER_RENAME_SYMBOLS DONE RULE
         //user friendly variables
-        var x = position[0];
-        var y = position[1];
-        var z = position[2];
+        var x1 = position[0];
+        var x2 = position[1];
+        var x3 = position[2];
         //additional "constant" variables for this calculation
-        var x0 = x;
-        var y0 = y;
-        var z0 = z;
+        //var x0 = x;
+        //var y0 = y;
+        //var z0 = z;
 
         let scope = {
-            x: x,
-            y: y,
-            z: z,
+            x1: x1,
+            x2: x2,
+            x3: x3,
         };
 
         if (apply_rule_x == 1) {
-            scope.x = math.evaluate(this.p_streamline_generator.shader_rule_x_pos_x, scope);
-            scope.y = math.evaluate(this.p_streamline_generator.shader_rule_x_pos_y, scope);
-            scope.z = math.evaluate(this.p_streamline_generator.shader_rule_x_pos_z, scope);
+            scope.x1 = math.evaluate(this.p_streamline_generator.shader_rule_x_pos_x, scope);
+            scope.x2 = math.evaluate(this.p_streamline_generator.shader_rule_x_pos_y, scope);
+            scope.x3 = math.evaluate(this.p_streamline_generator.shader_rule_x_pos_z, scope);
         }
         else if (apply_rule_x == -1) {
-            scope.x = math.evaluate(this.p_streamline_generator.shader_rule_x_neg_x, scope);
-            scope.y = math.evaluate(this.p_streamline_generator.shader_rule_x_neg_y, scope);
-            scope.z = math.evaluate(this.p_streamline_generator.shader_rule_x_neg_z, scope);
+            scope.x1 = math.evaluate(this.p_streamline_generator.shader_rule_x_neg_x, scope);
+            scope.x2 = math.evaluate(this.p_streamline_generator.shader_rule_x_neg_y, scope);
+            scope.x3 = math.evaluate(this.p_streamline_generator.shader_rule_x_neg_z, scope);
         }
 
         if (apply_rule_y == 1) {
-            scope.x = math.evaluate(this.p_streamline_generator.shader_rule_y_pos_x, scope);
-            scope.y = math.evaluate(this.p_streamline_generator.shader_rule_y_pos_y, scope);
-            scope.z = math.evaluate(this.p_streamline_generator.shader_rule_y_pos_z, scope);
+            scope.x1 = math.evaluate(this.p_streamline_generator.shader_rule_y_pos_x, scope);
+            scope.x2 = math.evaluate(this.p_streamline_generator.shader_rule_y_pos_y, scope);
+            scope.x3 = math.evaluate(this.p_streamline_generator.shader_rule_y_pos_z, scope);
         }
         else if (apply_rule_y == -1) {
-            scope.x = math.evaluate(this.p_streamline_generator.shader_rule_y_neg_x, scope);
-            scope.y = math.evaluate(this.p_streamline_generator.shader_rule_y_neg_y, scope);
-            scope.z = math.evaluate(this.p_streamline_generator.shader_rule_y_neg_z, scope);
+            scope.x1 = math.evaluate(this.p_streamline_generator.shader_rule_y_neg_x, scope);
+            scope.x2 = math.evaluate(this.p_streamline_generator.shader_rule_y_neg_y, scope);
+            scope.x3 = math.evaluate(this.p_streamline_generator.shader_rule_y_neg_z, scope);
         }
 
         if (apply_rule_z == 1) {
-            scope.x = math.evaluate(this.p_streamline_generator.shader_rule_z_pos_x, scope);
-            scope.y = math.evaluate(this.p_streamline_generator.shader_rule_z_pos_y, scope);
-            scope.z = math.evaluate(this.p_streamline_generator.shader_rule_z_pos_z, scope);
+            scope.x1 = math.evaluate(this.p_streamline_generator.shader_rule_z_pos_x, scope);
+            scope.x2 = math.evaluate(this.p_streamline_generator.shader_rule_z_pos_y, scope);
+            scope.x3 = math.evaluate(this.p_streamline_generator.shader_rule_z_pos_z, scope);
         }
         else if (apply_rule_z == -1) {
-            scope.x = math.evaluate(this.p_streamline_generator.shader_rule_z_neg_x, scope);
-            scope.y = math.evaluate(this.p_streamline_generator.shader_rule_z_neg_y, scope);
-            scope.z = math.evaluate(this.p_streamline_generator.shader_rule_z_neg_z, scope);
+            scope.x1 = math.evaluate(this.p_streamline_generator.shader_rule_z_neg_x, scope);
+            scope.x2 = math.evaluate(this.p_streamline_generator.shader_rule_z_neg_y, scope);
+            scope.x3 = math.evaluate(this.p_streamline_generator.shader_rule_z_neg_z, scope);
         }
 
-        return glMatrix.vec3.fromValues(scope.x, scope.y, scope.z);
+        return glMatrix.vec3.fromValues(scope.x1, scope.x2, scope.x3);
     }
 
     /**
