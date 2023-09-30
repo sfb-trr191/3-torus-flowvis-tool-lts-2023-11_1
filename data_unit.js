@@ -139,7 +139,7 @@ class DataUnit {
     }
 
     copyArray(source_array, target_array, target_start_index) {
-        console.log("target_start_index: " + target_start_index + ", source_array.length: " + source_array.length + ", target_array.length: " + target_array.length);
+        //console.log("target_start_index: " + target_start_index + ", source_array.length: " + source_array.length + ", target_array.length: " + target_array.length);
         target_array.set(source_array, target_start_index);
     }
 }
