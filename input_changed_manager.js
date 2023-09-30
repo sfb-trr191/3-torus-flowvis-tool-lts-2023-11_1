@@ -201,6 +201,7 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("select_seed_mode_side"));     
         
         this.group_render_settings.AddInput(document.getElementById("input_camera_speed")); 
+        this.group_render_settings.AddInput(document.getElementById("input_camera_roll_speed"));         
         this.group_render_settings.AddInput(document.getElementById("input_trackball_rotation_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_translation_sensitivity"));  
         this.group_render_settings.AddInput(document.getElementById("input_trackball_wheel_sensitivity"));  

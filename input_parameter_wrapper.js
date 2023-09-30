@@ -281,6 +281,7 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_camera_control_3d_right", "cc3r");  
         //settings - trackball
         new InputWrapper(this, "input_camera_speed", "cs"); 
+        new InputWrapper(this, "input_camera_roll_speed", "crs"); 
         new InputWrapper(this, "input_trackball_rotation_sensitivity", "trs");  
         new InputWrapper(this, "input_trackball_translation_sensitivity", "tts");  
         new InputWrapper(this, "input_trackball_wheel_sensitivity", "tws");  
