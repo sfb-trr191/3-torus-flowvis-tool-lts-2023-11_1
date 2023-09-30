@@ -218,6 +218,7 @@ class TreeViewNode {
     }
 
     onHeaderClicked(event){
+        this.tree_view.notifyHeaderClicked();
         var ctrl_pressed = event.getModifierState("Control");
         var shift_pressed = event.getModifierState("Shift");
         //shift --> no children
@@ -324,6 +325,16 @@ class TreeView{
         //this.updatePropertiesHelp();
 
         console.log("this.dict_eye_id_to_node", this.dict_eye_id_to_node);
+    }
+
+    notifyHeaderClicked(){        
+        document.body.style.display = 'none';
+        this.properties_view_is_disabled = true;
+    }
+
+    reenablePropertiesView(){
+        document.body.style.display = '';
+        this.properties_view_is_disabled = false;
     }
 
     generateNodes() {

@@ -762,6 +762,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
         updateViewSizes();
         ActivateInput();
+        tree_view.reenablePropertiesView();
 
         if(tree_view.eyes_changed){
             console.log("eyes changed");
