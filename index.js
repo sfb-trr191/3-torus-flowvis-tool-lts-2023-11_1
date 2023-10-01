@@ -420,6 +420,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         input_parameter_wrapper.fromURLVersion();
         RedirectVersion();
         input_parameter_wrapper.fromURL();
+        ManifoldOrDataOrderChanged();
         UpdateVersionString();
         onChangedDrawMode();
         onChangedCameraControl();

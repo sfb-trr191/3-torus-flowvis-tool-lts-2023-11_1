@@ -106,8 +106,10 @@ class InputParameterWrapper {
         new InputWrapper(this, "select_side_canvas_streamline_method", "sml");
         new InputWrapper(this, "select_side_canvas_streamline_method_projection", "smpl");
         //data
-        //data - general
-        new InputWrapper(this, "select_space", "space");
+        //data - general     
+        new InputWrapper(this, "select_manifold_type", "mani");
+        new InputWrapper(this, "select_data_order", "flow");
+        //new InputWrapper(this, "select_space", "space");
         new InputWrapper(this, "select_streamline_termination_method", "stm");
         new InputWrapper(this, "input_streamline_calculation_advection_time", "stt");
         new InputWrapper(this, "input_streamline_calculation_arc_length", "stl");
