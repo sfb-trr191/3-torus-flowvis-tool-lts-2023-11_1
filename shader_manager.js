@@ -15,6 +15,17 @@ class EquationCollection {
         this.light_transport_d1 = GetFormula("input_field_light_transport_d1");
         this.light_transport_d2 = GetFormula("input_field_light_transport_d2");
         this.light_transport_d3 = GetFormula("input_field_light_transport_d3");
+                
+        console.warn("input_field_parametric_h1", GetFormula("input_field_parametric_h1"));
+        this.light_parametric_h1 = GetFormula("input_field_parametric_h1");
+        this.light_parametric_h2 = GetFormula("input_field_parametric_h2");
+        this.light_parametric_h3 = GetFormula("input_field_parametric_h3");
+        this.light_parametric_h4 = GetFormula("input_field_parametric_h4");
+        this.light_parametric_h5 = GetFormula("input_field_parametric_h5");
+        this.light_parametric_h6 = GetFormula("input_field_parametric_h6");
+        this.light_parametric_x1 = GetFormula("input_field_parametric_x1");
+        this.light_parametric_x2 = GetFormula("input_field_parametric_x2");
+        this.light_parametric_x3 = GetFormula("input_field_parametric_x3");
 
         this.shader_rule_x_pos_x = GetFormula("input_field_shader_rule_x_pos_x");
         this.shader_rule_x_pos_y = GetFormula("input_field_shader_rule_x_pos_y");
@@ -146,6 +157,16 @@ class ShaderManager {
         code = code.replace("light_transport_d1", equations.light_transport_d1);
         code = code.replace("light_transport_d2", equations.light_transport_d2);
         code = code.replace("light_transport_d3", equations.light_transport_d3);
+
+        code = code.replace("light_parametric_h1", equations.light_parametric_h1);
+        code = code.replace("light_parametric_h2", equations.light_parametric_h2);
+        code = code.replace("light_parametric_h3", equations.light_parametric_h3);
+        code = code.replace("light_parametric_h4", equations.light_parametric_h4);
+        code = code.replace("light_parametric_h5", equations.light_parametric_h5);
+        code = code.replace("light_parametric_h6", equations.light_parametric_h6);
+        code = code.replace("light_parametric_x1", equations.light_parametric_x1);
+        code = code.replace("light_parametric_x2", equations.light_parametric_x2);
+        code = code.replace("light_parametric_x3", equations.light_parametric_x3);
 
         code = code.replace("shader_rule_x_pos_x", equations.shader_rule_x_pos_x);
         code = code.replace("shader_rule_x_pos_y", equations.shader_rule_x_pos_y);
@@ -325,6 +346,16 @@ class ShaderManager {
             key += ";"+equations.light_transport_d1 
             key += ";"+equations.light_transport_d2 
             key += ";"+equations.light_transport_d3 
+            
+            key += ";"+equations.light_parametric_h1 
+            key += ";"+equations.light_parametric_h2 
+            key += ";"+equations.light_parametric_h3 
+            key += ";"+equations.light_parametric_h4 
+            key += ";"+equations.light_parametric_h5 
+            key += ";"+equations.light_parametric_h6 
+            key += ";"+equations.light_parametric_x1 
+            key += ";"+equations.light_parametric_x2 
+            key += ";"+equations.light_parametric_x3 
         }
         if(true){//TODO: optimize this: we dont need this everywhere
             key += ";"+equations.shader_rule_x_pos_x 

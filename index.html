@@ -819,6 +819,63 @@
                                     </div>
                                     <input id="input_field_light_transport_d3" type="text" value="-x4" title="">
                                 </div>
+
+                                <div class="input_row" id="input_row_parametric_h1">
+                                    <div class="math-left-align">
+                                        $$ {h}_1(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_h1" type="text" value="v3" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_h2">
+                                    <div class="math-left-align">
+                                        $$ {h}_2(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_h2" type="text" value="sqrt(v1*v1+v2*v2)" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_h3">
+                                    <div class="math-left-align">
+                                        $$ {h}_3(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_h3" type="text" value="atan(v2,v1)" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_h4">
+                                    <div class="math-left-align">
+                                        $$ {h}_4(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_h4" type="text" value="h2*t*cos(h3)-0.5*h1*(h2*t*t*sin(h3))-1.0/6.0*h1*h1*(h2*t*t*t*cos(h3))+1.0/24.0*h2*t*t*t*t*h1*h1*h1*sin(h3)" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_h5">
+                                    <div class="math-left-align">
+                                        $$ {h}_5(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_h5" type="text" value="h2*t*sin(h3)+0.5*h2*t*t*h1*cos(h3)-1.0/6.0*h1*h1*(h2*t*t*t*sin(h3))-1.0/24.0*h1*h1*h1*(h2*t*t*t*t*cos(h3))" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_h6">
+                                    <div class="math-left-align">
+                                        $$ {h}_6(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_h6" type="text" value="0.25*h2*h2*t*t*sin(2.0*h3)+h1*(0.25*h2*h2*pow(t,3.0)*cos(2.0*h3)+0.0833333*h2*h2*pow(t,3.0)+t)-0.145833*h1*h1*(h2*h2*pow(t,4.0)*sin(2.0*h3))+h2*h2*pow(t,5.0)*pow(h1,3.0)*(-0.0625*cos(2.0*h3)-0.00416667)" title="">
+                                </div>
+
+
+                                <div class="input_row" id="input_row_parametric_x1">
+                                    <div class="math-left-align">
+                                        $$ {x}_1(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_x1" type="text" value="x1+h4" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_x2">
+                                    <div class="math-left-align">
+                                        $$ {x}_2(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_x2" type="text" value="x2+h5" title="">
+                                </div>
+                                <div class="input_row" id="input_row_parametric_x3">
+                                    <div class="math-left-align">
+                                        $$ {x}_3(t) $$
+                                    </div>
+                                    <input id="input_field_parametric_x3" type="text" value="x3+h6+x1*h5" title="">
+                                </div>
                             </div>
                         </div>    
                         <div class="group_properties_children">

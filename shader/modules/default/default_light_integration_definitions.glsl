@@ -87,6 +87,29 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
 	float v2 = explicitIntegrationData.original_direction.y;
 	float v3 = explicitIntegrationData.original_direction.z;
 
+    if(true){
+        float h1 = light_parametric_h1;
+        float h2 = light_parametric_h2;
+        float h3 = light_parametric_h3;
+        float h4 = light_parametric_h4;
+        float h5 = light_parametric_h5;
+        float h6 = light_parametric_h6;
+        float P1 = light_parametric_x1;
+        float P2 = light_parametric_x2;
+        float P3 = light_parametric_x3;
+	    return vec3(P1,P2,P3);	
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     //equations
     float P1;

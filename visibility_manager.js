@@ -54,6 +54,17 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_equation_d1", this.ShouldShow_flow_implicit_v());
         this.UpdateInputRow("input_row_equation_d2", this.ShouldShow_flow_implicit_v());
         this.UpdateInputRow("input_row_equation_d3", this.ShouldShow_flow_implicit_v());
+
+        this.UpdateInputRow("input_row_parametric_h1", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_h2", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_h3", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_h4", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_h5", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_h6", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_x1", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_x2", this.ShouldShow_parametric());
+        this.UpdateInputRow("input_row_parametric_x3", this.ShouldShow_parametric());
+        
         
         this.UpdateInputRow("input_row_space", this.ShowOnDebug());
 
@@ -65,6 +76,12 @@ class VisibilityManager {
         var settings = document.getElementById("select_settings_mode").value;
         return settings == 3;//DEBUG = 3
     }
+
+    ShouldShow_parametric(){
+        var geodesic_formulation = document.getElementById("select_light_integrator_type").value;
+        return geodesic_formulation == LIGHT_INTEGRATOR_EXPLICIT;
+    }
+
 
     ShouldShow_boundary_rules(){
         var manifold_formulation = document.getElementById("select_manifold_type").value;

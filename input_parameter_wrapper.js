@@ -140,6 +140,17 @@ class InputParameterWrapper {
         new InputWrapper(this, "input_field_light_transport_d1", "ld1");
         new InputWrapper(this, "input_field_light_transport_d2", "ld2");
         new InputWrapper(this, "input_field_light_transport_d3", "ld3");
+        
+        new InputWrapper(this, "input_field_parametric_h1", "ph1");
+        new InputWrapper(this, "input_field_parametric_h2", "ph2");
+        new InputWrapper(this, "input_field_parametric_h3", "ph3");
+        new InputWrapper(this, "input_field_parametric_h4", "ph4");
+        new InputWrapper(this, "input_field_parametric_h5", "ph5");
+        new InputWrapper(this, "input_field_parametric_h6", "ph6");
+        new InputWrapper(this, "input_field_parametric_x1", "px1");
+        new InputWrapper(this, "input_field_parametric_x2", "px2");
+        new InputWrapper(this, "input_field_parametric_x3", "px3");
+
         //data - rules
         new InputWrapper(this, "input_field_shader_rule_x_pos_x", "rxpx");
         new InputWrapper(this, "input_field_shader_rule_x_pos_y", "rxpy");

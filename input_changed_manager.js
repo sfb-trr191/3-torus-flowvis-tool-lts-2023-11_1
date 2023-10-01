@@ -234,7 +234,16 @@ class InputChangedManager{
         this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d1"));
         this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d2"));
         this.group_render_settings.AddInput(document.getElementById("input_field_light_transport_d3"));
-
+        
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_h1"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_h2"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_h3"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_h4"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_h5"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_h6"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_x1"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_x2"));
+        this.group_render_settings.AddInput(document.getElementById("input_field_parametric_x3"));
 
         this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_pos_u"));
         this.group_render_settings.AddInput(document.getElementById("input_field_shader_rule_x_pos_v"));
