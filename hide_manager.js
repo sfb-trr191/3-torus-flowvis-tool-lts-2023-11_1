@@ -343,6 +343,7 @@ class HideManager {
     }
 
     InitEquations(){
+        /*
         var mcir_equation_u = new MultiConditionalInputRow("input_row_field_equation_u");
         var condition_equation_u_space_3_torus = new ConditionRequiredValue("select_space",
             mcir_equation_u,
@@ -377,7 +378,7 @@ class HideManager {
             SPACE_2_PLUS_2D, true);
         mcir_equation_b.set_condition(condition_equation_b_space_2_plus_2D)
         this.multi_consodtional_elements.push(mcir_equation_b);
-        
+        */
     }
 
     UpdateVisibility() {        

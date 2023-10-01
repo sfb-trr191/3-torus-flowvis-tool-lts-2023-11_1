@@ -1279,6 +1279,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             console.error("UNKNOWN manifold_type", manifold_type);
         }
         document.getElementById("select_space").value = value;
+        visibility_manager.UpdateVisibility();
     }
 
     function addChangedCameraControl() {
