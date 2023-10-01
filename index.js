@@ -1257,7 +1257,27 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
             ui_seeds.UpdateCSS();
         });
 
+        document.getElementById("select_manifold_type").addEventListener("change", (event) => {
+            ManifoldOrDataOrderChanged();
+        });
         
+        document.getElementById("select_data_order").addEventListener("change", (event) => {
+            ManifoldOrDataOrderChanged();
+        });
+    }
+
+    function ManifoldOrDataOrderChanged(){
+        var manifold_type = document.getElementById("select_manifold_type").value;
+        var data_order = document.getElementById("select_data_order").value;
+        var value = 0;
+        if(manifold_type == MANIFOLD_TYPE_QUOTIENT_SPACE){
+            value = data_order == DATA_ORDER_FIRST_ORDER ? SPACE_3_TORUS : SPACE_2_PLUS_2D;
+        }else if(manifold_type == MANIFOLD_TYPE_IMPLICIT){
+            value = SPACE_3_SPHERE_4_PLUS_4D;
+        }else{
+            console.error("UNKNOWN manifold_type", manifold_type);
+        }
+        document.getElementById("select_space").value = value;
     }
 
     function addChangedCameraControl() {
