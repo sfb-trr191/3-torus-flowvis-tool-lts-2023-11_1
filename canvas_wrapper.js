@@ -338,6 +338,7 @@ class CanvasWrapper {
 
         this.adaptive_resolution = true;
         this.adaptive_resolution_current_t = 1.0;
+        this.adaptive_resolution_snap_t = 1.0;
         //this.adaptive_resolution_next_t = 1.0;
         this.adaptive_resolution_step_size = 0.5;
         this.adaptive_resolution_last_time_stamp = 0;
@@ -348,6 +349,9 @@ class CanvasWrapper {
         this.adaptive_alternating_number_changes = 0;
         this.adaptive_last_change = ADAPTIVE_CHANGE_NONE;
         this.adaptive_resolution_decimals = 3;
+
+        this.fps_threschold_increase_quality = 20;
+        this.fps_threschold_decrease_quality = 10;
 
         if(name == "main"){
             this.element_legend_associated_view = document.getElementById("legend_main_view");
@@ -624,8 +628,8 @@ class CanvasWrapper {
 
         if(this.adaptive_resolution){
             //this.adaptive_resolution_current_t = this.adaptive_resolution_next_t;
-            width_panning = Math.round(module_utilit.lerp(width_panning, width_still, this.adaptive_resolution_current_t));
-            height_panning = Math.round(module_utilit.lerp(height_panning, height_still, this.adaptive_resolution_current_t));
+            width_panning = Math.round(module_utilit.lerp(width_panning, width_still, this.adaptive_resolution_snap_t));
+            height_panning = Math.round(module_utilit.lerp(height_panning, height_still, this.adaptive_resolution_snap_t));
         }
 
         var changed = (width_panning != this.camera.width_panning) || (height_panning != this.camera.height_panning);
@@ -762,7 +766,7 @@ class CanvasWrapper {
                 && this.adaptive_number_changes <= 8;
             if(flag){
                 if(time_now > this.adaptive_resolution_last_time_stamp + this.adaptive_resolution_cooldown){
-                    if(current_fps > 30 && this.adaptive_resolution_current_t < 1.0){
+                    if(current_fps > this.fps_threschold_increase_quality && this.adaptive_resolution_current_t < 1.0){
                         /*
                         if(this.adaptive_last_change == ADAPTIVE_CHANGE_NEGATIVE){
                             this.adaptive_alternating_counter += 1;
@@ -776,11 +780,12 @@ class CanvasWrapper {
                         this.adaptive_number_changes += 1;
                         this.adaptive_resolution_last_time_stamp = time_now;
     
-                        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+                        this.adaptive_resolution_snap_t = this.adaptive_resolution_current_t > 0.95 ? 1 : this.adaptive_resolution_current_t < 0.05 ? 0 : this.adaptive_resolution_current_t;
+                        var quality_string = this.adaptive_resolution_snap_t.toFixed(this.adaptive_resolution_decimals);
                         this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
-                        console.warn("fps: ", current_fps, " ---> INCREASE to", this.adaptive_resolution_current_t);
+                        console.warn("fps: ", current_fps, " ---> INCREASE to", this.adaptive_resolution_current_t, "snap:", this.adaptive_resolution_snap_t);
                     }
-                    else if(current_fps < 15 && this.adaptive_resolution_current_t > 0.0){
+                    else if(current_fps < this.fps_threschold_decrease_quality && this.adaptive_resolution_current_t > 0.0){
                          /*
                         if(this.adaptive_last_change == ADAPTIVE_CHANGE_POSITIVE){
                             this.adaptive_alternating_counter += 1;
@@ -794,9 +799,10 @@ class CanvasWrapper {
                         this.adaptive_number_changes += 1;
                         this.adaptive_resolution_last_time_stamp = time_now;
                         
-                        var quality_string = this.adaptive_resolution_current_t.toFixed(this.adaptive_resolution_decimals);
+                        this.adaptive_resolution_snap_t = this.adaptive_resolution_current_t > 0.95 ? 1 : this.adaptive_resolution_current_t < 0.05 ? 0 : this.adaptive_resolution_current_t;
+                        var quality_string = this.adaptive_resolution_snap_t.toFixed(this.adaptive_resolution_decimals);
                         this.element_legend_associated_view.innerHTML = this.view_name+" [quality:" + quality_string+"]";
-                        console.warn("fps: ", current_fps, " ---> REDUCE to", this.adaptive_resolution_current_t);
+                        console.warn("fps: ", current_fps, " ---> REDUCE to", this.adaptive_resolution_current_t, "snap:", this.adaptive_resolution_snap_t);
                     }    
                 }
             }
