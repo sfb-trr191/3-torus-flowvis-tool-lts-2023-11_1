@@ -66,7 +66,8 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_parametric_x3", this.ShouldShow_parametric());
         
         
-        this.UpdateInputRow("input_row_space", this.ShowOnDebug());
+        //this.UpdateInputRow("input_row_space", this.ShowOnDebug());
+        this.UpdateInputRow("input_row_space", false);
 
         this.UpdateVerticalContainer("content_boundary_rules", this.ShouldShow_boundary_rules());
         
