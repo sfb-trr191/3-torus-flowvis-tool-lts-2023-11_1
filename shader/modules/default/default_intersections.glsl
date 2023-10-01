@@ -12,6 +12,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
     Ray transitional_ray;
 
     ExplicitIntegrationData explicitIntegrationData;
+    explicitIntegrationData.jump = false;
     explicitIntegrationData.t = 0.0;
     explicitIntegrationData.markError = false;
     explicitIntegrationData.original_position = ray.origin;
@@ -164,7 +165,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 		if(variableRay.rayDistance > (maxRayDistance + 1.8))
 			break;
 
-        if(!flag_ray_stays_inside){            
+        if(!flag_ray_stays_inside){   
             if(projection_index >= 0)
             {
                 if(projection_index == 0){
@@ -253,10 +254,14 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                     //variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
 
                     if(render_face_border_intersections)
-                    {
+                    {   
+                        float tmp = variableRay.rayDistance;
+                        variableRay.rayDistance = tmp_rayDistance;
                         RenderFaceIntersections(variableRay, hit, exit);
+                        variableRay.rayDistance = tmp;
                     }
                     
+                    explicitIntegrationData.jump = true;
                     explicitIntegrationData.t = 0.0;
                     explicitIntegrationData.original_position = MoveOutOfBounds(variableRay.nextPosition);
 
@@ -270,8 +275,11 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
                 
 #else
                 if(render_face_border_intersections)
-                {
+                {   
+                    float tmp = variableRay.rayDistance;
+                    variableRay.rayDistance = tmp_rayDistance;
                     RenderFaceIntersections(variableRay, hit, exit);
+                    variableRay.rayDistance = tmp;
                 }
 
                 variableRay.direction = normalize(MoveOutOfBoundsDirection(exit, variableRay.direction));
@@ -283,7 +291,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
         count++;
 #ifdef INTEGRATE_LIGHT
-        LightIntegrationPost(variableRay, flag_ray_stays_inside);  
+        LightIntegrationPost(variableRay, flag_ray_stays_inside, explicitIntegrationData);  
         if(count >= light_integration_max_step_count){
             break;
         }

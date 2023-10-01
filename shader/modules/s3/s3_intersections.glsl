@@ -16,6 +16,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
     //initialize ExplicitIntegrationData, which is NOT USED for s3 currently, but needed to call functions
     ExplicitIntegrationData explicitIntegrationData;
+    explicitIntegrationData.jump = false;
     explicitIntegrationData.t = 0.0;
     explicitIntegrationData.original_position = ray.origin;
 	explicitIntegrationData.original_direction = ray.direction;
@@ -84,7 +85,7 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 			break;
 
 #ifdef INTEGRATE_LIGHT
-        LightIntegrationPost(variableRay, flag_ray_stays_inside);  
+        LightIntegrationPost(variableRay, flag_ray_stays_inside, explicitIntegrationData);  
         if(count >= light_integration_max_step_count){
             break;
         }

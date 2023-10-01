@@ -100,6 +100,27 @@ vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrati
 	    P1 = x1 + v1 * t;
 	    P2 = x2 + v2 * t;
 	    P3 = x3 + v3 * t;
+        /*
+        float w = v3;
+        float c = sqrt(v1*v1 + v2*v2);
+        float alpha = atan(v2, v1);
+
+        //xt = c*t *cos(alpha) - 0.5 *w *(c *t*t *sin(alpha)) - 1.0/6.0 *w*w *(c *t*t*t *cos(alpha)) + 1.0/24.0 *c *t*t*t*t *w*w*w *sin(alpha);
+        f1 = c*t *cos(alpha) - 0.5 *w *(c *t*t *sin(alpha)) - 1.0/6.0 *w*w *(c *t*t*t *cos(alpha)) + 1.0/24.0 *c *t*t*t*t *w*w*w *sin(alpha);
+        //yt = c *t *sin(alpha) + 0.5 *c *t*t *w *cos(alpha) - 1.0/6.0 *w*w *(c *t*t*t *sin(alpha)) - 1.0/24.0 *w*w*w *(c *t*t*t*t *cos(alpha));    
+        f2 = c*t *cos(alpha) - 0.5 *w *(c *t*t *sin(alpha)) - 1.0/6.0 *w*w *(c *t*t*t *cos(alpha)) + 1.0/24.0 *c *t*t*t*t *w*w*w *sin(alpha);
+        //zt = 0.25 *c*c *t*t* sin(2.0*alpha) + w* (0.25 *c*c* pow(t,3.0) *cos(2.0*alpha) + 0.0833333 *c*c* pow(t,3.0) + t)            
+        //- 0.145833 *w*w *(c*c* pow(t,4.0)* sin(2.0*alpha)) + c*c* pow(t,5.0) *pow(w,3.0)* (-0.0625 *cos(2.0* alpha) - 0.00416667);
+        f3 = c*t *cos(alpha) - 0.5 *w *(c *t*t *sin(alpha)) - 1.0/6.0 *w*w *(c *t*t*t *cos(alpha)) + 1.0/24.0 *c *t*t*t*t *w*w*w *sin(alpha);
+
+        P1 = x1 + xt;
+        P2 = x2 + yt;
+        P3 = x3 + zt + x1*yt;
+
+        //shader_formula_parametric_x1
+        //shader_formula_parametric_x2
+        //shader_formula_parametric_x3
+        */
     }else{
         float w = v3;
         float c = sqrt(v1*v1 + v2*v2);

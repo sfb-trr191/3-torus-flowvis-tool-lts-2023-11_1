@@ -105,7 +105,7 @@ void RayEulerStep(inout Ray ray);
 void RayRK4Step(inout Ray ray);
 void RayExplicitStep(inout Ray ray, inout ExplicitIntegrationData explicitIntegrationData);
 void LightIntegrationPre(inout Ray ray, inout HitInformation hit, inout ExplicitIntegrationData explicitIntegrationData);
-void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside);
+void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside, inout ExplicitIntegrationData explicitIntegrationData);
 
 //                       linalg
 int mat3eigenvalues(mat3 m, inout vec3 lambda);

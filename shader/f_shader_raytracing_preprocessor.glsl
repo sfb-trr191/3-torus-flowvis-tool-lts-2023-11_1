@@ -184,7 +184,7 @@ void LightIntegrationPre(inout Ray ray, inout HitInformation hit, inout Explicit
 
 }
 
-void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside){
+void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside, inout ExplicitIntegrationData explicitIntegrationData){
     if(light_integrator_type == LIGHT_INTEGRATOR_RK4)
     {
         ray.origin = ray.nextPosition;
@@ -193,7 +193,13 @@ void LightIntegrationPost(inout Ray ray, bool flag_ray_stays_inside){
     }
     else//LIGHT_INTEGRATOR_EXPLICIT
     {
-        ray.origin = ray.nextPosition;
+        if(explicitIntegrationData.jump){
+            ray.origin = explicitIntegrationData.original_position;
+            explicitIntegrationData.jump = false;
+        }
+        else{
+            ray.origin = ray.nextPosition;
+        }
     }
 }
 #endif 
