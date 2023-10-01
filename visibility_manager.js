@@ -33,12 +33,9 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_light_transport_d2", this.ShouldShow_light_integration());
         this.UpdateInputRow("input_row_light_transport_d3", this.ShouldShow_light_integration());
         
-
         this.UpdateInputRow("input_row_field_equation_u", this.ShouldShow_flow_quotiont_x1x2());
         this.UpdateInputRow("input_row_field_equation_v", this.ShouldShow_flow_quotiont_x1x2());
         this.UpdateInputRow("input_row_field_equation_w", this.ShouldShow_flow_quotiont_x3());
-
-
         
         this.UpdateInputRow("input_row_dummy_autonomous_x1", this.ShouldShow_flow_quotiont_x1x2_autonomous_dummy());
         this.UpdateInputRow("input_row_dummy_autonomous_x2", this.ShouldShow_flow_quotiont_x1x2_autonomous_dummy());
@@ -59,12 +56,21 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_equation_d3", this.ShouldShow_flow_implicit_v());
         
         this.UpdateInputRow("input_row_space", this.ShowOnDebug());
+
+        this.UpdateVerticalContainer("content_boundary_rules", this.ShouldShow_boundary_rules());
+        
     }
     
     ShowOnDebug(){
         var settings = document.getElementById("select_settings_mode").value;
         return settings == 3;//DEBUG = 3
     }
+
+    ShouldShow_boundary_rules(){
+        var manifold_formulation = document.getElementById("select_manifold_type").value;
+        return manifold_formulation == MANIFOLD_TYPE_QUOTIENT_SPACE;
+    }
+
 
     ShouldShow_parameter_s(){
         var manifold_formulation = document.getElementById("select_manifold_type").value;
@@ -156,6 +162,11 @@ class VisibilityManager {
     UpdateInputRow(input_row_name, is_visible){
         var element = document.getElementById(input_row_name)
         element.className = is_visible ? "input_row" : "hidden";
+    }
+
+    UpdateVerticalContainer(input_row_name, is_visible){
+        var element = document.getElementById(input_row_name)
+        element.className = is_visible ? "vertical_container" : "hidden";
     }
 }
 
