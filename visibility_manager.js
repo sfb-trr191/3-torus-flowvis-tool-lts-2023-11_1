@@ -45,6 +45,9 @@ class VisibilityManager {
         this.UpdateInputRow("input_row_field_equation_a", this.ShouldShow_flow_quotiont_v1v2());
         this.UpdateInputRow("input_row_field_equation_b", this.ShouldShow_flow_quotiont_v1v2());
         
+        
+        this.UpdateInputRow("input_row_field_quation_parameter_s", this.ShouldShow_parameter_s());
+
         this.UpdateInputRow("input_row_equation_p0", this.ShouldShow_flow_implicit_x());
         this.UpdateInputRow("input_row_equation_p1", this.ShouldShow_flow_implicit_x());
         this.UpdateInputRow("input_row_equation_p2", this.ShouldShow_flow_implicit_x());
@@ -57,10 +60,16 @@ class VisibilityManager {
         
         this.UpdateInputRow("input_row_space", this.ShowOnDebug());
     }
-
+    
     ShowOnDebug(){
         var settings = document.getElementById("select_settings_mode").value;
         return settings == 3;//DEBUG = 3
+    }
+
+    ShouldShow_parameter_s(){
+        var manifold_formulation = document.getElementById("select_manifold_type").value;
+        var flow_formulation = document.getElementById("select_data_order").value;
+        return manifold_formulation == MANIFOLD_TYPE_IMPLICIT;
     }
 
     ShouldShow_flow_quotiont_x1x2(){
