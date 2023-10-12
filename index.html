@@ -348,51 +348,126 @@
                 <div class="group_properties_content">
                     <fieldset class="fieldset_load_example" id="fieldset_load_magnetic_field">
                         <legend>Magnetic Field</legend>
+                        <!--    
                         <label>Set equations to magnetic field:</label>
                         <label>u = cos(2 * PI * z)</label>
                         <label>v = sin(2 * PI * z)</label>
                         <label>w remains unchanged</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = \cos(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = \sin(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 \text{ remains unchanged} $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_double_pndulum">
                         <legend>Double Pendulum</legend>
+                        <!--                            
                         <label>Set equations to double pendulum:</label>
-                        <label>a = sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_x*v_x - sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_y*v_y</label>
-                        <label>b = -2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y</label>
+                        <label>\dot{v}_1 = sin(4*PI*(x1-x2))/(2*(cos(2*PI*(x1-x2))-2))*v1*v1-sin(2*PI*(x1-x2))/(2-cos(2*PI*(x1-x2)))*v2*v2</label>
+                        <label>\dot{v}_2 = -2*sin(2*PI*(x1-x2))/(2-cos(2*PI*(x1-x2)))*v1*v1-sin(4*PI*(x1-x2))/(2*(cos(2*PI*(x1-x2))-2))*v2*v2</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{v}_1 = \frac{\sin(4\pi(x_1-x_2))}{2(\cos(2\pi(x_1-x_2))-2)}v_1^2 - \frac{\sin(2\pi(x_1-x_2))}{2-\cos(2\pi(x_1-x_2))}v_2^2 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_2 = - \frac{2 \sin(2\pi(x_1-x_2))}{2-\cos(2\pi(x_1-x_2))} v_1^2 - \frac{\sin(4\pi(x_1-x_2))}{2(\cos(2\pi(x_1-x_2))-2)} v_2^2 $$
+                        </div>
                     </fieldset>                   
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_1">
-                        <legend>Example 1: Magnetic Field: w = 0</legend>
+                        <legend>Example 1: Magnetic Field: zero</legend>
+                        <!--                            
                         <label>Set equations to the most basic magnetic field:</label>
                         <label>u = cos(2 * PI * z)</label>
                         <label>v = sin(2 * PI * z)</label>
                         <label>w = 0</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = \cos(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = \sin(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = 0 $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_2">
-                        <legend>Example 2: Magnetic Field: w = c</legend>
+                        <legend>Example 2: Magnetic Field: constant</legend>
+                        <!--
                         <label>Set equations to magnetic field with constant w:</label>
                         <label>u = cos(2 * PI * z)</label>
                         <label>v = sin(2 * PI * z)</label>
                         <label>w = 1</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = \cos(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = \sin(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = 1 $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_3">
-                        <legend>Example 3: Magnetic Field: w = c * cos(2 * PI * x)</legend>
+                        <legend>Example 3: Magnetic Field: Taimanov</legend>
+                        <!--
                         <label>u = cos(2 * PI * z)</label>
                         <label>v = sin(2 * PI * z)</label>
                         <label>w = cos(2 * PI * x)</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = \cos(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = \sin(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = \cos(2 \pi x_1) $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_4">
-                        <legend>Example 4: Magnetic Field: w = sin(2 * PI * x) + cos(2 * PI * y)</legend>
+                        <legend>Example 4: Magnetic Field: tunnel</legend>
+                        <!--                            
                         <label>u = cos(2 * PI * z)</label>
                         <label>v = sin(2 * PI * z)</label>
                         <label>w = sin(2 * PI * x) + cos(2 * PI * y)</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = \cos(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = \sin(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = \sin(2 \pi x_1) + \cos(2 \pi x_2) $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_5">
-                        <legend>Example 5: default field</legend>
+                        <legend>Example 5: default</legend>
+                        <!--
                         <label>u = 2 * sin(2 * PI * z)</label>
                         <label>v = sin(2 * PI * y) + 2 * cos (2 * PI * z)</label>
                         <label>w = cos(2 * PI * x)</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = 2 \pi \sin(2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = \sin(2 \pi x_2) + 2 \cos (2 \pi x_3) $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = \cos(2 \pi x_1) $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_6">
                         <legend>Example 6: 3-sphere</legend>
+                        <!--
                         <label>p0 = d0</label>
                         <label>p1 = d1</label>
                         <label>p2 = d2</label>
@@ -401,9 +476,35 @@
                         <label>d1 = -p1</label>
                         <label>d2 = -p2</label>
                         <label>d3 = -p3</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = v_1 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = v_2 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = v_3 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_4 = v_4 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_1 = -x_1 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_2 = -x_2 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_3 = -x_3 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_4 = -x_4 $$
+                        </div>
                     </fieldset>
                     <fieldset class="fieldset_load_example" id="fieldset_load_example_7">
                         <legend>Example 7: Magnetic 3-sphere</legend>
+                        <!--
                         <label>p0 = d0</label>
                         <label>p1 = d1</label>
                         <label>p2 = d2</label>
@@ -413,6 +514,34 @@
                         <label>d2 = -s*d3-(1-s*delta)*p2</label>
                         <label>d3 = s*d2-(1-s*delta)*p3</label>
                         <label>s = 0.5</label>
+                        -->
+                        <div class="math-left-align">
+                            $$ \dot{x}_1 = v_1 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_2 = v_2 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_3 = v_3 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{x}_4 = v_4 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_1 = -s v_2-(1-s \delta) x_1 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_2 = s v_1-(1-s \delta) x_2 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_3 = -s v_4-(1-s \delta) x_3 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ \dot{v}_4 = s v_3-(1-s \delta) x_4 $$
+                        </div>
+                        <div class="math-left-align">
+                            $$ s = 0.5 $$
+                        </div>
                     </fieldset>
                 </div>   
             </fieldset>

@@ -4,7 +4,8 @@ class ExampleManager {
         this.InitButtons();   
     }
 
-    Link(hide_manager){
+    Link(visibility_manager, hide_manager){
+        this.visibility_manager = visibility_manager;
         this.hide_manager = hide_manager;
     }
 
@@ -106,131 +107,149 @@ class ExampleManager {
     SetMagneticField(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_FIRST_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_u").value = "cos(2*PI*x3)";
+        document.getElementById("input_field_equation_v").value = "sin(2*PI*x3)";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetDoublePendulum(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_2_PLUS_2D;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_SECOND_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_a").value = "sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_x*v_x - sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_y*v_y";
-        document.getElementById("input_field_equation_b").value = "-2*sin(2*PI*(x-y)) / (2-cos(2*PI*(x-y))) * v_x*v_x - sin(4*PI*(x-y)) / (2*(cos(2*PI*(x-y))-2)) * v_y*v_y";
+        document.getElementById("input_field_equation_a").value = "sin(4*PI*(x1-x2))/(2*(cos(2*PI*(x1-x2))-2))*v1*v1-sin(2*PI*(x1-x2))/(2-cos(2*PI*(x1-x2)))*v2*v2";
+        document.getElementById("input_field_equation_b").value = "-2*sin(2*PI*(x1-x2))/(2-cos(2*PI*(x1-x2)))*v1*v1-sin(4*PI*(x1-x2))/(2*(cos(2*PI*(x1-x2))-2))*v2*v2";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetExample1(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_FIRST_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_u").value = "cos(2*PI*x3)";
+        document.getElementById("input_field_equation_v").value = "sin(2*PI*x3)";
         document.getElementById("input_field_equation_w").value = "0";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetExample2(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_FIRST_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
+        document.getElementById("input_field_equation_u").value = "cos(2*PI*x3)";
+        document.getElementById("input_field_equation_v").value = "sin(2*PI*x3)";
         document.getElementById("input_field_equation_w").value = "1";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetExample3(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_FIRST_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "cos(2 * PI * x)";
+        document.getElementById("input_field_equation_u").value = "cos(2*PI*x3)";
+        document.getElementById("input_field_equation_v").value = "sin(2*PI*x3)";
+        document.getElementById("input_field_equation_w").value = "cos(2*PI*x1)";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetExample4(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_FIRST_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_u").value = "cos(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "sin(2 * PI * x) + cos(2 * PI * y)";
+        document.getElementById("input_field_equation_u").value = "cos(2*PI*x3)";
+        document.getElementById("input_field_equation_v").value = "sin(2*PI*x3)";
+        document.getElementById("input_field_equation_w").value = "sin(2*PI*x1)+cos(2*PI*x2)";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetExample5(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_TORUS;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_QUOTIENT_SPACE;
+        document.getElementById("select_data_order").value = DATA_ORDER_FIRST_ORDER;
         this.SetLightTransportLinear();
         this.SetDuplicatorOnce();
-        document.getElementById("input_field_equation_u").value = "2 * sin(2 * PI * z)";
-        document.getElementById("input_field_equation_v").value = "sin(2 * PI * y) + 2 * cos (2 * PI * z)";
-        document.getElementById("input_field_equation_w").value = "cos(2 * PI * x)";
+        document.getElementById("input_field_equation_u").value = "2*sin(2*PI*x3)";
+        document.getElementById("input_field_equation_v").value = "sin(2*PI*x2)+2*cos(2*PI*x3)";
+        document.getElementById("input_field_equation_w").value = "cos(2*PI*x1)";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
   
     SetExample6(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_IMPLICIT;
+        document.getElementById("select_data_order").value = DATA_ORDER_SECOND_ORDER;
         this.SetLightTransport3Sphere();
         this.SetDuplicatorOff();
-        document.getElementById("input_field_equation_p0").value = "d0";
-        document.getElementById("input_field_equation_p1").value = "d1";
-        document.getElementById("input_field_equation_p2").value = "d2";
-        document.getElementById("input_field_equation_p3").value = "d3";
-        document.getElementById("input_field_equation_d0").value = "-p0";
-        document.getElementById("input_field_equation_d1").value = "-p1";
-        document.getElementById("input_field_equation_d2").value = "-p2";
-        document.getElementById("input_field_equation_d3").value = "-p3";
+        document.getElementById("input_field_equation_p0").value = "v1";
+        document.getElementById("input_field_equation_p1").value = "v2";
+        document.getElementById("input_field_equation_p2").value = "v3";
+        document.getElementById("input_field_equation_p3").value = "v4";
+        document.getElementById("input_field_equation_d0").value = "-x1";
+        document.getElementById("input_field_equation_d1").value = "-x2";
+        document.getElementById("input_field_equation_d2").value = "-x3";
+        document.getElementById("input_field_equation_d3").value = "-x4";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetExample7(){
         //MARKER_RENAME_SYMBOLS
         document.getElementById("select_space").value = SPACE_3_SPHERE_4_PLUS_4D;
+        document.getElementById("select_manifold_type").value = MANIFOLD_TYPE_IMPLICIT;
+        document.getElementById("select_data_order").value = DATA_ORDER_SECOND_ORDER;
         this.SetLightTransport3Sphere();
         this.SetDuplicatorOff();
         document.getElementById("input_field_equation_parameter_s").value = "0.5";
-        document.getElementById("input_field_equation_p0").value = "d0";
-        document.getElementById("input_field_equation_p1").value = "d1";
-        document.getElementById("input_field_equation_p2").value = "d2";
-        document.getElementById("input_field_equation_p3").value = "d3";
-        document.getElementById("input_field_equation_d0").value = "-s*d1-(1-s*delta)*p0";
-        document.getElementById("input_field_equation_d1").value = "s*d0-(1-s*delta)*p1";
-        document.getElementById("input_field_equation_d2").value = "-s*d3-(1-s*delta)*p2";
-        document.getElementById("input_field_equation_d3").value = "s*d2-(1-s*delta)*p3";
+        document.getElementById("input_field_equation_p0").value = "v1";
+        document.getElementById("input_field_equation_p1").value = "v2";
+        document.getElementById("input_field_equation_p2").value = "v3";
+        document.getElementById("input_field_equation_p3").value = "v4";
+        document.getElementById("input_field_equation_d0").value = "-s*v2-(1-s*delta)*x1";
+        document.getElementById("input_field_equation_d1").value = "s*v1-(1-s*delta)*x2";
+        document.getElementById("input_field_equation_d2").value = "-s*v4-(1-s*delta)*x3";
+        document.getElementById("input_field_equation_d3").value = "s*v3-(1-s*delta)*x4";
         document.getElementById("wrapper_dialog_load_field").className = "hidden";
-        this.hide_manager.UpdateVisibility();
+        this.UpdateVisibility();
     }
 
     SetLightTransport3Sphere(){    
         //MARKER_RENAME_SYMBOLS            
         document.getElementById("select_light_integrator_type").value = LIGHT_INTEGRATOR_RK4;
-        document.getElementById("input_field_light_transport_p0").value = "d0";
-        document.getElementById("input_field_light_transport_p1").value = "d1";
-        document.getElementById("input_field_light_transport_p2").value = "d2";
-        document.getElementById("input_field_light_transport_p3").value = "d3";
-        document.getElementById("input_field_light_transport_d0").value = "-p0";
-        document.getElementById("input_field_light_transport_d1").value = "-p1";
-        document.getElementById("input_field_light_transport_d2").value = "-p2";
-        document.getElementById("input_field_light_transport_d3").value = "-p3";
+        document.getElementById("input_field_light_transport_p0").value = "v1";
+        document.getElementById("input_field_light_transport_p1").value = "v2";
+        document.getElementById("input_field_light_transport_p2").value = "v3";
+        document.getElementById("input_field_light_transport_p3").value = "v4";
+        document.getElementById("input_field_light_transport_d0").value = "-x1";
+        document.getElementById("input_field_light_transport_d1").value = "-x2";
+        document.getElementById("input_field_light_transport_d2").value = "-x3";
+        document.getElementById("input_field_light_transport_d3").value = "-x4";
     }
 
     SetLightTransportLinear(){                
@@ -243,6 +262,11 @@ class ExampleManager {
 
     SetDuplicatorOnce(){                
         document.getElementById("segment_duplicator_iterations").value = "1";
+    }
+
+    UpdateVisibility(){
+        this.visibility_manager.UpdateVisibility();
+        this.hide_manager.UpdateVisibility();
     }
 }
 

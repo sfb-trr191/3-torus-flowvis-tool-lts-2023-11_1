@@ -264,7 +264,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         tab_manager = new TabManager();
         hide_manager = new HideManager(tab_manager);
         visibility_manager = new VisibilityManager();
-        example_manager.Link(hide_manager);
+        example_manager.Link(visibility_manager, hide_manager);
         tab_manager.Link(hide_manager);
         ui_tools = new UiTools();
 
