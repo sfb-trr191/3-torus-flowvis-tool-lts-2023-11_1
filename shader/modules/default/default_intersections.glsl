@@ -246,7 +246,22 @@ void Intersect(Ray ray, inout HitInformation hit, inout HitInformation hit_outsi
 
                         exit_distance = distance(transitional_ray.origin, exit);
                     }
-                }else{
+                }
+                else if(light_integrator_type == LIGHT_INTEGRATOR_RK4){
+                    //NEW RK4
+                    //set next position of variable ray
+                    variableRay.nextPosition = MoveOutOfBounds(variableRay.nextPosition);
+                    variableRay.rayDistance = tmp_rayDistance + variableRay.local_cutoff;
+
+                    if(render_face_border_intersections)
+                    {   
+                        float tmp = variableRay.rayDistance;
+                        variableRay.rayDistance = tmp_rayDistance;
+                        RenderFaceIntersections(variableRay, hit, exit);
+                        variableRay.rayDistance = tmp;
+                    }
+                }
+                else{
                     //NEW
                     //IF EXPLICIT
                     //set next position of variable ray, next iteration will resume normally
