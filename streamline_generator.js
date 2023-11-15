@@ -393,6 +393,8 @@ class StreamlineGenerator {
     }
 
     ContinueStreamline3Torus(bo_calculate_streamlines) {
+        //MARKER_MODIFIED_STREAMLINE_CALCULATION
+        //TODO: make new method ContinueStreamlineQuotientSpace
         var t_start = performance.now();
 
 

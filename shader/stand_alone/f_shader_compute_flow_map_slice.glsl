@@ -33,6 +33,8 @@ const float PI = 3.1415926535897932384626433832795;
 //! [0]
 void main()
 {
+    //MARKER_MODIFIED_STREAMLINE_CALCULATION
+    //TODO: new calculation method
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
     float t_x = float(x) / float(dim_x_extended-1);

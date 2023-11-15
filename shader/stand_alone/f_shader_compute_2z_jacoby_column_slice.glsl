@@ -40,6 +40,8 @@ void main()
 }
 
 vec3 CalculateCentralDifference(int direction, float h2){
+    //MARKER_MODIFIED_STREAMLINE_CALCULATION
+    //TODO: do not identify neighboring nodes, instead use the boundary rules, the new phi function, trilinear interpolation   
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
 

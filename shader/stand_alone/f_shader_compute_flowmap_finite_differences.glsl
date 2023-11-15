@@ -21,7 +21,9 @@ vec3 f(vec3 vector);
 const float PI = 3.1415926535897932384626433832795;
 //! [0]
 void main()
-{
+{    
+    //MARKER_MODIFIED_STREAMLINE_CALCULATION
+    //TODO: do not wrap around, instead use the boundary rules, the new phi function, trilinear interpolation   
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
 

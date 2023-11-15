@@ -355,6 +355,8 @@ class FTLEManager {
     }
 
     execute_flow_map_setup(bo){//bo = bo_calculate_ftle
+        //MARKER_MODIFIED_STREAMLINE_CALCULATION
+        //TODO: do not use extended dimension, we wrap around instead        
         this.data_texture_flowmap.initDimensions(bo.gl, this.dim_x_extended, this.dim_y_extended, 2*this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(bo.gl);
 
@@ -364,6 +366,8 @@ class FTLEManager {
     }
 
     execute_flow_map_compute(bo){//bo = bo_calculate_ftle
+        //MARKER_MODIFIED_STREAMLINE_CALCULATION
+        //TODO: do not use extended dimension, we wrap around instead    
         if(!bo.tmp.finished_forward){
             if(bo.tmp.i == this.dim_z_extended){
                 bo.tmp.finished_forward = true
@@ -722,7 +726,9 @@ class FTLEManager {
     }
     */
 
-    computeFlowMapFiniteDifferencesDirection(gl, direction, data_texture, h2) {
+    computeFlowMapFiniteDifferencesDirection(gl, direction, data_texture, h2) {        
+        //MARKER_MODIFIED_STREAMLINE_CALCULATION
+        //TODO: this seems to be unused, comment out? 
         data_texture.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
         for (var i = 0; i < this.dim_z; i++) {
             this.computeFlowMapFiniteDifferencesSlice(gl, i, direction, data_texture, h2, true);

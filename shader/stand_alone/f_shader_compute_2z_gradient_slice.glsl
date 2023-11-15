@@ -43,7 +43,9 @@ void main()
     outputColor = vec4(vector, 1);
 }
 
-float CalculateCentralDifference(int direction, float h2){
+float CalculateCentralDifference(int direction, float h2){    
+    //MARKER_MODIFIED_STREAMLINE_CALCULATION
+    //TODO: do not identify neighboring nodes, instead use the boundary rules, the new phi function, trilinear interpolation    
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
 
