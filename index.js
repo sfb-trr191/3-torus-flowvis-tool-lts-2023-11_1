@@ -111,12 +111,14 @@ const PixelResults = require("./pixel_results");
 const gram_schmidt = require("./gram_schmidt");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 const ExampleManager = require("./example_manager");
+const Christoffel = require("./christoffel");
 
 
 const math4D = require("./math4D");
 const cpu_intersect = require("./cpu_intersect");
 const DynamicStreamline = require("./dynamic_streamline");
 const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftle");
+const { re } = require("mathjs");
 
 ; (function () {
     "use strict"
@@ -200,6 +202,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     var t_stop_export;
 
     var is_mobile;
+
+    var christoffel;
 
     function onStart(evt) {
         console.log("onStart");
@@ -291,6 +295,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
         input_manager.initialize();
         mouse_manager = new MouseManager(main_canvas, main_camera, side_canvas, side_camera, dynamic_streamline);
         mouse_manager.initialize();
+
+        christoffel = new Christoffel();
 
         //buildErrorDictionary();
 
@@ -416,7 +422,7 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools);
+        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools, christoffel);
         input_parameter_wrapper.fromURLVersion();
         RedirectVersion();
         input_parameter_wrapper.fromURL();
@@ -1375,6 +1381,8 @@ const BackgroundObjectCalculateFTLE = require("./background_object_calculate_ftl
     function UpdateRenderSettings() {
         console.log("UpdateRenderSettings");
         settings_changed = true;
+
+        christoffel.ReadChristoffelSymbolsFromUI();
 
         ui_seeds.UpdateChanges();
         onChangedDrawMode();

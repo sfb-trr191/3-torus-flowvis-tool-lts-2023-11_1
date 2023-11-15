@@ -84,7 +84,7 @@ class InputWrapper {
 
 class InputParameterWrapper {
 
-    constructor(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools) {
+    constructor(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools, christoffel) {
         this.tree_view = tree_view;
         this.ui_seeds = ui_seeds;
         this.main_camera = main_camera;
@@ -93,6 +93,7 @@ class InputParameterWrapper {
         this.tab_manager = tab_manager;
         this.state_manager = state_manager;
         this.ui_tools = ui_tools;
+        this.christoffel = christoffel;
         this.dict_url_parameter_name_to_input_wrapper = {};
         this.dict_input_element_name_to_input_wrapper = {};
 
@@ -402,6 +403,9 @@ class InputParameterWrapper {
 
             const transfer_function_manager = urlParams.get(PARAM_TRANSFER_FUNCTION_MANAGER);
             this.transfer_function_manager.fromString(transfer_function_manager);  
+            
+            const christoffel = urlParams.get(PARAM_CHRISTOFFEL);
+            this.christoffel.fromString(christoffel);
         }
 
         const text = urlParams.get("text");
@@ -501,6 +505,7 @@ class InputParameterWrapper {
             params[PARAM_CAMERA] = this.main_camera.toString();
             params[PARAM_SIDE_CAMERA] = this.side_camera.toString();
             params[PARAM_TRANSFER_FUNCTION_MANAGER] = this.transfer_function_manager.toString();
+            params[PARAM_CHRISTOFFEL] = this.christoffel.toString();
 
             /*
             if(is_export){
