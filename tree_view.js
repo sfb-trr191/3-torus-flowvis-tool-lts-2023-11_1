@@ -359,6 +359,7 @@ class TreeView{
         var node_equations = this.generateNode(this, "Equations", "group_properties_root_data_equations", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_equations_light_integration = this.generateNode(this, "Ray Integration", "group_properties_root_data_equations_light_integration", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_equations_rules = this.generateNode(this, "Boundary Rules", "group_properties_root_data_equations_rules", NO_EYE, null, EYE_DEFAULT_VISIBLE);
+        var node_equations_christoffel = this.generateNode(this, "Christoffel Symbols", "group_properties_root_data_equations_christoffel", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_streamline_calculation = this.generateNode(this, "Streamline Calculation", "group_properties_root_data_streamline_calculation", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_streamline_calculation_dynamic = this.generateNode(this, "Dynamic Streamline", "group_properties_root_data_streamline_calculation_dynamic", NO_EYE, null, EYE_DEFAULT_VISIBLE);
         var node_ftle_calculation = this.generateNode(this, "FTLE Calculation", "group_properties_root_data_ftle_calculation", NO_EYE, null, EYE_DEFAULT_VISIBLE);
@@ -408,6 +409,7 @@ class TreeView{
         node_data.addChild(node_equations); 
         node_equations.addChild(node_equations_light_integration);
         node_equations.addChild(node_equations_rules);        
+        node_equations.addChild(node_equations_christoffel);        
         node_data.addChild(node_streamline_calculation);
         node_streamline_calculation.addChild(node_streamline_calculation_dynamic);
         node_data.addChild(node_ftle_calculation);

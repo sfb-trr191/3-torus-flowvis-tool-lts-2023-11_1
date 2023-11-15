@@ -315,6 +315,16 @@ legend {
     gap: 0px; 
 }
 
+.input_row_triple{
+    display: grid;
+    grid-template-columns: 50px 1fr 25px 50px 1fr 25px 50px 1fr;
+    grid-template-rows: auto auto auto auto auto;
+    position: relative;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+    gap: 0px; 
+}
+
 .math-left-align{
     display: inline-block
 }
