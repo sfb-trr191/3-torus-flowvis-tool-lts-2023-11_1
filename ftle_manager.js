@@ -235,6 +235,45 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
     }
 
+    ReplaceComputeFlowMapFiniteDifferencesShader(gl){
+        console.log("ReplaceComputeFlowMapFiniteDifferencesShader");
+        console.log(gl);
+        var space = this.p_streamline_generator.space;
+
+        this.program_compute_flowmap_finite_differences = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, 
+            this.p_shader_manager.GetShaderComputeFlowMapFiniteDifferences(space));
+        this.location_compute_flowmap_finite_differences = new UniformLocationsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
+        this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
+        this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
+    }
+
+    ReplaceCompute2zGradientSliceShader(gl){
+        console.log("ReplaceCompute2zGradientSliceShader");
+        console.log(gl);
+        var space = this.p_streamline_generator.space;
+
+        this.program_compute_2z_gradient_slice = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_2z_gradient_slice, V_SHADER_RAYTRACING, 
+            this.p_shader_manager.GetShaderCompute2zGradientSlice(space));
+        this.location_compute_compute_2z_gradient_slice = new UniformLocationsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
+        this.shader_uniforms_compute_compute_2z_gradient_slice = this.loadShaderUniformsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
+        this.attribute_location_dummy_program_compute_2z_gradient_slice = gl.getAttribLocation(this.program_compute_2z_gradient_slice, "a_position");
+    }
+
+    ReplaceCompute2zJacobyColumnSliceShader(gl){
+        console.log("ReplaceCompute2zJacobyColumnSliceShader");
+        console.log(gl);
+        var space = this.p_streamline_generator.space;
+
+        this.program_compute_2z_jacoby_column_slice = gl.createProgram();
+        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, 
+            this.p_shader_manager.GetShaderCompute2zJacobyColumnSlice(space));
+        this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
+        this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
+        this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
+    }
+
     bind(canvas_wrapper_name, gl, 
         location_texture_ftle, texture_ftle_index, 
         location_texture_ftle_gradient, texture_ftle_gradient_index, 
@@ -336,6 +375,9 @@ class FTLEManager {
         //TODO: do not use extended dimension, we wrap around instead        
         this.data_texture_flowmap.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
         this.ReplaceComputeFlowMapSliceShader(bo.gl);
+        this.ReplaceComputeFlowMapFiniteDifferencesShader(bo.gl);
+        this.ReplaceCompute2zGradientSliceShader(bo.gl);
+        this.ReplaceCompute2zJacobyColumnSliceShader(bo.gl);
 
         bo.tmp.i = 0;
         bo.tmp.finished_forward = false;
@@ -630,6 +672,7 @@ class FTLEManager {
     }
     */
 
+    /*
     computeFlowMap(gl) {
         console.log("computeFlowMap");
         this.data_texture_flowmap.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
@@ -642,6 +685,7 @@ class FTLEManager {
         }
         this.data_texture_flowmap.update(gl);
     }
+    */
 
     computeFlowMapSlice(gl, slice_index, is_forward) {
         var sign_f = is_forward ? 1.0 : -1.0;

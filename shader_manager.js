@@ -245,6 +245,70 @@ class ShaderManager {
         return code;  
     }
 
+    GetShaderComputeFlowMapFiniteDifferences(space){
+        //get variables
+        var equations = new EquationCollection();
+
+        var code;
+        switch (space) {
+            case SPACE_3_TORUS:
+                //code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE_TORUS;
+                code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
+                break;
+            case SPACE_2_PLUS_2D:
+                code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
+
+        code = this.ReplaceEquations(code, equations);
+        return code;  
+    }
+    
+    GetShaderCompute2zGradientSlice(space){
+        //get variables
+        var equations = new EquationCollection();
+
+        var code;
+        switch (space) {
+            case SPACE_3_TORUS:
+                code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE_QUOTIENT_SPACE;
+                break;
+            case SPACE_2_PLUS_2D:
+                code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE_QUOTIENT_SPACE;
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
+
+        code = this.ReplaceEquations(code, equations);
+        return code;  
+    }
+
+    GetShaderCompute2zJacobyColumnSlice(space){
+        //get variables
+        var equations = new EquationCollection();
+
+        var code;
+        switch (space) {
+            case SPACE_3_TORUS:
+                code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE;
+                break;
+            case SPACE_2_PLUS_2D:
+                code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE;
+                break;
+            default:
+                console.log("Error unknonw space");
+                break;
+        }
+
+        code = this.ReplaceEquations(code, equations);
+        return code;  
+    }
+
     GetShaderKey(equations, shader_flags){
         var key = shader_flags.space + ";" + equations.shader_formula_scalar_float;
         
