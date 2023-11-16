@@ -226,7 +226,7 @@ class ShaderManager {
         var code;
         switch (space) {
             case SPACE_3_TORUS:
-                code = F_SHADER_COMPUTE_FLOW_MAP_SLICE;
+                code = F_SHADER_COMPUTE_FLOW_MAP_SLICE_TORUS;
                 break;
             case SPACE_2_PLUS_2D:
                 code = F_SHADER_COMPUTE_FLOW_MAP_SLICE_AB;
