@@ -253,7 +253,8 @@ class ShaderManager {
         var code;
         switch (space) {
             case SPACE_3_TORUS:
-                //code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE_TORUS;
+                //code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_TORUS;
+                //code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
                 code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
                 break;
             case SPACE_2_PLUS_2D:
@@ -263,7 +264,7 @@ class ShaderManager {
                 console.log("Error unknonw space");
                 break;
         }
-
+        code = this.ReplaceComputationModules(code);
         code = this.ReplaceEquations(code, equations);
         return code;  
     }
@@ -510,6 +511,7 @@ class ShaderManager {
     }
 
     ReplaceComputationModules(code){
+        code = code.replace("$SHADER_MODULE_SHARED_UTILITY$", SHADER_MODULE_SHARED_UTILITY);
         code = code.replace("$SHADER_MODULE_COMPUTE_PHI$", SHADER_MODULE_COMPUTE_PHI);
         code = code.replace("$SHADER_MODULE_COMPUTE_BOUNDS$", SHADER_MODULE_COMPUTE_BOUNDS);
         return code;

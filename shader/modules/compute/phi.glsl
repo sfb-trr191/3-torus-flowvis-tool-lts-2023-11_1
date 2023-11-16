@@ -2,6 +2,10 @@ global.SHADER_MODULE_COMPUTE_PHI = `
 
 vec3 phi(vec3 a, vec3 dir)
 {    
+    float epsilon_clamp = 0.00001;
+    float epsilon_t_exit = 0.000001;
+    //a = clamp(a, 0.0+epsilon_clamp, 1.0-epsilon_clamp);//does not seem to be required
+
     vec3 b = a + dir;  
     int iteration_count_at_border = 0;  
     while(CheckOutOfBounds(b)){
@@ -18,7 +22,8 @@ vec3 phi(vec3 a, vec3 dir)
         //float t_y = (tar_y - origin.y) * dir_inv.y;	
         //float t_z = (tar_z - origin.z) * dir_inv.z;	
         vec3 t_v = (tar - a) * dir_inv;	
-        float t_exit = min(t_v.x, min(t_v.y, t_v.z));		
+        float t_exit = min(t_v.x, min(t_v.y, t_v.z));	
+        t_exit = max(0.0, t_exit);	
         vec3 c = a + t_exit * dir_normalized;
 
         //Calculate the distance dist between c and b (that is how far we need to go into the next FD)
@@ -37,7 +42,7 @@ vec3 phi(vec3 a, vec3 dir)
 
         //Detect infinite loop when a stays on border
         //if a starts at the border
-        if(t_exit < 0.001)
+        if(t_exit < epsilon_t_exit)
         {            
             iteration_count_at_border += 1;
         }        
@@ -47,14 +52,17 @@ vec3 phi(vec3 a, vec3 dir)
 
     }
 
-    float epsilon = 0.0001;
-    b = clamp(b, 0.0+epsilon, 1.0-epsilon);
+    b = clamp(b, 0.0+epsilon_clamp, 1.0-epsilon_clamp);
 
     return b;
 }
 
 vec3 phi_track(vec3 a, vec3 dir, inout vec3 pos_r3)
 {    
+    float epsilon_clamp = 0.00001;
+    float epsilon_t_exit = 0.000001;
+    //a = clamp(a, 0.0+epsilon_clamp, 1.0-epsilon_clamp);//does not seem to be required
+
     vec3 b = a + dir;  
     int iteration_count_at_border = 0;  
     while(CheckOutOfBounds(b)){
@@ -71,7 +79,8 @@ vec3 phi_track(vec3 a, vec3 dir, inout vec3 pos_r3)
         //float t_y = (tar_y - origin.y) * dir_inv.y;	
         //float t_z = (tar_z - origin.z) * dir_inv.z;	
         vec3 t_v = (tar - a) * dir_inv;	
-        float t_exit = min(t_v.x, min(t_v.y, t_v.z));		
+        float t_exit = min(t_v.x, min(t_v.y, t_v.z));	
+        t_exit = max(0.0, t_exit);		
         vec3 c = a + t_exit * dir_normalized;
 
         //Update the flow tracker variable
@@ -93,7 +102,7 @@ vec3 phi_track(vec3 a, vec3 dir, inout vec3 pos_r3)
 
         //Detect infinite loop when a stays on border
         //if a starts at the border
-        if(t_exit < 0.001)
+        if(t_exit < epsilon_t_exit)
         {            
             iteration_count_at_border += 1;
         }        
@@ -103,8 +112,7 @@ vec3 phi_track(vec3 a, vec3 dir, inout vec3 pos_r3)
 
     }
 
-    float epsilon = 0.0001;
-    b = clamp(b, 0.0+epsilon, 1.0-epsilon);
+    b = clamp(b, 0.0+epsilon_clamp, 1.0-epsilon_clamp);
 
     //Update the flow tracker variable (this is either the entire segment, or the last part that remains in the new FD after exiting the old FD)
     pos_r3 += b - a;

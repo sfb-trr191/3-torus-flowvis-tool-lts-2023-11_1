@@ -21,18 +21,13 @@ const int FTLE_TERMINATION_CONDITION_ADVECTION_TIME = 1;
 const int FTLE_TERMINATION_CONDITION_ARC_LENGTH = 2;
 
 vec3 f(vec3 vector);
-vec3 phi(vec3 a, vec3 dir);
-vec3 phi_track(vec3 a, vec3 dir, inout vec3 pos_r3);
-bool CheckOutOfBounds(vec3 position);
-vec3 MoveOutOfBounds(vec3 position);
-vec3 MoveOutOfBoundsDirection(vec3 position, vec3 direction);
 
 const float PI = 3.1415926535897932384626433832795;
 const float epsilon_move_ray = 0.0000001;//DUMMY
 const float epsilon_out_of_bounds = 0.0;//00001;//DUMMY
 
-$SHADER_MODULE_COMPUTE_PHI$
 $SHADER_MODULE_COMPUTE_BOUNDS$
+$SHADER_MODULE_COMPUTE_PHI$
 
 void main()
 {

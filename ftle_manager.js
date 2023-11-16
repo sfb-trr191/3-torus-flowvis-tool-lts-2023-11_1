@@ -162,7 +162,7 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
 
         this.program_compute_flowmap_finite_differences = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE);
+        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_TORUS);
         this.location_compute_flowmap_finite_differences = new UniformLocationsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
