@@ -4,16 +4,9 @@ precision highp isampler3D;         //high precision required for indices / ids 
 precision highp float;
 precision highp sampler3D;
 
-uniform int dim_x_extended;
-uniform int dim_y_extended;
-uniform int dim_z_extended;
-
-uniform float extended_min_x;
-uniform float extended_min_y;
-uniform float extended_min_z;
-uniform float extended_max_x;
-uniform float extended_max_y;
-uniform float extended_max_z;
+uniform int dim_x;
+uniform int dim_y;
+uniform int dim_z;
 
 uniform int slice_index;
 uniform float sign_f;//1.0 for forward direction, -1.0 for backward direction
@@ -37,15 +30,11 @@ void main()
     //TODO: new calculation method
     int x = int(gl_FragCoord[0]);
     int y = int(gl_FragCoord[1]);
-    float t_x = float(x) / float(dim_x_extended-1);
-    float t_y = float(y) / float(dim_y_extended-1);
-    float t_z = float(slice_index) / float(dim_z_extended-1);
+    float t_x = float(x) / float(dim_x-1);
+    float t_y = float(y) / float(dim_y-1);
+    float t_z = float(slice_index) / float(dim_z-1);
 
-    float val_x = mix(extended_min_x, extended_max_x, t_x);
-    float val_y = mix(extended_min_y, extended_max_y, t_y);
-    float val_z = mix(extended_min_z, extended_max_z, t_z);
-
-    vec3 previous_position = vec3(val_x, val_y, val_z);
+    vec3 previous_position = vec3(t_x, t_y, t_z);
 
     vec3 previous_f = f(previous_position);
     float previous_speed = length(previous_f);
