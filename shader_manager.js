@@ -149,68 +149,7 @@ class ShaderManager {
         
         code = code.replace("$defines$", defines);
         
-        code = code.replace("light_transport_p0", equations.light_transport_p0);
-        code = code.replace("light_transport_p1", equations.light_transport_p1);
-        code = code.replace("light_transport_p2", equations.light_transport_p2);
-        code = code.replace("light_transport_p3", equations.light_transport_p3);
-        code = code.replace("light_transport_d0", equations.light_transport_d0);
-        code = code.replace("light_transport_d1", equations.light_transport_d1);
-        code = code.replace("light_transport_d2", equations.light_transport_d2);
-        code = code.replace("light_transport_d3", equations.light_transport_d3);
-
-        code = code.replace("light_parametric_h1", equations.light_parametric_h1);
-        code = code.replace("light_parametric_h2", equations.light_parametric_h2);
-        code = code.replace("light_parametric_h3", equations.light_parametric_h3);
-        code = code.replace("light_parametric_h4", equations.light_parametric_h4);
-        code = code.replace("light_parametric_h5", equations.light_parametric_h5);
-        code = code.replace("light_parametric_h6", equations.light_parametric_h6);
-        code = code.replace("light_parametric_x1", equations.light_parametric_x1);
-        code = code.replace("light_parametric_x2", equations.light_parametric_x2);
-        code = code.replace("light_parametric_x3", equations.light_parametric_x3);
-
-        code = code.replace("shader_rule_x_pos_x", equations.shader_rule_x_pos_x);
-        code = code.replace("shader_rule_x_pos_y", equations.shader_rule_x_pos_y);
-        code = code.replace("shader_rule_x_pos_z", equations.shader_rule_x_pos_z);        
-        code = code.replace("shader_rule_x_neg_x", equations.shader_rule_x_neg_x);
-        code = code.replace("shader_rule_x_neg_y", equations.shader_rule_x_neg_y);
-        code = code.replace("shader_rule_x_neg_z", equations.shader_rule_x_neg_z);
-
-        code = code.replace("shader_rule_y_pos_x", equations.shader_rule_y_pos_x);
-        code = code.replace("shader_rule_y_pos_y", equations.shader_rule_y_pos_y);
-        code = code.replace("shader_rule_y_pos_z", equations.shader_rule_y_pos_z);        
-        code = code.replace("shader_rule_y_neg_x", equations.shader_rule_y_neg_x);
-        code = code.replace("shader_rule_y_neg_y", equations.shader_rule_y_neg_y);
-        code = code.replace("shader_rule_y_neg_z", equations.shader_rule_y_neg_z);
-
-        code = code.replace("shader_rule_z_pos_x", equations.shader_rule_z_pos_x);
-        code = code.replace("shader_rule_z_pos_y", equations.shader_rule_z_pos_y);
-        code = code.replace("shader_rule_z_pos_z", equations.shader_rule_z_pos_z);        
-        code = code.replace("shader_rule_z_neg_x", equations.shader_rule_z_neg_x);
-        code = code.replace("shader_rule_z_neg_y", equations.shader_rule_z_neg_y);
-        code = code.replace("shader_rule_z_neg_z", equations.shader_rule_z_neg_z);
-
-
-        code = code.replace("shader_rule_x_pos_u", equations.shader_rule_x_pos_u);
-        code = code.replace("shader_rule_x_pos_v", equations.shader_rule_x_pos_v);
-        code = code.replace("shader_rule_x_pos_w", equations.shader_rule_x_pos_w);        
-        code = code.replace("shader_rule_x_neg_u", equations.shader_rule_x_neg_u);
-        code = code.replace("shader_rule_x_neg_v", equations.shader_rule_x_neg_v);
-        code = code.replace("shader_rule_x_neg_w", equations.shader_rule_x_neg_w);
-
-        code = code.replace("shader_rule_y_pos_u", equations.shader_rule_y_pos_u);
-        code = code.replace("shader_rule_y_pos_v", equations.shader_rule_y_pos_v);
-        code = code.replace("shader_rule_y_pos_w", equations.shader_rule_y_pos_w);        
-        code = code.replace("shader_rule_y_neg_u", equations.shader_rule_y_neg_u);
-        code = code.replace("shader_rule_y_neg_v", equations.shader_rule_y_neg_v);
-        code = code.replace("shader_rule_y_neg_w", equations.shader_rule_y_neg_w);
-
-        code = code.replace("shader_rule_z_pos_u", equations.shader_rule_z_pos_u);
-        code = code.replace("shader_rule_z_pos_v", equations.shader_rule_z_pos_v);
-        code = code.replace("shader_rule_z_pos_w", equations.shader_rule_z_pos_w);        
-        code = code.replace("shader_rule_z_neg_u", equations.shader_rule_z_neg_u);
-        code = code.replace("shader_rule_z_neg_v", equations.shader_rule_z_neg_v);
-        code = code.replace("shader_rule_z_neg_w", equations.shader_rule_z_neg_w);
-
+        code = this.ReplaceEquations(code, equations);
 
         console.log("code:", code);
         return code;
@@ -280,6 +219,9 @@ class ShaderManager {
     }
 
     GetShaderComputeFlowMapSlice(space, shader_formula_u, shader_formula_v, shader_formula_w, shader_formula_a, shader_formula_b){
+        //get variables
+        var equations = new EquationCollection();
+
         //MARKER_RENAME_SYMBOLS Nothing to do here
         var code;
         switch (space) {
@@ -298,6 +240,7 @@ class ShaderManager {
         code = code.replace("shader_formula_w", shader_formula_w);
         code = code.replace("shader_formula_a", shader_formula_a);
         code = code.replace("shader_formula_b", shader_formula_b);
+        code = this.ReplaceEquations(code, equations);
         return code;  
     }
 
@@ -500,7 +443,72 @@ class ShaderManager {
         this.settings_changed = false;
     }
 
+    ReplaceEquations(code, equations){
+        code = code.replace("light_transport_p0", equations.light_transport_p0);
+        code = code.replace("light_transport_p1", equations.light_transport_p1);
+        code = code.replace("light_transport_p2", equations.light_transport_p2);
+        code = code.replace("light_transport_p3", equations.light_transport_p3);
+        code = code.replace("light_transport_d0", equations.light_transport_d0);
+        code = code.replace("light_transport_d1", equations.light_transport_d1);
+        code = code.replace("light_transport_d2", equations.light_transport_d2);
+        code = code.replace("light_transport_d3", equations.light_transport_d3);
 
+        code = code.replace("light_parametric_h1", equations.light_parametric_h1);
+        code = code.replace("light_parametric_h2", equations.light_parametric_h2);
+        code = code.replace("light_parametric_h3", equations.light_parametric_h3);
+        code = code.replace("light_parametric_h4", equations.light_parametric_h4);
+        code = code.replace("light_parametric_h5", equations.light_parametric_h5);
+        code = code.replace("light_parametric_h6", equations.light_parametric_h6);
+        code = code.replace("light_parametric_x1", equations.light_parametric_x1);
+        code = code.replace("light_parametric_x2", equations.light_parametric_x2);
+        code = code.replace("light_parametric_x3", equations.light_parametric_x3);
+
+
+        code = code.replace("shader_rule_x_pos_x", equations.shader_rule_x_pos_x);
+        code = code.replace("shader_rule_x_pos_y", equations.shader_rule_x_pos_y);
+        code = code.replace("shader_rule_x_pos_z", equations.shader_rule_x_pos_z);        
+        code = code.replace("shader_rule_x_neg_x", equations.shader_rule_x_neg_x);
+        code = code.replace("shader_rule_x_neg_y", equations.shader_rule_x_neg_y);
+        code = code.replace("shader_rule_x_neg_z", equations.shader_rule_x_neg_z);
+
+        code = code.replace("shader_rule_y_pos_x", equations.shader_rule_y_pos_x);
+        code = code.replace("shader_rule_y_pos_y", equations.shader_rule_y_pos_y);
+        code = code.replace("shader_rule_y_pos_z", equations.shader_rule_y_pos_z);        
+        code = code.replace("shader_rule_y_neg_x", equations.shader_rule_y_neg_x);
+        code = code.replace("shader_rule_y_neg_y", equations.shader_rule_y_neg_y);
+        code = code.replace("shader_rule_y_neg_z", equations.shader_rule_y_neg_z);
+
+        code = code.replace("shader_rule_z_pos_x", equations.shader_rule_z_pos_x);
+        code = code.replace("shader_rule_z_pos_y", equations.shader_rule_z_pos_y);
+        code = code.replace("shader_rule_z_pos_z", equations.shader_rule_z_pos_z);        
+        code = code.replace("shader_rule_z_neg_x", equations.shader_rule_z_neg_x);
+        code = code.replace("shader_rule_z_neg_y", equations.shader_rule_z_neg_y);
+        code = code.replace("shader_rule_z_neg_z", equations.shader_rule_z_neg_z);
+
+
+        code = code.replace("shader_rule_x_pos_u", equations.shader_rule_x_pos_u);
+        code = code.replace("shader_rule_x_pos_v", equations.shader_rule_x_pos_v);
+        code = code.replace("shader_rule_x_pos_w", equations.shader_rule_x_pos_w);        
+        code = code.replace("shader_rule_x_neg_u", equations.shader_rule_x_neg_u);
+        code = code.replace("shader_rule_x_neg_v", equations.shader_rule_x_neg_v);
+        code = code.replace("shader_rule_x_neg_w", equations.shader_rule_x_neg_w);
+
+        code = code.replace("shader_rule_y_pos_u", equations.shader_rule_y_pos_u);
+        code = code.replace("shader_rule_y_pos_v", equations.shader_rule_y_pos_v);
+        code = code.replace("shader_rule_y_pos_w", equations.shader_rule_y_pos_w);        
+        code = code.replace("shader_rule_y_neg_u", equations.shader_rule_y_neg_u);
+        code = code.replace("shader_rule_y_neg_v", equations.shader_rule_y_neg_v);
+        code = code.replace("shader_rule_y_neg_w", equations.shader_rule_y_neg_w);
+
+        code = code.replace("shader_rule_z_pos_u", equations.shader_rule_z_pos_u);
+        code = code.replace("shader_rule_z_pos_v", equations.shader_rule_z_pos_v);
+        code = code.replace("shader_rule_z_pos_w", equations.shader_rule_z_pos_w);        
+        code = code.replace("shader_rule_z_neg_u", equations.shader_rule_z_neg_u);
+        code = code.replace("shader_rule_z_neg_v", equations.shader_rule_z_neg_v);
+        code = code.replace("shader_rule_z_neg_w", equations.shader_rule_z_neg_w);
+
+        return code;
+    }
 
 }
 
