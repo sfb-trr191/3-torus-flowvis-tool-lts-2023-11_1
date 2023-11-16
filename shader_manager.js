@@ -236,6 +236,7 @@ class ShaderManager {
                 console.log("Error unknonw space");
                 break;
         }
+        code = this.ReplaceComputationModules(code);
         code = code.replace("shader_formula_u", shader_formula_u);
         code = code.replace("shader_formula_v", shader_formula_v);
         code = code.replace("shader_formula_w", shader_formula_w);
@@ -506,6 +507,12 @@ class ShaderManager {
         var ok_right = this.container_side.check_status(gl_side, ext_parallel_side);
         this.shaders_linked = ok_left && ok_right;
         this.settings_changed = false;
+    }
+
+    ReplaceComputationModules(code){
+        code = code.replace("$SHADER_MODULE_COMPUTE_PHI$", SHADER_MODULE_COMPUTE_PHI);
+        code = code.replace("$SHADER_MODULE_COMPUTE_BOUNDS$", SHADER_MODULE_COMPUTE_BOUNDS);
+        return code;
     }
 
     ReplaceEquations(code, equations){

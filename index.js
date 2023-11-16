@@ -58,6 +58,9 @@ const shader_modules_s3_ray_generation = require("./shader/modules/s3/s3_ray_gen
 const shader_modules_s3_shading = require("./shader/modules/s3/s3_shading.glsl");
 const shader_modules_s3_light_integration_definitions = require("./shader/modules/s3/s3_light_integration_definitions.glsl");
 const shader_modules_s3_output_data = require("./shader/modules/s3/s3_output_data.glsl");
+//modules: compute
+const shader_modules_compute_phi = require("./shader/modules/compute/phi.glsl");
+const shader_modules_compute_bounds = require("./shader/modules/compute/bounds.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");
