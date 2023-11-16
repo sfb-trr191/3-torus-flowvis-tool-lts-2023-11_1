@@ -5,6 +5,7 @@ const f_shader_compare = require("./shader/stand_alone/f_shader_compare.glsl");
 const f_shader_average = require("./shader/stand_alone/f_shader_average.glsl");
 const f_shader_compute_flow_map_slice_AB = require("./shader/stand_alone/f_shader_compute_flow_map_slice_AB.glsl");
 const f_shader_compute_flow_map_slice_torus = require("./shader/stand_alone/f_shader_compute_flow_map_slice_torus.glsl");
+const f_shader_compute_flow_map_slice_quotient_space = require("./shader/stand_alone/f_shader_compute_flow_map_slice_quotient_space.glsl");
 const f_shader_compute_flowmap_finite_differences = require("./shader/stand_alone/f_shader_compute_flowmap_finite_differences.glsl");
 const f_shader_compute_ftle_normals = require("./shader/stand_alone/f_shader_compute_ftle_normals.glsl");
 const f_shader_compute_2z_gradient_slice = require("./shader/stand_alone/f_shader_compute_2z_gradient_slice.glsl");
