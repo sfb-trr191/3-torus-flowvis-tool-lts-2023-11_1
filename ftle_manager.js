@@ -113,10 +113,11 @@ class UniformLocationsCompute2zSymmetricColumnSlice {
 
 class FTLEManager {
 
-    constructor(gl, gl_side, p_streamline_context, p_shader_manager) {
+    constructor(gl, gl_side, p_streamline_context, p_shader_manager, p_christoffel) {
         this.p_streamline_context = p_streamline_context;
         this.p_streamline_generator = p_streamline_context.streamline_generator;
         this.p_shader_manager = p_shader_manager;
+        this.p_christoffel = p_christoffel;
         this.dim_x = 100;
         this.dim_y = 100;
         this.dim_z = 100;
@@ -242,7 +243,7 @@ class FTLEManager {
 
         this.program_compute_flowmap_finite_differences = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, 
-            this.p_shader_manager.GetShaderComputeFlowMapFiniteDifferences(space));
+            this.p_shader_manager.GetShaderComputeFlowMapFiniteDifferences(space, this.p_christoffel));
         this.location_compute_flowmap_finite_differences = new UniformLocationsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");

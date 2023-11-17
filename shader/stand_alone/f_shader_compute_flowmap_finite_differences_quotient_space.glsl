@@ -64,25 +64,33 @@ vec3 CalculateCentralDifference(int direction, float h2){
 
     //Calculate central differences without using christoffel symbols
     vec3 central_difference = (value_forward - value_backward) / h2;
+
+    //Rename for user convenience
+    float u1 = value_sample.x;
+    float u2 = value_sample.y;
+    float u3 = value_sample.z;
+    float x1 = position_sample.x;
+    float x2 = position_sample.y;
+    float x3 = position_sample.z;
     
-    //add christoffel
-    if(direction == 0)
+    //add christoffel, ijk, i=function, j=direction, k=change
+    if(direction == 0)//j=0 (1 in mathematical notation)
     {
-        central_difference.x += 0.0;
-        central_difference.y += 0.0;
-        central_difference.z += 0.0;
+        central_difference.x += covariant_derivative_11k;
+        central_difference.y += covariant_derivative_21k;
+        central_difference.z += covariant_derivative_31k;
     }
-    else if(direction == 1)
+    else if(direction == 1)//j=1 (2 in mathematical notation)
     {
-        central_difference.x += 0.0;
-        central_difference.y += 0.0;
-        central_difference.z += 0.0;
+        central_difference.x += covariant_derivative_12k;
+        central_difference.y += covariant_derivative_22k;
+        central_difference.z += covariant_derivative_32k;
     }
-    else
+    else//j=2 (3 in mathematical notation)
     {
-        central_difference.x += 0.0;
-        central_difference.y += 0.0;
-        central_difference.z += 0.0;
+        central_difference.x += covariant_derivative_13k;
+        central_difference.y += covariant_derivative_23k;
+        central_difference.z += covariant_derivative_33k;
     }
     
     return central_difference;

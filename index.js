@@ -352,7 +352,7 @@ const { re } = require("mathjs");
         streamline_context_dynamic = new StreamlineContext("dynamic", lights, ui_seeds, gl, gl_side, dynamic_streamline);
         dynamic_streamline.LinkAndCompleteInitialization(streamline_context_dynamic);
         visibility_manager.Link(streamline_context_static);
-        ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager);
+        ftle_manager = new FTLEManager(gl, gl_side, streamline_context_static, shader_manager, christoffel);
 
         main_camera.SetRenderSizes(1280, 720, 640, 360);
         main_camera.SetDefaultValuesMain();

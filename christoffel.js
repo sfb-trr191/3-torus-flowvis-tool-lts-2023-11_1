@@ -2,6 +2,7 @@ const { string } = require("mathjs");
 const module_utility = require("./utility");
 const GetFormula = module_utility.GetFormula;
 const GetFormulaFloat = module_utility.GetFormulaFloat;
+const regexIntToFloat = module_utility.regexIntToFloat;
 
 class Christoffel {
 
@@ -118,17 +119,18 @@ class Christoffel {
 
 
                 var christoffel_index = this.Transform_christoffel_ijkOneBased_to_index(indices.i, indices.j, k);
-                var christoffel_symbol = this.christoffel_symbols[christoffel_index];
-                if(christoffel_symbol == "0"){
+                var christoffel_symbol = regexIntToFloat(this.christoffel_symbols[christoffel_index]);
+                if(christoffel_symbol == "0.0"){
                     continue;
                 }
                 if(formula != ""){
-                    formula += "+"
+                    if(christoffel_symbol[0] != "-")
+                        formula += "+"
                 }
                 formula += christoffel_symbol + "*" + this.covariant_derivative_symbol + string(k)
             }
             if(formula == ""){
-                formula = "0";
+                formula = "0.0";
             }
             
             this.covariant_derivatives[index] = formula;

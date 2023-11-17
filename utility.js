@@ -172,29 +172,29 @@ exports.clamp = function (x, min_x, max_x) {
 exports.regexIntToFloat = function(input_string) {
     //MARKER_RENAME_SYMBOLS float ignores
 
-    input_string = input_string.replace("x1", "x_one")
-    input_string = input_string.replace("x2", "x_two")
-    input_string = input_string.replace("x3", "x_three")
-    input_string = input_string.replace("x4", "x_four")
+    input_string = input_string.replaceAll("x1", "x_one")
+    input_string = input_string.replaceAll("x2", "x_two")
+    input_string = input_string.replaceAll("x3", "x_three")
+    input_string = input_string.replaceAll("x4", "x_four")
     
-    input_string = input_string.replace("v1", "v_one")
-    input_string = input_string.replace("v2", "v_two")
-    input_string = input_string.replace("v3", "v_three")
-    input_string = input_string.replace("v4", "v_four")
+    input_string = input_string.replaceAll("v1", "v_one")
+    input_string = input_string.replaceAll("v2", "v_two")
+    input_string = input_string.replaceAll("v3", "v_three")
+    input_string = input_string.replaceAll("v4", "v_four")
 
     var string_float = input_string.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
         return ($2 == ".") ? $0 : $0 + ".0";
     });
 
-    string_float = string_float.replace("x_one", "x1")
-    string_float = string_float.replace("x_two", "x2")
-    string_float = string_float.replace("x_three", "x3")
-    string_float = string_float.replace("x_four", "x4")
+    string_float = string_float.replaceAll("x_one", "x1")
+    string_float = string_float.replaceAll("x_two", "x2")
+    string_float = string_float.replaceAll("x_three", "x3")
+    string_float = string_float.replaceAll("x_four", "x4")
 
-    string_float = string_float.replace("v_one", "v1")
-    string_float = string_float.replace("v_two", "v2")
-    string_float = string_float.replace("v_three", "v3")
-    string_float = string_float.replace("v_four", "v4")
+    string_float = string_float.replaceAll("v_one", "v1")
+    string_float = string_float.replaceAll("v_two", "v2")
+    string_float = string_float.replaceAll("v_three", "v3")
+    string_float = string_float.replaceAll("v_four", "v4")
 
     return string_float;
 }
@@ -219,29 +219,29 @@ exports.GetFormulaFloat = function(element_id){
     
     var shader_formula = document.getElementById(element_id).value;
 
-    shader_formula = shader_formula.replace("x1", "x_one")
-    shader_formula = shader_formula.replace("x2", "x_two")
-    shader_formula = shader_formula.replace("x3", "x_three")
-    shader_formula = shader_formula.replace("x4", "x_four")
+    shader_formula = shader_formula.replaceAll("x1", "x_one")
+    shader_formula = shader_formula.replaceAll("x2", "x_two")
+    shader_formula = shader_formula.replaceAll("x3", "x_three")
+    shader_formula = shader_formula.replaceAll("x4", "x_four")
 
-    shader_formula = shader_formula.replace("v1", "v_one")
-    shader_formula = shader_formula.replace("v2", "v_two")
-    shader_formula = shader_formula.replace("v3", "v_three")
-    shader_formula = shader_formula.replace("v4", "v_four")
+    shader_formula = shader_formula.replaceAll("v1", "v_one")
+    shader_formula = shader_formula.replaceAll("v2", "v_two")
+    shader_formula = shader_formula.replaceAll("v3", "v_three")
+    shader_formula = shader_formula.replaceAll("v4", "v_four")
 
     var shader_formula_float = shader_formula.replace(/([0-9]*)([.])*([0-9]+)/gm, function ($0, $1, $2, $3) {
         return ($2 == ".") ? $0 : $0 + ".0";
     });
 
-    shader_formula_float = shader_formula_float.replace("x_one", "x1")
-    shader_formula_float = shader_formula_float.replace("x_two", "x2")
-    shader_formula_float = shader_formula_float.replace("x_three", "x3")
-    shader_formula_float = shader_formula_float.replace("x_four", "x4")
+    shader_formula_float = shader_formula_float.replaceAll("x_one", "x1")
+    shader_formula_float = shader_formula_float.replaceAll("x_two", "x2")
+    shader_formula_float = shader_formula_float.replaceAll("x_three", "x3")
+    shader_formula_float = shader_formula_float.replaceAll("x_four", "x4")
 
-    shader_formula_float = shader_formula_float.replace("v_one", "v1")
-    shader_formula_float = shader_formula_float.replace("v_two", "v2")
-    shader_formula_float = shader_formula_float.replace("v_three", "v3")
-    shader_formula_float = shader_formula_float.replace("v_four", "v4")
+    shader_formula_float = shader_formula_float.replaceAll("v_one", "v1")
+    shader_formula_float = shader_formula_float.replaceAll("v_two", "v2")
+    shader_formula_float = shader_formula_float.replaceAll("v_three", "v3")
+    shader_formula_float = shader_formula_float.replaceAll("v_four", "v4")
 
     return shader_formula_float;
 }

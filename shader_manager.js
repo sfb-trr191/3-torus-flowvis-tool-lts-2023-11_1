@@ -1,3 +1,4 @@
+const { string } = require("mathjs");
 const ShaderContainer = require("./shader_container");
 const module_utility = require("./utility");
 const GetFormula = module_utility.GetFormula;
@@ -246,7 +247,7 @@ class ShaderManager {
         return code;  
     }
 
-    GetShaderComputeFlowMapFiniteDifferences(space){
+    GetShaderComputeFlowMapFiniteDifferences(space, christoffel){
         //get variables
         var equations = new EquationCollection();
 
@@ -266,6 +267,8 @@ class ShaderManager {
         }
         code = this.ReplaceComputationModules(code);
         code = this.ReplaceEquations(code, equations);
+        code = this.ReplaceChristoffel(code, christoffel);
+        console.warn(code);
         return code;  
     }
     
@@ -581,6 +584,16 @@ class ShaderManager {
         code = code.replace("shader_rule_z_neg_v", equations.shader_rule_z_neg_v);
         code = code.replace("shader_rule_z_neg_w", equations.shader_rule_z_neg_w);
 
+        return code;
+    }
+
+    ReplaceChristoffel(code, christoffel){
+        for(var index=0; index<9; index++){
+            var indices = christoffel.Transform_covariant_derivative_index_to_ijOneBased(index);
+            var c = christoffel.covariant_derivatives[index];
+            var s = "covariant_derivative_" + string(indices.i) + string(indices.j) + "k";
+            code = code.replace(s, c);
+        }
         return code;
     }
 
