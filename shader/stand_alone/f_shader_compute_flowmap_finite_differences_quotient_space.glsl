@@ -1,4 +1,17 @@
 global.F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE = `#version 300 es
+//nearly identical to F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE, except texture_flow_map instead of texture_vector_fields
+
+// INPUT TEXTURE
+// this shader uses two vector fields as input 
+// each of the vector fields has dimensions (dim_x, dim_y, dim_z)
+// they are stored together in one texture with dimensions (dim_x, dim_y, 2*dim_z)
+
+// OUTPUT TEXTURE
+// this shader calculates a column of the Jacoby matrix of each point of one slice determined by "slice_index"
+// the uniform "is_forward" determines which of the two scalar fields is used
+// for the backwards scalar field, "dim_z" is added to all indices to access the correct part of the texture
+// the output texture has dimensions (dim_x, dim_y)
+
 precision highp int;                //high precision required for indices / ids etc.
 precision highp isampler3D;         //high precision required for indices / ids etc.
 precision highp float;

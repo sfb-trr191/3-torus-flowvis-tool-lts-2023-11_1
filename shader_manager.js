@@ -293,7 +293,7 @@ class ShaderManager {
         return code;  
     }
 
-    GetShaderCompute2zJacobyColumnSlice(space){
+    GetShaderCompute2zJacobyColumnSlice(space, christoffel){
         //get variables
         var equations = new EquationCollection();
 
@@ -309,8 +309,9 @@ class ShaderManager {
                 console.log("Error unknonw space");
                 break;
         }
-
+        code = this.ReplaceComputationModules(code);
         code = this.ReplaceEquations(code, equations);
+        code = this.ReplaceChristoffel(code, christoffel);
         return code;  
     }
 

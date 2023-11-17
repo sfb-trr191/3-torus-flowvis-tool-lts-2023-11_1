@@ -175,7 +175,7 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_2z_gradient_slice = gl.getAttribLocation(this.program_compute_2z_gradient_slice, "a_position");
     
         this.program_compute_2z_jacoby_column_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE);
+        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_TORUS);
         this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
@@ -269,7 +269,7 @@ class FTLEManager {
 
         this.program_compute_2z_jacoby_column_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, 
-            this.p_shader_manager.GetShaderCompute2zJacobyColumnSlice(space));
+            this.p_shader_manager.GetShaderCompute2zJacobyColumnSlice(space, this.p_christoffel));
         this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
