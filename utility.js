@@ -254,3 +254,22 @@ exports.LogToLinear = function(alpha_log, d){
     return alpha_linear;
 }
 
+//glsl-like
+//step generates a step function by comparing x to edge.
+//For element i of the return value, 0.0 is returned if x[i] < edge[i], and 1.0 is returned otherwise. 
+exports.stepVec3 = function(edge, x){
+    var results = glMatrix.vec3.create();
+    for (var i = 0; i < 3; i++) {
+        results[i] = x[i] < edge[i] ? 0.0 : 1.0;        
+    }
+    return results;
+}
+
+//glsl-like
+exports.clampVec3 = function(x, minVal, maxVal){
+    var results = glMatrix.vec3.create();
+    for (var i = 0; i < 3; i++) {
+        results[i] = Math.min(maxVal, Math.max(x[i], minVal));
+    }
+    return results;
+}
