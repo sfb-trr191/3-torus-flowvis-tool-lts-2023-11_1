@@ -619,10 +619,12 @@ class StreamlineGenerator {
                 iteration_count_at_border += 1;
             }        
             if(iteration_count_at_border == 3){
+                console.warn("REACHED 3 ITERATIONS");
                 break;
             }
     
         }
+        /*
         if(isNaN(b[0]) || isNaN(b[1]) || isNaN(b[2])){
             //console.warn("b is NaN before clamp", b);
             debugger;
@@ -632,6 +634,7 @@ class StreamlineGenerator {
             //console.warn("b is NaN after clamp", b);
             debugger;
         }
+        */
         //console.warn("b", b);
         //console.warn("---PHI END---");
     
@@ -699,7 +702,7 @@ class StreamlineGenerator {
             
             var t_exit = Math.min(t_v[0], Math.min(t_v[1], t_v[2]));
             t_exit += 0.00001;//test: force minimal out of bounds		
-            t_exit = Math.max(0.0, t_exit);		
+            t_exit = Math.max(0.0, t_exit);
 
             //var c = a + t_exit * dir_normalized;
             glMatrix.vec3.scaleAndAdd(c, a, dir_normalized, t_exit);
@@ -721,12 +724,12 @@ class StreamlineGenerator {
             //Apply boundary rule to (c, normalize(dir)) to get c_new and dir_new (because the rules are only valid at the border)
             var dir_new = this.MoveOutOfBoundsDirection3(c, dir_normalized);
             var c_new = this.MoveOutOfBounds3(c);
-    
+
             //Calculate new b
             //b = c_new + dist * normalize(dir_new);
             glMatrix.vec3.normalize(dir_new_normalized, dir_new);
             glMatrix.vec3.scaleAndAdd(b, c_new, dir_new_normalized, dist);
-
+    
             /*
             console.warn("b", b);
             console.warn("c_new", c_new);
@@ -751,12 +754,13 @@ class StreamlineGenerator {
                 iteration_count_at_border += 1;
             }        
             if(iteration_count_at_border == 3){
+                console.warn("REACHED 3 ITERATIONS");
                 break;
             }
     
         }
 
-        b = clampVec3(b, 0.0+epsilon_clamp, 1.0-epsilon_clamp);
+        //b = clampVec3(b, 0.0+epsilon_clamp, 1.0-epsilon_clamp);
 
 
         //Update the flow tracker variable (this is either the entire segment, or the last part that remains in the new FD after exiting the old FD)

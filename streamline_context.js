@@ -171,7 +171,7 @@ class StreamlineContext {
         if(should_use_r3_data){
             raw_data.CopyR3();
         }
-        console.log("FinishStreamlinesPart");
+        console.warn("FinishStreamlinesPart");
 
         this.lod_0.ExtractMultiPolyLines(part_index);
 
