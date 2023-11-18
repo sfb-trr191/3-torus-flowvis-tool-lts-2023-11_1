@@ -260,6 +260,10 @@ class StreamlineGenerator {
         tmp.startIndex = startIndex;
         tmp.signum = signum;
         tmp.i=1;
+        tmp.debug_r3_tracker = glMatrix.vec3.fromValues(
+            raw_data.data[startIndex].position[0],
+            raw_data.data[startIndex].position[1],
+            raw_data.data[startIndex].position[2]);
 
     }
 
@@ -487,7 +491,6 @@ class StreamlineGenerator {
 
         glMatrix.vec3.copy(position_r3, position_previous_r3);//copy from last point
         raw_data.AddEntry(flag, position, position_r3, f_current, signum, time_current, arc_length_current, local_i_previous+1);
-        //console.warn("Add", "START", time_current, position);
     }
 
     addSegmentContinue(bo_calculate_streamlines, position){
@@ -716,7 +719,8 @@ class StreamlineGenerator {
             glMatrix.vec3.subtract(diff_inside, c, a);
             //console.log("diff_inside", diff_inside);
             //console.log("pos_r3", pos_r3);
-            //glMatrix.vec3.add(pos_r3, pos_r3, diff_inside);
+            //glMatrix.vec3.add(pos_r3, pos_r3, diff_inside);            
+            glMatrix.vec3.add(tmp.debug_r3_tracker, tmp.debug_r3_tracker, diff_inside);
     
             //Calculate the distance dist between c and b (that is how far we need to go into the next FD)
             var dist = glMatrix.vec3.distance(c, b);
@@ -766,6 +770,7 @@ class StreamlineGenerator {
         //Update the flow tracker variable (this is either the entire segment, or the last part that remains in the new FD after exiting the old FD)
         //pos_r3 += b - a;
         glMatrix.vec3.subtract(diff_remaining, b, a);
+        glMatrix.vec3.add(tmp.debug_r3_tracker, tmp.debug_r3_tracker, diff_remaining);
 
         this.addSegmentContinue(bo_calculate_streamlines, b);
         /*
@@ -912,6 +917,7 @@ class StreamlineGenerator {
                 var last_entry = raw_data.data[raw_data.data.length-1];
                 this.UpdateTotalStreamlineProgress(tmp.i, last_entry.time_current, last_entry.arc_length_current, bo_calculate_streamlines);
                 //console.warn("last_entry", last_entry)
+                console.warn("#end debug_r3_tracker", tmp.debug_r3_tracker);
                 break;
             }
 
