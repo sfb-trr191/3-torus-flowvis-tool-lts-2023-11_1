@@ -167,6 +167,10 @@ class StreamlineContext {
 
 
         var raw_data = this.GetRawData(part_index);
+        var should_use_r3_data = this.streamline_generator.space == SPACE_3_TORUS && part_index == PART_INDEX_OUTSIDE;
+        if(should_use_r3_data){
+            raw_data.CopyR3();
+        }
         console.log("FinishStreamlinesPart");
 
         this.lod_0.ExtractMultiPolyLines(part_index);

@@ -48,15 +48,22 @@ class RawData {
         //console.log("data: ", this.data);
     }
 
-    AddEntry(flag, position_vec3, f_vec3, signum, time, arc_length, local_i){
+    AddEntry(flag, position_vec3, position_r3, f_vec3, signum, time, arc_length, local_i){
         var new_entry = new RawDataEntry();
         new_entry.flag = flag;
         new_entry.position = glMatrix.vec4.fromValues(position_vec3[0], position_vec3[1], position_vec3[2], 1);
+        new_entry.position_r3 = glMatrix.vec4.fromValues(position_r3[0], position_r3[1], position_r3[2], 1);
         new_entry.u_v_w_signum = glMatrix.vec4.fromValues(f_vec3[0], f_vec3[1], f_vec3[2], signum);
         new_entry.time = time;
         new_entry.arc_length = arc_length;
         new_entry.local_i = local_i; 
         this.data.push(new_entry);
+    }
+
+    CopyR3(){
+        console.log("CopyR3");
+        for (var i = 0; i < this.data.length; i++)
+            glMatrix.vec3.copy(this.data[i].position, this.data[i].position_r3);
     }
 
     MakeDataHomogenous() {

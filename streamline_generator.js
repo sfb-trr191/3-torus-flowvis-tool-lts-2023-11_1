@@ -234,6 +234,7 @@ class StreamlineGenerator {
         raw_data.data.push(new_entry);
         //console.log("this.seeds[i]: ", this.seeds[seed_index]);
         glMatrix.vec4.copy(raw_data.data[startIndex].position, this.seeds[seed_index]);
+        glMatrix.vec4.copy(raw_data.data[startIndex].position_r3, this.seeds[seed_index]);
         raw_data.data[startIndex].u_v_w_signum[3] = this.seed_signums[seed_index];
         raw_data.data[startIndex].flag = this.seed_signums[seed_index];
 
@@ -259,12 +260,6 @@ class StreamlineGenerator {
         tmp.startIndex = startIndex;
         tmp.signum = signum;
         tmp.i=1;
-
-        //we need to store the previous position twice in case we want to calculate inside the FD but store in R3
-        tmp.previous_position_r3 = glMatrix.vec3.create();
-        tmp.previous_position_fd = glMatrix.vec3.create();
-        glMatrix.vec3.copy(tmp.previous_position_r3, startPosition);
-        glMatrix.vec3.copy(tmp.previous_position_fd, startPosition);
 
     }
 
@@ -427,6 +422,7 @@ class StreamlineGenerator {
 
     addSegmentEnd(bo_calculate_streamlines, position){
         var diff = glMatrix.vec3.create();
+        var position_r3 = glMatrix.vec3.create();
 
         //get variables
         var tmp = bo_calculate_streamlines.current_streamline;
@@ -436,6 +432,7 @@ class StreamlineGenerator {
         //data from last point
         var last_entry = raw_data.data[raw_data.data.length-1];
         var position_previous = glMatrix.vec3.fromValues(last_entry.position[0], last_entry.position[1], last_entry.position[2]);
+        var position_previous_r3 = glMatrix.vec3.fromValues(last_entry.position_r3[0], last_entry.position_r3[1], last_entry.position_r3[2]);
         var f_previous = this.f(position_previous, signum);
         var v_previous = glMatrix.vec3.length(f_previous);
         var time_previous = last_entry.time;
@@ -454,12 +451,14 @@ class StreamlineGenerator {
         var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
         var arc_length_current = arc_length_previous + segment_length;
 
-        raw_data.AddEntry(flag, position, f_current, signum, time_current, arc_length_current, local_i_previous+1);
-        console.warn("Add", "END", time_current, position);
+        glMatrix.vec3.add(position_r3, position_previous_r3, diff);
+        raw_data.AddEntry(flag, position, position_r3, f_current, signum, time_current, arc_length_current, local_i_previous+1);
+        //console.warn("Add", "END", time_current, position);
     }
 
     addSegmentStart(bo_calculate_streamlines, position){
         var diff = glMatrix.vec3.create();
+        var position_r3 = glMatrix.vec3.create();
 
         //get variables
         var tmp = bo_calculate_streamlines.current_streamline;
@@ -469,6 +468,7 @@ class StreamlineGenerator {
         //data from last point
         var last_entry = raw_data.data[raw_data.data.length-1];
         var position_previous = glMatrix.vec3.fromValues(last_entry.position[0], last_entry.position[1], last_entry.position[2]);
+        var position_previous_r3 = glMatrix.vec3.fromValues(last_entry.position_r3[0], last_entry.position_r3[1], last_entry.position_r3[2]);
         var f_previous = this.f(position_previous, signum);
         var v_previous = glMatrix.vec3.length(f_previous);
         var time_previous = last_entry.time;
@@ -485,12 +485,14 @@ class StreamlineGenerator {
         var time_current = time_previous;//copy from last point
         var arc_length_current = arc_length_previous;//copy from last point
 
-        raw_data.AddEntry(flag, position, f_current, signum, time_current, arc_length_current, local_i_previous+1);
-        console.warn("Add", "START", time_current, position);
+        glMatrix.vec3.copy(position_r3, position_previous_r3);//copy from last point
+        raw_data.AddEntry(flag, position, position_r3, f_current, signum, time_current, arc_length_current, local_i_previous+1);
+        //console.warn("Add", "START", time_current, position);
     }
 
     addSegmentContinue(bo_calculate_streamlines, position){
         var diff = glMatrix.vec3.create();
+        var position_r3 = glMatrix.vec3.create();
 
         //get variables
         var tmp = bo_calculate_streamlines.current_streamline;
@@ -500,6 +502,7 @@ class StreamlineGenerator {
         //data from last point
         var last_entry = raw_data.data[raw_data.data.length-1];
         var position_previous = glMatrix.vec3.fromValues(last_entry.position[0], last_entry.position[1], last_entry.position[2]);
+        var position_previous_r3 = glMatrix.vec3.fromValues(last_entry.position_r3[0], last_entry.position_r3[1], last_entry.position_r3[2]);
         var f_previous = this.f(position_previous, signum);
         var v_previous = glMatrix.vec3.length(f_previous);
         var time_previous = last_entry.time;
@@ -522,11 +525,12 @@ class StreamlineGenerator {
             tmp.terminate = true;
             flag = 3;//end of polyline
         }
-        raw_data.AddEntry(flag, position, f_current, signum, time_current, arc_length_current, local_i_previous+1);
-        console.warn("Add", flag==3 ? "END" : "", time_current, position);
-        console.warn("   segment_length", segment_length);
-        console.warn("   position_previous", position_previous);
-        console.warn("   position", position);
+        glMatrix.vec3.add(position_r3, position_previous_r3, diff);
+        raw_data.AddEntry(flag, position, position_r3, f_current, signum, time_current, arc_length_current, local_i_previous+1);
+        //console.warn("Add", flag==3 ? "END" : "", time_current, position);
+        //console.warn("   segment_length", segment_length);
+        //console.warn("   position_previous", position_previous);
+        //console.warn("   position", position);
     }
 
     phi(a_input, dir_input)
@@ -639,12 +643,15 @@ class StreamlineGenerator {
     //pos_r3 = tmp.previous_position_r3
     phi_add_segments(a, dir, bo_calculate_streamlines)
     {    
-        console.warn("---PHI ADD SEGMENTS---");
+        //console.warn("---PHI ADD SEGMENTS---");
         var tmp = bo_calculate_streamlines.current_streamline;
-        var a = tmp.previous_position_fd
         var raw_data = bo_calculate_streamlines.raw_data;
         var signum = tmp.signum;
-        var pos_r3 = tmp.previous_position_r3;
+
+        var previousVec4 = raw_data.data[raw_data.data.length-1].position;
+        var a = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
+        var raw_data = bo_calculate_streamlines.raw_data;
+        var signum = tmp.signum;
 
         var b = glMatrix.vec3.create();
         var c = glMatrix.vec3.create();
@@ -706,7 +713,7 @@ class StreamlineGenerator {
             glMatrix.vec3.subtract(diff_inside, c, a);
             //console.log("diff_inside", diff_inside);
             //console.log("pos_r3", pos_r3);
-            glMatrix.vec3.add(pos_r3, pos_r3, diff_inside);
+            //glMatrix.vec3.add(pos_r3, pos_r3, diff_inside);
     
             //Calculate the distance dist between c and b (that is how far we need to go into the next FD)
             var dist = glMatrix.vec3.distance(c, b);
@@ -757,7 +764,6 @@ class StreamlineGenerator {
         glMatrix.vec3.subtract(diff_remaining, b, a);
 
         this.addSegmentContinue(bo_calculate_streamlines, b);
-        glMatrix.vec3.copy(tmp.previous_position_fd, b);
         /*
         if(is_new_segment){
             //b was out of bounds, the part inside was already added, now we add the part in the new FD as a new polyline
@@ -834,7 +840,7 @@ class StreamlineGenerator {
         var tmp = bo_calculate_streamlines.current_streamline;
         var raw_data = bo_calculate_streamlines.raw_data;
         var signum = tmp.signum;
-        console.log("#SC: ContinueStreamlineQuotientSpace", tmp.i);
+        //console.log("#SC: ContinueStreamlineQuotientSpace", tmp.i);
 
         var currentPosition = glMatrix.vec3.create();
         var difference = glMatrix.vec3.create();//current - previous positions, calculated from k values
@@ -851,26 +857,23 @@ class StreamlineGenerator {
         
         while(true){
             //tmp.i starts with 1, the index 0 is the seed
-            var local_i = tmp.i;//does not change even if duplicating point (used for point data)
-            var currentIndex = tmp.startIndex + tmp.i;
-            var previousIndex = currentIndex - 1;
-            var previousVec4 = raw_data.data[previousIndex].position;
+            var previousVec4 = raw_data.data[raw_data.data.length-1].position;
             var previousPosition = glMatrix.vec3.fromValues(previousVec4[0], previousVec4[1], previousVec4[2]);
             
             //---------- START OF RK4 ----------
             //CALCULATE: vec3 k1 = step_size * f(previousPosition, signum);
-            glMatrix.vec3.scale(k1, this.f(tmp.previous_position_fd, signum), this.step_size);
+            glMatrix.vec3.scale(k1, this.f(previousPosition, signum), this.step_size);
 
             //CALCULATE: vec3 k2 = step_size * f(previousPosition + k1/2, signum);
             glMatrix.vec3.scale(k1_2, k1, 1 / 2);// k1_2 = k1/2        
-            glMatrix.vec3.scale(k2, this.f(this.phi(tmp.previous_position_fd, k1_2), signum), this.step_size);
+            glMatrix.vec3.scale(k2, this.f(this.phi(previousPosition, k1_2), signum), this.step_size);
 
             //CALCULATE: vec3 k3 = step_size * f(previousPosition + k2/2, signum);
             glMatrix.vec3.scale(k2_2, k2, 1 / 2);// k2_2 = k2/2
-            glMatrix.vec3.scale(k3, this.f(this.phi(tmp.previous_position_fd, k2_2), signum), this.step_size);
+            glMatrix.vec3.scale(k3, this.f(this.phi(previousPosition, k2_2), signum), this.step_size);
 
             //CALCULATE: vec3 k4 = step_size * f(previousPosition + k3, signum);
-            glMatrix.vec3.scale(k4, this.f(this.phi(tmp.previous_position_fd, k3), signum), this.step_size);
+            glMatrix.vec3.scale(k4, this.f(this.phi(previousPosition, k3), signum), this.step_size);
 
             //CALCULATE: vec3 currentPosition = previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6;
             glMatrix.vec3.scale(k1_6, k1, 1 / 6);// k1_6 = k1/6
@@ -883,8 +886,8 @@ class StreamlineGenerator {
             glMatrix.vec3.add(difference, difference, k3_3);// k1 / 6 + k2 / 3 + k3 / 3
             glMatrix.vec3.add(difference, difference, k4_6);// k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
             
-            console.warn("currentPosition", currentPosition)
-            glMatrix.vec3.add(currentPosition, tmp.previous_position_fd, difference);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+            //console.warn("currentPosition", currentPosition)
+            glMatrix.vec3.add(currentPosition, previousPosition, difference);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
 
             //prepare next iteration: copy current to previous
             //glMatrix.vec3.copy(previousPosition, currentPosition);              
@@ -897,14 +900,14 @@ class StreamlineGenerator {
             //console.warn("tmp.previous_position_fd", tmp.previous_position_fd);
             //console.warn("difference", difference);
             //Next we apply phi to make sure currentPosition is inside the FD, and store all segments needed
-            this.phi_add_segments(tmp.previous_position_fd, difference, bo_calculate_streamlines);
+            this.phi_add_segments(previousPosition, difference, bo_calculate_streamlines);
 
             if (tmp.terminate){
                 tmp.finished = true;
                 //this.InterpolateLastSegment(currentIndex, previousIndex, raw_data);
                 var last_entry = raw_data.data[raw_data.data.length-1];
                 this.UpdateTotalStreamlineProgress(tmp.i, last_entry.time_current, last_entry.arc_length_current, bo_calculate_streamlines);
-                console.warn("last_entry", last_entry)
+                //console.warn("last_entry", last_entry)
                 break;
             }
 
