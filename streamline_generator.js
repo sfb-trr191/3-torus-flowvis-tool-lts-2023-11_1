@@ -457,7 +457,6 @@ class StreamlineGenerator {
 
         glMatrix.vec3.add(position_r3, position_previous_r3, diff);
         raw_data.AddEntry(flag, position, position_r3, f_current, signum, time_current, arc_length_current, local_i_previous+1);
-        //console.warn("Add", "END", time_current, position);
     }
 
     addSegmentStart(bo_calculate_streamlines, position){
@@ -530,10 +529,6 @@ class StreamlineGenerator {
         }
         glMatrix.vec3.add(position_r3, position_previous_r3, diff);
         raw_data.AddEntry(flag, position, position_r3, f_current, signum, time_current, arc_length_current, local_i_previous+1);
-        //console.warn("Add", flag==3 ? "END" : "", time_current, position);
-        //console.warn("   segment_length", segment_length);
-        //console.warn("   position_previous", position_previous);
-        //console.warn("   position", position);
     }
 
     phi(a_input, dir_input)
@@ -556,11 +551,6 @@ class StreamlineGenerator {
     
         //var b = a + dir;  
         glMatrix.vec3.add(b, a, dir);
-
-        //console.warn("---PHI---");
-        //console.warn("a", a);
-        //console.warn("dir", dir);
-        //console.warn("b", b);
 
         var iteration_count_at_border = 0;  
         while(this.CheckOutOfBounds3(b)){
@@ -590,10 +580,6 @@ class StreamlineGenerator {
 
             //var c = a + t_exit * dir_normalized;
             glMatrix.vec3.scaleAndAdd(c, a, dir_normalized, t_exit);
-            //console.warn("-");
-            //console.warn("c", c);
-            //console.warn("dir_normalizedc", dir_normalized);
-            //console.warn("t_exit", t_exit);
         
             //Calculate the distance dist between c and b (that is how far we need to go into the next FD)
             var dist = glMatrix.vec3.distance(c, b);
@@ -606,9 +592,7 @@ class StreamlineGenerator {
             //b = c_new + dist * normalize(dir_new);
             glMatrix.vec3.normalize(dir_new_normalized, dir_new);
             glMatrix.vec3.scaleAndAdd(b, c_new, dir_new_normalized, dist);
-            //console.warn("c_new", c_new);
-            //console.warn("b", b);
-    
+
             //Cleanup for next iteration:
             //a = c_new;
             glMatrix.vec3.copy(a, c_new);
@@ -627,19 +611,6 @@ class StreamlineGenerator {
             }
     
         }
-        /*
-        if(isNaN(b[0]) || isNaN(b[1]) || isNaN(b[2])){
-            //console.warn("b is NaN before clamp", b);
-            debugger;
-        }
-        b = clampVec3(b, 0.0+epsilon_clamp, 1.0-epsilon_clamp);
-        if(isNaN(b[0]) || isNaN(b[1]) || isNaN(b[2])){
-            //console.warn("b is NaN after clamp", b);
-            debugger;
-        }
-        */
-        //console.warn("b", b);
-        //console.warn("---PHI END---");
     
         return b;
     }
@@ -647,7 +618,7 @@ class StreamlineGenerator {
     //a = tmp.previous_position_fd
     //dir = currentPosition - tmp.previous_position_fd 
     //pos_r3 = tmp.previous_position_r3
-    phi_add_segments(a, dir, bo_calculate_streamlines)
+    phi_add_segments(bo_calculate_streamlines, dir)
     {    
         //console.warn("---PHI ADD SEGMENTS---");
         var tmp = bo_calculate_streamlines.current_streamline;
@@ -733,15 +704,7 @@ class StreamlineGenerator {
             //b = c_new + dist * normalize(dir_new);
             glMatrix.vec3.normalize(dir_new_normalized, dir_new);
             glMatrix.vec3.scaleAndAdd(b, c_new, dir_new_normalized, dist);
-    
-            /*
-            console.warn("b", b);
-            console.warn("c_new", c_new);
-            console.warn("dir_new_normalized", dir_new_normalized);
-            console.warn("dist", dist);
-            debug;
-            */
-    
+        
             //Cleanup for next iteration:
             //a = c_new;
             glMatrix.vec3.copy(a, c_new);
@@ -773,77 +736,10 @@ class StreamlineGenerator {
         glMatrix.vec3.add(tmp.debug_r3_tracker, tmp.debug_r3_tracker, diff_remaining);
 
         this.addSegmentContinue(bo_calculate_streamlines, b);
-        /*
-        if(is_new_segment){
-            //b was out of bounds, the part inside was already added, now we add the part in the new FD as a new polyline
-            //add "a" with flag new polyline
-            //add "b" with flag default continue 
-            tmp.terminate = true;
-            console.warn("TERMINATE");
-        }
-        else{
-            //b was not out of bounds, we can directly add "b" as new point with flag default continue
-            console.warn("b stayed inside");
-            var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
-            var f_previous = this.f(tmp.previous_position_fd, signum);
-            var f_current = this.f(b, signum);
-            var v_previous = glMatrix.vec3.length(f_previous);
-            var v_current = glMatrix.vec3.length(f_current);
-            var v_average = (v_previous + v_current) * 0.5;
-            var segment_length = glMatrix.vec3.length(diff_remaining);
 
-            //get data from last point
-            var last_entry = raw_data.data[raw_data.data.length-1];
-            console.warn(last_entry);
-            var time_previous = last_entry.time;
-            var arc_length_previous = last_entry.arc_length;
-
-            var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
-            var arc_length_current = arc_length_previous + segment_length;
-
-            glMatrix.vec3.copy(tmp.previous_position_fd, b);
-            glMatrix.vec3.add(tmp.previous_position_r3, tmp.previous_position_r3, diff_remaining);
-            var pos_add_new =  this.check_bounds ? tmp.previous_position_fd : tmp.previous_position_r3;
-
-            if(this.TerminationChecks(tmp.i, time_current, arc_length_current, bo_calculate_streamlines)){
-                tmp.terminate = true;
-                flag = 3;//end of polyline
-            }
-
-            //generate and add new point
-            var new_entry = new RawDataEntry();
-            new_entry.flag = flag;
-            new_entry.position = glMatrix.vec4.fromValues(pos_add_new[0], pos_add_new[1], pos_add_new[2], 1);
-            new_entry.u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
-            new_entry.time = time_current;
-            new_entry.arc_length = arc_length_current;
-            new_entry.local_i = last_entry.local_i+1;    
-            raw_data.data.push(new_entry);
-            tmp.i += 1;
-
-            //console.warn("b", b);
-            console.warn("added point", new_entry.position);
-        }    
-
-        //console.log("diff_remaining", diff_remaining);
-        //console.log("pos_r3", pos_r3);
-        glMatrix.vec3.add(pos_r3, pos_r3, diff_remaining);
-        console.warn("---PHI ADD SEGMENTS END---");
-        return b;
-        */
     }
 
     ContinueStreamlineQuotientSpace(bo_calculate_streamlines) {
-
-        //debug
-        /*
-        var a = glMatrix.vec3.fromValues(0.95, 0.9, 0.5);
-        var dir = glMatrix.vec3.fromValues(0.2, 0.2, 0.0);
-        this.phi(a, dir);
-        debug;
-        */
-        //end debug
-
         var t_start = performance.now();
 
         var tmp = bo_calculate_streamlines.current_streamline;
@@ -851,7 +747,7 @@ class StreamlineGenerator {
         var signum = tmp.signum;
         //console.log("#SC: ContinueStreamlineQuotientSpace", tmp.i);
 
-        var currentPosition = glMatrix.vec3.create();
+        //var currentPosition = glMatrix.vec3.create();
         var difference = glMatrix.vec3.create();//current - previous positions, calculated from k values
         var k1 = glMatrix.vec3.create();
         var k2 = glMatrix.vec3.create();
@@ -896,7 +792,7 @@ class StreamlineGenerator {
             glMatrix.vec3.add(difference, difference, k4_6);// k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
             
             //console.warn("currentPosition", currentPosition)
-            glMatrix.vec3.add(currentPosition, previousPosition, difference);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+            //glMatrix.vec3.add(currentPosition, previousPosition, difference);// previousPosition + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
 
             //prepare next iteration: copy current to previous
             //glMatrix.vec3.copy(previousPosition, currentPosition);              
@@ -909,7 +805,7 @@ class StreamlineGenerator {
             //console.warn("tmp.previous_position_fd", tmp.previous_position_fd);
             //console.warn("difference", difference);
             //Next we apply phi to make sure currentPosition is inside the FD, and store all segments needed
-            this.phi_add_segments(previousPosition, difference, bo_calculate_streamlines);
+            this.phi_add_segments(bo_calculate_streamlines, difference);
 
             if (tmp.terminate){
                 tmp.finished = true;
@@ -917,143 +813,9 @@ class StreamlineGenerator {
                 var last_entry = raw_data.data[raw_data.data.length-1];
                 this.UpdateTotalStreamlineProgress(tmp.i, last_entry.time_current, last_entry.arc_length_current, bo_calculate_streamlines);
                 //console.warn("last_entry", last_entry)
-                console.warn("#end debug_r3_tracker", tmp.debug_r3_tracker);
+                console.warn("#end debug_r3_tracker and last_entry.position_r3", tmp.debug_r3_tracker, last_entry.position_r3);
                 break;
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            /*
-
-
-
-            var flag = 2;//2=normal point   1=new polyline   3=end polyline   0=skip point
-            var f_previous = this.f(tmp.previous_position_fd, signum);
-            var f_current = this.f(currentPosition, signum);
-            var v_previous = glMatrix.vec3.length(f_previous);
-            var v_current = glMatrix.vec3.length(f_current);
-            var v_average = (v_previous + v_current) * 0.5;
-            var time_previous = raw_data.data[previousIndex].time;
-            var arc_length_previous = raw_data.data[previousIndex].arc_length;
-
-            var difference = glMatrix.vec3.create();
-            glMatrix.vec3.subtract(difference, currentPosition, previousPosition);
-            var segment_length = glMatrix.vec3.length(difference);
-
-            var time_current = time_previous + (segment_length / v_average);//var time_current = time_previous + (this.step_size / v_average);
-            var arc_length_current = arc_length_previous + segment_length;
-
-            //console.log("time_current", time_current);
-
-            //push entry for current index
-            var new_entry = new RawDataEntry();
-            raw_data.data.push(new_entry);
-
-            var terminate = false;
-
-            if(this.TerminationChecks(tmp.i, time_current, arc_length_current, bo_calculate_streamlines)){
-                terminate = true;
-                flag = 3;//end of polyline
-            }
-            else if (this.check_bounds) {
-                var outOfBounds = this.CheckOutOfBounds3(currentPosition);
-                if (outOfBounds) {
-                    flag = 3;//end of polyline
-                    //vectorPosition[currentIndex]= vec4(currentPosition, 3);//3 = end
-                   
-                    if (this.continue_at_bounds) {//if (this.continue_at_bounds && i < this.num_points_per_streamline - 2) {
-                        var movedPosition = this.MoveOutOfBounds3(currentPosition);
-                        var f_movedPosition = this.f(movedPosition, signum);
-                        var v_movedPosition = glMatrix.vec3.length(f_movedPosition);
-
-                        //push entry for moved position (current index + 1)
-                        var new_entry = new RawDataEntry();
-                        raw_data.data.push(new_entry);
-
-                        raw_data.data[currentIndex + 1].flag = signum;//1 or -1 for start
-                        raw_data.data[currentIndex + 1].position = glMatrix.vec4.fromValues(movedPosition[0], movedPosition[1], movedPosition[2], 1);;//1 or -1 for start
-                        raw_data.data[currentIndex + 1].u_v_w_signum = glMatrix.vec4.fromValues(f_movedPosition[0], f_movedPosition[1], f_movedPosition[2], signum);
-                        raw_data.data[currentIndex + 1].time = time_current;
-                        raw_data.data[currentIndex + 1].arc_length = arc_length_current;
-                        raw_data.data[currentIndex + 1].local_i = local_i+1;                        
-                        raw_data.data[currentIndex + 1].velocity = v_movedPosition;
-                        tmp.i++;
-                    }
-                    else {
-                        terminate = true;
-                    }
-                }
-            }
-
-            raw_data.data[currentIndex].flag = flag;
-            raw_data.data[currentIndex].position = glMatrix.vec4.fromValues(currentPosition[0], currentPosition[1], currentPosition[2], 1);
-            raw_data.data[currentIndex].u_v_w_signum = glMatrix.vec4.fromValues(f_current[0], f_current[1], f_current[2], signum);
-            raw_data.data[currentIndex].time = time_current;
-            raw_data.data[currentIndex].arc_length = arc_length_current;
-            raw_data.data[currentIndex].local_i = local_i;               
-
-            //previousPosition = currentPosition;
-            if (terminate){
-                tmp.finished = true;
-                this.InterpolateLastSegment(currentIndex, previousIndex, raw_data);
-                this.UpdateTotalStreamlineProgress(tmp.i, time_current, arc_length_current, bo_calculate_streamlines);
-                break;
-            }
-
-            tmp.i++;
-
-            var t_now = performance.now();
-            var t_diff = Math.ceil(t_now-t_start);
-            if(t_diff > 100){
-                this.UpdateTotalStreamlineProgress(tmp.i, time_current, arc_length_current, bo_calculate_streamlines);
-                break;
-            }
-
-            */
-
         }
     }
 
