@@ -28,56 +28,9 @@ $SHADER_MODULE_COMPUTE_PHI$
 
 void main()
 {    
-    if(true){
-        vec3 central_difference = CalculateCentralDifference(direction, h2);
-        outputColor = vec4(central_difference,1);
-        return;
-    }
-
-    //OLD METHOD BELOW
-
-    int x = int(gl_FragCoord[0]);
-    int y = int(gl_FragCoord[1]);
-
-    int forward_x = x;
-    int forward_y = y;
-    int forward_z = slice_index;
-
-    int backward_x = x;
-    int backward_y = y;
-    int backward_z = slice_index;
-
-    //identify the correct neighboring index. always +1 and -1 because flowmap is padded.
-    //direction X
-    if(direction == 0){
-        forward_x += 1;
-        backward_x -= 1;
-    }
-    //direction Y
-    else if(direction == 1){
-        forward_y += 1;
-        backward_y -= 1;
-    }
-    //direction Z
-    else{
-        forward_z += 1;  
-        backward_z -= 1;
-    }
-    //offset for backward data
-    if(!is_forward){
-        forward_z += dim_z+2; 
-        backward_z += dim_z+2;
-    }
-
-    ivec3 extended_offset = ivec3(1,1,1);
-    ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
-    vec3 forward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
-    
-    pointer = ivec3(backward_x,backward_y,backward_z);
-    vec3 backward_value = texelFetch(texture_flow_map, pointer+extended_offset, 0).rgb;
-
-    vec3 central_difference = (forward_value - backward_value) / h2;
-    outputColor = vec4(central_difference,1);     
+    vec3 central_difference = CalculateCentralDifference(direction, h2);
+    outputColor = vec4(central_difference,1);
+    return;
 }
 
 void ReadFlowmapValues(inout vec3 value_sample, inout vec3 value_forward, inout vec3 value_backward){

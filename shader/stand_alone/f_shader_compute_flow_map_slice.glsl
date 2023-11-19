@@ -30,7 +30,6 @@ const int FTLE_TERMINATION_CONDITION_ARC_LENGTH = 2;
 vec3 f(vec3 vector);
 int CountBorderDimensions(int x_index_extended, int y_index_extended, int z_index_extended);
 vec3 GetStartPosition(int count, int x_index_extended, int y_index_extended, int z_index_extended);
-int CalculateFinalPositionOld(vec3 start_position, inout vec3 final_position);
 int CalculateFinalPositionRelative(vec3 start_position, inout vec3 final_position);
 
 const float PI = 3.1415926535897932384626433832795;
@@ -44,39 +43,6 @@ void main()
     int y_index_extended = int(gl_FragCoord[1]);
     int z_index_extended = slice_index;
     
-    /*
-    x_index_extended = 0;
-    y_index_extended = 50;
-    z_index_extended = 75;
-
-    int mod_num = 2;
-    if(int(gl_FragCoord[0]) / mod_num == 0){
-        x_index_extended = 0;
-    }
-    else if(int(gl_FragCoord[0]) / mod_num == 1){
-        x_index_extended = 1;
-    }
-    else if(int(gl_FragCoord[0]) / mod_num == 2){
-        x_index_extended = 2;
-    }
-    else if(int(gl_FragCoord[0]) / mod_num == 3){
-        x_index_extended = 3;
-    }
-
-    else if(int(gl_FragCoord[0]) / mod_num == 4){
-        x_index_extended = dim_x_extended - 1;
-    }
-    else if(int(gl_FragCoord[0]) / mod_num == 5){
-        x_index_extended = dim_x_extended - 2;
-    }
-    else if(int(gl_FragCoord[0]) / mod_num == 6){
-        x_index_extended = dim_x_extended - 3;
-    }
-    else if(int(gl_FragCoord[0]) / mod_num == 7){
-        x_index_extended = dim_x_extended - 4;
-    }
-    */
-
     int count = CountBorderDimensions(x_index_extended, y_index_extended, z_index_extended);
     if(count > 1){
         outputColor = vec4(0,0,0,0);
@@ -86,19 +52,8 @@ void main()
     vec3 start_position = GetStartPosition(count, x_index_extended, y_index_extended, z_index_extended);
     vec3 final_position = vec3(0,0,0);
     int iteration_count = CalculateFinalPositionRelative(start_position, final_position);
-
-    /*
-    if(int(gl_FragCoord[0]) % mod_num == 0){
-        outputColor = vec4(1000+x_index_extended, start_position);
-    }else if(int(gl_FragCoord[0]) % mod_num == 1){        
-        outputColor = vec4(2000+x_index_extended, final_position);
-    }
-    */
     
     outputColor = vec4(final_position,iteration_count);
-    //WARNING: FOR DEBUG PURPOSES
-    //outputColor = vec4(start_position,iteration_count);
-    //outputColor = vec4(x_index_extended, y_index_extended, start_position.x, start_position.y);
 }
 
 vec3 f(vec3 vector)
@@ -262,64 +217,6 @@ int CalculateFinalPositionRelative(vec3 start_position, inout vec3 final_positio
     }
     final_position = pos_r3;
     return iteration_count;
-}
-
-int CalculateFinalPositionOld(vec3 start_position, inout vec3 final_position)    
-{
-    vec3 previous_position = start_position;
-    vec3 previous_f = f(previous_position);
-    float previous_speed = length(previous_f);
-    float previous_cost = 0.0;//cost = time or length depending on termination_condition
-
-    vec3 current_position;
-    vec3 current_f;
-    float current_speed = 0.0;
-    float current_cost = 0.0;//cost = time or length depending on termination_condition
-
-    float segment_length = 0.0;
-    float average_speed = 0.0;
-    float arc_length = 0.0;
-    int iteration_count = 0;
-    for (int i=0; i<max_iterations; i++){
-        vec3 k1 = step_size * f(previous_position);
-		vec3 k2 = step_size * f(previous_position + k1/2.0);
-		vec3 k3 = step_size * f(previous_position + k2/2.0);
-		vec3 k4 = step_size * f(previous_position + k3);
-				
-		current_position = previous_position + k1 / 6.0 + k2 / 3.0 + k3 / 3.0 + k4 / 6.0;
-        current_f = f(current_position);
-        current_speed = length(current_f);
-        vec3 difference = current_position - previous_position;
-        segment_length = length(difference);
-        arc_length += segment_length;
-        average_speed = (previous_speed + current_speed) * 0.5;
-
-
-        //cost = time or length depending on termination_condition
-        if(termination_condition == FTLE_TERMINATION_CONDITION_ADVECTION_TIME){
-            current_cost = previous_cost + (segment_length / average_speed);
-            //stop if speed is below threshold or advection time is reached
-            if(current_cost > advection_time)
-                break;
-        }else{
-            //FTLE_TERMINATION_CONDITION_ARC_LENGTH
-            current_cost = arc_length;
-            //stop if speed is below threshold or advection time is reached
-            if(current_cost > termination_arc_length)
-                break;
-        }
-
-
-        //prepare next iteration
-        previous_position = current_position;
-        previous_f = current_f;
-        previous_cost = current_cost;
-        previous_speed = current_speed;
-        iteration_count = i;
-    }
-    final_position = current_position;
-    return iteration_count;
-}
-    
+} 
 
 `;
