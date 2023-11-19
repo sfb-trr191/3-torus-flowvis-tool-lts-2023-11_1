@@ -160,30 +160,6 @@ class FTLEManager {
         this.data_texture_ftle_jacoby_direction_y_side = new DataTexture3D_RGBA(gl_side);
         this.data_texture_ftle_jacoby_direction_z_side = new DataTexture3D_RGBA(gl_side);
 
-        this.program_compute_flowmap_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_flowmap_slice, V_SHADER_RAYTRACING, F_SHADER_PLACEHOLDER);
-        this.location_compute_flowmap_slice = new UniformLocationsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
-        this.shader_uniforms_compute_flowmap_slice = this.loadShaderUniformsComputeFlowMapSlice(gl, this.program_compute_flowmap_slice);
-        this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
-
-        this.program_compute_flowmap_finite_differences = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES);
-        this.location_compute_flowmap_finite_differences = new UniformLocationsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
-        this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
-        this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
-
-        this.program_compute_2z_gradient_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_2z_gradient_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_GRADIENT_SLICE);
-        this.location_compute_compute_2z_gradient_slice = new UniformLocationsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
-        this.shader_uniforms_compute_compute_2z_gradient_slice = this.loadShaderUniformsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
-        this.attribute_location_dummy_program_compute_2z_gradient_slice = gl.getAttribLocation(this.program_compute_2z_gradient_slice, "a_position");
-    
-        this.program_compute_2z_jacoby_column_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE);
-        this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
-        this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
-        this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
-
         this.program_compute_2z_symmetric_column_slice = gl.createProgram();
         loadShaderProgramFromCode(gl, this.program_compute_2z_symmetric_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_SYMMETRIC_COLUMN_SLICE);
         this.location_compute_2z_symmetric_column_slice = new UniformLocationsCompute2zSymmetricColumnSlice(gl, this.program_compute_2z_symmetric_column_slice);
