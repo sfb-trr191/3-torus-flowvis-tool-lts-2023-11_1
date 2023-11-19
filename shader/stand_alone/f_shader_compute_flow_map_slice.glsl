@@ -29,6 +29,7 @@ const int FTLE_TERMINATION_CONDITION_ARC_LENGTH = 2;
 
 vec3 f(vec3 vector);
 int CountBorderDimensions();
+vec3 GetStartPosition(int count);
 
 const float PI = 3.1415926535897932384626433832795;
 //! [0]
@@ -39,19 +40,7 @@ void main()
         outputColor = vec4(0,0,0,0);
         return;
     }
-
-
-    int x = int(gl_FragCoord[0]);
-    int y = int(gl_FragCoord[1]);
-    float t_x = float(x) / float(dim_x_extended-1);
-    float t_y = float(y) / float(dim_y_extended-1);
-    float t_z = float(slice_index) / float(dim_z_extended-1);
-
-    float val_x = mix(extended_min_x, extended_max_x, t_x);
-    float val_y = mix(extended_min_y, extended_max_y, t_y);
-    float val_z = mix(extended_min_z, extended_max_z, t_z);
-
-    vec3 previous_position = vec3(val_x, val_y, val_z);
+    vec3 previous_position = GetStartPosition(count);
 
     vec3 previous_f = f(previous_position);
     float previous_speed = length(previous_f);
@@ -132,6 +121,58 @@ int CountBorderDimensions()
     count += (y == 0 || y == dim_y_extended-1) ? 1 : 0;
     count += (z == 0 || z == dim_z_extended-1) ? 1 : 0;
     return count;
+}
+
+vec3 GetStartPosition(int count){
+    vec3 start_position = vec3(0,0,0);
+
+    int x_index = int(gl_FragCoord[0]);
+    int y_index = int(gl_FragCoord[1]);
+    int z_index = slice_index;
+    if(count == 0){
+        float t_x = float(x_index) / float(dim_x_extended-1);
+        float t_y = float(y_index) / float(dim_y_extended-1);
+        float t_z = float(z_index) / float(dim_z_extended-1);
+
+        float val_x = mix(extended_min_x, extended_max_x, t_x);
+        float val_y = mix(extended_min_y, extended_max_y, t_y);
+        float val_z = mix(extended_min_z, extended_max_z, t_z);
+
+        start_position = vec3(val_x, val_y, val_z);        
+    }
+    else{
+        if(x_index == 0){
+            x_index = dim_x_extended - 3;
+        }
+        else if(x_index == dim_x_extended - 1){
+            x_index = 2;
+        }
+
+        if(y_index == 0){
+            y_index = dim_y_extended - 3;
+        }
+        else if(y_index == dim_y_extended - 1){
+            y_index = 2;
+        }
+
+        if(z_index == 0){
+            z_index = dim_z_extended - 3;
+        }
+        else if(z_index == dim_z_extended - 1){
+            z_index = 2;
+        }
+
+        float t_x = float(x_index) / float(dim_x_extended-1);
+        float t_y = float(y_index) / float(dim_y_extended-1);
+        float t_z = float(z_index) / float(dim_z_extended-1);
+
+        float val_x = mix(extended_min_x, extended_max_x, t_x);
+        float val_y = mix(extended_min_y, extended_max_y, t_y);
+        float val_z = mix(extended_min_z, extended_max_z, t_z);
+
+        start_position = vec3(val_x, val_y, val_z);  
+    }
+    return start_position;
 }
 
 `;
