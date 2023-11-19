@@ -25,6 +25,7 @@ const float PI = 3.1415926535897932384626433832795;
 
 $SHADER_MODULE_COMPUTE_BOUNDS$
 $SHADER_MODULE_COMPUTE_PHI$
+$SHADER_MODULE_COMPUTE_CHRISTOFFEL$
 
 void main()
 {    
@@ -114,43 +115,8 @@ vec3 CalculateCentralDifference(int direction, float h2){
     vec3 central_difference = (value_forward - value_backward) / h2;
 
     //Correct the central differences using christoffel symbols
-    central_difference += CorrectionTerm(value_sample, position_sample);
+    central_difference += CorrectionTermChristoffel(value_sample, position_sample);
     
     return central_difference;
 }
-
-vec3 CorrectionTerm(vec3 value_sample, vec3 position_sample){
-    vec3 correction = vec3(0,0,0);
-
-    //Rename for user convenience
-    float u1 = value_sample.x;
-    float u2 = value_sample.y;
-    float u3 = value_sample.z;
-    float x1 = position_sample.x;
-    float x2 = position_sample.y;
-    float x3 = position_sample.z;
-    
-    //add christoffel, ijk, i=function, j=direction, k=change
-    if(direction == 0)//j=0 (1 in mathematical notation)
-    {
-        correction.x += covariant_derivative_11k;
-        correction.y += covariant_derivative_21k;
-        correction.z += covariant_derivative_31k;
-    }
-    else if(direction == 1)//j=1 (2 in mathematical notation)
-    {
-        correction.x += covariant_derivative_12k;
-        correction.y += covariant_derivative_22k;
-        correction.z += covariant_derivative_32k;
-    }
-    else//j=2 (3 in mathematical notation)
-    {
-        correction.x += covariant_derivative_13k;
-        correction.y += covariant_derivative_23k;
-        correction.z += covariant_derivative_33k;
-    }
-
-    return correction;
-}
-
 `;

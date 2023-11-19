@@ -65,6 +65,7 @@ const shader_modules_s3_output_data = require("./shader/modules/s3/s3_output_dat
 //modules: compute
 const shader_modules_compute_phi = require("./shader/modules/compute/phi.glsl");
 const shader_modules_compute_bounds = require("./shader/modules/compute/bounds.glsl");
+const shader_modules_compute_christoffel = require("./shader/modules/compute/christoffel.glsl");
 
 //########## THIRD PARTY MODULES ##########
 const glMatrix = require("gl-matrix");

@@ -517,8 +517,9 @@ class ShaderManager {
 
     ReplaceComputationModules(code){
         code = code.replace("$SHADER_MODULE_SHARED_UTILITY$", SHADER_MODULE_SHARED_UTILITY);
-        code = code.replace("$SHADER_MODULE_COMPUTE_PHI$", SHADER_MODULE_COMPUTE_PHI);
         code = code.replace("$SHADER_MODULE_COMPUTE_BOUNDS$", SHADER_MODULE_COMPUTE_BOUNDS);
+        code = code.replace("$SHADER_MODULE_COMPUTE_PHI$", SHADER_MODULE_COMPUTE_PHI);
+        code = code.replace("$SHADER_MODULE_COMPUTE_CHRISTOFFEL$", SHADER_MODULE_COMPUTE_CHRISTOFFEL);        
         return code;
     }
 
