@@ -227,8 +227,7 @@ class ShaderManager {
         var code;
         switch (space) {
             case SPACE_3_TORUS:
-                //code = F_SHADER_COMPUTE_FLOW_MAP_SLICE_TORUS;
-                code = F_SHADER_COMPUTE_FLOW_MAP_SLICE_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_FLOW_MAP_SLICE;
                 break;
             case SPACE_2_PLUS_2D:
                 code = F_SHADER_COMPUTE_FLOW_MAP_SLICE_AB;
@@ -254,12 +253,11 @@ class ShaderManager {
         var code;
         switch (space) {
             case SPACE_3_TORUS:
-                //code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_TORUS;
                 //code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
-                code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES;                
                 break;
             case SPACE_2_PLUS_2D:
-                code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES;
                 break;
             default:
                 console.log("Error unknonw space");
@@ -279,10 +277,11 @@ class ShaderManager {
         var code;
         switch (space) {
             case SPACE_3_TORUS:
-                code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE_QUOTIENT_SPACE;
+                //code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE;
                 break;
             case SPACE_2_PLUS_2D:
-                code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_2Z_GRADIENT_SLICE;
                 break;
             default:
                 console.log("Error unknonw space");
@@ -300,10 +299,11 @@ class ShaderManager {
         var code;
         switch (space) {
             case SPACE_3_TORUS:
-                code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE;
+                //code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE;
                 break;
             case SPACE_2_PLUS_2D:
-                code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_QUOTIENT_SPACE;
+                code = F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE;
                 break;
             default:
                 console.log("Error unknonw space");

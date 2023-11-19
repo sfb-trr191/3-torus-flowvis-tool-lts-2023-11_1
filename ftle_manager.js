@@ -25,9 +25,15 @@ const FileSaver = require("file-saver");
 class UniformLocationsComputeFlowMapSlice {
     constructor(gl, program, name) {
         console.log("UniformLocationsComputeFlowMapSlice: ", name)
-        this.location_dim_x = gl.getUniformLocation(program, "dim_x");
-        this.location_dim_y = gl.getUniformLocation(program, "dim_y");
-        this.location_dim_z = gl.getUniformLocation(program, "dim_z");
+        this.location_dim_x_extended = gl.getUniformLocation(program, "dim_x_extended");
+        this.location_dim_y_extended = gl.getUniformLocation(program, "dim_y_extended");
+        this.location_dim_z_extended = gl.getUniformLocation(program, "dim_z_extended");
+        this.location_extended_min_x = gl.getUniformLocation(program, "extended_min_x");
+        this.location_extended_min_y = gl.getUniformLocation(program, "extended_min_y");
+        this.location_extended_min_z = gl.getUniformLocation(program, "extended_min_z");
+        this.location_extended_max_x = gl.getUniformLocation(program, "extended_max_x");
+        this.location_extended_max_y = gl.getUniformLocation(program, "extended_max_y");
+        this.location_extended_max_z = gl.getUniformLocation(program, "extended_max_z");
         this.location_slice_index = gl.getUniformLocation(program, "slice_index");
         this.location_sign_f = gl.getUniformLocation(program, "sign_f");        
         this.location_step_size = gl.getUniformLocation(program, "step_size");
@@ -121,11 +127,8 @@ class FTLEManager {
         this.dim_x = 100;
         this.dim_y = 100;
         this.dim_z = 100;
-        this.dim_x_old = 0;
-        this.dim_y_old = 0;
-        this.dim_z_old = 0;
         this.force_symmetric = true;
-        this.UpdateComputeWrapperDims(gl);
+        this.UpdateExtendedDims(gl);
         this.step_size = 0.0125;
         this.advection_time = 0.5;
         this.termination_arc_length = 0.5;
@@ -163,19 +166,19 @@ class FTLEManager {
         this.attribute_location_dummy_program_compute_flowmap_slice = gl.getAttribLocation(this.program_compute_flowmap_slice, "a_position");
 
         this.program_compute_flowmap_finite_differences = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES_TORUS);
+        loadShaderProgramFromCode(gl, this.program_compute_flowmap_finite_differences, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_FLOWMAP_FINITE_DIFFERENCES);
         this.location_compute_flowmap_finite_differences = new UniformLocationsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.shader_uniforms_compute_flowmap_finite_differences = this.loadShaderUniformsComputeFlowMapFiniteDifferences(gl, this.program_compute_flowmap_finite_differences);
         this.attribute_location_dummy_program_compute_flowmap_finite_differences = gl.getAttribLocation(this.program_compute_flowmap_finite_differences, "a_position");
 
         this.program_compute_2z_gradient_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_2z_gradient_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_GRADIENT_SLICE_QUOTIENT_SPACE);
+        loadShaderProgramFromCode(gl, this.program_compute_2z_gradient_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_GRADIENT_SLICE);
         this.location_compute_compute_2z_gradient_slice = new UniformLocationsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
         this.shader_uniforms_compute_compute_2z_gradient_slice = this.loadShaderUniformsCompute2zGradientSlice(gl, this.program_compute_2z_gradient_slice);
         this.attribute_location_dummy_program_compute_2z_gradient_slice = gl.getAttribLocation(this.program_compute_2z_gradient_slice, "a_position");
     
         this.program_compute_2z_jacoby_column_slice = gl.createProgram();
-        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE_TORUS);
+        loadShaderProgramFromCode(gl, this.program_compute_2z_jacoby_column_slice, V_SHADER_RAYTRACING, F_SHADER_COMPUTE_2Z_JACOBY_COLUMN_SLICE);
         this.location_compute_2z_jacoby_column_slice = new UniformLocationsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.shader_uniforms_compute_2z_jacoby_column_slice = this.loadShaderUniformsCompute2zJacobyColumnSlice(gl, this.program_compute_2z_jacoby_column_slice);
         this.attribute_location_dummy_program_compute_2z_jacoby_column_slice = gl.getAttribLocation(this.program_compute_2z_jacoby_column_slice, "a_position");
@@ -189,22 +192,34 @@ class FTLEManager {
         this.dummy_quad = new DummyQuad(gl);
     }
 
-    
-    UpdateComputeWrapperDims(gl) {
-        var changed = this.dim_x != this.dim_x_old
-            || this.dim_y != this.dim_y_old
-            || this.dim_z != this.dim_z_old;
+    UpdateExtendedDims(gl) {
+        var h_x = 1 / (this.dim_x - 1)
+        var h_y = 1 / (this.dim_y - 1)
+        var h_z = 1 / (this.dim_z - 1)
 
-        this.dim_x_old = this.dim_x;
-        this.dim_y_old = this.dim_y;
-        this.dim_z_old = this.dim_z;
+        var dim_x_extended = this.dim_x + 2;
+        var dim_y_extended = this.dim_y + 2;
+        var dim_z_extended = this.dim_z + 2;
+        this.extended_min_x = 0 - h_x;
+        this.extended_min_y = 0 - h_y;
+        this.extended_min_z = 0 - h_z;
+        this.extended_max_x = 1 + h_x;
+        this.extended_max_y = 1 + h_y;
+        this.extended_max_z = 1 + h_z;
+
+        var changed = dim_x_extended != this.dim_x_extended
+            || dim_y_extended != this.dim_y_extended
+            || dim_z_extended != this.dim_z_extended;
+
+        this.dim_x_extended = dim_x_extended;
+        this.dim_y_extended = dim_y_extended;
+        this.dim_z_extended = dim_z_extended;
 
         if(changed){
-            //this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
+            this.compute_wrapper_extended = new ComputeWrapper(gl, "compute_wrapper_extended", this.dim_x_extended, this.dim_y_extended);
             this.compute_wrapper = new ComputeWrapper(gl, "compute_wrapper", this.dim_x, this.dim_y);
         }
     }
-    
 
     ReplaceComputeFlowMapSliceShader(gl) {
         //MARKER_RENAME_SYMBOLS
@@ -322,7 +337,7 @@ class FTLEManager {
         this.dim_x = bo.input_parameters.dim_x;
         this.dim_y = bo.input_parameters.dim_y;
         this.dim_z = bo.input_parameters.dim_z;
-        this.UpdateComputeWrapperDims(bo.gl);
+        this.UpdateExtendedDims(bo.gl);
         this.termination_condition = bo.input_parameters.termination_condition;
         this.advection_time = bo.input_parameters.advection_time;
         this.termination_arc_length = bo.input_parameters.termination_arc_length;
@@ -374,7 +389,7 @@ class FTLEManager {
     execute_flow_map_setup(bo){//bo = bo_calculate_ftle
         //MARKER_MODIFIED_STREAMLINE_CALCULATION
         //TODO: do not use extended dimension, we wrap around instead        
-        this.data_texture_flowmap.initDimensions(bo.gl, this.dim_x, this.dim_y, 2*this.dim_z);
+        this.data_texture_flowmap.initDimensions(bo.gl, this.dim_x_extended, this.dim_y_extended, 2*this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(bo.gl);
         this.ReplaceComputeFlowMapFiniteDifferencesShader(bo.gl);
         this.ReplaceCompute2zGradientSliceShader(bo.gl);
@@ -389,23 +404,23 @@ class FTLEManager {
         //MARKER_MODIFIED_STREAMLINE_CALCULATION
         //TODO: do not use extended dimension, we wrap around instead    
         if(!bo.tmp.finished_forward){
-            if(bo.tmp.i == this.dim_z){
+            if(bo.tmp.i == this.dim_z_extended){
                 bo.tmp.finished_forward = true
                 bo.tmp.i = 0;
             }else{
                 this.computeFlowMapSlice(bo.gl, bo.tmp.i, true);
                 bo.tmp.i += 1;
-                var progress = bo.tmp.i / (2 * this.dim_z)
+                var progress = bo.tmp.i / (2 * this.dim_z_extended)
                 bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_1");
             }
         }
         else{
-            if(bo.tmp.i == this.dim_z){
+            if(bo.tmp.i == this.dim_z_extended){
                 this.enterState(FTLE_STATE_FLOW_MAP_FINISH);
             }else{
                 this.computeFlowMapSlice(bo.gl, bo.tmp.i, false);
                 bo.tmp.i += 1;
-                var progress = (this.dim_z + bo.tmp.i) / (2 * this.dim_z)
+                var progress = (this.dim_z_extended + bo.tmp.i) / (2 * this.dim_z_extended)
                 bo.OnProgressChanged(progress, "progress_bar_calculate_ftle_1");
             }
         }
@@ -657,7 +672,7 @@ class FTLEManager {
         this.dim_x = dim_x;
         this.dim_y = dim_y;
         this.dim_z = dim_z;
-        this.UpdateComputeWrapperDims(gl);
+        this.UpdateExtendedDims(gl);
         this.advection_time = advection_time;
         this.step_size = step_size;
         this.highest_iteration_count = 0;
@@ -676,12 +691,21 @@ class FTLEManager {
     /*
     computeFlowMap(gl) {
         console.log("computeFlowMap");
-        this.data_texture_flowmap.initDimensions(gl, this.dim_x, this.dim_y, 2*this.dim_z);
+        console.log("this.dim_x_extended: ", this.dim_x_extended);
+        console.log("this.dim_y_extended: ", this.dim_y_extended);
+        console.log("this.dim_z_extended: ", this.dim_z_extended);
+        console.log("this.extended_min_x: ", this.extended_min_x);
+        console.log("this.extended_min_y: ", this.extended_min_y);
+        console.log("this.extended_min_z: ", this.extended_min_z);
+        console.log("this.extended_max_x: ", this.extended_max_x);
+        console.log("this.extended_max_y: ", this.extended_max_y);
+        console.log("this.extended_max_z: ", this.extended_max_z);
+        this.data_texture_flowmap.initDimensions(gl, this.dim_x_extended, this.dim_y_extended, 2*this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(gl);
-        for (var i = 0; i < this.dim_z; i++) {
+        for (var i = 0; i < this.dim_z_extended; i++) {
             this.computeFlowMapSlice(gl, i, true);
         }
-        for (var i = 0; i < this.dim_z; i++) {
+        for (var i = 0; i < this.dim_z_extended; i++) {
             this.computeFlowMapSlice(gl, i, false);
         }
         this.data_texture_flowmap.update(gl);
@@ -691,15 +715,21 @@ class FTLEManager {
     computeFlowMapSlice(gl, slice_index, is_forward) {
         var sign_f = is_forward ? 1.0 : -1.0;
         //var sign_f = 1.0;
-        var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z;
+        var slice_index_combined_texture = is_forward ? slice_index : slice_index + this.dim_z_extended;
         //var z = slice_index / (this.dim_z - 1);
         //console.log("computeFlowMapSlice: ", slice_index);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper.frame_buffer);
-        gl.viewport(0, 0, this.dim_x, this.dim_y);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.compute_wrapper_extended.frame_buffer);
+        gl.viewport(0, 0, this.dim_x_extended, this.dim_y_extended);
         gl.useProgram(this.program_compute_flowmap_slice);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_x, this.dim_x);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_y, this.dim_y);
-        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_z, this.dim_z);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_x_extended, this.dim_x_extended);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_y_extended, this.dim_y_extended);
+        gl.uniform1i(this.location_compute_flowmap_slice.location_dim_z_extended, this.dim_z_extended);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_x, this.extended_min_x);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_y, this.extended_min_y);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_min_z, this.extended_min_z);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_x, this.extended_max_x);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_y, this.extended_max_y);
+        gl.uniform1f(this.location_compute_flowmap_slice.location_extended_max_z, this.extended_max_z);
         gl.uniform1f(this.location_compute_flowmap_slice.location_step_size, this.step_size);
         gl.uniform1i(this.location_compute_flowmap_slice.location_slice_index, slice_index);
         gl.uniform1f(this.location_compute_flowmap_slice.location_sign_f, sign_f);        
@@ -708,7 +738,7 @@ class FTLEManager {
         gl.uniform1f(this.location_compute_flowmap_slice.location_termination_arc_length, this.termination_arc_length);
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
-        var slice_data = this.readPixelsRGBA(gl, this.dim_x, this.dim_y);
+        var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
         this.data_texture_flowmap.updateSlice(gl, slice_index_combined_texture, slice_data);
 
         var highest_iteration_count_slice = 0;
