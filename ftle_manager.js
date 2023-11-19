@@ -19,6 +19,7 @@ const {
 } = require('ml-matrix');
 const JSZip = require("jszip");
 const FileSaver = require("file-saver");
+const glMatrix = require("gl-matrix");
 //const V_SHADER_RAYTRACING = require("./shader/v_shader_raytracing.js");
 //const F_SHADER_PLACEHOLDER = require("./shader/f_shader_placeholder.glsl");
 
@@ -388,7 +389,8 @@ class FTLEManager {
 
     execute_flow_map_setup(bo){//bo = bo_calculate_ftle
         //MARKER_MODIFIED_STREAMLINE_CALCULATION
-        //TODO: do not use extended dimension, we wrap around instead        
+        //TODO: do not use extended dimension, we wrap around instead      
+        this.createFTLEDebugger();  
         this.data_texture_flowmap.initDimensions(bo.gl, this.dim_x_extended, this.dim_y_extended, 2*this.dim_z_extended);
         this.ReplaceComputeFlowMapSliceShader(bo.gl);
         this.ReplaceComputeFlowMapFiniteDifferencesShader(bo.gl);
@@ -427,6 +429,7 @@ class FTLEManager {
     }
 
     execute_flow_map_finish(bo){//bo = bo_calculate_ftle
+        //this.runFTLEDebuggerTests();
         this.data_texture_flowmap.update(bo.gl);
 
         bo.tmp.h2_x = 2 / (this.dim_x - 1);
@@ -712,6 +715,129 @@ class FTLEManager {
     }
     */
 
+    createFTLEDebugger(){
+        this.ftle_debugger = {};
+    }
+
+    addFTLEDebuggerSlice(slice_data, slice_index){
+        this.ftle_debugger[slice_index] = slice_data;
+    }
+
+    runFTLEDebuggerTests(){
+        var slice_data = this.ftle_debugger[50];
+        console.warn("runFTLEDebuggerTests");
+
+        var data = this.debugPixelFlowMapSlice(slice_data,0,1);
+        console.warn(data);
+        var data = this.debugPixelFlowMapSlice(slice_data,this.dim_x_extended-3,1);
+        console.warn(data);
+        var data = this.debugPixelFlowMapSlice(slice_data,1,1);
+        console.warn(data);
+        var data = this.debugPixelFlowMapSlice(slice_data,this.dim_x_extended-2,1);
+        console.warn(data);
+
+        //this.testFTLEDebuggerPoint(0, 1, 50);
+        //this.testFTLEDebuggerPoint(this.dim_x_extended-3, 1, 50);
+        //this.testFTLEDebuggerPoint(1, 1, 50);
+        //this.testFTLEDebuggerPoint(this.dim_x_extended-2, 1, 50);
+
+        //check inside
+        
+        for(var z_index_extended=0; z_index_extended<this.dim_z_extended; z_index_extended++){
+            for(var y_index_extended=0; y_index_extended<this.dim_y_extended; y_index_extended++){
+                for(var x_index_extended=0; x_index_extended<this.dim_x_extended; x_index_extended++){
+                    this.testFTLEDebuggerPoint(x_index_extended, y_index_extended, z_index_extended);
+                }
+            }
+        }
+        
+
+        debugger;
+    }
+
+    //returns 0 for any node inside the FD
+    //returns 1 for a node that is interesting (i.e. requires boundary rules)
+    //returns 2 for edges --> no computation required
+    //returns 3 for corners --> no computation required
+    CountBorderDimensions(x_index_extended, y_index_extended, z_index_extended)
+    {
+        var count = 0;
+        count += (x_index_extended == 0 || x_index_extended == this.dim_x_extended-1) ? 1 : 0;
+        count += (y_index_extended == 0 || y_index_extended == this.dim_y_extended-1) ? 1 : 0;
+        count += (z_index_extended == 0 || z_index_extended == this.dim_z_extended-1) ? 1 : 0;
+        return count;
+    }
+
+    testFTLEDebuggerPoint(x_index_extended, y_index_extended, z_index_extended){
+        //console.warn("test point", x_index_extended, y_index_extended, z_index_extended);
+
+        //console.warn("    ", value);
+
+        var count = this.CountBorderDimensions(x_index_extended, y_index_extended, z_index_extended);
+        if(count > 1){
+            return;
+        }
+        else if(count == 1){  
+            /*   
+            var x_index_extended_torus_identical = x_index_extended;
+            var y_index_extended_torus_identical = y_index_extended;
+            var z_index_extended_torus_identical = z_index_extended;
+            if(x_index_extended == 0){
+                x_index_extended_torus_identical = this.dim_x_extended-3
+            }
+            else if(x_index_extended == this.dim_x_extended-1){
+                x_index_extended_torus_identical = 2
+            }
+            if(y_index_extended == 0){
+                y_index_extended_torus_identical = this.dim_y_extended-3
+            }
+            else if(y_index_extended == this.dim_y_extended-1){
+                y_index_extended_torus_identical = 2
+            }
+            if(z_index_extended == 0){
+                z_index_extended_torus_identical = this.dim_z_extended-3
+            }
+            else if(z_index_extended == this.dim_z_extended-1){
+                z_index_extended_torus_identical = 2
+            }
+            var slice_data = this.ftle_debugger[z_index_extended];
+            var value = this.debugPixelFlowMapSlice(slice_data, x_index_extended, y_index_extended);
+            var slice_data_identical = this.ftle_debugger[z_index_extended_torus_identical];
+            var value_identical = this.debugPixelFlowMapSlice(slice_data_identical, x_index_extended_torus_identical, y_index_extended_torus_identical);
+            console.warn("test point", x_index_extended, y_index_extended, z_index_extended);
+            console.warn("identical", x_index_extended_torus_identical, y_index_extended_torus_identical, z_index_extended_torus_identical);
+            console.warn("value", value);
+            console.warn("value_identical", value_identical);
+            */
+        }
+        else{
+            var x_index_extended_torus_identical = x_index_extended;
+            var y_index_extended_torus_identical = y_index_extended;
+            var z_index_extended_torus_identical = z_index_extended;
+            if(x_index_extended == 1){
+                x_index_extended_torus_identical = this.dim_x_extended-2
+                var slice_data = this.ftle_debugger[z_index_extended];
+                var value = this.debugPixelFlowMapSlice(slice_data, x_index_extended, y_index_extended);
+                var slice_data_identical = this.ftle_debugger[z_index_extended_torus_identical];
+                var value_identical = this.debugPixelFlowMapSlice(slice_data_identical, x_index_extended_torus_identical, y_index_extended_torus_identical);
+                console.warn("test point", x_index_extended, y_index_extended, z_index_extended);
+                console.warn("identical", x_index_extended_torus_identical, y_index_extended_torus_identical, z_index_extended_torus_identical);
+                console.warn("value", value);
+                console.warn("value_identical", value_identical);
+                console.warn("x diff", Math.abs(value[0] - value_identical[0]));
+            }
+
+        }
+
+
+    }
+
+    debugPixelFlowMapSlice(slice_data, x_index_extended, y_index_extended){
+        var global_index = x_index_extended + this.dim_x_extended * y_index_extended;
+        var p = 4 * global_index;
+        return glMatrix.vec4.fromValues(slice_data[p], slice_data[p+1], slice_data[p+2], slice_data[p+3]);
+    }
+
     computeFlowMapSlice(gl, slice_index, is_forward) {
         var sign_f = is_forward ? 1.0 : -1.0;
         //var sign_f = 1.0;
@@ -739,6 +865,35 @@ class FTLEManager {
 
         this.dummy_quad.draw(gl, this.attribute_location_dummy_program_compute_flowmap_slice);
         var slice_data = this.readPixelsRGBA(gl, this.dim_x_extended, this.dim_y_extended);
+        this.addFTLEDebuggerSlice(slice_data, slice_index);
+        /*
+        //debug special output values
+        var entry_size = 8;
+        for(var i=0; i<8; i++){
+            var p = i * entry_size;
+            console.warn("----------");
+            console.warn("x_index_extended", slice_data[p+0]-1000);
+            console.warn("start_position", slice_data[p+1], slice_data[p+2], slice_data[p+3]);
+            console.warn("x_index_extended", slice_data[p+4]-2000);
+            console.warn("final_position", slice_data[p+5], slice_data[p+6], slice_data[p+7]);
+        }
+        debugger;
+        */
+        /*
+        var list = [0, 1, 2, 101, 100, 99];
+        if(slice_index == 50){
+            var data = this.debugPixelFlowMapSlice(slice_data,0,1);
+            console.warn(data);
+            var data = this.debugPixelFlowMapSlice(slice_data,this.dim_x_extended-3,1);
+            console.warn(data);
+            var data = this.debugPixelFlowMapSlice(slice_data,1,1);
+            console.warn(data);
+            var data = this.debugPixelFlowMapSlice(slice_data,this.dim_x_extended-2,1);
+            console.warn(data);
+            debugger;
+        }
+        */
+
         this.data_texture_flowmap.updateSlice(gl, slice_index_combined_texture, slice_data);
 
         var highest_iteration_count_slice = 0;

@@ -28,8 +28,8 @@ const int FTLE_TERMINATION_CONDITION_ADVECTION_TIME = 1;
 const int FTLE_TERMINATION_CONDITION_ARC_LENGTH = 2;
 
 vec3 f(vec3 vector);
-int CountBorderDimensions();
-vec3 GetStartPosition(int count);
+int CountBorderDimensions(int x_index_extended, int y_index_extended, int z_index_extended);
+vec3 GetStartPosition(int count, int x_index_extended, int y_index_extended, int z_index_extended);
 int CalculateFinalPositionOld(vec3 start_position, inout vec3 final_position);
 
 const float PI = 3.1415926535897932384626433832795;
@@ -38,16 +38,66 @@ $SHADER_MODULE_COMPUTE_BOUNDS$
 $SHADER_MODULE_COMPUTE_PHI$
 //! [0]
 void main()
-{
-    int count = CountBorderDimensions();
+{    
+    int x_index_extended = int(gl_FragCoord[0]);
+    int y_index_extended = int(gl_FragCoord[1]);
+    int z_index_extended = slice_index;
+    
+    /*
+    x_index_extended = 0;
+    y_index_extended = 50;
+    z_index_extended = 75;
+
+    int mod_num = 2;
+    if(int(gl_FragCoord[0]) / mod_num == 0){
+        x_index_extended = 0;
+    }
+    else if(int(gl_FragCoord[0]) / mod_num == 1){
+        x_index_extended = 1;
+    }
+    else if(int(gl_FragCoord[0]) / mod_num == 2){
+        x_index_extended = 2;
+    }
+    else if(int(gl_FragCoord[0]) / mod_num == 3){
+        x_index_extended = 3;
+    }
+
+    else if(int(gl_FragCoord[0]) / mod_num == 4){
+        x_index_extended = dim_x_extended - 1;
+    }
+    else if(int(gl_FragCoord[0]) / mod_num == 5){
+        x_index_extended = dim_x_extended - 2;
+    }
+    else if(int(gl_FragCoord[0]) / mod_num == 6){
+        x_index_extended = dim_x_extended - 3;
+    }
+    else if(int(gl_FragCoord[0]) / mod_num == 7){
+        x_index_extended = dim_x_extended - 4;
+    }
+    */
+
+    int count = CountBorderDimensions(x_index_extended, y_index_extended, z_index_extended);
     if(count > 1){
         outputColor = vec4(0,0,0,0);
         return;
     }
-    vec3 start_position = GetStartPosition(count);
+
+    vec3 start_position = GetStartPosition(count, x_index_extended, y_index_extended, z_index_extended);
     vec3 final_position;
     int iteration_count = CalculateFinalPositionOld(start_position, final_position);
+
+    /*
+    if(int(gl_FragCoord[0]) % mod_num == 0){
+        outputColor = vec4(1000+x_index_extended, start_position);
+    }else if(int(gl_FragCoord[0]) % mod_num == 1){        
+        outputColor = vec4(2000+x_index_extended, final_position);
+    }
+    */
+    
     outputColor = vec4(final_position,iteration_count);
+    //WARNING: FOR DEBUG PURPOSES
+    //outputColor = vec4(start_position,iteration_count);
+    //outputColor = vec4(x_index_extended, y_index_extended, start_position.x, start_position.y);
 }
 
 vec3 f(vec3 vector)
@@ -66,15 +116,12 @@ vec3 f(vec3 vector)
 //returns 1 for a node that is interesting (i.e. requires boundary rules)
 //returns 2 for edges --> no computation required
 //returns 3 for corners --> no computation required
-int CountBorderDimensions()
+int CountBorderDimensions(int x_index_extended, int y_index_extended, int z_index_extended)
 {
     int count = 0;
-    int x = int(gl_FragCoord[0]);
-    int y = int(gl_FragCoord[1]);
-    int z = slice_index;
-    count += (x == 0 || x == dim_x_extended-1) ? 1 : 0;
-    count += (y == 0 || y == dim_y_extended-1) ? 1 : 0;
-    count += (z == 0 || z == dim_z_extended-1) ? 1 : 0;
+    count += (x_index_extended == 0 || x_index_extended == dim_x_extended-1) ? 1 : 0;
+    count += (y_index_extended == 0 || y_index_extended == dim_y_extended-1) ? 1 : 0;
+    count += (z_index_extended == 0 || z_index_extended == dim_z_extended-1) ? 1 : 0;
     return count;
 }
 
@@ -94,12 +141,8 @@ vec3 GetPosition(int x_index, int y_index, int z_index)
     return position;
 }
 
-vec3 GetStartPosition(int count){
+vec3 GetStartPosition(int count, int x_index_extended, int y_index_extended, int z_index_extended){
     vec3 start_position = vec3(0,0,0);
-
-    int x_index_extended = int(gl_FragCoord[0]);
-    int y_index_extended = int(gl_FragCoord[1]);
-    int z_index_extended = slice_index;
 
     int dim_x = dim_x_extended - 2;
     int dim_y = dim_y_extended - 2;
@@ -152,9 +195,9 @@ vec3 GetStartPosition(int count){
         int z_index_border = z_index_extended_border - 1;
         vec3 border_position = GetPosition(x_index_border, y_index_border, z_index_border);
         //this results in a point outside the FD:
-        start_position = border_position + vector_from_border_to_this;
+        //start_position = border_position + vector_from_border_to_this;
         //this results in a point inside the FD:
-        //start_position = phi(border_position, vector_from_border_to_this);
+        start_position = phi(border_position, vector_from_border_to_this);
     }
     return start_position;
 }
