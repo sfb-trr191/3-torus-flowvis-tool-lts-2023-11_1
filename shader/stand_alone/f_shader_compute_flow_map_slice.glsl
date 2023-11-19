@@ -126,49 +126,59 @@ int CountBorderDimensions()
 vec3 GetStartPosition(int count){
     vec3 start_position = vec3(0,0,0);
 
-    int x_index = int(gl_FragCoord[0]);
-    int y_index = int(gl_FragCoord[1]);
-    int z_index = slice_index;
+    int x_index_extended = int(gl_FragCoord[0]);
+    int y_index_extended = int(gl_FragCoord[1]);
+    int z_index_extended = slice_index;
     if(count == 0){
-        float t_x = float(x_index) / float(dim_x_extended-1);
-        float t_y = float(y_index) / float(dim_y_extended-1);
-        float t_z = float(z_index) / float(dim_z_extended-1);
-
-        float val_x = mix(extended_min_x, extended_max_x, t_x);
-        float val_y = mix(extended_min_y, extended_max_y, t_y);
-        float val_z = mix(extended_min_z, extended_max_z, t_z);
+        int x_index = x_index_extended - 1;
+        int y_index = y_index_extended - 1;
+        int z_index = z_index_extended - 1;
+        int dim_x = dim_x_extended - 2;
+        int dim_y = dim_y_extended - 2;
+        int dim_z = dim_z_extended - 2;
+        float t_x = float(x_index) / float(dim_x-1);
+        float t_y = float(y_index) / float(dim_y-1);
+        float t_z = float(z_index) / float(dim_z-1);
+        float val_x = mix(0.0, 1.0, t_x);
+        float val_y = mix(0.0, 1.0, t_y);
+        float val_z = mix(0.0, 1.0, t_z);
 
         start_position = vec3(val_x, val_y, val_z);        
     }
     else{
-        if(x_index == 0){
-            x_index = dim_x_extended - 3;
+        if(x_index_extended == 0){
+            x_index_extended = dim_x_extended - 3;
         }
-        else if(x_index == dim_x_extended - 1){
-            x_index = 2;
-        }
-
-        if(y_index == 0){
-            y_index = dim_y_extended - 3;
-        }
-        else if(y_index == dim_y_extended - 1){
-            y_index = 2;
+        else if(x_index_extended == dim_x_extended - 1){
+            x_index_extended = 2;
         }
 
-        if(z_index == 0){
-            z_index = dim_z_extended - 3;
+        if(y_index_extended == 0){
+            y_index_extended = dim_y_extended - 3;
         }
-        else if(z_index == dim_z_extended - 1){
-            z_index = 2;
+        else if(y_index_extended == dim_y_extended - 1){
+            y_index_extended = 2;
         }
 
-        float t_x = float(x_index) / float(dim_x_extended-1);
-        float t_y = float(y_index) / float(dim_y_extended-1);
-        float t_z = float(z_index) / float(dim_z_extended-1);
+        if(z_index_extended == 0){
+            z_index_extended = dim_z_extended - 3;
+        }
+        else if(z_index_extended == dim_z_extended - 1){
+            z_index_extended = 2;
+        }
 
-        float val_x = mix(extended_min_x, extended_max_x, t_x);
-        float val_y = mix(extended_min_y, extended_max_y, t_y);
-        float val_z = mix(extended_min_z, extended_max_z, t_z);
+        int x_index = x_index_extended - 1;
+        int y_index = y_index_extended - 1;
+        int z_index = z_index_extended - 1;
+        int dim_x = dim_x_extended - 2;
+        int dim_y = dim_y_extended - 2;
+        int dim_z = dim_z_extended - 2;
+        float t_x = float(x_index) / float(dim_x-1);
+        float t_y = float(y_index) / float(dim_y-1);
+        float t_z = float(z_index) / float(dim_z-1);
+        float val_x = mix(0.0, 1.0, t_x);
+        float val_y = mix(0.0, 1.0, t_y);
+        float val_z = mix(0.0, 1.0, t_z);
 
         start_position = vec3(val_x, val_y, val_z);  
     }
