@@ -288,7 +288,7 @@ class ShaderManager {
                 console.log("Error unknonw space");
                 break;
         }
-
+        code = this.ReplaceComputationModules(code);
         code = this.ReplaceEquations(code, equations);
         return code;  
     }
