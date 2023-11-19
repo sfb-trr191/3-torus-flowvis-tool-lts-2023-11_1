@@ -123,64 +123,81 @@ int CountBorderDimensions()
     return count;
 }
 
+vec3 GetPosition(int x_index, int y_index, int z_index)
+{
+    int dim_x = dim_x_extended - 2;
+    int dim_y = dim_y_extended - 2;
+    int dim_z = dim_z_extended - 2;
+    float t_x = float(x_index) / float(dim_x-1);
+    float t_y = float(y_index) / float(dim_y-1);
+    float t_z = float(z_index) / float(dim_z-1);
+    float val_x = mix(0.0, 1.0, t_x);
+    float val_y = mix(0.0, 1.0, t_y);
+    float val_z = mix(0.0, 1.0, t_z);
+
+    vec3 position = vec3(val_x, val_y, val_z);
+    return position;
+}
+
 vec3 GetStartPosition(int count){
     vec3 start_position = vec3(0,0,0);
 
     int x_index_extended = int(gl_FragCoord[0]);
     int y_index_extended = int(gl_FragCoord[1]);
     int z_index_extended = slice_index;
+
+    int dim_x = dim_x_extended - 2;
+    int dim_y = dim_y_extended - 2;
+    int dim_z = dim_z_extended - 2;
+    float d_x = 1.0 / float(dim_x - 1);
+    float d_y = 1.0 / float(dim_y - 1);
+    float d_z = 1.0 / float(dim_z - 1);
+
     if(count == 0){
         int x_index = x_index_extended - 1;
         int y_index = y_index_extended - 1;
         int z_index = z_index_extended - 1;
-        int dim_x = dim_x_extended - 2;
-        int dim_y = dim_y_extended - 2;
-        int dim_z = dim_z_extended - 2;
-        float t_x = float(x_index) / float(dim_x-1);
-        float t_y = float(y_index) / float(dim_y-1);
-        float t_z = float(z_index) / float(dim_z-1);
-        float val_x = mix(0.0, 1.0, t_x);
-        float val_y = mix(0.0, 1.0, t_y);
-        float val_z = mix(0.0, 1.0, t_z);
-
-        start_position = vec3(val_x, val_y, val_z);        
+        start_position = GetPosition(x_index, y_index, z_index);        
     }
     else{
+        int x_index_extended_border = x_index_extended;
+        int y_index_extended_border = y_index_extended;
+        int z_index_extended_border = z_index_extended;
+        vec3 vector_from_border_to_this = vec3(0,0,0);
+
         if(x_index_extended == 0){
-            x_index_extended = dim_x_extended - 3;
+            x_index_extended_border = 1;
+            vector_from_border_to_this[0] = - d_x;
         }
         else if(x_index_extended == dim_x_extended - 1){
-            x_index_extended = 2;
+            x_index_extended_border = dim_x_extended - 2;
+            vector_from_border_to_this[0] = d_x;
         }
 
         if(y_index_extended == 0){
-            y_index_extended = dim_y_extended - 3;
+            y_index_extended_border = 1;
+            vector_from_border_to_this[1] = - d_y;
         }
         else if(y_index_extended == dim_y_extended - 1){
-            y_index_extended = 2;
+            y_index_extended_border = dim_y_extended - 2;
+            vector_from_border_to_this[1] = d_y;
         }
 
         if(z_index_extended == 0){
-            z_index_extended = dim_z_extended - 3;
+            z_index_extended_border = 1;
+            vector_from_border_to_this[2] = - d_z;
         }
         else if(z_index_extended == dim_z_extended - 1){
-            z_index_extended = 2;
+            z_index_extended_border = dim_z_extended - 2;
+            vector_from_border_to_this[2] = d_z;
         }
 
-        int x_index = x_index_extended - 1;
-        int y_index = y_index_extended - 1;
-        int z_index = z_index_extended - 1;
-        int dim_x = dim_x_extended - 2;
-        int dim_y = dim_y_extended - 2;
-        int dim_z = dim_z_extended - 2;
-        float t_x = float(x_index) / float(dim_x-1);
-        float t_y = float(y_index) / float(dim_y-1);
-        float t_z = float(z_index) / float(dim_z-1);
-        float val_x = mix(0.0, 1.0, t_x);
-        float val_y = mix(0.0, 1.0, t_y);
-        float val_z = mix(0.0, 1.0, t_z);
-
-        start_position = vec3(val_x, val_y, val_z);  
+        int x_index_border = x_index_extended_border - 1;
+        int y_index_border = y_index_extended_border - 1;
+        int z_index_border = z_index_extended_border - 1;
+        vec3 border_position = GetPosition(x_index_border, y_index_border, z_index_border);
+        //this results in a point outside the FD
+        start_position = border_position + vector_from_border_to_this;
     }
     return start_position;
 }
