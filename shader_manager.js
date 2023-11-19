@@ -243,6 +243,7 @@ class ShaderManager {
         code = code.replace("shader_formula_a", shader_formula_a);
         code = code.replace("shader_formula_b", shader_formula_b);
         code = this.ReplaceEquations(code, equations);
+        console.warn(code);
         return code;  
     }
 

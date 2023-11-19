@@ -581,6 +581,15 @@ class StreamlineGenerator {
             //var c = a + t_exit * dir_normalized;
             glMatrix.vec3.scaleAndAdd(c, a, dir_normalized, t_exit);
         
+            /*
+            console.warn("dir_normalized", dir_normalized);
+            console.warn("dir_inv", dir_inv);
+            console.warn("t_exit", t_exit);
+            console.warn("c", c);
+            debugger;
+            */
+
+
             //Calculate the distance dist between c and b (that is how far we need to go into the next FD)
             var dist = glMatrix.vec3.distance(c, b);
     
@@ -746,6 +755,25 @@ class StreamlineGenerator {
         var raw_data = bo_calculate_streamlines.raw_data;
         var signum = tmp.signum;
         //console.log("#SC: ContinueStreamlineQuotientSpace", tmp.i);
+
+
+        /*
+        //debug
+        var dim_x = 100.0;
+        var d_x = 1.0 / (dim_x - 1);
+
+        var result = this.phi(glMatrix.vec3.fromValues(0,0,0), glMatrix.vec3.fromValues(-d_x,0,0));
+        console.warn("d_x:", d_x);
+        console.warn("phi:", result);
+        var start_f = this.f(glMatrix.vec3.fromValues(-d_x,0,0), signum);
+        var result_f = this.f(result, signum);
+        console.warn("start_f:", start_f);
+        console.warn("result_f:", result_f);
+        debugger;
+        //end debug
+        */
+        
+
 
         //var currentPosition = glMatrix.vec3.create();
         var difference = glMatrix.vec3.create();//current - previous positions, calculated from k values
