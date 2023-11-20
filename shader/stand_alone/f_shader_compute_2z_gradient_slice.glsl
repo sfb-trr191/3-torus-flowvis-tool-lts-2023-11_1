@@ -74,14 +74,6 @@ float CalculateCentralDifference(int direction, float h2){
     float value_forward = InterpolateFloat(texture_scalar_fields, position_forward, z_offset);
     float value_backward = InterpolateFloat(texture_scalar_fields, position_backward, z_offset);
 
-    /*
-    ivec3 pointer = ivec3(forward_x,forward_y,forward_z);
-    float forward_value = texelFetch(texture_scalar_fields, pointer, 0).r;
-    
-    pointer = ivec3(backward_x,backward_y,backward_z);
-    float backward_value = texelFetch(texture_scalar_fields, pointer, 0).r;
-    */
-
     float central_difference = (value_forward - value_backward) / h2;
     return central_difference;
 }
