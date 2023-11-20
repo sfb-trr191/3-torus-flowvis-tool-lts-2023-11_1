@@ -38,6 +38,7 @@ const float tubeRadiusOutside = 0.0;//dummy for importing utility
 $SHADER_MODULE_SHARED_UTILITY$
 $SHADER_MODULE_COMPUTE_BOUNDS$
 $SHADER_MODULE_COMPUTE_PHI$
+$SHADER_MODULE_COMPUTE_CHRISTOFFEL$
 
 void main()
 {
@@ -70,7 +71,12 @@ vec3 CalculateCentralDifference(int direction, float h2){
     vec3 value_forward = InterpolateVec3(texture_vector_fields, position_forward, z_offset);
     vec3 value_backward = InterpolateVec3(texture_vector_fields, position_backward, z_offset);
 
+    //Calculate central differences without using christoffel symbols
     vec3 central_difference = (value_forward - value_backward) / h2;
+
+    //Correct the central differences using christoffel symbols
+    central_difference += CorrectionTermChristoffel(value_sample, position_sample);
+
     return central_difference;
 }
 
