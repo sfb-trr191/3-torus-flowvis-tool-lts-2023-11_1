@@ -34,6 +34,16 @@ vec3 phi(vec3 a, vec3 dir)
         vec3 dir_new = MoveOutOfBoundsDirection(c, dir_normalized);
         vec3 c_new = MoveOutOfBounds(c);
 
+        int attempts_left = 10;
+        while(CheckOutOfBounds(c_new)){
+            dir_new = MoveOutOfBoundsDirection(c_new, normalize(dir_new));
+            c_new = MoveOutOfBounds(c_new);
+            if(attempts_left == 0){
+                break;
+            }
+            attempts_left--;
+        }
+
         //Calculate new b
         b = c_new + dist * normalize(dir_new);
 
@@ -94,6 +104,16 @@ vec3 phi_track(vec3 a, vec3 dir, inout vec3 pos_r3)
         //Apply boundary rule to (c, normalize(dir)) to get c_new and dir_new (because the rules are only valid at the border)
         vec3 dir_new = MoveOutOfBoundsDirection(c, dir_normalized);
         vec3 c_new = MoveOutOfBounds(c);
+
+        int attempts_left = 10;
+        while(CheckOutOfBounds(c_new)){
+            dir_new = MoveOutOfBoundsDirection(c_new, normalize(dir_new));
+            c_new = MoveOutOfBounds(c_new);
+            if(attempts_left == 0){
+                break;
+            }
+            attempts_left--;
+        }
 
         //Calculate new b
         b = c_new + dist * normalize(dir_new);
