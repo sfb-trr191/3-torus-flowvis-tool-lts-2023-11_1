@@ -3,6 +3,7 @@ const ShaderContainer = require("./shader_container");
 const module_utility = require("./utility");
 const GetFormula = module_utility.GetFormula;
 const GetFormulaFloat = module_utility.GetFormulaFloat;
+const regexIntToFloat = module_utility.regexIntToFloat;
 
 class EquationCollection {
     
@@ -80,9 +81,10 @@ class ShaderManager {
         this.dict_shaders_side = {};
     }
 
-    Link(canvas_wrapper_main, canvas_wrapper_side){
+    Link(canvas_wrapper_main, canvas_wrapper_side, metric){
         this.canvas_wrapper_main = canvas_wrapper_main;
         this.canvas_wrapper_side = canvas_wrapper_side;
+        this.metric = metric;
     }
 
     NotifySettingsChanged(){
@@ -151,6 +153,7 @@ class ShaderManager {
         code = code.replace("$defines$", defines);
         
         code = this.ReplaceEquations(code, equations);
+        code = this.ReplaceMetric(code);
 
         console.log("code:", code);
         return code;
@@ -197,6 +200,7 @@ class ShaderManager {
             code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_OUT_OF_BOUNDS);
             code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", SHADER_MODULE_DEFAULT_HANDLE_INSIDE);
             code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", SHADER_MODULE_DEFAULT_HANDLE_OUT_OF_BOUNDS);
+            code = code.replace("$SHADER_MODULE_DEFAULT_METRIC$", SHADER_MODULE_DEFAULT_METRIC);
         }           
         
 
@@ -411,6 +415,7 @@ class ShaderManager {
             key += ";"+equations.shader_rule_z_neg_v 
             key += ";"+equations.shader_rule_z_neg_w 
         }
+        key += ";"+this.metric.toString()
         console.log("shader key:", key);       
         return key;
     }
@@ -595,6 +600,16 @@ class ShaderManager {
             var indices = christoffel.Transform_covariant_derivative_index_to_ijOneBased(index);
             var c = christoffel.covariant_derivatives[index];
             var s = "covariant_derivative_" + string(indices.i) + string(indices.j) + "k";
+            code = code.replace(s, c);
+        }
+        return code;
+    }
+
+    ReplaceMetric(code){
+        for(var index=0; index<9; index++){
+            var indices = this.metric.Transform_metric_index_to_ijOneBased(index);
+            var c = regexIntToFloat(this.metric.metric_values[index]);
+            var s = "metric_tensor_r" + string(indices.i) + "c" + string(indices.j);
             code = code.replace(s, c);
         }
         return code;

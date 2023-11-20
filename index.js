@@ -37,6 +37,7 @@ const shader_modules_volume_rendering = require("./shader/modules/default/defaul
 const shader_modules_default_bisection = require("./shader/modules/default/default_bisection.glsl");
 const shader_modules_handle_inside = require("./shader/modules/default/default_handle_inside.glsl");
 const shader_modules_handle_out_of_bounds = require("./shader/modules/default/default_handle_out_of_bounds.glsl");
+const shader_modules_metric = require("./shader/modules/default/default_metric.glsl");
 //modules: shared
 const shader_modules_shared_utility = require("./shader/modules/shared/shared_utility.glsl");
 const shader_modules_data_access = require("./shader/modules/shared/shared_data_access.glsl");
@@ -123,6 +124,7 @@ const gram_schmidt = require("./gram_schmidt");
 const VERSION_REDIRECTION_DICT = require("./version_redirection_dict").VERSION_REDIRECTION_DICT;
 const ExampleManager = require("./example_manager");
 const Christoffel = require("./christoffel");
+const Metric = require("./metric");
 
 
 const math4D = require("./math4D");
@@ -215,6 +217,7 @@ const { re } = require("mathjs");
     var is_mobile;
 
     var christoffel;
+    var metric;
 
     function onStart(evt) {
         console.log("onStart");
@@ -308,6 +311,7 @@ const { re } = require("mathjs");
         mouse_manager.initialize();
 
         christoffel = new Christoffel();
+        metric = new Metric();
 
         //buildErrorDictionary();
 
@@ -419,7 +423,7 @@ const { re } = require("mathjs");
         canvas_wrapper_transfer_function = new CanvasWrapperTransferFunction(gl_transfer_function, CANVAS_WRAPPER_TRANSFER_FUNCTION, 
             transfer_function_canvas, CANVAS_TRANSFER_FUNCTION_WIDTH, CANVAS_TRANSFER_FUNCTION_HEIGHT, global_data, transfer_function_manager);
 
-        shader_manager.Link(canvas_wrapper_main, canvas_wrapper_side);
+        shader_manager.Link(canvas_wrapper_main, canvas_wrapper_side, metric);
         mouse_manager.Link(ui_left_tool_bar, canvas_wrapper_main, canvas_wrapper_side);
 
         tick_counter = 0;
@@ -433,7 +437,7 @@ const { re } = require("mathjs");
 
         initializeAttributes();
 
-        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools, christoffel);
+        input_parameter_wrapper = new InputParameterWrapper(tree_view, ui_seeds, main_camera, side_camera, transfer_function_manager, tab_manager, state_manager, ui_tools, christoffel, metric);
         input_parameter_wrapper.fromURLVersion();
         RedirectVersion();
         input_parameter_wrapper.fromURL();
@@ -1394,6 +1398,7 @@ const { re } = require("mathjs");
         settings_changed = true;
 
         christoffel.ReadChristoffelSymbolsFromUI();
+        metric.ReadFromUI();
 
         ui_seeds.UpdateChanges();
         onChangedDrawMode();

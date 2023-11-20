@@ -16,17 +16,17 @@ void GetRidgeInformation(bool forward, vec3 sample_position, inout RidgeInformat
     vec3 ev = vec3(0,0,0);
     bool ok = mat3RidgeEigenNoThreshold(sample_hessian, lambda, ev);
 
-    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_X_AXIS && dot(ev, vec3(1,0,0)) > 0.0){
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_X_AXIS && dot_using_metric(ev, vec3(1,0,0), sample_position) > 0.0){
         ev = -ev;
     }
-    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_Y_AXIS && dot(ev, vec3(0,1,0)) > 0.0){
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_Y_AXIS && dot_using_metric(ev, vec3(0,1,0), sample_position) > 0.0){
         ev = -ev;
     }
-    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_Z_AXIS && dot(ev, vec3(0,0,1)) > 0.0){
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_Z_AXIS && dot_using_metric(ev, vec3(0,0,1), sample_position) > 0.0){
         ev = -ev;
     }
 
-    float dot_grad_ev = dot(sample_gradient, ev);
+    float dot_grad_ev = dot_using_metric(sample_gradient, ev, sample_position);
 
     //RidgeInformation info;
     info.ok = ok;
@@ -40,7 +40,7 @@ void GetRidgeInformation(bool forward, vec3 sample_position, inout RidgeInformat
 
 bool IntervalHasSignChange(RidgeInformation info_start, RidgeInformation info_stop){
     float info_stop_dot_grad_ev = info_stop.dot_grad_ev;
-    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_LOCAL && dot(info_start.ev, info_stop.ev) < 0.0){
+    if(eigen_orientation_method == EIGEN_ORIENTATION_METHOD_LOCAL && dot_using_metric(info_start.ev, info_stop.ev, info_start.sample_position) < 0.0){
         info_stop_dot_grad_ev = -info_stop.dot_grad_ev;
     }
     return (info_start.dot_grad_ev > 0.0) ? (info_stop_dot_grad_ev < 0.0) : (info_stop_dot_grad_ev > 0.0);

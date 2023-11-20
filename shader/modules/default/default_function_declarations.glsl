@@ -9,6 +9,7 @@ float GetScalar(vec3 position);
 vec3 RayLightFunctionPos(vec3 position, vec3 direction);
 vec3 RayLightFunctionDir(vec3 position, vec3 direction);
 vec3 RayLightFunctionPosExplicit(inout ExplicitIntegrationData explicitIntegrationData);
+float dot_using_metric(vec3 a, vec3 b, vec3 position);
 
 //**********************************************************
 
