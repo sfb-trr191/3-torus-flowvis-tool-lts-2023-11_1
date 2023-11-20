@@ -22,6 +22,9 @@ class BackgroundObjectCalculateFTLE{
         this.input_parameters.termination_arc_length = parseFloat(document.getElementById("input_ftle_termination_arc_length").value);
         this.input_parameters.step_size = parseFloat(document.getElementById("input_ftle_step_size").value);
         this.input_parameters.force_symmetric = document.getElementById("input_ftle_calculation_force_symmetric").checked;
+        this.input_parameters.always_central_differences = document.getElementById("input_ftle_calculation_always_central_differences").checked;
+
+        
     }
 
     start(){

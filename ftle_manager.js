@@ -56,6 +56,7 @@ class UniformLocationsComputeFlowMapFiniteDifferences {
         this.location_direction = gl.getUniformLocation(program, "direction");
         this.location_h2 = gl.getUniformLocation(program, "h2");
         this.location_is_forward = gl.getUniformLocation(program, "is_forward");
+        this.location_use_forward_and_backward_at_border = gl.getUniformLocation(program, "use_forward_and_backward_at_border");
     }
 }
 
@@ -86,6 +87,7 @@ class UniformLocationsCompute2zGradientSlice {
         this.location_h2_y = gl.getUniformLocation(program, "h2_y");
         this.location_h2_z = gl.getUniformLocation(program, "h2_z");
         this.location_is_forward = gl.getUniformLocation(program, "is_forward");
+        this.location_use_forward_and_backward_at_border = gl.getUniformLocation(program, "use_forward_and_backward_at_border");
     }
 }
 
@@ -100,6 +102,7 @@ class UniformLocationsCompute2zJacobyColumnSlice {
         this.location_direction = gl.getUniformLocation(program, "direction");
         this.location_h2 = gl.getUniformLocation(program, "h2");
         this.location_is_forward = gl.getUniformLocation(program, "is_forward");
+        this.location_use_forward_and_backward_at_border = gl.getUniformLocation(program, "use_forward_and_backward_at_border");
     }
 }
 
@@ -136,6 +139,7 @@ class FTLEManager {
         this.termination_condition = FTLE_TERMINATION_CONDITION_ADVECTION_TIME;
         this.ftle_max_value = 0;
         this.ftle_min_value = 0;
+        this.use_forward_and_backward_at_border = true;//false = central differences everywhere using phi to get correct position
 
         //temporary textures
         this.data_texture_flowmap = new DataTexture3D_RGBA(gl);
@@ -320,6 +324,8 @@ class FTLEManager {
         this.termination_arc_length = bo.input_parameters.termination_arc_length;
         this.step_size = bo.input_parameters.step_size;
         this.force_symmetric = bo.input_parameters.force_symmetric;
+        this.always_central_differences = bo.input_parameters.always_central_differences;
+        this.use_forward_and_backward_at_border = !this.always_central_differences;
         this.highest_iteration_count = 0;
         this.enterState(FTLE_STATE_FLOW_MAP_SETUP);
     }
@@ -922,6 +928,9 @@ class FTLEManager {
         gl.uniform1i(this.location_compute_flowmap_finite_differences.location_direction, direction);
         gl.uniform1i(this.location_compute_flowmap_finite_differences.location_is_forward, is_forward);
         gl.uniform1f(this.location_compute_flowmap_finite_differences.location_h2, h2);
+        gl.uniform1i(this.location_compute_flowmap_finite_differences.location_use_forward_and_backward_at_border, this.use_forward_and_backward_at_border);
+
+        
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.data_texture_flowmap.texture.texture);
@@ -1046,6 +1055,7 @@ class FTLEManager {
         gl.uniform1f(this.location_compute_compute_2z_gradient_slice.location_h2_x, h2_x);
         gl.uniform1f(this.location_compute_compute_2z_gradient_slice.location_h2_y, h2_y);
         gl.uniform1f(this.location_compute_compute_2z_gradient_slice.location_h2_z, h2_z);
+        gl.uniform1i(this.location_compute_compute_2z_gradient_slice.location_use_forward_and_backward_at_border, this.use_forward_and_backward_at_border);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle.texture.texture);
@@ -1094,6 +1104,7 @@ class FTLEManager {
             gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_direction, direction);
             gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_is_forward, is_forward);
             gl.uniform1f(this.location_compute_2z_jacoby_column_slice.location_h2, h2);
+            gl.uniform1i(this.location_compute_2z_jacoby_column_slice.location_use_forward_and_backward_at_border, this.use_forward_and_backward_at_border);
     
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_3D, this.data_texture_ftle_gradient.texture.texture);
