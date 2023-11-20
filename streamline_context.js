@@ -130,6 +130,8 @@ class StreamlineContext {
         else {
             this.ClearStreamlinesPart(bo_calculate_streamlines.part_index, bo_calculate_streamlines.gl, bo_calculate_streamlines.gl_side);
         }
+        
+        this.streamline_generator.TestBoundaryRules();
     }
 
     ClearStreamlinesPart(part_index, gl, gl_side) {

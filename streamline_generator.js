@@ -27,6 +27,53 @@ class StreamlineGenerator {
         this.termination_condition = STREAMLINE_TERMINATION_CONDITION_POINTS;
         this.termination_advection_time = 0;
         this.termination_arc_length = 0;
+
+        //for debugging purposes
+        this.debug_phi_changed = false;
+        this.debug_phi_a_input = glMatrix.vec3.create();
+        this.debug_phi_dir_input = glMatrix.vec3.create();
+        this.debug_phi_dir_new = glMatrix.vec3.create();
+        this.debug_phi_c = glMatrix.vec3.create();
+        this.debug_phi_c_new = glMatrix.vec3.create();
+        this.debug_phi_b = glMatrix.vec3.create();
+    }
+
+    TestBoundaryRules(){
+        console.warn("TestBoundaryRules");
+        this.TestPhiOneSample(glMatrix.vec3.fromValues(0.99, 0.7, 0.1), glMatrix.vec3.fromValues(0.02, 0.00, 0.00), 0.02);
+        this.TestPhiOneSample(glMatrix.vec3.fromValues(0.99, 0.7, 0.1), glMatrix.vec3.fromValues(0.02, 0.01, 0.01), 0.02);
+        //debugger;
+    }
+
+    TestPhiOneSample(position, direction, length){
+        glMatrix.vec3.normalize(direction, direction);
+        glMatrix.vec3.scale(direction, direction, length);
+        this.phi(position, direction);
+
+        console.warn("----------");
+        console.warn("input pos", this.debug_phi_a_input);
+        console.warn("input dir", this.debug_phi_dir_input);
+        console.warn("input c", this.debug_phi_c);
+        console.warn("input c_new", this.debug_phi_c_new);
+        console.warn("input b", this.debug_phi_b);
+
+        console.warn("REVERSE");
+        var reverse_direction = glMatrix.vec3.create();
+        glMatrix.vec3.subtract(reverse_direction, this.debug_phi_c_new, this.debug_phi_b);
+        glMatrix.vec3.normalize(reverse_direction, reverse_direction);
+        glMatrix.vec3.scale(reverse_direction, reverse_direction, length);
+        this.phi(this.debug_phi_b, reverse_direction);
+
+        console.warn("input pos", this.debug_phi_a_input);
+        console.warn("input dir", this.debug_phi_dir_input);
+        console.warn("input c", this.debug_phi_c);
+        console.warn("input c_new", this.debug_phi_c_new);
+        console.warn("input b", this.debug_phi_b);
+
+        var diff = glMatrix.vec3.distance(position, this.debug_phi_b);
+        console.warn("start", position);
+        console.warn("stop", this.debug_phi_b);
+        console.warn("diff", diff);
     }
 
     GenerateExampleSeeds() {
@@ -533,6 +580,11 @@ class StreamlineGenerator {
 
     phi(a_input, dir_input)
     {    
+        //for debugging purposes
+        this.debug_phi_changed = false;
+        glMatrix.vec3.copy(this.debug_phi_a_input, a_input);
+        glMatrix.vec3.copy(this.debug_phi_dir_input, dir_input);
+
         var a = glMatrix.vec3.create();
         var dir = glMatrix.vec3.create();
         glMatrix.vec3.copy(a, a_input);
@@ -554,6 +606,8 @@ class StreamlineGenerator {
 
         var iteration_count_at_border = 0;  
         while(this.CheckOutOfBounds3(b)){
+            //for debugging purposes
+            this.debug_phi_changed = true;
             //console.warn("b is out of bounds", b);
             //vec3 dir_normalized = normalize(dir);
             glMatrix.vec3.normalize(dir_normalized, dir);
@@ -580,14 +634,17 @@ class StreamlineGenerator {
 
             //var c = a + t_exit * dir_normalized;
             glMatrix.vec3.scaleAndAdd(c, a, dir_normalized, t_exit);
+            //for debugging purposes
+            glMatrix.vec3.copy(this.debug_phi_c, c);
         
             /*
-            console.warn("dir_normalized", dir_normalized);
-            console.warn("dir_inv", dir_inv);
-            console.warn("t_exit", t_exit);
-            console.warn("c", c);
-            debugger;
+            console.warn("   dir_normalized", dir_normalized);
+            console.warn("   dir_inv", dir_inv);
+            console.warn("   t_exit", t_exit);
+            console.warn("   c", c);
             */
+            //debugger;
+            
 
 
             //Calculate the distance dist between c and b (that is how far we need to go into the next FD)
@@ -596,11 +653,31 @@ class StreamlineGenerator {
             //Apply boundary rule to (c, normalize(dir)) to get c_new and dir_new (because the rules are only valid at the border)
             var dir_new = this.MoveOutOfBoundsDirection3(c, dir_normalized);
             var c_new = this.MoveOutOfBounds3(c);
+            //console.warn("   c_new", c_new);
+            var attempts_left = 10;
+            while(this.CheckOutOfBounds3(c_new)){
+                glMatrix.vec3.normalize(dir_new_normalized, dir_new);
+                dir_new = this.MoveOutOfBoundsDirection3(c_new, dir_new_normalized);
+                c_new = this.MoveOutOfBounds3(c_new);
+                //console.warn("   c_new", c_new);
+                if(attempts_left == 0){
+                    break;
+                }
+                attempts_left--;
+            }
     
             //Calculate new b
             //b = c_new + dist * normalize(dir_new);
             glMatrix.vec3.normalize(dir_new_normalized, dir_new);
             glMatrix.vec3.scaleAndAdd(b, c_new, dir_new_normalized, dist);
+            //console.warn("   c_new", c_new);
+            //console.warn("   dir_new_normalized", dir_new_normalized);
+            //console.warn("   b", b);
+
+            //for debugging purposes
+            glMatrix.vec3.copy(this.debug_phi_dir_new, dir_new);
+            glMatrix.vec3.copy(this.debug_phi_c_new, c_new);
+            glMatrix.vec3.copy(this.debug_phi_b, b);
 
             //Cleanup for next iteration:
             //a = c_new;
@@ -708,6 +785,18 @@ class StreamlineGenerator {
             //Apply boundary rule to (c, normalize(dir)) to get c_new and dir_new (because the rules are only valid at the border)
             var dir_new = this.MoveOutOfBoundsDirection3(c, dir_normalized);
             var c_new = this.MoveOutOfBounds3(c);
+            //console.warn("   c_new", c_new);
+            var attempts_left = 10;
+            while(this.CheckOutOfBounds3(c_new)){
+                glMatrix.vec3.normalize(dir_new_normalized, dir_new);
+                dir_new = this.MoveOutOfBoundsDirection3(c_new, dir_new_normalized);
+                c_new = this.MoveOutOfBounds3(c_new);
+                //console.warn("   c_new", c_new);
+                if(attempts_left == 0){
+                    break;
+                }
+                attempts_left--;
+            }
 
             //Calculate new b
             //b = c_new + dist * normalize(dir_new);
