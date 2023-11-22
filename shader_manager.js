@@ -185,6 +185,7 @@ class ShaderManager {
             code = code.replace("$SHADER_MODULE_OUT_OF_BOUNDS$", "");
             code = code.replace("$SHADER_MODULE_HANDLE_INSIDE$", "");
             code = code.replace("$SHADER_MODULE_HANDLE_OUT_OF_BOUNDS$", "");
+            code = code.replace("$SHADER_MODULE_DEFAULT_METRIC$", "");
         }
         else{
             code = code.replace("$SHADER_MODULE_ADDITIONAL_STRUCTS$", SHADER_MODULE_DEFAULT_STRUCTS);     
