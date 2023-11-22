@@ -3,8 +3,8 @@ const state_description_dict_1 = require("./state_description/1").state_descript
 
 //ON_RELEASE: CHANGE EVERY RELEASE
 global.VERSION_YEAR = 2023;
-global.VERSION_MONTH = 10;
-global.VERSION_NUMBER = 1;
+global.VERSION_MONTH = 1;
+global.VERSION_NUMBER = 11;
 //ON_RELEASE: INCREMENT IF STATE DATA DESCRIPTION CHANGES
 global.STATE_VERSION = 1;
 
